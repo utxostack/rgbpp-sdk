@@ -1,0 +1,29 @@
+{
+  "name": "btc-wallet-poc",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "build:packages": "turbo run build --filter=./packages/*",
+    "lint:fix": "turbo run lint:fix",
+    "lint:fix-all": "prettier --write '{packages,apps}/**/*.{js,jsx,ts,tsx,md,json}'",
+    "clean": "turbo run clean",
+    "clean:packages": "turbo run clean --filter=./packags/*",
+    "clean:dependencies": "pnpm clean:sub-dependencies && rimraf node_modules",
+    "clean:sub-dependencies": "rimraf packages/**/node_modules apps/**/node_modules"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.1",
+    "typescript": "^5.3.3",
+    "prettier": "^3.2.5",
+    "rimraf": "^5.0.5",
+    "turbo": "^1.12.4"
+  },
+  "packageManager": "^pnpm@8.0.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

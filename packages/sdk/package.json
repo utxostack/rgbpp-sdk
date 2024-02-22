@@ -1,0 +1,31 @@
+{
+  "name": "btc-wallet-poc-sdk",
+  "version": "0.1.0",
+  "scripts": {
+    "test": "vitest",
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "prettier --check '{src,tests}/**/*.{js,jsx,ts,tsx}'",
+    "lint:fix": "prettier --write '{src,tests}/**/*.{js,jsx,ts,tsx}'",
+    "clean": "pnpm run clean:cache & pnpm run clean:build",
+    "clean:build": "rimraf lib && pnpm run clean:buildinfo",
+    "clean:buildinfo": "rimraf tsconfig.*tsbuildinfo",
+    "clean:cache": "rimraf .turbo"
+  },
+  "main": "lib",
+  "files": [
+    "lib"
+  ],
+  "dependencies": {
+    "bip32": "^4.0.0",
+    "bitcoinjs-lib": "^6.1.5",
+    "ecpair": "^2.1.0",
+    "lodash": "^4.17.21",
+    "tiny-secp256k1": "^2.2.3"
+  },
+  "devDependencies": {
+    "vitest": "^1.2.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

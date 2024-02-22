@@ -1,0 +1,1 @@
+export const MIN_COLLECTABLE_SATOSHIS = 546;
