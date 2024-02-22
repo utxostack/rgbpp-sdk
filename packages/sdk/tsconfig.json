@@ -3,10 +3,7 @@
     "moduleResolution": "Node",
     "module": "ESNext",
     "target": "ESNext",
-    "lib": [
-      "ESNext",
-      "DOM"
-    ],
+    "lib": ["ESNext", "DOM"],
     "strict": true,
     "noEmit": true,
     "allowJs": true,
@@ -18,8 +15,5 @@
     "resolveJsonModule": true,
     "isolatedModules": true
   },
-  "exclude": [
-    "node_modules",
-    "lib"
-  ]
+  "exclude": ["node_modules", "lib"]
 }

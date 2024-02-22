@@ -22,11 +22,11 @@ interface UniSatApiBalance {
 }
 
 export interface UniSatApiUtxoList {
-  cursor: 0,
-  total: 1,
-  totalConfirmed: 1,
-  totalUnconfirmed: 0,
-  totalUnconfirmedSpend: 0,
+  cursor: 0;
+  total: 1;
+  totalConfirmed: 1;
+  totalUnconfirmed: 0;
+  totalUnconfirmedSpend: 0;
   utxo: UniSatApiUtxo[];
 }
 export interface UniSatApiUtxo {
@@ -55,13 +55,13 @@ export class UniSatOpenApi {
 
   async request<T, R extends UniSatOpenApiResponse<T> = UniSatOpenApiResponse<T>>(
     route: string,
-    options?: UniSatOpenApiRequestOptions
+    options?: UniSatOpenApiRequestOptions,
   ): Promise<R> {
     const params = options?.params ? '?' + new URLSearchParams(options.params).toString() : '';
     const res = await fetch(`${this.apiUrl}/${route}${params}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
+        Authorization: `Bearer ${this.apiKey}`,
       },
     });
 

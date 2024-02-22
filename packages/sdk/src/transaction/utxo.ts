@@ -5,7 +5,12 @@ import { AddressType, UnspentOutput } from '../types';
 import { NetworkType, toPsbtNetwork } from '../network';
 import { MIN_COLLECTABLE_SATOSHIS } from '../constants';
 
-export async function collectSatoshis(openApi: UniSatOpenApi, address: string, satoshi: number, networkType: NetworkType): Promise<{
+export async function collectSatoshis(
+  openApi: UniSatOpenApi,
+  address: string,
+  satoshi: number,
+  networkType: NetworkType,
+): Promise<{
   utxos: UnspentOutput[];
   satoshi: number;
 }> {
@@ -35,10 +40,12 @@ export async function collectSatoshis(openApi: UniSatOpenApi, address: string, s
       vout: utxo.vout,
       satoshi: utxo.satoshi,
       scriptPk: utxo.scriptPk,
-      pubkey: bitcoin.address.fromOutputScript(
-        bitcoin.address.toOutputScript(address, toPsbtNetwork(networkType)),
-        toPsbtNetwork(networkType)
-      ).toString(),
+      pubkey: bitcoin.address
+        .fromOutputScript(
+          bitcoin.address.toOutputScript(address, toPsbtNetwork(networkType)),
+          toPsbtNetwork(networkType),
+        )
+        .toString(),
       // TODO: support other address types
       addressType: AddressType.P2WPKH,
     };

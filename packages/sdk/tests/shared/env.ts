@@ -15,9 +15,7 @@ export const accounts = {
 };
 
 function createAccount(privateKey: string, _network?: bitcoin.Network) {
-  const keyPair = ECPair.fromPrivateKey(
-    Buffer.from(privateKey, 'hex'),
-    { network: _network });
+  const keyPair = ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'), { network: _network });
   const p2wpkh = bitcoin.payments.p2wpkh({
     pubkey: keyPair.publicKey,
     network: _network,

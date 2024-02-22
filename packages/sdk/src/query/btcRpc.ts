@@ -22,7 +22,7 @@ export class BtcRpc {
     const res = await fetch(this.rpcUrl, {
       method: 'POST',
       headers: {
-        'Authorization': 'Basic ' + this.rpcUser,
+        Authorization: 'Basic ' + this.rpcUser,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),

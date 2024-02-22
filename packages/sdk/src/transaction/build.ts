@@ -30,12 +30,7 @@ export class TxBuild {
 
   openApi: UniSatOpenApi;
 
-  constructor(props: {
-    openApi: UniSatOpenApi,
-    networkType: NetworkType,
-    changeAddress: string,
-    fee: number,
-  }) {
+  constructor(props: { openApi: UniSatOpenApi; networkType: NetworkType; changeAddress: string; fee: number }) {
     this.openApi = props.openApi;
 
     this.networkType = props.networkType;
