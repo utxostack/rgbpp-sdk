@@ -1,12 +1,12 @@
 export enum ErrorCodes {
   UNKNOWN,
-  INSUFFICIENT_BTC_UTXO,
+  INSUFFICIENT_UTXO,
   UNSUPPORTED_ADDRESS_TYPE,
 }
 
 export const ErrorMessages = {
   [ErrorCodes.UNKNOWN]: 'Unknown error',
-  [ErrorCodes.INSUFFICIENT_BTC_UTXO]: 'Insufficient btc utxo',
+  [ErrorCodes.INSUFFICIENT_UTXO]: 'Insufficient UTXO',
   [ErrorCodes.UNSUPPORTED_ADDRESS_TYPE]: 'Unsupported address type',
 };
 

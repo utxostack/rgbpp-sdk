@@ -76,7 +76,7 @@ export class UniSatOpenApi {
     return this.request<UniSatApiUtxoList>(`/v1/indexer/address/${address}/utxo-data`, {
       params: {
         cursor: cursor ?? 0,
-        size: size ?? 50,
+        size: size ?? 5000,
       },
     });
   }

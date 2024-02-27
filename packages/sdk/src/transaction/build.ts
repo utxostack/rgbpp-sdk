@@ -1,9 +1,9 @@
 import bitcoin from 'bitcoinjs-lib';
 import { AddressType, UnspentOutput } from '../types';
-import { UniSatOpenApi } from '../query/uniSatOpenApi';
 import { NetworkType, toPsbtNetwork } from '../network';
 import { ErrorCodes, TxBuildError } from '../error';
 import { collectSatoshis } from './utxo';
+import { UtxoSource } from './source';
 
 interface TxInput {
   data: {
@@ -28,10 +28,10 @@ export class TxBuild {
   changedAddress: string;
   fee: number;
 
-  openApi: UniSatOpenApi;
+  source: UtxoSource;
 
-  constructor(props: { openApi: UniSatOpenApi; networkType: NetworkType; changeAddress: string; fee: number }) {
-    this.openApi = props.openApi;
+  constructor(props: { source: UtxoSource; networkType: NetworkType; changeAddress: string; fee: number }) {
+    this.source = props.source;
 
     this.networkType = props.networkType;
     this.changedAddress = props.changeAddress;
@@ -53,7 +53,7 @@ export class TxBuild {
     const outputAmount = this.outputs.reduce((acc, output) => acc + output.value, 0);
     const neededAmount = outputAmount + this.fee;
 
-    const { utxos, satoshi } = await collectSatoshis(this.openApi, address, neededAmount, this.networkType);
+    const { utxos, satoshi } = await collectSatoshis(this.source, address, neededAmount);
     utxos.forEach((utxo) => {
       this.addInput(utxo);
     });
@@ -84,7 +84,7 @@ export function utxoToInput(utxo: UnspentOutput): TxInput {
       hash: utxo.txid,
       index: utxo.vout,
       witnessUtxo: {
-        value: utxo.satoshi,
+        value: utxo.value,
         script: Buffer.from(utxo.scriptPk, 'hex'),
       },
     };

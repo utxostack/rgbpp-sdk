@@ -1,9 +1,9 @@
 export interface UnspentOutput {
   txid: string;
   vout: number;
-  satoshi: number;
+  value: number;
+  address: string;
   scriptPk: string;
-  pubkey: string;
   addressType: AddressType;
 }
 

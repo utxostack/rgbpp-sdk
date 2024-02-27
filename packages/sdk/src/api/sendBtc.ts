@@ -1,6 +1,6 @@
 import { NetworkType } from '../network';
 import { TxBuild } from '../transaction/build';
-import { UniSatOpenApi } from '../query/uniSatOpenApi';
+import { UtxoSource } from '../transaction/source';
 
 export async function sendBtc(props: {
   from: string;
@@ -8,13 +8,13 @@ export async function sendBtc(props: {
     address: string;
     value: number;
   }[];
-  openApi: UniSatOpenApi;
+  source: UtxoSource;
   networkType: NetworkType;
   changeAddress?: string;
   fee: number;
 }) {
   const tx = new TxBuild({
-    openApi: props.openApi,
+    source: props.source,
     changeAddress: props.changeAddress ?? props.from,
     networkType: props.networkType,
     fee: props.fee,
