@@ -3,8 +3,9 @@ export interface UnspentOutput {
   vout: number;
   value: number;
   address: string;
-  scriptPk: string;
   addressType: AddressType;
+  scriptPk: string;
+  pubkey?: string;
 }
 
 export enum AddressType {

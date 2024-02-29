@@ -1,6 +1,63 @@
 import bitcoin from 'bitcoinjs-lib';
 import { AddressType } from './types';
 import { NetworkType, toPsbtNetwork } from './network';
+import { ErrorCodes, TxBuildError } from './error';
+
+/**
+ * Convert public key to bitcoin payment object.
+ */
+export function publicKeyToPayment(publicKey: string, addressType: AddressType, networkType: NetworkType) {
+  if (!publicKey) {
+    return void 0;
+  }
+
+  const network = toPsbtNetwork(networkType);
+  const pubkey = Buffer.from(publicKey, 'hex');
+
+  if (addressType === AddressType.P2PKH) {
+    return bitcoin.payments.p2pkh({
+      pubkey,
+      network,
+    });
+  }
+  if (addressType === AddressType.P2WPKH || addressType === AddressType.M44_P2WPKH) {
+    return bitcoin.payments.p2wpkh({
+      pubkey,
+      network,
+    });
+  }
+  if (addressType === AddressType.P2TR || addressType === AddressType.M44_P2TR) {
+    return bitcoin.payments.p2tr({
+      internalPubkey: pubkey.slice(1, 33),
+      network,
+    });
+  }
+  if (addressType === AddressType.P2SH_P2WPKH) {
+    const data = bitcoin.payments.p2wpkh({
+      pubkey,
+      network,
+    });
+    return bitcoin.payments.p2sh({
+      pubkey,
+      network,
+      redeem: data,
+    });
+  }
+
+  return void 0;
+}
+
+/**
+ * Convert public key to bitcoin address.
+ */
+export function publicKeyToAddress(publicKey: string, addressType: AddressType, networkType: NetworkType) {
+  const payment = publicKeyToPayment(publicKey, addressType, networkType);
+  if (payment && payment.address) {
+    return payment.address;
+  } else {
+    throw new TxBuildError(ErrorCodes.UNSUPPORTED_ADDRESS_TYPE);
+  }
+}
 
 /**
  * Convert bitcoin address to scriptPk.

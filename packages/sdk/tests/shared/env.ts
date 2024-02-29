@@ -1,17 +1,15 @@
-import ECPairFactory from 'ecpair';
 import bitcoin from 'bitcoinjs-lib';
-import * as ecc from 'tiny-secp256k1';
-import { BtcRpc, UniSatOpenApi } from '../../src';
-import { BtcServiceApi } from '../../src/query/btcServiceApi';
+import { NetworkType, BtcAssetsApi, ECPair } from '../../src';
 
-export const ECPair = ECPairFactory(ecc);
+export const networkType = NetworkType.TESTNET;
+
 export const network = bitcoin.networks.testnet;
 
-export const btcRpc = new BtcRpc(process.env.VITE_BTC_RPC_URL!, process.env.VITE_BTC_RPC_USER!);
-
-export const openApi = new UniSatOpenApi(process.env.VITE_OPENAPI_URL!, process.env.VITE_OPENAPI_KEY!);
-
-export const serviceApi = new BtcServiceApi(process.env.VITE_SERVICE_URL!, process.env.VITE_SERVICE_APP!);
+export const assetsApi = new BtcAssetsApi(
+  process.env.VITE_SERVICE_URL!,
+  process.env.VITE_SERVICE_APP!,
+  process.env.VITE_SERVICE_DOMAIN!,
+);
 
 export const accounts = {
   charlie: createAccount('8d3c23d340ac0841e6c3b58a9bbccb9a28e94ab444f972cff35736fa2fcf9f3f', network),

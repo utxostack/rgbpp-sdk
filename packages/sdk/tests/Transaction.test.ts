@@ -1,9 +1,10 @@
 import { describe, it } from 'vitest';
-import { accounts, btcRpc, openApi } from './shared/env';
-import { MIN_COLLECTABLE_SATOSHIS, NetworkType, sendBtc } from '../src';
+import { accounts, networkType, assetsApi } from './shared/env';
+import { DataSource, sendBtc } from '../src';
 
 describe('Transaction', () => {
-  it('Create SegWit BTC transfer', async () => {
+  it('Transfer BTC from P2WPKH address', async () => {
+    const source = new DataSource(assetsApi, networkType);
     const psbt = await sendBtc({
       from: accounts.charlie.p2wpkh.address,
       tos: [
@@ -12,12 +13,9 @@ describe('Transaction', () => {
           value: 1000,
         },
       ],
-      networkType: NetworkType.TESTNET,
-      fee: 200,
-      openApi,
+      networkType,
+      source,
     });
-
-    console.log(psbt.txOutputs);
 
     // Sign & finalize inputs
     psbt.signAllInputs(accounts.charlie.keyPair);
@@ -25,7 +23,10 @@ describe('Transaction', () => {
 
     // Broadcast transaction
     const tx = psbt.extractTransaction();
-    const res = await btcRpc.sendRawTransaction(tx.toHex());
-    console.log(res);
-  });
+    console.log('ins:', tx.ins);
+    console.log('outs:', tx.outs);
+    const res = await assetsApi.sendTransaction(tx.toHex());
+    console.log('txid:', res.txid);
+    console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
+  }, 0);
 });
