@@ -9,6 +9,7 @@ export const assetsApi = new BtcAssetsApi(
   process.env.VITE_SERVICE_URL!,
   process.env.VITE_SERVICE_APP!,
   process.env.VITE_SERVICE_DOMAIN!,
+  process.env.VITE_SERVICE_TOKEN,
 );
 
 export const accounts = {
