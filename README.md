@@ -53,17 +53,19 @@ console.log(res);
 
 ### Constructing transaction
 
-Transfers from a P2WPKH address:
+Transfer from a P2WPKH address:
 ```typescript
-import { sendBtc, DataSource, NetworkType } from 'poc-sdk';
+import { sendBtc, BtcAssetsApi, DataSource, NetworkType } from 'poc-sdk';
 
-const networkType = NetworkType.TESTNET;
 const service = new BtcAssetsApi.fromToken(
   'btc_assets_api_url',
   'your_token'
 );
 
+const networkType = NetworkType.TESTNET;
 const source = new DataSource(service, networkType);
+
+// Create a PSBT
 const psbt = await sendBtc({
   from: 'from_address', // your P2WPKH address
   tos: [
