@@ -73,21 +73,29 @@ export interface BtcAssetsApiTransaction {
 
 export class BtcAssetsApi {
   public url: string;
-  public app: string;
-  public domain: string;
+  public app?: string;
+  public domain?: string;
   private token?: string;
 
-  constructor(url: string, app: string, domain: string, token?: string) {
-    this.url = url;
-    this.app = app;
-    this.domain = domain;
-    if (token) {
-      this.token = token;
-    }
+  constructor(props: { url: string, app?: string, domain?: string, token?: string }) {
+    this.url = props.url;
+
+    // Optional
+    this.app = props.app;
+    this.domain = props.domain;
+    this.token = props.token;
+  }
+
+  static fromToken(url: string, token: string) {
+    return new BtcAssetsApi({ url, token });
+  }
+
+  static fromApp(url: string, app: string, domain: string) {
+    return new BtcAssetsApi({ url, app, domain });
   }
 
   async init(force?: boolean) {
-    // If token exists and not a force action, do nothing
+    // If the token exists and not a force action, do nothing
     if (this.token && !force) {
       return;
     }
@@ -143,11 +151,15 @@ export class BtcAssetsApi {
   }
 
   generateToken() {
+    if (!this.token && !this.app && !this.domain) {
+      throw new TxBuildError(ErrorCodes.ASSETS_API_REQUIRED_APP_INFO);
+    }
+
     return this.post<BtcAssetsApiToken>('/token/generate', {
       requireToken: false,
       body: JSON.stringify({
-        app: this.app,
-        domain: this.domain,
+        app: this.app!,
+        domain: this.domain!,
       }),
     });
   }
