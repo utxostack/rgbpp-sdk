@@ -59,14 +59,14 @@ export class TxBuilder {
     });
   }
 
-  async collectInputsAndPayFee(address: string, fee?: number, extraAmount?: number): Promise<void> {
-    extraAmount = extraAmount ?? 0;
+  async collectInputsAndPayFee(address: string, fee?: number, extraChange?: number): Promise<void> {
+    extraChange = extraChange ?? 0;
     fee = fee ?? 0;
 
     const outputAmount = this.outputs.reduce((acc, out) => acc + out.value, 0);
-    const targetAmount = outputAmount + fee + extraAmount;
+    const targetAmount = outputAmount + fee + extraChange;
 
-    const { utxos, satoshi, changeSatoshi } = await this.source.collectSatoshi(
+    const { utxos, satoshi, exceedSatoshi } = await this.source.collectSatoshi(
       address,
       targetAmount,
       this.minimalSatoshi,
@@ -80,40 +80,45 @@ export class TxBuilder {
       this.addInput(utxo);
     });
 
+    console.log('----');
     console.log(
-      'inputs',
-      this.inputs.map((input) => input.utxo.value),
+      `collecting satoshi: ${targetAmount} = outputAmount(${outputAmount}) + fee(${fee}) + + extraChange(${extraChange})`,
     );
 
-    let lackSatoshi = 0;
     const originalOutputs = clone(this.outputs);
-    if (changeSatoshi > 0) {
-      if (changeSatoshi < this.minimalSatoshi) {
-        lackSatoshi = this.minimalSatoshi - changeSatoshi;
-      }
-      console.log(
-        `changeSatoshi: ${changeSatoshi}, minimalSatoshi: ${this.minimalSatoshi}, lackSatoshi: ${lackSatoshi}`,
-      );
-      const changeValue = Math.max(changeSatoshi, this.minimalSatoshi);
-      this.addOutput(this.changedAddress, changeValue);
+    const changeSatoshi = exceedSatoshi + extraChange;
+    const requireChangeUtxo = changeSatoshi > 0;
+    console.log(
+      `collected satoshi: ${satoshi}, collected utxos: [${this.inputs.map((u) => u.utxo.value)}], returning change: ${changeSatoshi}`,
+    );
+    if (requireChangeUtxo) {
+      this.addOutput(this.changedAddress, changeSatoshi);
     }
 
     const addressType = getAddressType(address);
     const estimatedFee = await this.calculateFee(addressType);
-    console.log(`collectedFee: ${fee}, estimatedFee: ${estimatedFee}`);
-    if (estimatedFee > fee || lackSatoshi > extraAmount) {
+    console.log(`expected fee: ${estimatedFee}`);
+    if (estimatedFee > fee || changeSatoshi < this.minimalSatoshi) {
       this.inputs = originalInputs;
       this.outputs = originalOutputs;
 
-      const newExtraAmount = Math.max(lackSatoshi, extraAmount);
-      console.log(`collectedExtraAmount: ${extraAmount}, newExtraAmount: ${newExtraAmount}`);
-      return await this.collectInputsAndPayFee(address, estimatedFee, newExtraAmount);
+      const nextExtraChange = requireChangeUtxo
+        ? changeSatoshi < this.minimalSatoshi
+          ? this.minimalSatoshi
+          : extraChange
+        : 0;
+
+      console.log(`extra collecting satoshi: ${nextExtraChange}`);
+      return await this.collectInputsAndPayFee(address, estimatedFee, nextExtraChange);
     }
   }
 
   async calculateFee(addressType: AddressType): Promise<number> {
     const psbt = await this.createEstimatedPsbt(addressType);
     const vSize = psbt.extractTransaction(true).virtualSize();
+    console.log(
+      `calculating vSize, vSize: ${vSize}, feeRate: ${this.feeRate}, rawFee: ${vSize * this.feeRate}, ceilFee: ${Math.ceil(vSize * this.feeRate)}`,
+    );
     return Math.ceil(vSize * this.feeRate);
   }
 

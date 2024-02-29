@@ -121,6 +121,7 @@ export class BtcAssetsApi {
     }
 
     if (json && json.ok === false) {
+      console.error(json);
       throw new TxBuildError(
         ErrorCodes.ASSETS_API_RESPONSE_ERROR,
         `${ErrorMessages[ErrorCodes.ASSETS_API_RESPONSE_ERROR]}: ${json.message}`,

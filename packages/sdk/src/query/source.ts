@@ -17,27 +17,32 @@ export class DataSource {
     const utxos = await this.source.getUtxos(address);
 
     const scriptPk = addressToScriptPublicKeyHex(address, this.networkType);
-    return utxos.map((row): UnspentOutput => {
-      return {
-        address,
-        scriptPk,
-        txid: row.txid,
-        vout: row.vout,
-        value: row.value,
-        addressType: getAddressType(address),
-      };
-    });
+    return utxos
+      .sort((a, b) => {
+        const aOrder = `${a.status.block_height}${a.vout}`;
+        const bOrder = `${b.status.block_height}${b.vout}`;
+        return Number(aOrder) - Number(bOrder);
+      })
+      .map((row): UnspentOutput => {
+        return {
+          address,
+          scriptPk,
+          txid: row.txid,
+          vout: row.vout,
+          value: row.value,
+          addressType: getAddressType(address),
+        };
+      });
   }
 
   async collectSatoshi(
     address: string,
     targetAmount: number,
     minimalSatoshi?: number,
-    minimalChangeSatoshi?: number,
   ): Promise<{
     utxos: UnspentOutput[];
     satoshi: number;
-    changeSatoshi: number;
+    exceedSatoshi: number;
   }> {
     const utxos = await this.getUtxos(address);
 
@@ -61,7 +66,7 @@ export class DataSource {
     return {
       utxos: collected,
       satoshi: collectedAmount,
-      changeSatoshi: collectedAmount - targetAmount,
+      exceedSatoshi: collectedAmount - targetAmount,
     };
   }
 }
