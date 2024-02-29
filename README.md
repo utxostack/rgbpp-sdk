@@ -37,9 +37,9 @@ const service = new BtcAssetsApi.fromToken(
 );
 ```
 
-Once the initialization is complete, you can query info from the service:
+Once the initialization is complete, you can query from the service:
 ```typescript
-// Query the balance of a the address
+// Query the balance of an address
 const res = await service.getBalance('tb1qm06rvrq8jyyckzc5v709u7qpthel9j4d9f7nh3');
 
 console.log(res);
@@ -53,7 +53,7 @@ console.log(res);
 
 ### Constructing transaction
 
-Transfer from a P2WPKH address:
+Transfer BTC from a P2WPKH address:
 ```typescript
 import { sendBtc, BtcAssetsApi, DataSource, NetworkType } from 'poc-sdk';
 
@@ -202,5 +202,44 @@ interface BtcAssetsApiTransaction {
     block_hash: string;
     block_time: number;
   };
+}
+```
+
+### Basic
+
+#### UnspentOutput
+```typescript
+interface UnspentOutput {
+  txid: string;
+  vout: number;
+  value: number;
+  address: string;
+  addressType: AddressType;
+  scriptPk: string;
+  pubkey?: string;
+}
+```
+
+#### AddressType
+```typescript
+enum AddressType {
+  P2PKH,
+  P2WPKH,
+  P2TR,
+  P2SH_P2WPKH,
+  M44_P2WPKH, // deprecated
+  M44_P2TR, // deprecated
+  P2WSH,
+  P2SH,
+  UNKNOWN,
+}
+```
+
+#### NetworkType
+```typescript
+enum NetworkType {
+  MAINNET,
+  TESTNET,
+  REGTEST,
 }
 ```
