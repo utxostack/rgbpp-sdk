@@ -1,5 +1,5 @@
 {
-  "name": "btc-wallet-poc",
+  "name": "rgbpp-sdk",
   "private": true,
   "workspaces": [
     "packages/*"

@@ -1,5 +1,5 @@
 {
-  "name": "btc-wallet-poc-sdk",
+  "name": "@rgbpp-sdk/btc",
   "version": "0.1.0",
   "scripts": {
     "test": "vitest",
