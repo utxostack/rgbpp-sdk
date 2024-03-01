@@ -17,7 +17,7 @@ If you don't have a token (API-Key) of the service for your app:
 ```typescript
 import { BtcAssetsApi } from '@rgbpp-sdk/btc';
 
-const service = new BtcAssetsApi.fromApp(
+const service = BtcAssetsApi.fromApp(
   'btc_assets_api_url', 
   'your_app_name', 
   'your_domain'
@@ -31,7 +31,7 @@ Instead, if you already have a token for your app:
 ```typescript
 import { BtcAssetsApi } from '@rgbpp-sdk/btc';
 
-const service = new BtcAssetsApi.fromToken(
+const service = BtcAssetsApi.fromToken(
   'btc_assets_api_url', 
   'your_token'
 );
@@ -57,7 +57,7 @@ Transfer BTC from a P2WPKH address:
 ```typescript
 import { sendBtc, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
 
-const service = new BtcAssetsApi.fromToken(
+const service = BtcAssetsApi.fromToken(
   'btc_assets_api_url',
   'your_token'
 );
