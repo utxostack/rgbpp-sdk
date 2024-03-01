@@ -5,6 +5,7 @@
     "packages/*"
   ],
   "scripts": {
+    "prepare": "husky",
     "build": "turbo run build",
     "build:packages": "turbo run build --filter=./packages/*",
     "lint:fix": "turbo run lint:fix",
@@ -16,11 +17,16 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
     "turbo": "^1.12.4",
     "typescript": "^5.3.3"
+  },
+  "lint-staged": {
+    "{packages}/**/*.{js,jsx,ts,tsx,md,json}": "prettier --ignore-unknown --write"
   },
   "packageManager": "^pnpm@8.0.0",
   "engines": {
