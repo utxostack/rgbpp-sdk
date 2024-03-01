@@ -1,4 +1,4 @@
-import bitcoin from 'bitcoinjs-lib';
+import bitcoin from '../bitcoin';
 import { ECPairInterface } from 'ecpair';
 import { ECPair } from '../constants';
 import { AddressType } from '../types';
