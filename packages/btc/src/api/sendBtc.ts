@@ -1,4 +1,4 @@
-import bitcoin from 'bitcoinjs-lib';
+import bitcoin from '../bitcoin';
 import { NetworkType } from '../network';
 import { DataSource } from '../query/source';
 import { TxBuilder } from '../transaction/build';

@@ -1,5 +1,5 @@
 import clone from 'lodash/clone';
-import bitcoin from 'bitcoinjs-lib';
+import bitcoin from '../bitcoin';
 import { DataSource } from '../query/source';
 import { ErrorCodes, TxBuildError } from '../error';
 import { AddressType, UnspentOutput } from '../types';

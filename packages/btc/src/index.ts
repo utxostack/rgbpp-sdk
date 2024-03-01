@@ -3,6 +3,7 @@ export * from './constants';
 
 export * from './utils';
 export * from './error';
+export * from './bitcoin';
 export * from './network';
 export * from './address';
 

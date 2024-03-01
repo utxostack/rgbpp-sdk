@@ -1,4 +1,4 @@
-# BTC Wallet Integration POC
+# @rgbpp-sdk Integration POC
 
 This proof of concept (POC) provides:
 - APIs for constructing simple BTC transactions
@@ -6,7 +6,7 @@ This proof of concept (POC) provides:
 
 ## Disclaimer
 
-- This POC does not have an NPM package released yet. For this reason, we are using `poc-sdk` as a temporary name for the package. The name of the package may be changed in the future.
+- This POC does not have an NPM package released yet. For this reason, we are using `rgbpp-sdk` as a temporary name for the package. The name of the package may /btcbe changed in the future.
 - The main logic of the POC is referenced and cut/simplified from the [unisat wallet-sdk](https://github.com/unisat-wallet/wallet-sdk) package to adapt to the specific needs of our own projects. The unisat wallet-sdk is using the [ISC license](https://github.com/unisat-wallet/wallet-sdk/blob/master/LICENSE). If we open-source our project in the future, it would be best to include the appropriate license referencing the unisat wallet-sdk.
 
 ## Getting started
@@ -15,9 +15,9 @@ This proof of concept (POC) provides:
 
 If you don't have a token (API-Key) of the service for your app:
 ```typescript
-import { BtcAssetsApi } from 'poc-sdk';
+import { BtcAssetsApi } from '@rgbpp-sdk/btc';
 
-const service = new BtcAssetsApi.fromApp(
+const service = BtcAssetsApi.fromApp(
   'btc_assets_api_url', 
   'your_app_name', 
   'your_domain'
@@ -29,9 +29,9 @@ await service.init();
 
 Instead, if you already have a token for your app:
 ```typescript
-import { BtcAssetsApi } from 'poc-sdk';
+import { BtcAssetsApi } from '@rgbpp-sdk/btc';
 
-const service = new BtcAssetsApi.fromToken(
+const service = BtcAssetsApi.fromToken(
   'btc_assets_api_url', 
   'your_token'
 );
@@ -55,9 +55,9 @@ console.log(res);
 
 Transfer BTC from a P2WPKH address:
 ```typescript
-import { sendBtc, BtcAssetsApi, DataSource, NetworkType } from 'poc-sdk';
+import { sendBtc, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
 
-const service = new BtcAssetsApi.fromToken(
+const service = BtcAssetsApi.fromToken(
   'btc_assets_api_url',
   'your_token'
 );

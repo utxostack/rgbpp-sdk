@@ -1,4 +1,4 @@
-import bitcoin from 'bitcoinjs-lib';
+import bitcoin from './bitcoin';
 
 export enum NetworkType {
   MAINNET,

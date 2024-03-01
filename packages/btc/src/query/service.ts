@@ -119,7 +119,7 @@ export class BtcAssetsApi {
         ...headers,
       },
       ...otherOptions,
-    });
+    } as RequestInit);
 
     let json: Record<string, any> | undefined;
     try {
@@ -147,11 +147,11 @@ export class BtcAssetsApi {
         'Content-Type': 'application/json',
         ...options?.headers,
       },
-    });
+    } as BtcAssetsApiRequestOptions);
   }
 
   generateToken() {
-    if (!this.token && !this.app && !this.domain) {
+    if (!this.app || !this.domain) {
       throw new TxBuildError(ErrorCodes.ASSETS_API_REQUIRED_APP_INFO);
     }
 
