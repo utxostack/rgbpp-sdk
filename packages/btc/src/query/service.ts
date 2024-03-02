@@ -106,6 +106,9 @@ export class BtcAssetsApi {
 
   async request<T>(route: string, options?: BtcAssetsApiRequestOptions): Promise<T> {
     const { requireToken = true, method = 'GET', headers, params, ...otherOptions } = options ?? {};
+    if (requireToken && !this.token && !(this.app && this.domain)) {
+      throw new TxBuildError(ErrorCodes.ASSETS_API_REQUIRE_TOKEN);
+    }
     if (requireToken && !this.token) {
       await this.init();
     }
@@ -152,7 +155,7 @@ export class BtcAssetsApi {
 
   generateToken() {
     if (!this.app || !this.domain) {
-      throw new TxBuildError(ErrorCodes.ASSETS_API_REQUIRED_APP_INFO);
+      throw new TxBuildError(ErrorCodes.ASSETS_API_REQUIRE_APP_INFO);
     }
 
     return this.post<BtcAssetsApiToken>('/token/generate', {
