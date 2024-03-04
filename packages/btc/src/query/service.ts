@@ -77,7 +77,7 @@ export class BtcAssetsApi {
   public domain?: string;
   private token?: string;
 
-  constructor(props: { url: string, app?: string, domain?: string, token?: string }) {
+  constructor(props: { url: string; app?: string; domain?: string; token?: string }) {
     this.url = props.url;
 
     // Optional
