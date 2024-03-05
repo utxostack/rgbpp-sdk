@@ -1,11 +1,10 @@
 import bitcoin from 'bitcoinjs-lib';
-import { NetworkType, BtcAssetsApi, ECPair } from '../../src';
-
-export const networkType = NetworkType.TESTNET;
+import { BtcAssetsApi, ECPair, toNetworkType } from '../../src';
 
 export const network = bitcoin.networks.testnet;
+export const networkType = toNetworkType(network);
 
-export const assetsApi = BtcAssetsApi.fromToken(
+export const service = BtcAssetsApi.fromToken(
   process.env.VITE_SERVICE_URL!,
   process.env.VITE_SERVICE_TOKEN!,
   process.env.VITE_SERVICE_ORIGIN!,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { accounts, networkType, assetsApi } from './shared/env';
+import { accounts, networkType, service } from './shared/env';
 import { DataSource, sendBtc } from '../src';
 
 describe.skip('Transaction', () => {
@@ -15,7 +15,7 @@ describe.skip('Transaction', () => {
       if (index !== 0) {
         await new Promise((resolve) => setTimeout(resolve, 3000));
       }
-      const source = new DataSource(assetsApi, networkType);
+      const source = new DataSource(service, networkType);
       const psbt = await sendBtc({
         from: accounts.charlie.p2wpkh.address,
         tos: [
@@ -36,7 +36,7 @@ describe.skip('Transaction', () => {
       const tx = psbt.extractTransaction();
       console.log('ins:', tx.ins);
       console.log('outs:', tx.outs);
-      const res = await assetsApi.sendTransaction(tx.toHex());
+      const res = await service.sendTransaction(tx.toHex());
       expect(res.txid).toMatch(/^[a-f0-9]+$/);
       console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     }, 10000);

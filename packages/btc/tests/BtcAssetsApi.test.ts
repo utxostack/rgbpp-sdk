@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { accounts, assetsApi } from './shared/env';
+import { accounts, service } from './shared/env';
 import { BtcAssetsApi, ErrorCodes, ErrorMessages } from '../src';
 
 describe(
@@ -47,7 +47,7 @@ describe(
 
     describe('Queries', () => {
       it('Get BlockchainInfo', async () => {
-        const res = await assetsApi.getBlockchainInfo();
+        const res = await service.getBlockchainInfo();
         expect(res.chain).toBeTypeOf('string');
         expect(res.blocks).toBeTypeOf('number');
         expect(res.headers).toBeTypeOf('number');
@@ -56,7 +56,7 @@ describe(
         expect(res.bestblockhash).toBeTypeOf('string');
       });
       it('Get balance', async () => {
-        const res = await assetsApi.getBalance(accounts.charlie.p2wpkh.address);
+        const res = await service.getBalance(accounts.charlie.p2wpkh.address);
         expect(res.address).toEqual('tb1qm06rvrq8jyyckzc5v709u7qpthel9j4d9f7nh3');
         expect(res.satoshi).toBeTypeOf('number');
         expect(res.pending_satoshi).toBeTypeOf('number');
@@ -64,8 +64,8 @@ describe(
         expect(res.utxo_count).toBeTypeOf('number');
       }, 0);
       it('Get balance with min_satoshi filter', async () => {
-        const originalBalance = await assetsApi.getBalance(accounts.charlie.p2wpkh.address);
-        const filteredBalance = await assetsApi.getBalance(accounts.charlie.p2wpkh.address, {
+        const originalBalance = await service.getBalance(accounts.charlie.p2wpkh.address);
+        const filteredBalance = await service.getBalance(accounts.charlie.p2wpkh.address, {
           min_satoshi: originalBalance.satoshi + 1,
         });
 
@@ -73,7 +73,7 @@ describe(
         expect(filteredBalance.dust_satoshi).toEqual(originalBalance.satoshi + originalBalance.dust_satoshi);
       }, 0);
       it('Get UTXOs', async () => {
-        const res = await assetsApi.getUtxos(accounts.charlie.p2wpkh.address);
+        const res = await service.getUtxos(accounts.charlie.p2wpkh.address);
         expect(Array.isArray(res)).toBe(true);
         expect(res.length).toBeGreaterThan(0);
 
@@ -93,17 +93,17 @@ describe(
         });
       }, 0);
       it('Get UTXOs with min_satoshi filter', async () => {
-        const originalUtxos = await assetsApi.getUtxos(accounts.charlie.p2wpkh.address);
+        const originalUtxos = await service.getUtxos(accounts.charlie.p2wpkh.address);
 
         const maxValue = originalUtxos.reduce((max, out) => Math.max(max, out.value), 0);
-        const filteredUtxos = await assetsApi.getUtxos(accounts.charlie.p2wpkh.address, {
+        const filteredUtxos = await service.getUtxos(accounts.charlie.p2wpkh.address, {
           min_satoshi: maxValue + 1,
         });
 
         expect(filteredUtxos.length).toBe(0);
       });
       it('Get Transactions', async () => {
-        const res = await assetsApi.getTransactions(accounts.charlie.p2wpkh.address);
+        const res = await service.getTransactions(accounts.charlie.p2wpkh.address);
         expect(Array.isArray(res)).toBe(true);
         expect(res.length).toBeGreaterThan(0);
         res.forEach((transaction) => {
@@ -117,7 +117,7 @@ describe(
         });
       }, 0);
       it('Get Transaction', async () => {
-        const res = await assetsApi.getTransaction('102d5a002e72f0781944eef636117377da6d3601061e47e03025e7cd29a91579');
+        const res = await service.getTransaction('102d5a002e72f0781944eef636117377da6d3601061e47e03025e7cd29a91579');
         expect(res.txid).toBe('102d5a002e72f0781944eef636117377da6d3601061e47e03025e7cd29a91579');
       });
     });
