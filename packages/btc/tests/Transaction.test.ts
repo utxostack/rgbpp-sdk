@@ -4,10 +4,10 @@ import { DataSource, sendBtc } from '../src';
 
 describe.skip('Transaction', () => {
   const addresses = [
-    { type: 'Native Segwit(P2WPKH)', address: accounts.charlie.p2wpkh.address },
-    { type: 'Nested Segwit(P2SH)', address: '2N4gkVAQ1f6bi8BKon8MLKEV1pi85MJWcPV' },
-    { type: 'Taproot(P2TR)', address: 'tb1pjew2gs9aqr2m7r8jc8car9jpwuv6wye006l4slplzcthupnldmjqpf8h5d' },
-    { type: 'Legacy(P2PKH)', address: 'mqkAgjy8gfrMZh1VqV5Wm1Yi4G9KWLXA1Q' },
+    { type: 'Native SegWit (P2WPKH)', address: accounts.charlie.p2wpkh.address },
+    { type: 'Nested SegWit (P2SH)', address: '2N4gkVAQ1f6bi8BKon8MLKEV1pi85MJWcPV' },
+    { type: 'Taproot (P2TR)', address: 'tb1pjew2gs9aqr2m7r8jc8car9jpwuv6wye006l4slplzcthupnldmjqpf8h5d' },
+    { type: 'Legacy (P2PKH)', address: 'mqkAgjy8gfrMZh1VqV5Wm1Yi4G9KWLXA1Q' },
   ];
 
   addresses.forEach((addressInfo, index) => {

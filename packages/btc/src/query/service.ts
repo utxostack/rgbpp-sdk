@@ -7,17 +7,33 @@ export interface BtcAssetsApiRequestOptions extends RequestInit {
   requireToken?: boolean;
 }
 
-interface BtcAssetsApiToken {
+export interface BtcAssetsApiToken {
   token: string;
 }
 
-interface BtcAssetsApiBalance {
+export interface BtcAssetsApiBlockchainInfo {
+  chain: string;
+  blocks: number;
+  headers: number;
+  bestblockhash: number;
+  difficulty: number;
+  mediantime: number;
+}
+
+export interface BtcAssetsApiBalanceParams {
+  min_satoshi: number;
+}
+export interface BtcAssetsApiBalance {
   address: string;
   satoshi: number;
   pending_satoshi: number;
+  dust_satoshi: number;
   utxo_count: number;
 }
 
+export interface BtcAssetsApiUtxoParams {
+  min_satoshi: number;
+}
 export interface BtcAssetsApiUtxo {
   txid: string;
   vout: number;
@@ -88,6 +104,7 @@ export class BtcAssetsApi {
     this.origin = props.origin;
     this.token = props.token;
 
+    // Validation
     if (this.domain && !isDomain(this.domain)) {
       throw new TxBuildError(
         ErrorCodes.ASSETS_API_INVALID_PARAM,
@@ -206,12 +223,20 @@ export class BtcAssetsApi {
     });
   }
 
-  getBalance(address: string) {
-    return this.request<BtcAssetsApiBalance>(`/bitcoin/v1/address/${address}/balance`);
+  getBlockchainInfo() {
+    return this.request<BtcAssetsApiBlockchainInfo>('/bitcoin/v1/info');
   }
 
-  getUtxos(address: string) {
-    return this.request<BtcAssetsApiUtxo[]>(`/bitcoin/v1/address/${address}/unspent`);
+  getBalance(address: string, params?: BtcAssetsApiBalanceParams) {
+    return this.request<BtcAssetsApiBalance>(`/bitcoin/v1/address/${address}/balance`, {
+      params,
+    });
+  }
+
+  getUtxos(address: string, params?: BtcAssetsApiUtxoParams) {
+    return this.request<BtcAssetsApiUtxo[]>(`/bitcoin/v1/address/${address}/unspent`, {
+      params,
+    });
   }
 
   getTransactions(address: string) {
