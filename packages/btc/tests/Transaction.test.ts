@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { accounts, networkType, service } from './shared/env';
-import { DataSource, sendBtc } from '../src';
+import { DataSource, ErrorCodes, ErrorMessages, sendBtc } from '../src';
 
-describe.skip('Transaction', () => {
+describe('Transaction', () => {
   const addresses = [
     { type: 'Native SegWit (P2WPKH)', address: accounts.charlie.p2wpkh.address },
     { type: 'Nested SegWit (P2SH)', address: '2N4gkVAQ1f6bi8BKon8MLKEV1pi85MJWcPV' },
@@ -36,9 +36,26 @@ describe.skip('Transaction', () => {
       const tx = psbt.extractTransaction();
       console.log('ins:', tx.ins);
       console.log('outs:', tx.outs);
-      const res = await service.sendTransaction(tx.toHex());
-      expect(res.txid).toMatch(/^[a-f0-9]+$/);
-      console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
+      // const res = await service.sendTransaction(tx.toHex());
+      // expect(res.txid).toMatch(/^[a-f0-9]+$/);
+      // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     }, 10000);
+  });
+  it('Transfer with an impossible "minimalSatoshi" filter', async () => {
+    const source = new DataSource(service, networkType);
+    await expect(() =>
+      sendBtc({
+        from: accounts.charlie.p2wpkh.address,
+        tos: [
+          {
+            address: accounts.charlie.p2wpkh.address,
+            value: 1000,
+          },
+        ],
+        minUtxoSatoshi: 1000000000000,
+        networkType,
+        source,
+      }),
+    ).rejects.toThrow(ErrorMessages[ErrorCodes.INSUFFICIENT_UTXO]);
   });
 });

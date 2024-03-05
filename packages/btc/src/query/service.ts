@@ -21,7 +21,7 @@ export interface BtcAssetsApiBlockchainInfo {
 }
 
 export interface BtcAssetsApiBalanceParams {
-  min_satoshi: number;
+  min_satoshi?: number;
 }
 export interface BtcAssetsApiBalance {
   address: string;
@@ -32,7 +32,7 @@ export interface BtcAssetsApiBalance {
 }
 
 export interface BtcAssetsApiUtxoParams {
-  min_satoshi: number;
+  min_satoshi?: number;
 }
 export interface BtcAssetsApiUtxo {
   txid: string;
