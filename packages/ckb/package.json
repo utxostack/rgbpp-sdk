@@ -2,7 +2,7 @@
   "name": "@rgbpp-sdk/ckb",
   "version": "0.1.0",
   "scripts": {
-    "test": "vitest",
+    "test": "vitest --watch=false",
     "build": "tsc -p tsconfig.build.json",
     "lint": "prettier --check 'src/**/*.{js,jsx,ts,tsx}'",
     "lint:fix": "prettier --write 'src/**/*.{js,jsx,ts,tsx}'",
