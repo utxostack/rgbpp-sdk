@@ -1,0 +1,29 @@
+struct RGBPPConfig {
+  btc_lc_type_hash: Byte32,
+  btc_time_lock_type_hash: Byte32,
+}
+
+struct RGBPPLock {
+  out_index: Uint32,
+  btc_txid: Byte32,
+}
+
+struct ExtraCommitmentData {
+ input_len: byte,
+ output_len: byte,
+}
+
+array Uint16 [byte; 2];
+
+table RGBPPUnlock {
+  version: Uint16,
+  extra_data: ExtraCommitmentData,
+  btc_tx: Bytes,
+}
+
+table BTCTimeLock {
+  lock_script: Script,
+  after: Uint32,
+  btc_txid: Byte32,
+}
+
