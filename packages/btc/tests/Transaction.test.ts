@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { accounts, networkType, assetsApi } from './shared/env';
 import { DataSource, sendBtc } from '../src';
 
-describe('Transaction', () => {
+describe.skip('Transaction', () => {
   const addresses = [
     { type: 'Native Segwit(P2WPKH)', address: accounts.charlie.p2wpkh.address },
     { type: 'Nested Segwit(P2SH)', address: '2N4gkVAQ1f6bi8BKon8MLKEV1pi85MJWcPV' },

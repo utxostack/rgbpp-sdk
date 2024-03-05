@@ -3,8 +3,8 @@ export enum ErrorCodes {
   INSUFFICIENT_UTXO,
   UNSUPPORTED_ADDRESS_TYPE,
   ASSETS_API_RESPONSE_ERROR,
-  ASSETS_API_REQUIRE_TOKEN,
-  ASSETS_API_REQUIRE_APP_INFO,
+  ASSETS_API_UNAUTHORIZED,
+  ASSETS_API_INVALID_PARAM,
   ASSETS_API_RESPONSE_DECODE_ERROR,
 }
 
@@ -12,10 +12,10 @@ export const ErrorMessages = {
   [ErrorCodes.UNKNOWN]: 'Unknown error',
   [ErrorCodes.INSUFFICIENT_UTXO]: 'Insufficient UTXO',
   [ErrorCodes.UNSUPPORTED_ADDRESS_TYPE]: 'Unsupported address type',
-  [ErrorCodes.ASSETS_API_RESPONSE_ERROR]: 'AssetsAPI returned an error',
-  [ErrorCodes.ASSETS_API_REQUIRE_TOKEN]: 'AssetsAPI requires "token" to authenticate your request',
-  [ErrorCodes.ASSETS_API_REQUIRE_APP_INFO]: 'AssetsAPI requires "app" and "domain" to generate a token',
-  [ErrorCodes.ASSETS_API_RESPONSE_DECODE_ERROR]: 'Failed to decode the response of AssetsAPI',
+  [ErrorCodes.ASSETS_API_UNAUTHORIZED]: 'BtcAssetsAPI unauthorized, please check your token/origin',
+  [ErrorCodes.ASSETS_API_INVALID_PARAM]: 'Invalid param(s) was provided to the BtcAssetsAPI',
+  [ErrorCodes.ASSETS_API_RESPONSE_ERROR]: 'BtcAssetsAPI returned an error',
+  [ErrorCodes.ASSETS_API_RESPONSE_DECODE_ERROR]: 'Failed to decode the response of BtcAssetsAPI',
 };
 
 export class TxBuildError extends Error {

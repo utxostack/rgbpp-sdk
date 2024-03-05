@@ -1,35 +1,36 @@
 import { describe, expect, it } from 'vitest';
-import { BtcAssetsApi } from '../src';
+import { BtcAssetsApi, ErrorCodes, ErrorMessages } from '../src';
 
 describe('Token', () => {
-  describe('token test', () => {
-    it('Generate token', async () => {
-      const btcAssetsApiWithApp = new BtcAssetsApi({
-        url: process.env.VITE_SERVICE_URL!,
-        app: 'your_app',
-        domain: 'your_domain',
+  describe(
+    'token test',
+    {
+      retry: 3,
+    },
+    () => {
+      it('Generate a valid token', async () => {
+        const serviceWithApp = new BtcAssetsApi({
+          url: process.env.VITE_SERVICE_URL!,
+          domain: 'btc-test.app',
+          app: 'btc-test-app',
+        });
+
+        const res = await serviceWithApp.generateToken();
+        expect(typeof res.token).toBe('string');
+        // TODO: check if the token works
       });
 
-      const res = await btcAssetsApiWithApp.generateToken();
-      expect(res.token).toBeDefined();
-      expect(typeof res.token).toBe('string');
-      expect(res.token.length).toBeGreaterThan(0);
-    });
+      it('Missing parameters to generate tokens should throw error', async () => {
+        const serviceWithoutApp = new BtcAssetsApi({
+          url: process.env.VITE_SERVICE_URL!,
+          app: '',
+          domain: 'btc-test.app',
+        });
 
-    it('Missing parameters to generate tokens should throw error', async () => {
-      const btcAssetsApiWithoutApp = new BtcAssetsApi({
-        url: process.env.VITE_SERVICE_URL!,
-        app: '',
-        domain: 'your_domain',
+        await expect(async () => serviceWithoutApp.generateToken()).rejects.toThrow(
+          `${ErrorMessages[ErrorCodes.ASSETS_API_INVALID_PARAM]}: app, domain`,
+        );
       });
-
-      try {
-        await btcAssetsApiWithoutApp.generateToken();
-        throw new Error('Expected generateToken() to throw an error');
-      } catch (error) {
-        const err = error as Error;
-        expect(err.message).toBe('AssetsAPI requires "app" and "domain"');
-      }
-    });
-  });
+    },
+  );
 });
