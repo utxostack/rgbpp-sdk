@@ -17,11 +17,11 @@ If you don't have a token (API-Key) of the service for your app:
 ```typescript
 import { BtcAssetsApi } from '@rgbpp-sdk/btc';
 
-const service = BtcAssetsApi.fromApp(
-  'btc_assets_api_url', 
-  'your_app_name', 
-  'your_domain'
-);
+const service = new BtcAssetsApi({
+  url: 'https://your-btc-assets-api.url', 
+  app: 'your-test-app-name', 
+  domain: 'your.app',
+});
 
 // Generate a token for your app
 await service.init();
@@ -32,8 +32,28 @@ Instead, if you already have a token for your app:
 import { BtcAssetsApi } from '@rgbpp-sdk/btc';
 
 const service = BtcAssetsApi.fromToken(
-  'btc_assets_api_url', 
-  'your_token'
+  'https://your-btc-assets-api.url', 
+  'token'
+);
+```
+
+When initializing the service in Node.js, you should pass an extra `origin` param, which should be a URL matching your domain, or matching the domain of your token:
+```typescript
+import { BtcAssetsApi } from '@rgbpp-sdk/btc';
+
+// Without token
+const service = new BtcAssetsApi({
+  url: 'https://your-btc-assets-api.url',
+  app: 'your-test-app-name',
+  domain: 'your.app',
+  origin: 'https://your.app'
+});
+
+// With token
+const service = BtcAssetsApi.fromToken(
+  'https://your-btc-assets-api.url',
+  'token',
+  'https://your.app'
 );
 ```
 

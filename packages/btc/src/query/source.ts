@@ -2,7 +2,7 @@ import { NetworkType } from '../network';
 import { UnspentOutput } from '../types';
 import { ErrorCodes, TxBuildError } from '../error';
 import { addressToScriptPublicKeyHex, getAddressType } from '../address';
-import { BtcAssetsApi } from './service';
+import { BtcAssetsApi, BtcAssetsApiUtxoParams } from './service';
 
 export class DataSource {
   public source: BtcAssetsApi;
@@ -13,8 +13,8 @@ export class DataSource {
     this.networkType = networkType;
   }
 
-  async getUtxos(address: string): Promise<UnspentOutput[]> {
-    const utxos = await this.source.getUtxos(address);
+  async getUtxos(address: string, params?: BtcAssetsApiUtxoParams): Promise<UnspentOutput[]> {
+    const utxos = await this.source.getUtxos(address, params);
 
     const scriptPk = addressToScriptPublicKeyHex(address, this.networkType);
     return utxos
@@ -38,13 +38,15 @@ export class DataSource {
   async collectSatoshi(
     address: string,
     targetAmount: number,
-    minimalSatoshi?: number,
+    minSatoshi?: number,
   ): Promise<{
     utxos: UnspentOutput[];
     satoshi: number;
     exceedSatoshi: number;
   }> {
-    const utxos = await this.getUtxos(address);
+    const utxos = await this.getUtxos(address, {
+      min_satoshi: minSatoshi,
+    });
 
     const collected = [];
     let collectedAmount = 0;
@@ -52,7 +54,7 @@ export class DataSource {
       if (collectedAmount >= targetAmount) {
         break;
       }
-      if (minimalSatoshi !== void 0 && utxo.value < minimalSatoshi) {
+      if (minSatoshi !== void 0 && utxo.value < minSatoshi) {
         continue;
       }
       collected.push(utxo);

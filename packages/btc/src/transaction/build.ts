@@ -30,14 +30,14 @@ export class TxBuilder {
   source: DataSource;
   networkType: NetworkType;
   changedAddress: string;
-  minimalSatoshi: number;
+  minUtxoSatoshi: number;
   feeRate: number;
 
   constructor(props: {
     source: DataSource;
     networkType: NetworkType;
     changeAddress: string;
-    minimalUtxoSatoshi?: number;
+    minUtxoSatoshi?: number;
     feeRate?: number;
   }) {
     this.source = props.source;
@@ -45,7 +45,7 @@ export class TxBuilder {
     this.feeRate = props.feeRate ?? 1;
     this.networkType = props.networkType;
     this.changedAddress = props.changeAddress;
-    this.minimalSatoshi = props.minimalUtxoSatoshi ?? MIN_COLLECTABLE_SATOSHI;
+    this.minUtxoSatoshi = props.minUtxoSatoshi ?? MIN_COLLECTABLE_SATOSHI;
   }
 
   addInput(utxo: UnspentOutput) {
@@ -69,7 +69,7 @@ export class TxBuilder {
     const { utxos, satoshi, exceedSatoshi } = await this.source.collectSatoshi(
       address,
       targetAmount,
-      this.minimalSatoshi,
+      this.minUtxoSatoshi,
     );
     if (satoshi < targetAmount) {
       throw new TxBuildError(ErrorCodes.INSUFFICIENT_UTXO);
@@ -98,15 +98,19 @@ export class TxBuilder {
     const addressType = getAddressType(address);
     const estimatedFee = await this.calculateFee(addressType);
     console.log(`expected fee: ${estimatedFee}`);
-    if (estimatedFee > fee || changeSatoshi < this.minimalSatoshi) {
+    if (estimatedFee > fee || changeSatoshi < this.minUtxoSatoshi) {
       this.inputs = originalInputs;
       this.outputs = originalOutputs;
 
-      const nextExtraChange = requireChangeUtxo
-        ? changeSatoshi < this.minimalSatoshi
-          ? this.minimalSatoshi
-          : extraChange
-        : 0;
+      const nextExtraChange = (() => {
+        if (requireChangeUtxo) {
+          if (changeSatoshi < this.minUtxoSatoshi) {
+            return this.minUtxoSatoshi;
+          }
+          return extraChange;
+        }
+        return 0;
+      })();
 
       console.log(`extra collecting satoshi: ${nextExtraChange}`);
       return await this.collectInputsAndPayFee(address, estimatedFee, nextExtraChange);

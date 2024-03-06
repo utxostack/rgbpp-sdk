@@ -11,6 +11,7 @@ export async function sendBtc(props: {
   }[];
   source: DataSource;
   networkType: NetworkType;
+  minUtxoSatoshi?: number;
   changeAddress?: string;
   feeRate?: number;
 }): Promise<bitcoin.Psbt> {
@@ -18,6 +19,7 @@ export async function sendBtc(props: {
     source: props.source,
     networkType: props.networkType,
     changeAddress: props.changeAddress ?? props.from,
+    minUtxoSatoshi: props.minUtxoSatoshi,
     feeRate: props.feeRate,
   });
 

@@ -6,6 +6,7 @@
   ],
   "scripts": {
     "prepare": "husky",
+    "test:packages": "turbo run test --filter=./packages/*",
     "build": "turbo run build",
     "build:packages": "turbo run build --filter=./packages/*",
     "lint:fix": "turbo run lint:fix",
