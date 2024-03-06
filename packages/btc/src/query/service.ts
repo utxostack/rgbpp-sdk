@@ -117,10 +117,6 @@ export class BtcAssetsApi {
     return new BtcAssetsApi({ url, token, origin });
   }
 
-  static fromApp(url: string, app: string, domain: string, origin?: string) {
-    return new BtcAssetsApi({ url, app, domain, origin });
-  }
-
   async init(force?: boolean) {
     // If the token exists and not a force action, do nothing
     if (this.token && !force) {
