@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "test": "vitest --watch=false",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "pnpm run clean && tsc -p tsconfig.build.json",
     "lint": "prettier --check '{src,tests}/**/*.{js,jsx,ts,tsx}'",
     "lint:fix": "prettier --write '{src,tests}/**/*.{js,jsx,ts,tsx}'",
     "clean": "pnpm run clean:cache & pnpm run clean:build",
@@ -16,11 +16,11 @@
     "lib"
   ],
   "dependencies": {
+    "@bitcoinerlab/secp256k1": "^1.1.1",
     "bip32": "^4.0.0",
     "bitcoinjs-lib": "^6.1.5",
     "ecpair": "^2.1.0",
-    "lodash": "^4.17.21",
-    "tiny-secp256k1": "^2.2.3"
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.202",
