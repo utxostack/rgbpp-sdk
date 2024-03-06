@@ -1,3 +1,7 @@
+
+/* RGBPP Types */
+
+// Type hash of bitcoin light client and type hash of bitcoin time lock contract
 struct RGBPPConfig {
   btc_lc_type_hash: Byte32,
   btc_time_lock_type_hash: Byte32,
