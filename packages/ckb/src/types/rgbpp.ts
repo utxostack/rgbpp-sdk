@@ -9,3 +9,9 @@ export interface ConstructParams {
   capacityWithCKB: number;
   cellAmount: number;
 }
+
+export interface RgbppTransferParams {
+  collector: Collector;
+  xudtType: Hex;
+  transferAmount: bigint;
+}

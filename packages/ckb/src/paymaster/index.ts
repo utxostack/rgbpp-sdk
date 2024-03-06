@@ -1,5 +1,5 @@
 import { AddressPrefix, addressToScript, getTransactionSize, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
-import { ConstructParams } from '../types/transfer';
+import { ConstructParams } from '../types/rgbpp';
 import { NoLiveCellError } from '../error';
 import { CKB_UNIT, MAX_FEE, getSecp256k1CellDep } from '../constants';
 import { append0x, calculateTransactionFee } from '../utils';
