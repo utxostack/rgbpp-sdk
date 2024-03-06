@@ -8,9 +8,9 @@
   },
   "compilerOptions": {
     "moduleResolution": "Node",
-    "target": "ES2015",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "module": "ES2020",
+    "module": "ESNext",
+    "target": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "strict": true,
     "noEmit": true,
     "allowJs": true,
