@@ -1,15 +1,8 @@
-import {
-  AddressPrefix,
-  addressToScript,
-  getTransactionSize,
-  privateKeyToAddress,
-  serializeWitnessArgs,
-} from '@nervosnetwork/ckb-sdk-utils';
+import { AddressPrefix, addressToScript, getTransactionSize, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
 import { ConstructParams } from '../types/transfer';
 import { NoLiveCellError } from '../error';
 import { CKB_UNIT, MAX_FEE, getSecp256k1CellDep } from '../constants';
-import { append0x } from '../utils';
-import { calculateTransactionFee } from '../utils/ckb-tx';
+import { append0x, calculateTransactionFee } from '../utils';
 
 const SECP256K1_MIN_CAPACITY = BigInt(61) * CKB_UNIT;
 const SECP256K1_WITNESS_LOCK_LEN = 65;
