@@ -160,7 +160,7 @@ export class BtcAssetsApi {
     try {
       text = await res.text();
       json = JSON.parse(text);
-      ok = json?.ok ?? false;
+      ok = json?.ok ?? res.ok ?? false;
     } catch {
       // do nothing
     }
