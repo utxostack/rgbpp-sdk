@@ -102,11 +102,15 @@ export class TxBuilder {
       this.inputs = originalInputs;
       this.outputs = originalOutputs;
 
-      const nextExtraChange = requireChangeUtxo
-        ? changeSatoshi < this.minUtxoSatoshi
-          ? this.minUtxoSatoshi
-          : extraChange
-        : 0;
+      const nextExtraChange = (() => {
+        if (requireChangeUtxo) {
+          if (changeSatoshi < this.minUtxoSatoshi) {
+            return this.minUtxoSatoshi;
+          }
+          return extraChange;
+        }
+        return 0;
+      })();
 
       console.log(`extra collecting satoshi: ${nextExtraChange}`);
       return await this.collectInputsAndPayFee(address, estimatedFee, nextExtraChange);

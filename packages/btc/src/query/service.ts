@@ -160,16 +160,13 @@ export class BtcAssetsApi {
 
     let text: string | undefined;
     let json: Record<string, any> | undefined;
-    let ok: boolean;
+    let ok: boolean = false;
     try {
-      ok = res.ok;
       text = await res.text();
       json = JSON.parse(text);
-      if (json && json.ok !== void 0) {
-        ok = json.ok;
-      }
+      ok = json?.ok ?? false;
     } catch {
-      ok = false;
+      // do nothing
     }
 
     if (!json) {

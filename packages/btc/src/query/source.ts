@@ -44,14 +44,9 @@ export class DataSource {
     satoshi: number;
     exceedSatoshi: number;
   }> {
-    const utxos = await this.getUtxos(
-      address,
-      minSatoshi !== void 0
-        ? {
-            min_satoshi: minSatoshi,
-          }
-        : void 0,
-    );
+    const utxos = await this.getUtxos(address, {
+      min_satoshi: minSatoshi,
+    });
 
     const collected = [];
     let collectedAmount = 0;

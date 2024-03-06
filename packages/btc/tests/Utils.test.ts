@@ -6,6 +6,7 @@ describe('Utils', () => {
     expect(isDomain('google.com')).toBe(true);
     expect(isDomain('mail.google.com')).toBe(true);
     expect(isDomain('https://google.com')).toBe(false);
+    expect(isDomain('google.com/path')).toBe(false);
     expect(isDomain('google')).toBe(false);
   });
 });
