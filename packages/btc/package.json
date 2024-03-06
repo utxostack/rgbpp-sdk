@@ -16,11 +16,11 @@
     "lib"
   ],
   "dependencies": {
+    "@bitcoinerlab/secp256k1": "^1.1.1",
     "bip32": "^4.0.0",
     "bitcoinjs-lib": "^6.1.5",
     "ecpair": "^2.1.0",
-    "lodash": "^4.17.21",
-    "tiny-secp256k1": "^2.2.3"
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.202",

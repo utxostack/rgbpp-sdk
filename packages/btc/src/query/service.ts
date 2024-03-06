@@ -105,7 +105,7 @@ export class BtcAssetsApi {
     this.token = props.token;
 
     // Validation
-    if (this.domain && !isDomain(this.domain)) {
+    if (this.domain && !isDomain(this.domain) && this.domain !== 'localhost') {
       throw new TxBuildError(
         ErrorCodes.ASSETS_API_INVALID_PARAM,
         `${ErrorMessages[ErrorCodes.ASSETS_API_INVALID_PARAM]}: domain`,
