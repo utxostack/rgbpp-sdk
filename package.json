@@ -27,7 +27,7 @@
     "typescript": "^5.3.3"
   },
   "lint-staged": {
-    "{packages}/**/*.{js,jsx,ts,tsx,md,json}": "prettier --ignore-unknown --write"
+    "{packages,apps}/**/*.{js,jsx,ts,tsx,md,json}": "prettier --ignore-unknown --write"
   },
   "packageManager": "^pnpm@8.0.0",
   "engines": {
