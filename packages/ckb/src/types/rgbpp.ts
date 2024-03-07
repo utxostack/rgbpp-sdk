@@ -11,12 +11,7 @@ export interface ConstructPaymasterParams {
   cellAmount: number;
 }
 
-export interface BtcRgbppTransfer {
-  transferAmount: bigint;
-  btcAddress: Address;
-}
-
-export interface RgbppL1TransferVirtualParams {
+export interface BtcTransferCkbVirtualTxParams {
   collector: Collector;
   xudtTypeBytes: Hex;
   rgbppLockArgsList: Hex[];
@@ -24,13 +19,13 @@ export interface RgbppL1TransferVirtualParams {
   isMainnet?: boolean;
 }
 
-export interface RgbppL1TransferVirtualTx {
+export interface BtcTransferCkbVirtualTx {
   inputs: CKBComponents.CellInput[];
   outputs: CKBComponents.CellOutput[];
   outputsData: Hex[];
 }
 
-export interface RgbppL1TransferVirtualResult {
+export interface BtcTransferCkbVirtualResult {
   ckbRawTx: CKBComponents.RawTransaction;
   commitment: Hex;
   needPaymasterCell: boolean;
@@ -50,7 +45,7 @@ export interface AppendPaymasterCellAndSignTxParams {
   paymasterCell: IndexerCell;
 }
 
-export interface SendTxParams {
+export interface SendCkbTxParams {
   collector: Collector;
   signedTx: CKBComponents.RawTransaction;
 }
