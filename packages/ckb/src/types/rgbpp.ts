@@ -1,4 +1,5 @@
 import { Collector } from '../collector';
+import { IndexerCell } from './collector';
 import { Address, Hex } from './common';
 
 export interface ConstructPaymasterParams {
@@ -34,4 +35,17 @@ export interface RgbppL1TransferVirtualResult {
   commitment: Hex;
   needPaymasterCell: boolean;
   sumInputsCapacity: bigint;
+}
+
+export interface AppendWitnessesParams {
+  ckbRawTx: CKBComponents.RawTransaction;
+  sumInputsCapacity: bigint;
+  needPaymasterCell: boolean;
+}
+
+export interface AppendPaymasterCellAndSignTxParams {
+  secp256k1PrivateKey: Hex;
+  ckbRawTx: CKBComponents.RawTransaction;
+  sumInputsCapacity: bigint;
+  paymasterCell: IndexerCell;
 }

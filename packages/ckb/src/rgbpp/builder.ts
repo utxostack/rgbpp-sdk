@@ -4,19 +4,14 @@ import {
   scriptToHash,
   serializeWitnessArgs,
 } from '@nervosnetwork/ckb-sdk-utils';
-import { Hex, IndexerCell } from '../types';
+import { AppendPaymasterCellAndSignTxParams, AppendWitnessesParams } from '../types';
 import { SECP256K1_WITNESS_LOCK_LEN, getRgbppLockScript } from '../constants';
 import { append0x, calculateTransactionFee } from '../utils';
 import { InputsCapacityNotEnoughError } from '../error';
-import { Collector } from '../collector';
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 
 //TODO: waiting for SPV proof
-export const appendWitnesses = (
-  ckbRawTx: CKBComponents.RawTransaction,
-  sumInputsCapacity: bigint,
-  needPaymasterCell: boolean,
-) => {
+export const appendWitnesses = ({ ckbRawTx, sumInputsCapacity, needPaymasterCell }: AppendWitnessesParams) => {
   if (!needPaymasterCell) {
     let rawTx = ckbRawTx;
     const partialOutputsCapacity = rawTx.outputs
@@ -37,13 +32,12 @@ export const appendWitnesses = (
   }
 };
 
-export const appendPaymasterCellAndSignTx = async (
-  secp256k1PrivateKey: Hex,
-  collector: Collector,
-  ckbRawTx: CKBComponents.RawTransaction,
-  sumInputsCapacity: bigint,
-  paymasterCell: IndexerCell,
-) => {
+export const appendPaymasterCellAndSignTx = async ({
+  secp256k1PrivateKey,
+  ckbRawTx,
+  sumInputsCapacity,
+  paymasterCell,
+}: AppendPaymasterCellAndSignTxParams) => {
   let rawTx = ckbRawTx;
   const paymasterInput = { previousOutput: paymasterCell.outPoint, since: '0x0' };
   rawTx.inputs = [paymasterInput, ...rawTx.inputs];
@@ -84,6 +78,5 @@ export const appendPaymasterCellAndSignTx = async (
     ...rawTx,
     witnesses: signedWitnesses.map((witness, index) => (index === 0 ? serializeWitnessArgs(emptyWitness) : witness)),
   };
-  const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
-  return txHash;
+  return signedTx;
 };
