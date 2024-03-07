@@ -1,9 +1,15 @@
-import { getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
+import {
+  getTransactionSize,
+  rawTransactionToHash,
+  scriptToHash,
+  serializeWitnessArgs,
+} from '@nervosnetwork/ckb-sdk-utils';
 import { Hex, IndexerCell } from '../types';
-import { SECP256K1_WITNESS_LOCK_LEN } from '../constants';
+import { SECP256K1_WITNESS_LOCK_LEN, getRgbppLockScript } from '../constants';
 import { append0x, calculateTransactionFee } from '../utils';
 import { InputsCapacityNotEnoughError } from '../error';
 import { Collector } from '../collector';
+import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 
 //TODO: waiting for SPV proof
 export const appendWitnesses = (
@@ -31,13 +37,16 @@ export const appendWitnesses = (
   }
 };
 
-export const appendPaymasterCell = (
+export const appendPaymasterCellAndSignTx = async (
+  secp256k1PrivateKey: Hex,
+  collector: Collector,
   ckbRawTx: CKBComponents.RawTransaction,
   sumInputsCapacity: bigint,
   paymasterCell: IndexerCell,
 ) => {
   let rawTx = ckbRawTx;
-  rawTx.inputs = [{ previousOutput: paymasterCell.outPoint, since: '0x0' }, ...rawTx.inputs];
+  const paymasterInput = { previousOutput: paymasterCell.outPoint, since: '0x0' };
+  rawTx.inputs = [paymasterInput, ...rawTx.inputs];
   const inputsCapacity = sumInputsCapacity + BigInt(paymasterCell.output.capacity);
 
   const sumOutputsCapacity = rawTx.outputs
@@ -53,16 +62,28 @@ export const appendPaymasterCell = (
   const changeCapacity = inputsCapacity - sumOutputsCapacity - estimatedTxFee;
   rawTx.outputs[rawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
 
-  return rawTx;
-};
+  let keyMap = new Map<string, string>();
+  keyMap.set(scriptToHash(paymasterCell.output.lock), secp256k1PrivateKey);
+  // The 0x00 is placeholder for rpbpp cell and it has no effect on transaction signatures
+  keyMap.set('0x00', '');
 
-// Only used for the ckb tx who has paymaster cell
-export const signRgbppTx = async (
-  secp256k1PrivateKey: Hex,
-  collector: Collector,
-  ckbRawTx: CKBComponents.RawTransaction,
-) => {
-  const signedTx = collector.getCkb().signTransaction(secp256k1PrivateKey)(ckbRawTx);
+  const cells = ckbRawTx.inputs.map((input, index) => ({
+    outPoint: input.previousOutput,
+    lock: index === 0 ? paymasterCell.output.lock : getRgbppLockScript(false),
+  }));
+
+  const transactionHash = rawTransactionToHash(rawTx);
+  const signedWitnesses = signWitnesses(keyMap)({
+    transactionHash,
+    witnesses: rawTx.witnesses,
+    inputCells: cells,
+    skipMissingKeys: true,
+  });
+  const emptyWitness = { lock: '', inputType: '', outputType: '' };
+  const signedTx = {
+    ...rawTx,
+    witnesses: signedWitnesses.map((witness, index) => (index === 0 ? serializeWitnessArgs(emptyWitness) : witness)),
+  };
   const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
   return txHash;
 };
