@@ -25,7 +25,7 @@ importers:
         version: 5.0.5
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.11.24)(typescript@5.3.3)
+        version: 10.9.2(@types/node@20.11.10)(typescript@5.3.3)
       turbo:
         specifier: ^1.12.4
         version: 1.12.4
@@ -50,7 +50,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: ^20
-        version: 20.11.24
+        version: 20.11.10
       '@types/react':
         specifier: ^18
         version: 18.2.63
@@ -84,14 +84,13 @@ importers:
         version: 4.14.202
       vitest:
         specifier: ^1.2.0
-<<<<<<< HEAD
-        version: 1.3.0(@types/node@20.11.24)
-=======
         version: 1.3.0(@types/node@20.11.10)
->>>>>>> update ckb package ts-config
 
   packages/ckb:
     dependencies:
+      '@ckb-lumos/base':
+        specifier: 0.21.1
+        version: 0.21.1
       '@ckb-lumos/codec':
         specifier: 0.0.0-canary-3f37c5b-20240228111419
         version: 0.0.0-canary-3f37c5b-20240228111419
@@ -113,6 +112,9 @@ importers:
       camelcase-keys:
         specifier: ^7.0.2
         version: 7.0.2
+      js-sha256:
+        specifier: ^0.11.0
+        version: 0.11.0
     devDependencies:
       '@ckb-lumos/molecule':
         specifier: 0.0.0-canary-3f37c5b-20240228111419
@@ -122,11 +124,7 @@ importers:
         version: 4.14.202
       vitest:
         specifier: ^1.2.0
-<<<<<<< HEAD
-        version: 1.3.0(@types/node@20.11.24)
-=======
         version: 1.3.0(@types/node@20.11.10)
->>>>>>> update ckb package ts-config
 
 packages:
 
@@ -349,17 +347,45 @@ packages:
       prettier: 2.8.8
     dev: true
 
+  /@ckb-lumos/base@0.21.1:
+    resolution: {integrity: sha512-7O+jBl7pqMsRbYTMNnbpamgaQzvaLZq+ftMtnKZ3A+Zbs6hZcGbz/6nfbRZnyJitPXQHRPT5KAQz6g+TiYqJGg==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      '@ckb-lumos/bi': 0.21.1
+      '@ckb-lumos/codec': 0.21.1
+      '@ckb-lumos/toolkit': 0.21.1
+      '@types/blake2b': 2.1.3
+      '@types/lodash.isequal': 4.5.8
+      blake2b: 2.1.4
+      js-xxhash: 1.0.4
+      lodash.isequal: 4.5.0
+    dev: false
+
   /@ckb-lumos/bi@0.0.0-canary-3f37c5b-20240228111419:
     resolution: {integrity: sha512-pcPOzhPIfgHoDWwCiBgedJcDqAAQ5qQMChYtRdv7AtxgGRK1aWGa6dvVp1WONtC76LM/l6Jjd5zcF+TlgU2n1w==}
     engines: {node: '>=12.0.0'}
     dependencies:
       jsbi: 4.3.0
 
+  /@ckb-lumos/bi@0.21.1:
+    resolution: {integrity: sha512-6q8uesvu3DAM7GReei9H5seino4tnakTeg8uXtZBPDC6rboMohLCPQvEwhl1iHmsybXvBYVQt4Te1BPPZtuaRw==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      jsbi: 4.3.0
+    dev: false
+
   /@ckb-lumos/codec@0.0.0-canary-3f37c5b-20240228111419:
     resolution: {integrity: sha512-SaaQUGPvZuxHTwpsrlNFBqxmNQ+6XZx6qxOF5ZePuhhDEUPHtUcxhX6t+kPhtQLLVFe/M8AznkzsOAw3IDUQvQ==}
     engines: {node: '>=12.0.0'}
     dependencies:
       '@ckb-lumos/bi': 0.0.0-canary-3f37c5b-20240228111419
+
+  /@ckb-lumos/codec@0.21.1:
+    resolution: {integrity: sha512-z6IUUxVZrx663iC7VM9CmaQZL8jsdM3ybgz0UCS24JgBXTNec+Uz0/Zrl7yeH6fBpVls44C2wObcHKigKaNVAA==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      '@ckb-lumos/bi': 0.21.1
+    dev: false
 
   /@ckb-lumos/molecule@0.0.0-canary-3f37c5b-20240228111419:
     resolution: {integrity: sha512-2fK4/tG7Ns41urIW72X/CKpD41MW9tqaHSclL2owKUdcm3d7pVBy5Lrt1b4kbWJjUrFU8tM3SGDWQSd9EpaQMw==}
@@ -372,6 +398,13 @@ packages:
       moo: 0.5.2
       nearley: 2.20.1
     dev: true
+
+  /@ckb-lumos/toolkit@0.21.1:
+    resolution: {integrity: sha512-awrFos7uQXEVGbqKSv/8Fc8B8XAfxdYoyYak4zFyAAmxxA0NiTTvk9V8TsOA7zVXpxct4Jal22+qUe+4Jg8T/g==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      '@ckb-lumos/bi': 0.21.1
+    dev: false
 
   /@cspotcode/source-map-support@0.8.1:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -642,7 +675,41 @@ packages:
       read-yaml-file: 1.1.0
     dev: true
 
-<<<<<<< HEAD
+  /@nervosnetwork/ckb-sdk-core@0.109.0:
+    resolution: {integrity: sha512-c0pMKrZxVG0zRaPOMY+sV7CubW+Fr1YGEj/c3iEZadlXQPeeZ7wdhblG/F4oEtGebRv2lO+F8gTL9FwQlHAXRw==}
+    dependencies:
+      '@nervosnetwork/ckb-sdk-rpc': 0.109.0
+      '@nervosnetwork/ckb-sdk-utils': 0.109.0
+      '@nervosnetwork/ckb-types': 0.109.0
+      tslib: 2.3.1
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
+  /@nervosnetwork/ckb-sdk-rpc@0.109.0:
+    resolution: {integrity: sha512-qkb2TBMb/gqECNqzVlrx9p6V4TdyYcGlN4sOgjVrrDQw7wVcezZFMjj6usNZZLxzbyEmjksTxbAucUnbftumxA==}
+    dependencies:
+      '@nervosnetwork/ckb-sdk-utils': 0.109.0
+      axios: 0.21.4
+      tslib: 2.3.1
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
+  /@nervosnetwork/ckb-sdk-utils@0.109.0:
+    resolution: {integrity: sha512-/lqq9qU2COhQZx6chfTzASbB+v9dFxX5WfdKpvMNvRT6tOHRGTVRgjBBS++GXLKpmn1934EJOlYOc6Peeo7g6g==}
+    dependencies:
+      '@nervosnetwork/ckb-types': 0.109.0
+      bech32: 2.0.0
+      elliptic: 6.5.4
+      jsbi: 3.1.3
+      tslib: 2.3.1
+    dev: false
+
+  /@nervosnetwork/ckb-types@0.109.0:
+    resolution: {integrity: sha512-ZB3zpotHP8KDTex9Jxv7vi3sxVEqWijQjDmNA9laIEk01aoKVMyBZ09ByKuU46/88qgjmDsu3Ob7HqGaoFVtKQ==}
+    dev: false
+
   /@next/env@14.1.2:
     resolution: {integrity: sha512-U0iEG+JF86j6qyu330sfPgsMmDVH8vWVmzZadl+an5EU3o5HqdNytOpM+HsFpl58PmhGBTKx3UmM9c+eoLK0mA==}
     dev: false
@@ -728,43 +795,6 @@ packages:
     dev: false
     optional: true
 
-=======
-  /@nervosnetwork/ckb-sdk-core@0.109.0:
-    resolution: {integrity: sha512-c0pMKrZxVG0zRaPOMY+sV7CubW+Fr1YGEj/c3iEZadlXQPeeZ7wdhblG/F4oEtGebRv2lO+F8gTL9FwQlHAXRw==}
-    dependencies:
-      '@nervosnetwork/ckb-sdk-rpc': 0.109.0
-      '@nervosnetwork/ckb-sdk-utils': 0.109.0
-      '@nervosnetwork/ckb-types': 0.109.0
-      tslib: 2.3.1
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
-  /@nervosnetwork/ckb-sdk-rpc@0.109.0:
-    resolution: {integrity: sha512-qkb2TBMb/gqECNqzVlrx9p6V4TdyYcGlN4sOgjVrrDQw7wVcezZFMjj6usNZZLxzbyEmjksTxbAucUnbftumxA==}
-    dependencies:
-      '@nervosnetwork/ckb-sdk-utils': 0.109.0
-      axios: 0.21.4
-      tslib: 2.3.1
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
-  /@nervosnetwork/ckb-sdk-utils@0.109.0:
-    resolution: {integrity: sha512-/lqq9qU2COhQZx6chfTzASbB+v9dFxX5WfdKpvMNvRT6tOHRGTVRgjBBS++GXLKpmn1934EJOlYOc6Peeo7g6g==}
-    dependencies:
-      '@nervosnetwork/ckb-types': 0.109.0
-      bech32: 2.0.0
-      elliptic: 6.5.4
-      jsbi: 3.1.3
-      tslib: 2.3.1
-    dev: false
-
-  /@nervosnetwork/ckb-types@0.109.0:
-    resolution: {integrity: sha512-ZB3zpotHP8KDTex9Jxv7vi3sxVEqWijQjDmNA9laIEk01aoKVMyBZ09ByKuU46/88qgjmDsu3Ob7HqGaoFVtKQ==}
-    dev: false
-
->>>>>>> update ckb package ts-config
   /@noble/hashes@1.3.3:
     resolution: {integrity: sha512-V7/fPHgl+jsVPXqqeOzT8egNj2iBIVt+ECeMMG8TdcnTikP3oaBtUVqpT/gYCR68aEBJSF+XbYUxStjbFMqIIA==}
     engines: {node: '>= 16'}
@@ -936,13 +966,22 @@ packages:
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
     dev: true
 
+  /@types/blake2b@2.1.3:
+    resolution: {integrity: sha512-MFCdX0MNxFBP/xEILO5Td0kv6nI7+Q2iRWZbTL/yzH2/eDVZS5Wd1LHdsmXClvsCyzqaZfHFzZaN6BUeUCfSDA==}
+    dev: false
+
   /@types/estree@1.0.5:
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
     dev: true
 
+  /@types/lodash.isequal@4.5.8:
+    resolution: {integrity: sha512-uput6pg4E/tj2LGxCZo9+y27JNyB2OZuuI/T5F+ylVDYuqICLG2/ktjxx0v6GvVntAf8TvEzeQLcV0ffRirXuA==}
+    dependencies:
+      '@types/lodash': 4.14.202
+    dev: false
+
   /@types/lodash@4.14.202:
     resolution: {integrity: sha512-OvlIYQK9tNneDlS0VN54LLd5uiPCBOp7gS5Z0f1mjoJYBrtStzgmJBxONW3U6OZqdtNzZPmn9BS/7WI7BFFcFQ==}
-    dev: true
 
   /@types/minimist@1.2.5:
     resolution: {integrity: sha512-hov8bUuiLiyFPGyFPE1lwWhmzYbirOXQNNo40+y3zow8aFVTeyn3VWL0VFFfdNddA8S4Vf0Tc062rzyNr7Paag==}
@@ -956,13 +995,8 @@ packages:
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
     dev: true
 
-<<<<<<< HEAD
-  /@types/node@20.11.24:
-    resolution: {integrity: sha512-Kza43ewS3xoLgCEpQrsT+xRo/EJej1y0kVYGiLFE1NEODXGzTfwiC6tXTLMQskn1X4/Rjlh0MQUvx9W+L9long==}
-=======
   /@types/node@20.11.10:
     resolution: {integrity: sha512-rZEfe/hJSGYmdfX9tvcPMYeYPW2sNl50nsw4jZmRcaG0HIAb0WYEpsB05GOb53vjqpyE9GUhlDQ4jLSoB5q9kg==}
->>>>>>> update ckb package ts-config
     dependencies:
       undici-types: 5.26.5
     dev: true
@@ -1178,6 +1212,10 @@ packages:
       - debug
     dev: false
 
+  /b4a@1.6.6:
+    resolution: {integrity: sha512-5Tk1HLk6b6ctmjIkAcU/Ujv/1WqiDl0F0JdRCR80VsOcUlHcu7pWeWRlOqQLHfDEsVx9YH/aif5AG4ehoCtTmg==}
+    dev: false
+
   /balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
     dev: true
@@ -1232,6 +1270,20 @@ packages:
       bs58check: 3.0.1
       typeforce: 1.18.0
       varuint-bitcoin: 1.1.2
+    dev: false
+
+  /blake2b-wasm@2.4.0:
+    resolution: {integrity: sha512-S1kwmW2ZhZFFFOghcx73+ZajEfKBqhP82JMssxtLVMxlaPea1p9uoLiUZ5WYyHn0KddwbLc+0vh4wR0KBNoT5w==}
+    dependencies:
+      b4a: 1.6.6
+      nanoassert: 2.0.0
+    dev: false
+
+  /blake2b@2.1.4:
+    resolution: {integrity: sha512-AyBuuJNI64gIvwx13qiICz6H6hpmjvYS5DGkG6jbXMOT8Z3WUJ3V1X0FlhIoT1b/5JtHE3ki+xjtMvu1nn+t9A==}
+    dependencies:
+      blake2b-wasm: 2.4.0
+      nanoassert: 2.0.0
     dev: false
 
   /bn.js@4.12.0:
@@ -1335,14 +1387,13 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-<<<<<<< HEAD
-  /caniuse-lite@1.0.30001594:
-    resolution: {integrity: sha512-VblSX6nYqyJVs8DKFMldE2IVCJjZ225LW00ydtUWwh5hk9IfkTOffO6r8gJNsH0qqqeAF8KrbMYA2VEwTlGW5g==}
-=======
   /camelcase@6.3.0:
     resolution: {integrity: sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==}
     engines: {node: '>=10'}
->>>>>>> update ckb package ts-config
+    dev: false
+
+  /caniuse-lite@1.0.30001594:
+    resolution: {integrity: sha512-VblSX6nYqyJVs8DKFMldE2IVCJjZ225LW00ydtUWwh5hk9IfkTOffO6r8gJNsH0qqqeAF8KrbMYA2VEwTlGW5g==}
     dev: false
 
   /chai@4.4.1:
@@ -2353,12 +2404,21 @@ packages:
       '@pkgjs/parseargs': 0.11.0
     dev: true
 
+  /js-sha256@0.11.0:
+    resolution: {integrity: sha512-6xNlKayMZvds9h1Y1VWc0fQHQ82BxTXizWPEtEeGvmOUYpBRy4gbWroHLpzowe6xiQhHpelCQiE7HEdznyBL9Q==}
+    dev: false
+
   /js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
   /js-tokens@8.0.3:
     resolution: {integrity: sha512-UfJMcSJc+SEXEl9lH/VLHSZbThQyLpw1vLO1Lb+j4RWDvG3N2f7yj3PVQA3cmkTBNldJ9eFnM+xEXxHIXrYiJw==}
     dev: true
+
+  /js-xxhash@1.0.4:
+    resolution: {integrity: sha512-S/6Oo7ruxx5k8m4qlMnbpwQdJjRsvvfcIhIk1dA9c5y5GNhYHKYKu9krEK3QgBax6CxJuf4gRL2opgLkdzWIKg==}
+    engines: {node: '>=8.0.0'}
+    dev: false
 
   /js-yaml@3.14.1:
     resolution: {integrity: sha512-okMH7OXXJ7YrN9Ok3/SXrnu4iX9yOk+25nqX4imS2npuvTYDmo/QEZoqwZkYaIDk3jVvBOTOIEgEhaLOynBS9g==}
@@ -2470,6 +2530,10 @@ packages:
     dependencies:
       p-locate: 5.0.0
     dev: true
+
+  /lodash.isequal@4.5.0:
+    resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
+    dev: false
 
   /lodash.startcase@4.4.0:
     resolution: {integrity: sha512-+WKqsK294HMSc2jEbNgpHpd0JfIBhp7rEV4aqXWqFr6AlXov+SlcgB1Fv01y2kGe3Gc8nMW7VA0SrGuSkRfIEg==}
@@ -2661,6 +2725,10 @@ packages:
   /ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
     dev: true
+
+  /nanoassert@2.0.0:
+    resolution: {integrity: sha512-7vO7n28+aYO4J+8w96AzhmU8G+Y/xpPDJz/se19ICsqj/momRbb9mh9ZUtkoJ5X3nTnPdhEJyc0qnM6yAsHBaA==}
+    dev: false
 
   /nanoid@3.3.7:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
@@ -3564,11 +3632,7 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-<<<<<<< HEAD
-  /ts-node@10.9.2(@types/node@20.11.24)(typescript@5.3.3):
-=======
   /ts-node@10.9.2(@types/node@20.11.10)(typescript@5.3.3):
->>>>>>> update ckb package ts-config
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
     hasBin: true
     peerDependencies:
@@ -3587,11 +3651,7 @@ packages:
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-<<<<<<< HEAD
-      '@types/node': 20.11.24
-=======
       '@types/node': 20.11.10
->>>>>>> update ckb package ts-config
       acorn: 8.11.3
       acorn-walk: 8.3.2
       arg: 4.1.3
@@ -3603,13 +3663,12 @@ packages:
       yn: 3.1.1
     dev: true
 
-<<<<<<< HEAD
-  /tslib@2.6.2:
-    resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
-=======
   /tslib@2.3.1:
     resolution: {integrity: sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==}
->>>>>>> update ckb package ts-config
+    dev: false
+
+  /tslib@2.6.2:
+    resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
     dev: false
 
   /tty-table@4.2.3:
@@ -3808,11 +3867,7 @@ packages:
       safe-buffer: 5.2.1
     dev: false
 
-<<<<<<< HEAD
-  /vite-node@1.3.0(@types/node@20.11.24):
-=======
   /vite-node@1.3.0(@types/node@20.11.10):
->>>>>>> update ckb package ts-config
     resolution: {integrity: sha512-D/oiDVBw75XMnjAXne/4feCkCEwcbr2SU1bjAhCcfI5Bq3VoOHji8/wCPAfUkDIeohJ5nSZ39fNxM3dNZ6OBOA==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -3821,11 +3876,7 @@ packages:
       debug: 4.3.4
       pathe: 1.1.2
       picocolors: 1.0.0
-<<<<<<< HEAD
-      vite: 5.1.3(@types/node@20.11.24)
-=======
       vite: 5.1.3(@types/node@20.11.10)
->>>>>>> update ckb package ts-config
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -3837,11 +3888,7 @@ packages:
       - terser
     dev: true
 
-<<<<<<< HEAD
-  /vite@5.1.3(@types/node@20.11.24):
-=======
   /vite@5.1.3(@types/node@20.11.10):
->>>>>>> update ckb package ts-config
     resolution: {integrity: sha512-UfmUD36DKkqhi/F75RrxvPpry+9+tTkrXfMNZD+SboZqBCMsxKtO52XeGzzuh7ioz+Eo/SYDBbdb0Z7vgcDJew==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -3869,11 +3916,7 @@ packages:
       terser:
         optional: true
     dependencies:
-<<<<<<< HEAD
-      '@types/node': 20.11.24
-=======
       '@types/node': 20.11.10
->>>>>>> update ckb package ts-config
       esbuild: 0.19.12
       postcss: 8.4.35
       rollup: 4.12.0
@@ -3881,11 +3924,7 @@ packages:
       fsevents: 2.3.3
     dev: true
 
-<<<<<<< HEAD
-  /vitest@1.3.0(@types/node@20.11.24):
-=======
   /vitest@1.3.0(@types/node@20.11.10):
->>>>>>> update ckb package ts-config
     resolution: {integrity: sha512-V9qb276J1jjSx9xb75T2VoYXdO1UKi+qfflY7V7w93jzX7oA/+RtYE6TcifxksxsZvygSSMwu2Uw6di7yqDMwg==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -3910,11 +3949,7 @@ packages:
       jsdom:
         optional: true
     dependencies:
-<<<<<<< HEAD
-      '@types/node': 20.11.24
-=======
       '@types/node': 20.11.10
->>>>>>> update ckb package ts-config
       '@vitest/expect': 1.3.0
       '@vitest/runner': 1.3.0
       '@vitest/snapshot': 1.3.0
@@ -3932,13 +3967,8 @@ packages:
       strip-literal: 2.0.0
       tinybench: 2.6.0
       tinypool: 0.8.2
-<<<<<<< HEAD
-      vite: 5.1.3(@types/node@20.11.24)
-      vite-node: 1.3.0(@types/node@20.11.24)
-=======
       vite: 5.1.3(@types/node@20.11.10)
       vite-node: 1.3.0(@types/node@20.11.10)
->>>>>>> update ckb package ts-config
       why-is-node-running: 2.2.2
     transitivePeerDependencies:
       - less
