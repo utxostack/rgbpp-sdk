@@ -15,10 +15,17 @@ const ArrayBufferToHex = (arrayBuffer: ArrayBuffer): string => {
   return Array.prototype.map.call(new Uint8Array(arrayBuffer), (x) => ('00' + x.toString(16)).slice(-2)).join('');
 };
 
-export const u16ToBe = (u16: number): string => {
+export const u8ToHex = (u8: number): string => {
+  let buffer = new ArrayBuffer(1);
+  let view = new DataView(buffer);
+  view.setUint8(0, u8);
+  return ArrayBufferToHex(buffer);
+};
+
+export const u16ToLe = (u16: number): string => {
   let buffer = new ArrayBuffer(2);
   let view = new DataView(buffer);
-  view.setUint16(0, u16, false);
+  view.setUint16(0, u16, true);
   return ArrayBufferToHex(buffer);
 };
 
@@ -41,6 +48,26 @@ export const leToU32 = (leHex: string): number => {
   const bytes = hexToBytes(append0x(leHex));
   const beHex = `0x${bytes.reduceRight((pre, cur) => pre + cur.toString(16).padStart(2, '0'), '')}`;
   return parseInt(beHex, 16);
+};
+
+export const u64ToLe = (u64: bigint): string => {
+  const val = u64.toString(16).padStart(16, '0');
+  const viewLeft = u32ToLe(`0x${val.slice(8)}`);
+  const viewRight = u32ToLe(`0x${val.slice(0, 8)}`);
+  return `${viewLeft}${viewRight}`;
+};
+
+export const u128ToLe = (u128: bigint): string => {
+  const val = u128.toString(16).padStart(32, '0');
+  const viewLeft = u64ToLe(BigInt(`0x${val.slice(16)}`));
+  const viewRight = u64ToLe(BigInt(`0x${val.slice(0, 16)}`));
+  return `${viewLeft}${viewRight}`;
+};
+
+export const leToU128 = (leHex: string): bigint => {
+  const bytes = hexToBytes(append0x(leHex));
+  const beHex = `0x${bytes.reduceRight((pre, cur) => pre + cur.toString(16).padStart(2, '0'), '')}`;
+  return BigInt(beHex);
 };
 
 export const utf8ToHex = (text: string) => {
