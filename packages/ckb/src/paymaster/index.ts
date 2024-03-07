@@ -1,11 +1,10 @@
 import { AddressPrefix, addressToScript, getTransactionSize, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
-import { ConstructParams } from '../types/rgbpp';
+import { ConstructPaymasterParams } from '../types/rgbpp';
 import { NoLiveCellError } from '../error';
-import { CKB_UNIT, MAX_FEE, getSecp256k1CellDep } from '../constants';
+import { CKB_UNIT, MAX_FEE, SECP256K1_WITNESS_LOCK_LEN, getSecp256k1CellDep } from '../constants';
 import { append0x, calculateTransactionFee } from '../utils';
 
 const SECP256K1_MIN_CAPACITY = BigInt(61) * CKB_UNIT;
-const SECP256K1_WITNESS_LOCK_LEN = 65;
 
 export const splitMultiCellsWithSecp256k1 = async ({
   masterPrivateKey,
@@ -13,7 +12,7 @@ export const splitMultiCellsWithSecp256k1 = async ({
   receiverAddress,
   capacityWithCKB,
   cellAmount,
-}: ConstructParams) => {
+}: ConstructPaymasterParams) => {
   const isMainnet = receiverAddress.startsWith('ckb');
   const masterAddress = privateKeyToAddress(masterPrivateKey, {
     prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
