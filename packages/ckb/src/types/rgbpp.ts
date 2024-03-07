@@ -49,3 +49,8 @@ export interface AppendPaymasterCellAndSignTxParams {
   sumInputsCapacity: bigint;
   paymasterCell: IndexerCell;
 }
+
+export interface SendTxParams {
+  collector: Collector;
+  signedTx: CKBComponents.RawTransaction;
+}

@@ -4,7 +4,7 @@ import {
   scriptToHash,
   serializeWitnessArgs,
 } from '@nervosnetwork/ckb-sdk-utils';
-import { AppendPaymasterCellAndSignTxParams, AppendWitnessesParams } from '../types';
+import { AppendPaymasterCellAndSignTxParams, AppendWitnessesParams, SendTxParams } from '../types';
 import { SECP256K1_WITNESS_LOCK_LEN, getRgbppLockScript } from '../constants';
 import { append0x, calculateTransactionFee } from '../utils';
 import { InputsCapacityNotEnoughError } from '../error';
@@ -79,4 +79,9 @@ export const appendPaymasterCellAndSignTx = async ({
     witnesses: signedWitnesses.map((witness, index) => (index === 0 ? serializeWitnessArgs(emptyWitness) : witness)),
   };
   return signedTx;
+};
+
+export const sendCkbTx = async ({ collector, signedTx }: SendTxParams) => {
+  const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
+  return txHash;
 };
