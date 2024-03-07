@@ -1,9 +1,10 @@
 import axios from 'axios';
 import CKB from '@nervosnetwork/ckb-sdk-core';
 import { toCamelcase } from '../utils/case-parser';
-import { CollectResult, IndexerCell } from '../types/collector';
+import { CollectResult, CollectUdtResult, IndexerCell } from '../types/collector';
 import { MIN_CAPACITY } from '../constants';
-import { CapacityNotEnoughError, IndexerError } from '../error';
+import { CapacityNotEnoughError, IndexerError, UdtAmountNotEnoughError } from '../error';
+import { leToU128 } from '../utils';
 
 const parseScript = (script: CKBComponents.Script) => ({
   code_hash: script.codeHash,
@@ -110,5 +111,35 @@ export class Collector {
       throw new CapacityNotEnoughError(message);
     }
     return { inputs, capacity: sum };
+  }
+
+  collectUdtInputs(liveCells: IndexerCell[], needAmount: bigint): CollectUdtResult {
+    let inputs: CKBComponents.CellInput[] = [];
+    let sumCapacity = BigInt(0);
+    let sumAmount = BigInt(0);
+    for (let cell of liveCells) {
+      inputs.push({
+        previousOutput: {
+          txHash: cell.outPoint.txHash,
+          index: cell.outPoint.index,
+        },
+        since: '0x0',
+      });
+      sumCapacity = sumCapacity + BigInt(cell.output.capacity);
+      sumAmount += leToU128(cell.outputData);
+      if (sumAmount >= needAmount) {
+        break;
+      }
+    }
+    if (sumAmount < needAmount) {
+      throw new UdtAmountNotEnoughError('Insufficient UDT balance');
+    }
+    return { inputs, capacity: sumCapacity, amount: sumAmount };
+  }
+
+  async getLiveCell(outPoint: CKBComponents.OutPoint): Promise<CKBComponents.LiveCell> {
+    const ckb = new CKB(this.ckbNodeUrl);
+    const { cell } = await ckb.rpc.getLiveCell(outPoint, true);
+    return cell;
   }
 }
