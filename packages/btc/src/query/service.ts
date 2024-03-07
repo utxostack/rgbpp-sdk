@@ -179,9 +179,11 @@ export class BtcAssetsApi {
       }
     }
     if (json && !ok) {
+      const innerError = json?.error?.error ? `(${json.error.error.code}) ${json.error.error.message}` : void 0;
+      const message = json.message ?? innerError ?? JSON.stringify(json);
       throw new TxBuildError(
         ErrorCodes.ASSETS_API_RESPONSE_ERROR,
-        `${ErrorMessages[ErrorCodes.ASSETS_API_RESPONSE_ERROR]}: ${json.message}`,
+        `${ErrorMessages[ErrorCodes.ASSETS_API_RESPONSE_ERROR]}: ${message}`,
       );
     }
 
