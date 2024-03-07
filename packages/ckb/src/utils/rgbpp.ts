@@ -11,6 +11,7 @@ export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet?: boolean) => {
   } as CKBComponents.Script;
 };
 
+// refer to https://github.com/ckb-cell/rgbpp/blob/0c090b039e8d026aad4336395b908af283a70ebf/contracts/rgbpp-lock/src/main.rs#L173-L211
 export const calculateCommitment = (rgbppVirtualTx: RgbppL1TransferVirtualTx) => {
   var hash = sha256.create();
   hash.update(utf8ToHex('RGB++'));
