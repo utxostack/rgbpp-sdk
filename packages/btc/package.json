@@ -1,6 +1,6 @@
 {
   "name": "@rgbpp-sdk/btc",
-  "version": "0.1.0",
+  "version": "0.0.0-snap-20240308080935",
   "scripts": {
     "test": "vitest --watch=false",
     "build": "tsc -p tsconfig.build.json",
