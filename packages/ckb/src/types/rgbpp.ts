@@ -54,3 +54,10 @@ export interface SendCkbTxParams {
 export interface BtcJumpCkbVirtualTxParams extends BtcTransferCkbVirtualTxParams {
   toCkbAddress: Address;
 }
+
+export interface BtcTimeCellsParams {
+  collector: Collector;
+  xudtType: CKBComponents.Script;
+  cellCount: number;
+  isMainnet?: boolean;
+}
