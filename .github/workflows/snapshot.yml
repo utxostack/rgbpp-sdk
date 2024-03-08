@@ -56,8 +56,8 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          version: changeset version --snapshot snap
-          publish: changeset publish --snapshot --tag snap
+          version: npx changeset version --snapshot snap
+          publish: npx changeset publish --snapshot --tag snap
           createGithubReleases: false
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
