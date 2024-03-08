@@ -1,8 +1,9 @@
 import { sha256 } from 'js-sha256';
 import { Hex, BtcTransferCkbVirtualTx } from '../types';
-import { append0x, u16ToLe, u32ToLe, u8ToHex, utf8ToHex } from './hex';
+import { append0x, remove0x, u16ToLe, u32ToLe, u8ToHex, utf8ToHex } from './hex';
 import { getRgbppLockScript } from '../constants';
 import { hexToBytes, serializeOutPoint, serializeOutputs, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
+import { blockchain } from '@ckb-lumos/base';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet?: boolean) => {
   return {
@@ -34,4 +35,18 @@ export const calculateCommitment = (rgbppVirtualTx: BtcTransferCkbVirtualTx | CK
   hash.update(hexToBytes(serializeOutputs(rgbppVirtualTx.outputs)));
   // double sha256
   return sha256(hash.array());
+};
+
+/**
+ * BTC_TIME_lock:
+	  args: lock_script | after | %bitcoin_tx_id%
+ *  after: Uint32, bitcoin_tx_id: Byte32
+ */
+export const lockScriptFromBtcTimeLockArgs = (args: Hex): CKBComponents.Script => {
+  const temp = remove0x(args);
+  if (temp.length <= 72) {
+    throw new Error('Invalid BTC time lock args');
+  }
+  const lockScript = append0x(temp.substring(0, temp.length - 72));
+  return blockchain.Script.unpack(lockScript);
 };
