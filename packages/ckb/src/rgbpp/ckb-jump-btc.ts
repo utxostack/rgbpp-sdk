@@ -1,4 +1,4 @@
-import { BtcTransferCkbVirtualTx, CkbJumpBtcVirtualTxParams, CkbJumpBtcVirtualTxResult } from '../types/rgbpp';
+import { CkbJumpBtcVirtualTxParams, CkbJumpBtcVirtualTxResult, RgbppCkbVirtualTx } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
 import { NoXudtLiveCellError } from '../error';
 import { append0x, calculateRgbppCellCapacity, calculateTransactionFee, u128ToLe, u32ToLe } from '../utils';
@@ -66,7 +66,7 @@ export const genCkbJumpBtcVirtualTx = async ({
     ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(estimatedChangeCapacity.toString(16));
   }
 
-  const virtualTx: BtcTransferCkbVirtualTx = {
+  const virtualTx: RgbppCkbVirtualTx = {
     inputs,
     outputs,
     outputsData,
