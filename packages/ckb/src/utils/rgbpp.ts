@@ -1,13 +1,22 @@
 import { sha256 } from 'js-sha256';
 import { Hex, BtcTransferCkbVirtualTx } from '../types';
-import { append0x, u16ToLe, u8ToHex, utf8ToHex } from './hex';
+import { append0x, u16ToLe, u32ToLe, u8ToHex, utf8ToHex } from './hex';
 import { getRgbppLockScript } from '../constants';
-import { hexToBytes, serializeOutPoint, serializeOutputs } from '@nervosnetwork/ckb-sdk-utils';
+import { hexToBytes, serializeOutPoint, serializeOutputs, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet?: boolean) => {
   return {
     ...getRgbppLockScript(isMainnet),
     args: append0x(rgbppLockArgs),
+  } as CKBComponents.Script;
+};
+
+export const BTC_JUMP_LOCK_TIME = 6;
+export const genBtcTimeLockScript = (toLock: CKBComponents.Script, isMainnet?: boolean) => {
+  const lockArgs = `${append0x(serializeScript(toLock))}${u32ToLe(6)}`;
+  return {
+    ...getRgbppLockScript(isMainnet),
+    args: lockArgs,
   } as CKBComponents.Script;
 };
 
