@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { sha256 } from 'js-sha256';
 import { hexToBytes } from '@nervosnetwork/ckb-sdk-utils';
-import { calculateCommitment, lockScriptFromBtcTimeLockArgs } from './rgbpp';
+import { calculateCommitment, genBtcTimeLockScript, lockScriptFromBtcTimeLockArgs } from './rgbpp';
 import { BtcTransferCkbVirtualTx } from '../types';
 
 describe('rgbpp tests', () => {
@@ -42,6 +42,18 @@ describe('rgbpp tests', () => {
     };
     const hash = calculateCommitment(virtualTx);
     expect(hash).toBe('6c6077f12059b6d8534a3a6e893a2268fe12d3456d1bf5c029fe66615e016c21');
+  });
+
+  it('genBtcTimeLockScript', async () => {
+    const toLock: CKBComponents.Script = {
+      args: '0xc0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f',
+      codeHash: '0x28e83a1277d48add8e72fadaa9248559e1b632bab2bd60b27955ebc4c03800a5',
+      hashType: 'data',
+    };
+    const lock = genBtcTimeLockScript(toLock);
+    expect(lock.args).toBe(
+      '0x5500000010000000300000003100000028e83a1277d48add8e72fadaa9248559e1b632bab2bd60b27955ebc4c03800a50020000000c0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f06000000',
+    );
   });
 
   it('lockScriptFromBtcTimeLockArgs', async () => {
