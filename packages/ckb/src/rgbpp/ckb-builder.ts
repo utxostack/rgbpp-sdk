@@ -37,6 +37,7 @@ export const appendPaymasterCellAndSignCkbTx = async ({
   ckbRawTx,
   sumInputsCapacity,
   paymasterCell,
+  isMainnet,
 }: AppendPaymasterCellAndSignTxParams) => {
   let rawTx = ckbRawTx;
   const paymasterInput = { previousOutput: paymasterCell.outPoint, since: '0x0' };
@@ -58,12 +59,11 @@ export const appendPaymasterCellAndSignCkbTx = async ({
 
   let keyMap = new Map<string, string>();
   keyMap.set(scriptToHash(paymasterCell.output.lock), secp256k1PrivateKey);
-  // The 0x00 is placeholder for rpbpp cell and it has no effect on transaction signatures
-  keyMap.set('0x00', '');
+  keyMap.set(scriptToHash(getRgbppLockScript(isMainnet)), '');
 
   const cells = ckbRawTx.inputs.map((input, index) => ({
     outPoint: input.previousOutput,
-    lock: index === 0 ? paymasterCell.output.lock : getRgbppLockScript(false),
+    lock: index === 0 ? paymasterCell.output.lock : getRgbppLockScript(isMainnet),
   }));
 
   const transactionHash = rawTransactionToHash(rawTx);

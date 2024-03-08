@@ -43,6 +43,7 @@ export interface AppendPaymasterCellAndSignTxParams {
   ckbRawTx: CKBComponents.RawTransaction;
   sumInputsCapacity: bigint;
   paymasterCell: IndexerCell;
+  isMainnet?: boolean;
 }
 
 export interface SendCkbTxParams {
