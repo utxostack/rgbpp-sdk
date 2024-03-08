@@ -4,8 +4,9 @@ import { DataSource } from '../query/source';
 import { ErrorCodes, TxBuildError } from '../error';
 import { AddressType, UnspentOutput } from '../types';
 import { NetworkType, toPsbtNetwork } from '../network';
-import { addressToScriptPublicKeyHex, getAddressType } from '../address';
 import { MIN_COLLECTABLE_SATOSHI } from '../constants';
+import { addressToScriptPublicKeyHex, getAddressType } from '../address';
+import { removeHexPrefix } from '../utils';
 import { dataToOpReturnScriptPubkey } from './embed';
 import { FeeEstimator } from './fee';
 
@@ -72,7 +73,7 @@ export class TxBuilder {
 
   addTo(to: TxTo) {
     if ('data' in to) {
-      const data = typeof to.data === 'string' ? Buffer.from(to.data, 'hex') : to.data;
+      const data = typeof to.data === 'string' ? Buffer.from(removeHexPrefix(to.data), 'hex') : to.data;
       const scriptPubkey = dataToOpReturnScriptPubkey(data);
 
       return this.addOutput({

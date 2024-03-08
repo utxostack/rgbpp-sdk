@@ -11,6 +11,7 @@ export * from './query/service';
 export * from './query/source';
 
 export * from './transaction/build';
+export * from './transaction/embed';
 export * from './transaction/fee';
 
 export * from './api/sendBtc';
