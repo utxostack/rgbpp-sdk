@@ -96,3 +96,16 @@ export interface BtcTimeCellsParams {
   btcTimeCells: IndexerCell[];
   isMainnet?: boolean;
 }
+
+export interface CkbJumpBtcVirtualTxParams {
+  collector: Collector;
+  xudtTypeBytes: Hex;
+  fromCkbAddress: Address;
+  toCkbAddress: Address;
+  transferAmount: bigint;
+}
+
+export interface CkbJumpBtcVirtualTxResult {
+  ckbRawTx: CKBComponents.RawTransaction;
+  commitment: Hex;
+}
