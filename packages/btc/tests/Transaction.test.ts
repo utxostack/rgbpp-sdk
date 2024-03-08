@@ -1,7 +1,7 @@
 import bitcoin from 'bitcoinjs-lib';
 import { describe, expect, it } from 'vitest';
-import { accounts, networkType, source } from './shared/env';
-import { ErrorCodes, ErrorMessages, sendBtc } from '../src';
+import { accounts, networkType, service, source } from './shared/env';
+import { ErrorCodes, ErrorMessages, MIN_COLLECTABLE_SATOSHI, sendBtc } from '../src';
 
 describe('Transaction', () => {
   describe('Transfer to various address types', () => {
@@ -45,6 +45,10 @@ describe('Transaction', () => {
     });
   });
   it('Transfer with an impossible "minUtxoSatoshi" filter', async () => {
+    const balance = await service.getBalance(accounts.charlie.p2wpkh.address, {
+      min_satoshi: MIN_COLLECTABLE_SATOSHI,
+    });
+
     await expect(() =>
       sendBtc({
         from: accounts.charlie.p2wpkh.address,
@@ -54,7 +58,7 @@ describe('Transaction', () => {
             value: 1000,
           },
         ],
-        minUtxoSatoshi: 1000000000000,
+        minUtxoSatoshi: balance.satoshi + 1,
         networkType,
         source,
       }),
