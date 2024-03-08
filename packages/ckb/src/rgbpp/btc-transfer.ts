@@ -25,11 +25,7 @@ export const genBtcTransferCkbVirtualTx = async ({
     rgbppCells = [...rgbppCells, ...cells];
   }
 
-  const {
-    inputs,
-    capacity: sumInputsCapacity,
-    amount: sumAmount,
-  } = collector.collectUdtInputs(rgbppCells, transferAmount);
+  const { inputs, sumInputsCapacity, sumAmount } = collector.collectUdtInputs(rgbppCells, transferAmount);
 
   const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
   const outputsData = [append0x(u128ToLe(transferAmount))];

@@ -16,9 +16,9 @@ export interface IndexerCapacity {
 
 export interface CollectResult {
   inputs: CKBComponents.CellInput[];
-  capacity: Capacity;
+  sumInputsCapacity: Capacity;
 }
 
 export interface CollectUdtResult extends CollectResult {
-  amount: bigint;
+  sumAmount: bigint;
 }

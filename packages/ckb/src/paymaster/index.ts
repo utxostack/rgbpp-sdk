@@ -29,7 +29,7 @@ export const splitMultiCellsWithSecp256k1 = async ({
   const cellCapacity = BigInt(capacityWithCKB) * CKB_UNIT;
   const needCapacity = cellCapacity * BigInt(cellAmount);
   let txFee = MAX_FEE;
-  const { inputs, capacity: emptyInputsCapacity } = collector.collectInputs(
+  const { inputs, sumInputsCapacity } = collector.collectInputs(
     emptyCells,
     needCapacity,
     txFee,
@@ -41,7 +41,7 @@ export const splitMultiCellsWithSecp256k1 = async ({
     capacity: append0x(cellCapacity.toString(16)),
   });
 
-  const changeCapacity = emptyInputsCapacity - needCapacity - txFee;
+  const changeCapacity = sumInputsCapacity - needCapacity - txFee;
   outputs.push({
     lock: masterLock,
     capacity: append0x(changeCapacity.toString(16)),
