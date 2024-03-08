@@ -1,3 +1,4 @@
+import bitcoin from 'bitcoinjs-lib';
 import { describe, expect, it } from 'vitest';
 import { accounts, networkType, source } from './shared/env';
 import { ErrorCodes, ErrorMessages, sendBtc } from '../src';
@@ -58,5 +59,49 @@ describe('Transaction', () => {
         source,
       }),
     ).rejects.toThrow(ErrorMessages[ErrorCodes.INSUFFICIENT_UTXO]);
+  });
+  it('Transfer with an extra OP_RETURN output', async () => {
+    const psbt = await sendBtc({
+      from: accounts.charlie.p2wpkh.address,
+      tos: [
+        {
+          data: Buffer.from('00'.repeat(32), 'hex'),
+          value: 0,
+        },
+        {
+          address: accounts.charlie.p2wpkh.address,
+          value: 1000,
+        },
+      ],
+      networkType,
+      source,
+    });
+
+    const outputs = psbt.txOutputs;
+    expect(outputs).toHaveLength(3);
+
+    const opReturnOutput = outputs[0];
+    expect(opReturnOutput).toBeDefined();
+    expect(opReturnOutput.script).toBeDefined();
+
+    const scripts = bitcoin.script.decompile(opReturnOutput.script);
+    expect(scripts).toBeDefined();
+
+    const op = scripts![0];
+    expect(op).toBeTypeOf('number');
+    expect(op).toBe(bitcoin.opcodes.OP_RETURN);
+
+    const data = scripts![1];
+    expect(data).toBeInstanceOf(Buffer);
+    expect((data as Buffer).toString('hex')).toEqual('00'.repeat(32));
+
+    // Sign & finalize inputs
+    psbt.signAllInputs(accounts.charlie.keyPair);
+    psbt.finalizeAllInputs();
+
+    // Broadcast transaction
+    // const tx = psbt.extractTransaction();
+    // const res = await service.sendTransaction(tx.toHex());
+    // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
   });
 });

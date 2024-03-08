@@ -6,6 +6,7 @@ import { AddressType, UnspentOutput } from '../types';
 import { NetworkType, toPsbtNetwork } from '../network';
 import { addressToScriptPublicKeyHex, getAddressType } from '../address';
 import { MIN_COLLECTABLE_SATOSHI } from '../constants';
+import { dataToOpReturnScriptPubkey } from './embed';
 import { FeeEstimator } from './fee';
 
 interface TxInput {
@@ -18,8 +19,19 @@ interface TxInput {
   utxo: UnspentOutput;
 }
 
-interface TxOutput {
+export type TxOutput = TxAddressOutput | TxScriptOutput;
+export interface TxAddressOutput {
   address: string;
+  value: number;
+}
+export interface TxScriptOutput {
+  script: Buffer;
+  value: number;
+}
+
+export type TxTo = TxAddressOutput | TxDataOutput;
+export interface TxDataOutput {
+  data: Buffer | string;
   value: number;
 }
 
@@ -49,14 +61,30 @@ export class TxBuilder {
   }
 
   addInput(utxo: UnspentOutput) {
+    utxo = clone(utxo);
     this.inputs.push(utxoToInput(utxo));
   }
 
-  addOutput(address: string, value: number) {
-    this.outputs.push({
-      address,
-      value,
-    });
+  addOutput(output: TxOutput) {
+    output = clone(output);
+    this.outputs.push(output);
+  }
+
+  addTo(to: TxTo) {
+    if ('data' in to) {
+      const data = typeof to.data === 'string' ? Buffer.from(to.data, 'hex') : to.data;
+      const scriptPubkey = dataToOpReturnScriptPubkey(data);
+
+      return this.addOutput({
+        script: scriptPubkey,
+        value: to.value,
+      });
+    }
+    if ('address' in to) {
+      return this.addOutput(to);
+    }
+
+    throw new TxBuildError(ErrorCodes.UNSUPPORTED_OUTPUT);
   }
 
   async collectInputsAndPayFee(address: string, fee?: number, extraChange?: number): Promise<void> {
@@ -92,7 +120,10 @@ export class TxBuilder {
       `collected satoshi: ${satoshi}, collected utxos: [${this.inputs.map((u) => u.utxo.value)}], returning change: ${changeSatoshi}`,
     );
     if (requireChangeUtxo) {
-      this.addOutput(this.changedAddress, changeSatoshi);
+      this.addOutput({
+        address: this.changedAddress,
+        value: changeSatoshi,
+      });
     }
 
     const addressType = getAddressType(address);
