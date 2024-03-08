@@ -50,3 +50,7 @@ export interface SendCkbTxParams {
   collector: Collector;
   signedTx: CKBComponents.RawTransaction;
 }
+
+export interface BtcJumpCkbVirtualTxParams extends BtcTransferCkbVirtualTxParams {
+  toCkbAddress: Address;
+}
