@@ -13,13 +13,24 @@ const TestnetInfo = {
   } as CKBComponents.CellDep,
 
   RgbppLockScript: {
-    codeHash: '0xd23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac',
+    codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
     hashType: 'type',
     args: '',
   } as CKBComponents.Script,
 
   RgbppLockDep: {
-    outPoint: { txHash: '0x437d4343c1eb5901c74ba34f6e9b1a1a25d72b441659d73bb1b40e9924bda6fb', index: '0x0' },
+    outPoint: { txHash: '0x0000000000000000000000000000000000000000000000000000000000000000', index: '0x0' },
+    depType: 'depGroup',
+  } as CKBComponents.CellDep,
+
+  BtcTimeLockScript: {
+    codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    hashType: 'type',
+    args: '',
+  } as CKBComponents.Script,
+
+  BtcTimeLockDep: {
+    outPoint: { txHash: '0x0000000000000000000000000000000000000000000000000000000000000000', index: '0x0' },
     depType: 'depGroup',
   } as CKBComponents.CellDep,
 
@@ -48,13 +59,24 @@ const MainnetInfo = {
   } as CKBComponents.CellDep,
 
   RgbppLockScript: {
-    codeHash: '0xd23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac',
+    codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
     hashType: 'type',
     args: '',
   } as CKBComponents.Script,
 
   RgbppLockDep: {
-    outPoint: { txHash: '0x437d4343c1eb5901c74ba34f6e9b1a1a25d72b441659d73bb1b40e9924bda6fb', index: '0x0' },
+    outPoint: { txHash: '0x0000000000000000000000000000000000000000000000000000000000000000', index: '0x0' },
+    depType: 'depGroup',
+  } as CKBComponents.CellDep,
+
+  BtcTimeLockScript: {
+    codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    hashType: 'type',
+    args: '',
+  } as CKBComponents.Script,
+
+  BtcTimeLockDep: {
+    outPoint: { txHash: '0x0000000000000000000000000000000000000000000000000000000000000000', index: '0x0' },
     depType: 'depGroup',
   } as CKBComponents.CellDep,
 
@@ -83,3 +105,8 @@ export const getXudtDep = (isMainnet = false) => (isMainnet ? MainnetInfo.XUDTTy
 export const getRgbppLockScript = (isMainnet = false) =>
   isMainnet ? MainnetInfo.RgbppLockScript : TestnetInfo.RgbppLockScript;
 export const getRgbppLockDep = (isMainnet = false) => (isMainnet ? MainnetInfo.RgbppLockDep : TestnetInfo.RgbppLockDep);
+
+export const getBtcTimeLockScript = (isMainnet = false) =>
+  isMainnet ? MainnetInfo.BtcTimeLockScript : TestnetInfo.BtcTimeLockScript;
+export const getBtcTimeLockDep = (isMainnet = false) =>
+  isMainnet ? MainnetInfo.BtcTimeLockDep : TestnetInfo.BtcTimeLockDep;
