@@ -1,5 +1,5 @@
 import { sha256 } from 'js-sha256';
-import { Hex, BtcTransferCkbVirtualTx } from '../types';
+import { Hex, RgbppCkbVirtualTx } from '../types';
 import { append0x, remove0x, u16ToLe, u32ToLe, u8ToHex, utf8ToHex } from './hex';
 import { getRgbppLockScript } from '../constants';
 import { hexToBytes, serializeOutPoint, serializeOutputs, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
@@ -22,7 +22,7 @@ export const genBtcTimeLockScript = (toLock: CKBComponents.Script, isMainnet?: b
 };
 
 // refer to https://github.com/ckb-cell/rgbpp/blob/0c090b039e8d026aad4336395b908af283a70ebf/contracts/rgbpp-lock/src/main.rs#L173-L211
-export const calculateCommitment = (rgbppVirtualTx: BtcTransferCkbVirtualTx | CKBComponents.RawTransaction): Hex => {
+export const calculateCommitment = (rgbppVirtualTx: RgbppCkbVirtualTx | CKBComponents.RawTransaction): Hex => {
   var hash = sha256.create();
   hash.update(hexToBytes(utf8ToHex('RGB++')));
   const version = u16ToLe(0);

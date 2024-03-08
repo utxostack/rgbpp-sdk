@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { sha256 } from 'js-sha256';
 import { hexToBytes } from '@nervosnetwork/ckb-sdk-utils';
 import { calculateCommitment, genBtcTimeLockScript, lockScriptFromBtcTimeLockArgs } from './rgbpp';
-import { BtcTransferCkbVirtualTx } from '../types';
+import { RgbppCkbVirtualTx } from '../types';
 
 describe('rgbpp tests', () => {
   it('sha256', async () => {
@@ -13,7 +13,7 @@ describe('rgbpp tests', () => {
 
   // TODO: Check the hash result with the data from the rgbpp lock script test case
   it('calculateCommitment', async () => {
-    const virtualTx: BtcTransferCkbVirtualTx = {
+    const virtualTx: RgbppCkbVirtualTx = {
       inputs: [
         {
           previousOutput: {

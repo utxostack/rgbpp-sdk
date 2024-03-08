@@ -1,4 +1,4 @@
-import { BtcTransferCkbVirtualTxParams, BtcTransferCkbVirtualResult, BtcTransferCkbVirtualTx } from '../types/rgbpp';
+import { BtcTransferVirtualTxParams, BtcTransferVirtualTxResult, RgbppCkbVirtualTx } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
 import { NoRgbppLiveCellError } from '../error';
 import { append0x, calculateRgbppCellCapacity, u128ToLe, u32ToLe } from '../utils';
@@ -12,7 +12,7 @@ export const genBtcTransferCkbVirtualTx = async ({
   rgbppLockArgsList,
   transferAmount,
   isMainnet,
-}: BtcTransferCkbVirtualTxParams): Promise<BtcTransferCkbVirtualResult> => {
+}: BtcTransferVirtualTxParams): Promise<BtcTransferVirtualTxResult> => {
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
 
   const rgbppLocks = rgbppLockArgsList.map((args) => genRgbppLockScript(args, isMainnet));
@@ -63,7 +63,7 @@ export const genBtcTransferCkbVirtualTx = async ({
     witnesses,
   };
 
-  const virtualTx: BtcTransferCkbVirtualTx = {
+  const virtualTx: RgbppCkbVirtualTx = {
     inputs,
     outputs,
     outputsData,
