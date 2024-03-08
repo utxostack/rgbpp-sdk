@@ -52,11 +52,13 @@ jobs:
       - name: Build packages
         run: pnpm run build:packages
 
+      - name: Version packages
+        run: npx changeset version --snapshot snap
+
       - name: Publish to npm (ignore GitHub)
         id: changesets
         uses: changesets/action@v1
         with:
-          version: npx changeset version --snapshot snap
           publish: npx changeset publish --snapshot --tag snap
           createGithubReleases: false
         env:
