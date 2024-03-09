@@ -17,13 +17,15 @@
     "lib"
   ],
   "dependencies": {
+    "@ckb-lumos/base": "0.21.1",
     "@ckb-lumos/codec": "0.0.0-canary-3f37c5b-20240228111419",
     "@nervosnetwork/ckb-sdk-core": "^0.109.0",
     "@nervosnetwork/ckb-sdk-utils": "^0.109.0",
     "@nervosnetwork/ckb-types": "^0.109.0",
-    "camelcase-keys": "^7.0.2",
+    "axios": "^1.6.7",
     "bignumber.js": "^9.1.1",
-    "axios": "^1.6.7"
+    "camelcase-keys": "^7.0.2",
+    "js-sha256": "^0.11.0"
   },
   "devDependencies": {
     "@ckb-lumos/molecule": "0.0.0-canary-3f37c5b-20240228111419",

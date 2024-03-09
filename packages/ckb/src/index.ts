@@ -4,3 +4,4 @@ export * from './collector';
 export * from './error';
 export * from './paymaster';
 export * from './types';
+export * from './rgbpp';

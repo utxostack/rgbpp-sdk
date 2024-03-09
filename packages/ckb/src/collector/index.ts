@@ -1,9 +1,10 @@
 import axios from 'axios';
 import CKB from '@nervosnetwork/ckb-sdk-core';
 import { toCamelcase } from '../utils/case-parser';
-import { CollectResult, IndexerCell } from '../types/collector';
+import { CollectResult, CollectUdtResult, IndexerCell } from '../types/collector';
 import { MIN_CAPACITY } from '../constants';
-import { CapacityNotEnoughError, IndexerError } from '../error';
+import { CapacityNotEnoughError, IndexerError, UdtAmountNotEnoughError } from '../error';
+import { leToU128 } from '../utils';
 
 const parseScript = (script: CKBComponents.Script) => ({
   code_hash: script.codeHash,
@@ -91,7 +92,7 @@ export class Collector {
   ): CollectResult {
     const changeCapacity = minCapacity ?? MIN_CAPACITY;
     let inputs: CKBComponents.CellInput[] = [];
-    let sum = BigInt(0);
+    let sumInputsCapacity = BigInt(0);
     for (let cell of liveCells) {
       inputs.push({
         previousOutput: {
@@ -100,15 +101,45 @@ export class Collector {
         },
         since: '0x0',
       });
-      sum = sum + BigInt(cell.output.capacity);
-      if (sum >= needCapacity + changeCapacity + fee) {
+      sumInputsCapacity += BigInt(cell.output.capacity);
+      if (sumInputsCapacity >= needCapacity + changeCapacity + fee) {
         break;
       }
     }
-    if (sum < needCapacity + changeCapacity + fee) {
+    if (sumInputsCapacity < needCapacity + changeCapacity + fee) {
       const message = errMsg ?? 'Insufficient free CKB balance';
       throw new CapacityNotEnoughError(message);
     }
-    return { inputs, capacity: sum };
+    return { inputs, sumInputsCapacity };
+  }
+
+  collectUdtInputs(liveCells: IndexerCell[], needAmount: bigint): CollectUdtResult {
+    let inputs: CKBComponents.CellInput[] = [];
+    let sumInputsCapacity = BigInt(0);
+    let sumAmount = BigInt(0);
+    for (let cell of liveCells) {
+      inputs.push({
+        previousOutput: {
+          txHash: cell.outPoint.txHash,
+          index: cell.outPoint.index,
+        },
+        since: '0x0',
+      });
+      sumInputsCapacity = sumInputsCapacity + BigInt(cell.output.capacity);
+      sumAmount += leToU128(cell.outputData);
+      if (sumAmount >= needAmount) {
+        break;
+      }
+    }
+    if (sumAmount < needAmount) {
+      throw new UdtAmountNotEnoughError('Insufficient UDT balance');
+    }
+    return { inputs, sumInputsCapacity, sumAmount };
+  }
+
+  async getLiveCell(outPoint: CKBComponents.OutPoint): Promise<CKBComponents.LiveCell> {
+    const ckb = new CKB(this.ckbNodeUrl);
+    const { cell } = await ckb.rpc.getLiveCell(outPoint, true);
+    return cell;
   }
 }

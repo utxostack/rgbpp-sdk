@@ -1,11 +1,10 @@
 import { AddressPrefix, addressToScript, getTransactionSize, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
-import { ConstructParams } from '../types/transfer';
+import { ConstructPaymasterParams } from '../types/rgbpp';
 import { NoLiveCellError } from '../error';
-import { CKB_UNIT, MAX_FEE, getSecp256k1CellDep } from '../constants';
+import { CKB_UNIT, MAX_FEE, SECP256K1_WITNESS_LOCK_LEN, getSecp256k1CellDep } from '../constants';
 import { append0x, calculateTransactionFee } from '../utils';
 
 const SECP256K1_MIN_CAPACITY = BigInt(61) * CKB_UNIT;
-const SECP256K1_WITNESS_LOCK_LEN = 65;
 
 export const splitMultiCellsWithSecp256k1 = async ({
   masterPrivateKey,
@@ -13,7 +12,7 @@ export const splitMultiCellsWithSecp256k1 = async ({
   receiverAddress,
   capacityWithCKB,
   cellAmount,
-}: ConstructParams) => {
+}: ConstructPaymasterParams) => {
   const isMainnet = receiverAddress.startsWith('ckb');
   const masterAddress = privateKeyToAddress(masterPrivateKey, {
     prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
@@ -30,7 +29,7 @@ export const splitMultiCellsWithSecp256k1 = async ({
   const cellCapacity = BigInt(capacityWithCKB) * CKB_UNIT;
   const needCapacity = cellCapacity * BigInt(cellAmount);
   let txFee = MAX_FEE;
-  const { inputs, capacity: emptyInputsCapacity } = collector.collectInputs(
+  const { inputs, sumInputsCapacity } = collector.collectInputs(
     emptyCells,
     needCapacity,
     txFee,
@@ -42,7 +41,7 @@ export const splitMultiCellsWithSecp256k1 = async ({
     capacity: append0x(cellCapacity.toString(16)),
   });
 
-  const changeCapacity = emptyInputsCapacity - needCapacity - txFee;
+  const changeCapacity = sumInputsCapacity - needCapacity - txFee;
   outputs.push({
     lock: masterLock,
     capacity: append0x(changeCapacity.toString(16)),
