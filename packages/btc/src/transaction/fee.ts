@@ -1,6 +1,6 @@
 import bitcoin from '../bitcoin';
+import { ECPair } from '../bitcoin';
 import { ECPairInterface } from 'ecpair';
-import { ECPair } from '../constants';
 import { AddressType } from '../types';
 import { publicKeyToAddress } from '../address';
 import { NetworkType, toPsbtNetwork } from '../network';
