@@ -1,6 +1,5 @@
-import bitcoin from 'bitcoinjs-lib';
 import { describe, expect, it } from 'vitest';
-import { ECPair, toXOnly } from '../src';
+import { bitcoin, ECPair, toXOnly } from '../src';
 import { network } from './shared/env';
 
 describe('Address', () => {

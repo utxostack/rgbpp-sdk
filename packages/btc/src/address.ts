@@ -1,4 +1,4 @@
-import bitcoin from './bitcoin';
+import { bitcoin } from './bitcoin';
 import { AddressType } from './types';
 import { NetworkType, toPsbtNetwork } from './network';
 import { ErrorCodes, TxBuildError } from './error';

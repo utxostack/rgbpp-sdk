@@ -1,5 +1,4 @@
-import bitcoin from '../bitcoin';
-import { ECPair } from '../bitcoin';
+import { bitcoin, ECPair } from '../bitcoin';
 import { ECPairInterface } from 'ecpair';
 import { AddressType } from '../types';
 import { publicKeyToAddress } from '../address';

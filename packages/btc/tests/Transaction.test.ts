@@ -1,7 +1,6 @@
-import bitcoin from 'bitcoinjs-lib';
 import { describe, expect, it } from 'vitest';
 import { accounts, networkType, service, source } from './shared/env';
-import { ErrorCodes, ErrorMessages, MIN_COLLECTABLE_SATOSHI, sendBtc } from '../src';
+import { bitcoin, ErrorCodes, ErrorMessages, MIN_COLLECTABLE_SATOSHI, sendBtc } from '../src';
 
 describe('Transaction', () => {
   describe('Transfer to various address types', () => {
