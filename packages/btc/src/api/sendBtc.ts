@@ -1,14 +1,11 @@
 import bitcoin from '../bitcoin';
 import { NetworkType } from '../network';
 import { DataSource } from '../query/source';
-import { TxBuilder } from '../transaction/build';
+import { TxBuilder, TxTo } from '../transaction/build';
 
 export async function sendBtc(props: {
   from: string;
-  tos: {
-    address: string;
-    value: number;
-  }[];
+  tos: TxTo[];
   source: DataSource;
   networkType: NetworkType;
   minUtxoSatoshi?: number;
@@ -24,7 +21,7 @@ export async function sendBtc(props: {
   });
 
   props.tos.forEach((to) => {
-    tx.addOutput(to.address, to.value);
+    tx.addTo(to);
   });
 
   await tx.collectInputsAndPayFee(props.from);

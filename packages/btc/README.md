@@ -70,19 +70,19 @@ console.log(res);
 
 ### Constructing transaction
 
-Transfer BTC from a P2WPKH address:
+Transfer BTC from a `P2WPKH` address:
 
 ```typescript
 import { sendBtc, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
 
-const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
-
 const networkType = NetworkType.TESTNET;
+
+const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
 const source = new DataSource(service, networkType);
 
 // Create a PSBT
 const psbt = await sendBtc({
-  from: 'from_address', // your P2WPKH address
+  from: account.address, // your P2WPKH address
   tos: [
     {
       address: 'to_address', // destination btc address
@@ -95,7 +95,41 @@ const psbt = await sendBtc({
 });
 
 // Sign & finalize inputs
-psbt.signAllInputs(accounts.charlie.keyPair);
+psbt.signAllInputs(account.keyPair);
+psbt.finalizeAllInputs();
+
+// Broadcast transaction
+const tx = psbt.extractTransaction();
+const res = await service.sendTransaction(tx.toHex());
+console.log('txid:', res.txid);
+```
+
+Create an `OP_RETURN` output:
+
+```typescript
+import { sendBtc, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
+
+const networkType = NetworkType.TESTNET;
+
+const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
+const source = new DataSource(service, networkType);
+
+// Create a PSBT
+const psbt = await sendBtc({
+  from: account.address, // your address
+  tos: [
+    {
+      data: Buffer.from('0x' + '00'.repeat(32), 'hex'), // any data <= 80 bytes
+      value: 0, // normally the value is 0
+    },
+  ],
+  feeRate: 1, // optional
+  networkType,
+  source,
+});
+
+// Sign & finalize inputs
+psbt.signAllInputs(account.keyPair);
 psbt.finalizeAllInputs();
 
 // Broadcast transaction
