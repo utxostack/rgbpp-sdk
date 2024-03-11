@@ -1,4 +1,4 @@
-import { bitcoin, ECPair, BtcAssetsApi, DataSource, toNetworkType } from '../../src';
+import { bitcoin, ECPair, BtcAssetsApi, DataSource, toNetworkType, toXOnly } from '../../src';
 
 export const network = bitcoin.networks.testnet;
 export const networkType = toNetworkType(network);
@@ -21,14 +21,24 @@ function createAccount(privateKey: string, _network?: bitcoin.Network) {
     pubkey: keyPair.publicKey,
     network: _network,
   });
+  const p2tr = bitcoin.payments.p2tr({
+    internalPubkey: toXOnly(keyPair.publicKey),
+    network: _network,
+  });
 
   return {
-    privateKey,
     keyPair,
+    privateKey,
+    publicKey: keyPair.publicKey.toString('hex'),
     p2wpkh: {
       address: p2wpkh.address!,
       pubkey: p2wpkh.pubkey!,
       data: p2wpkh.data!,
+    },
+    p2tr: {
+      address: p2tr.address!,
+      pubkey: p2tr.pubkey!,
+      data: p2tr.data!,
     },
   };
 }

@@ -1,5 +1,6 @@
 export enum ErrorCodes {
   UNKNOWN,
+  MISSING_PUBKEY,
   INSUFFICIENT_UTXO,
   UNSUPPORTED_OUTPUT,
   UNSUPPORTED_ADDRESS_TYPE,
@@ -12,6 +13,7 @@ export enum ErrorCodes {
 
 export const ErrorMessages = {
   [ErrorCodes.UNKNOWN]: 'Unknown error',
+  [ErrorCodes.MISSING_PUBKEY]: 'Missing a pubkey corresponding to the UTXO',
   [ErrorCodes.INSUFFICIENT_UTXO]: 'Insufficient UTXO',
   [ErrorCodes.UNSUPPORTED_OUTPUT]: 'Unsupported output format',
   [ErrorCodes.UNSUPPORTED_ADDRESS_TYPE]: 'Unsupported address type',
