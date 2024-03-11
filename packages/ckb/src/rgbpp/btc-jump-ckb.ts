@@ -7,6 +7,14 @@ import { IndexerCell } from '../types';
 import { getRgbppLockDep, getSecp256k1CellDep, getXudtDep } from '../constants';
 import { addressToScript } from '@nervosnetwork/ckb-sdk-utils';
 
+/**
+ * Generate the virtual ckb transaction for the jumping tx from BTC to CKB
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param xudtTypeBytes The serialized hex string of the XUDT type script
+ * @param rgbppLockArgsList The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
+ * @param transferAmount The XUDT amount to be transferred
+ * @param isMainnet
+ */
 export const genBtcJumpCkbVirtualTx = async ({
   collector,
   xudtTypeBytes,

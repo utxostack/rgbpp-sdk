@@ -32,6 +32,7 @@ export const appendCkbTxWitnesses = ({ ckbRawTx, sumInputsCapacity, needPaymaste
   }
 };
 
+// Append paymaster cell to the ckb transaction inputs and sign the transaction with a secp256k1 private key
 export const appendPaymasterCellAndSignCkbTx = async ({
   secp256k1PrivateKey,
   ckbRawTx,

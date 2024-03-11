@@ -2,7 +2,15 @@ import { getBtcTimeLockDep, getBtcTimeLockScript, getXudtDep } from '../constant
 import { BtcTimeCellsParams } from '../types';
 import { lockScriptFromBtcTimeLockArgs } from '../utils';
 
-export const buildBtcTimeCellsTx = async ({
+/**
+ * Collect btc time cells and spend them to create xudt cells for the specific lock scripts in the btc time lock args
+ * The btc time lock args data structure is: lock_script | after | new_bitcoin_tx_id
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param xudtType The XUDT type script
+ * @param cellCount The count of the btc time cells to be collected and spent
+ * @param isMainnet
+ */
+export const buildBtcTimeCellsSpentTx = async ({
   collector,
   xudtType,
   cellCount,

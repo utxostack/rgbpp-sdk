@@ -6,6 +6,14 @@ import { calculateCommitment, genRgbppLockScript } from '../utils/rgbpp';
 import { IndexerCell } from '../types';
 import { getRgbppLockDep, getSecp256k1CellDep, getXudtDep } from '../constants';
 
+/**
+ * Generate the virtual ckb transaction for the btc transfer tx
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param xudtTypeBytes The serialized hex string of the XUDT type script
+ * @param rgbppLockArgsList The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
+ * @param transferAmount The XUDT amount to be transferred
+ * @param isMainnet
+ */
 export const genBtcTransferCkbVirtualTx = async ({
   collector,
   xudtTypeBytes,
