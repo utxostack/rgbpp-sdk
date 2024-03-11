@@ -1,5 +1,5 @@
-export * from './schemas/blockchain';
-export * from './schemas/rpbpp';
+export * from './schemas/generated/blockchain';
+export * from './schemas/generated/rgbpp';
 export * from './collector';
 export * from './error';
 export * from './paymaster';
