@@ -3,7 +3,7 @@ import { blockchain } from '@ckb-lumos/base';
 import { NoXudtLiveCellError } from '../error';
 import { append0x, calculateRgbppCellCapacity, calculateTransactionFee, u128ToLe, u32ToLe } from '../utils';
 import { calculateCommitment, genRgbppLockScript } from '../utils/rgbpp';
-import { MAX_FEE, getXudtDep } from '../constants';
+import { MAX_FEE, SECP256K1_WITNESS_LOCK_LEN, getXudtDep } from '../constants';
 import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
 export const genCkbJumpBtcVirtualTx = async ({
@@ -11,7 +11,7 @@ export const genCkbJumpBtcVirtualTx = async ({
   xudtTypeBytes,
   fromCkbAddress,
   transferAmount,
-  toCkbAddress,
+  witnessLockPlaceholderSize,
 }: CkbJumpBtcVirtualTxParams): Promise<CkbJumpBtcVirtualTxResult> => {
   const isMainnet = fromCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
@@ -27,7 +27,6 @@ export const genCkbJumpBtcVirtualTx = async ({
   const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
   const outputsData = [append0x(u128ToLe(transferAmount))];
 
-  const toLock = addressToScript(toCkbAddress);
   const outputs: CKBComponents.CellOutput[] = [
     {
       lock: genRgbppLockScript(u32ToLe(1), isMainnet),
@@ -39,7 +38,7 @@ export const genCkbJumpBtcVirtualTx = async ({
   let txFee = MAX_FEE;
   const changeCapacity = sumInputsCapacity - rpbppCellCapacity - txFee;
   outputs.push({
-    lock: toLock,
+    lock: fromLock,
     type: xudtType,
     capacity: append0x(changeCapacity.toString(16)),
   });
@@ -59,8 +58,7 @@ export const genCkbJumpBtcVirtualTx = async ({
   };
 
   if (txFee === MAX_FEE) {
-    // TODO: Add witness_args.lock placeholder length
-    const txSize = getTransactionSize(ckbRawTx);
+    const txSize = getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? SECP256K1_WITNESS_LOCK_LEN);
     const estimatedTxFee = calculateTransactionFee(txSize);
     const estimatedChangeCapacity = changeCapacity + (MAX_FEE - estimatedTxFee);
     ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(estimatedChangeCapacity.toString(16));

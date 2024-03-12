@@ -98,14 +98,23 @@ export interface BtcTimeCellsParams {
 }
 
 export interface CkbJumpBtcVirtualTxParams {
+  // The collector that collects CKB live cells and transactions
   collector: Collector;
+  // The serialized hex string of the XUDT type script
   xudtTypeBytes: Hex;
+  // The from ckb address who will use his private key to sign the ckb tx
   fromCkbAddress: Address;
-  toCkbAddress: Address;
+  // The receiver rgbpp lock script args whose data structure is: out_index | bitcoin_tx_id
+  toRgbppLockArgs: Hex;
+  // The XUDT amount to be transferred
   transferAmount: bigint;
+  // The WitnessArgs.lock placeholder bytes array size
+  witnessLockPlaceholderSize?: number;
 }
 
 export interface CkbJumpBtcVirtualTxResult {
+  // CKB raw transaction
   ckbRawTx: CKBComponents.RawTransaction;
+  // The rgbpp commitment to be inserted into BTC op_return
   commitment: Hex;
 }
