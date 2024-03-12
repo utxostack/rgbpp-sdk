@@ -1,4 +1,4 @@
-import { getBtcTimeLockDep, getBtcTimeLockScript, getXudtDep } from '../constants';
+import { getBtcTimeLockDep, getXudtDep } from '../constants';
 import { BtcTimeCellsParams } from '../types';
 import { lockScriptFromBtcTimeLockArgs } from '../utils';
 

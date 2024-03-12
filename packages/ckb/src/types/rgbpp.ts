@@ -108,7 +108,7 @@ export interface CkbJumpBtcVirtualTxParams {
   toRgbppLockArgs: Hex;
   // The XUDT amount to be transferred
   transferAmount: bigint;
-  // The WitnessArgs.lock placeholder bytes array size
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 65(official secp256k1/blake160 lock)
   witnessLockPlaceholderSize?: number;
 }
 

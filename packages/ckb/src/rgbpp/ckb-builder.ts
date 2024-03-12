@@ -5,7 +5,7 @@ import {
   serializeWitnessArgs,
 } from '@nervosnetwork/ckb-sdk-utils';
 import { AppendPaymasterCellAndSignTxParams, AppendWitnessesParams, SendCkbTxParams } from '../types';
-import { SECP256K1_WITNESS_LOCK_LEN, getRgbppLockScript } from '../constants';
+import { SECP256K1_WITNESS_LOCK_SIZE, getRgbppLockScript } from '../constants';
 import { append0x, calculateTransactionFee } from '../utils';
 import { InputsCapacityNotEnoughError } from '../error';
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
@@ -23,7 +23,7 @@ export const appendCkbTxWitnesses = ({ ckbRawTx, sumInputsCapacity, needPaymaste
       throw new InputsCapacityNotEnoughError('The sum of inputs capacity is not enough');
     }
 
-    const txSize = getTransactionSize(rawTx) + SECP256K1_WITNESS_LOCK_LEN;
+    const txSize = getTransactionSize(rawTx) + SECP256K1_WITNESS_LOCK_SIZE;
     const estimatedTxFee = calculateTransactionFee(txSize);
 
     const changeCapacity = sumInputsCapacity - partialOutputsCapacity - estimatedTxFee;
@@ -49,7 +49,7 @@ export const appendPaymasterCellAndSignCkbTx = async ({
     .map((output) => BigInt(output.capacity))
     .reduce((prev, current) => prev + current, BigInt(0));
 
-  const txSize = getTransactionSize(rawTx) + SECP256K1_WITNESS_LOCK_LEN;
+  const txSize = getTransactionSize(rawTx) + SECP256K1_WITNESS_LOCK_SIZE;
   const estimatedTxFee = calculateTransactionFee(txSize);
 
   if (inputsCapacity <= sumOutputsCapacity) {

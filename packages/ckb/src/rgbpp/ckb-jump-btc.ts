@@ -1,15 +1,26 @@
 import { CkbJumpBtcVirtualTxParams, CkbJumpBtcVirtualTxResult, RgbppCkbVirtualTx } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
 import { NoXudtLiveCellError } from '../error';
-import { append0x, calculateRgbppCellCapacity, calculateTransactionFee, u128ToLe, u32ToLe } from '../utils';
+import { append0x, calculateRgbppCellCapacity, calculateTransactionFee, remove0x, u128ToLe } from '../utils';
 import { calculateCommitment, genRgbppLockScript } from '../utils/rgbpp';
-import { MAX_FEE, SECP256K1_WITNESS_LOCK_LEN, getXudtDep } from '../constants';
+import { MAX_FEE, SECP256K1_WITNESS_LOCK_SIZE, getXudtDep } from '../constants';
 import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
+/**
+ * Generate the virtual ckb transaction for the jumping tx from CKB to BTC
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param xudtTypeBytes The serialized hex string of the XUDT type script
+ * @param fromCkbAddress The from ckb address who will use his private key to sign the ckb tx
+ * @param toRgbppLockArgs The receiver rgbpp lock script args whose data structure is: out_index | bitcoin_tx_id
+ * @param transferAmount The XUDT amount to be transferred
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 65(official secp256k1/blake160 lock)
+ * @param isMainnet
+ */
 export const genCkbJumpBtcVirtualTx = async ({
   collector,
   xudtTypeBytes,
   fromCkbAddress,
+  toRgbppLockArgs,
   transferAmount,
   witnessLockPlaceholderSize,
 }: CkbJumpBtcVirtualTxParams): Promise<CkbJumpBtcVirtualTxResult> => {
@@ -19,7 +30,7 @@ export const genCkbJumpBtcVirtualTx = async ({
 
   const xudtCells = await collector.getCells({ lock: fromLock, type: xudtType });
   if (!xudtCells || xudtCells.length === 0) {
-    throw new NoXudtLiveCellError('No rgb++ cells found with the xudt type script and the rgbpp lock args');
+    throw new NoXudtLiveCellError('No rgbpp cells found with the xudt type script and the rgbpp lock args');
   }
 
   const { inputs, sumInputsCapacity, sumAmount } = collector.collectUdtInputs(xudtCells, transferAmount);
@@ -27,9 +38,10 @@ export const genCkbJumpBtcVirtualTx = async ({
   const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
   const outputsData = [append0x(u128ToLe(transferAmount))];
 
+  const outIndex = remove0x(toRgbppLockArgs).substring(0, 8);
   const outputs: CKBComponents.CellOutput[] = [
     {
-      lock: genRgbppLockScript(u32ToLe(1), isMainnet),
+      lock: genRgbppLockScript(outIndex, isMainnet),
       type: xudtType,
       capacity: append0x(rpbppCellCapacity.toString(16)),
     },
@@ -58,7 +70,7 @@ export const genCkbJumpBtcVirtualTx = async ({
   };
 
   if (txFee === MAX_FEE) {
-    const txSize = getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? SECP256K1_WITNESS_LOCK_LEN);
+    const txSize = getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? SECP256K1_WITNESS_LOCK_SIZE);
     const estimatedTxFee = calculateTransactionFee(txSize);
     const estimatedChangeCapacity = changeCapacity + (MAX_FEE - estimatedTxFee);
     ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(estimatedChangeCapacity.toString(16));
