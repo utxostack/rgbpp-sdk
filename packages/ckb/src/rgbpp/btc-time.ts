@@ -11,7 +11,7 @@ import { lockScriptFromBtcTimeLockArgs } from '../utils';
 export const buildBtcTimeCellsSpentTx = async ({
   btcTimeCells,
   isMainnet,
-}: BtcTimeCellsParams): Promise<CKBComponents.RawTransaction | null> => {
+}: BtcTimeCellsParams): Promise<CKBComponents.RawTransaction> => {
   const inputs: CKBComponents.CellInput[] = btcTimeCells.map((cell) => ({
     previousOutput: cell.outPoint,
     since: '0x0',
