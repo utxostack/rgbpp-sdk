@@ -93,10 +93,6 @@ export interface BtcJumpCkbVirtualTxResult {
 
 export interface BtcTimeCellsParams {
   // The collector that collects CKB live cells and transactions
-  collector: Collector;
-  // The XUDT type script
-  xudtType: CKBComponents.Script;
-  // The count of btc time cells to be inserted into ckb transaction inputs
-  cellCount: number;
+  btcTimeCells: IndexerCell[];
   isMainnet?: boolean;
 }
