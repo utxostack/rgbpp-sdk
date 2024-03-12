@@ -20,7 +20,7 @@ describe('Address', () => {
 
     expect(address).toEqual('tb1qm06rvrq8jyyckzc5v709u7qpthel9j4d9f7nh3');
   });
-  it('Create Taproot (P2TR) address', async () => {
+  it('Create Taproot (P2TR) address', () => {
     const keyPair = ECPair.fromPrivateKey(
       Buffer.from('8d3c23d340ac0841e6c3b58a9bbccb9a28e94ab444f972cff35736fa2fcf9f3f', 'hex'),
       { network },

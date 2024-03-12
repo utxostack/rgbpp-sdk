@@ -34,7 +34,7 @@ export class FeeEstimator {
   }
 
   async signPsbt(psbt: bitcoin.Psbt): Promise<bitcoin.Psbt> {
-    psbt.data.inputs.forEach((v, index) => {
+    psbt.data.inputs.forEach((v) => {
       const isNotSigned = !(v.finalScriptSig || v.finalScriptWitness);
       const isP2TR = this.addressType === AddressType.P2TR;
       const lostInternalPubkey = !v.tapInternalKey;
