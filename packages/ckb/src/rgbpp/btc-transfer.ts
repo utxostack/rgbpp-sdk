@@ -28,7 +28,7 @@ export const genBtcTransferCkbVirtualTx = async ({
   for await (const rgbppLock of rgbppLocks) {
     const cells = await collector.getCells({ lock: rgbppLock, type: xudtType });
     if (!cells || cells.length === 0) {
-      throw new NoRgbppLiveCellError('No rgb++ cells found with the xudt type script and the rgbpp lock args');
+      throw new NoRgbppLiveCellError('No rgbpp cells found with the xudt type script and the rgbpp lock args');
     }
     rgbppCells = [...rgbppCells, ...cells];
   }
