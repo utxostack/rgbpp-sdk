@@ -10,7 +10,14 @@ import { append0x, calculateTransactionFee } from '../utils';
 import { InputsCapacityNotEnoughError } from '../error';
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 
-//TODO: waiting for SPV btc tx proof
+// TODO: waiting for SPV btc tx proof
+/**
+ * Append RGBPP unlock witnesses to ckb tx and the tx can be sent to blockchain if the needPaymasterCell is false.
+ * And if the needPaymasterCell is true, appending paymaster cell to inputs and signing ckb tx are required
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
+ * @param needPaymasterCell The needPaymasterCell indicates whether a paymaster cell is required
+ */
 export const appendCkbTxWitnesses = ({ ckbRawTx, sumInputsCapacity, needPaymasterCell }: AppendWitnessesParams) => {
   const inputsCapacity = BigInt(sumInputsCapacity);
   if (!needPaymasterCell) {
@@ -33,7 +40,13 @@ export const appendCkbTxWitnesses = ({ ckbRawTx, sumInputsCapacity, needPaymaste
   }
 };
 
-// Append paymaster cell to the ckb transaction inputs and sign the transaction with a secp256k1 private key
+/**
+ * Append paymaster cell to the ckb transaction inputs and sign the transaction with paymaster cell's secp256k1 private key
+ * @param secp256k1PrivateKey The Secp256k1 private key of the paymaster cells maintainer
+ * @param ckbRawTx CKB raw transaction
+ * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
+ * @param paymasterCell The paymaster cell whose type is IndexerCell is used to pay the extra output cell
+ */
 export const appendPaymasterCellAndSignCkbTx = async ({
   secp256k1PrivateKey,
   ckbRawTx,
