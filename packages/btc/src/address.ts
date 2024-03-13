@@ -1,7 +1,17 @@
-import bitcoin from './bitcoin';
+import { bitcoin } from './bitcoin';
 import { AddressType } from './types';
 import { NetworkType, toPsbtNetwork } from './network';
 import { ErrorCodes, TxBuildError } from './error';
+import { removeHexPrefix, toXOnly } from './utils';
+
+/**
+ * Check weather the address is supported as a from address.
+ * Currently, only P2WPKH and P2TR addresses are supported.
+ */
+export function isSupportedFromAddress(address: string) {
+  const { addressType } = decodeAddress(address);
+  return addressType === AddressType.P2WPKH || addressType === AddressType.P2TR;
+}
 
 /**
  * Convert public key to bitcoin payment object.
@@ -12,7 +22,7 @@ export function publicKeyToPayment(publicKey: string, addressType: AddressType, 
   }
 
   const network = toPsbtNetwork(networkType);
-  const pubkey = Buffer.from(publicKey, 'hex');
+  const pubkey = Buffer.from(removeHexPrefix(publicKey), 'hex');
 
   if (addressType === AddressType.P2PKH) {
     return bitcoin.payments.p2pkh({
@@ -20,15 +30,15 @@ export function publicKeyToPayment(publicKey: string, addressType: AddressType, 
       network,
     });
   }
-  if (addressType === AddressType.P2WPKH || addressType === AddressType.M44_P2WPKH) {
+  if (addressType === AddressType.P2WPKH) {
     return bitcoin.payments.p2wpkh({
       pubkey,
       network,
     });
   }
-  if (addressType === AddressType.P2TR || addressType === AddressType.M44_P2TR) {
+  if (addressType === AddressType.P2TR) {
     return bitcoin.payments.p2tr({
-      internalPubkey: pubkey.slice(1, 33),
+      internalPubkey: toXOnly(pubkey),
       network,
     });
   }
@@ -178,9 +188,9 @@ export function decodeAddress(address: string): {
 }
 
 function getAddressTypeDust(addressType: AddressType) {
-  if (addressType === AddressType.P2WPKH || addressType === AddressType.M44_P2WPKH) {
+  if (addressType === AddressType.P2WPKH) {
     return 294;
-  } else if (addressType === AddressType.P2TR || addressType === AddressType.M44_P2TR) {
+  } else if (addressType === AddressType.P2TR) {
     return 330;
   } else {
     return 546;

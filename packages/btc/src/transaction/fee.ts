@@ -1,10 +1,9 @@
-import bitcoin from '../bitcoin';
+import { bitcoin, ECPair, isTaprootInput } from '../bitcoin';
 import { ECPairInterface } from 'ecpair';
-import { ECPair } from '../constants';
 import { AddressType } from '../types';
 import { publicKeyToAddress } from '../address';
 import { NetworkType, toPsbtNetwork } from '../network';
-import { toXOnly } from '../utils';
+import { toXOnly, tweakSigner } from '../utils';
 
 export class FeeEstimator {
   public networkType: NetworkType;
@@ -35,9 +34,9 @@ export class FeeEstimator {
   }
 
   async signPsbt(psbt: bitcoin.Psbt): Promise<bitcoin.Psbt> {
-    psbt.data.inputs.forEach((v, index) => {
+    psbt.data.inputs.forEach((v) => {
       const isNotSigned = !(v.finalScriptSig || v.finalScriptWitness);
-      const isP2TR = this.addressType === AddressType.P2TR || this.addressType === AddressType.M44_P2TR;
+      const isP2TR = this.addressType === AddressType.P2TR;
       const lostInternalPubkey = !v.tapInternalKey;
       // Special measures taken for compatibility with certain applications.
       if (isNotSigned && isP2TR && lostInternalPubkey) {
@@ -52,8 +51,16 @@ export class FeeEstimator {
       }
     });
 
-    // TODO: support multiple from addresses
-    psbt.signAllInputs(this.keyPair);
+    psbt.data.inputs.forEach((input, index) => {
+      if (isTaprootInput(input)) {
+        const tweakedSigner = tweakSigner(this.keyPair, {
+          network: this.network,
+        });
+        psbt.signInput(index, tweakedSigner);
+      } else {
+        psbt.signInput(index, this.keyPair);
+      }
+    });
 
     psbt.finalizeAllInputs();
     return psbt;

@@ -1,18 +1,17 @@
-import bitcoin from 'bitcoinjs-lib';
 import { describe, expect, it } from 'vitest';
-import { accounts, networkType, service, source } from './shared/env';
-import { ErrorCodes, ErrorMessages, MIN_COLLECTABLE_SATOSHI, sendBtc } from '../src';
+import { accounts, network, networkType, service, source } from './shared/env';
+import { bitcoin, ErrorCodes, ErrorMessages, MIN_COLLECTABLE_SATOSHI, sendBtc, toXOnly, tweakSigner } from '../src';
 
 describe('Transaction', () => {
-  describe('Transfer to various address types', () => {
+  describe('Transfer from Native SegWit (P2WPKH) address', () => {
     const addresses = [
+      { type: 'Taproot (P2TR)', address: accounts.charlie.p2tr.address },
       { type: 'Native SegWit (P2WPKH)', address: accounts.charlie.p2wpkh.address },
       { type: 'Nested SegWit (P2SH)', address: '2N4gkVAQ1f6bi8BKon8MLKEV1pi85MJWcPV' },
-      { type: 'Taproot (P2TR)', address: 'tb1pjew2gs9aqr2m7r8jc8car9jpwuv6wye006l4slplzcthupnldmjqpf8h5d' },
       { type: 'Legacy (P2PKH)', address: 'mqkAgjy8gfrMZh1VqV5Wm1Yi4G9KWLXA1Q' },
     ];
     addresses.forEach((addressInfo, index) => {
-      it(`Transfer BTC from P2WPKH address to ${addressInfo.type} address`, async () => {
+      it(`Transfer to ${addressInfo.type} address`, async () => {
         if (index !== 0) {
           await new Promise((resolve) => setTimeout(resolve, 3000));
         }
@@ -33,16 +32,40 @@ describe('Transaction', () => {
         psbt.signAllInputs(accounts.charlie.keyPair);
         psbt.finalizeAllInputs();
 
-        // Convert psbt to transaction
-        const tx = psbt.extractTransaction();
-        console.log('ins:', tx.ins);
-        console.log('outs:', tx.outs);
-
         // Broadcast transaction
+        // const tx = psbt.extractTransaction();
         // const res = await service.sendTransaction(tx.toHex());
         // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
       }, 10000);
     });
+  });
+  it('Transfer from Taproot P2TR address', async () => {
+    const psbt = await sendBtc({
+      from: accounts.charlie.p2tr.address,
+      fromPubkey: accounts.charlie.publicKey,
+      tos: [
+        {
+          address: accounts.charlie.p2tr.address,
+          value: 1000,
+        },
+      ],
+      networkType,
+      source,
+    });
+
+    // Create a tweaked signer
+    const tweakedSigner = tweakSigner(accounts.charlie.keyPair, {
+      network,
+    });
+
+    // Sign & finalize inputs
+    psbt.signAllInputs(tweakedSigner);
+    psbt.finalizeAllInputs();
+
+    // Broadcast transaction
+    // const tx = psbt.extractTransaction();
+    // const res = await service.sendTransaction(tx.toHex());
+    // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
   });
   it('Transfer with an impossible "minUtxoSatoshi" filter', async () => {
     const balance = await service.getBalance(accounts.charlie.p2wpkh.address, {

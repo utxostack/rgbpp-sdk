@@ -1,4 +1,4 @@
-import bitcoin from './bitcoin';
+import { bitcoin } from './bitcoin';
 
 export enum NetworkType {
   MAINNET,

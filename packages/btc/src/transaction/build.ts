@@ -1,12 +1,12 @@
 import clone from 'lodash/clone';
-import bitcoin from '../bitcoin';
+import { bitcoin } from '../bitcoin';
 import { DataSource } from '../query/source';
 import { ErrorCodes, TxBuildError } from '../error';
 import { AddressType, UnspentOutput } from '../types';
 import { NetworkType, toPsbtNetwork } from '../network';
 import { MIN_COLLECTABLE_SATOSHI } from '../constants';
 import { addressToScriptPublicKeyHex, getAddressType } from '../address';
-import { removeHexPrefix } from '../utils';
+import { removeHexPrefix, toXOnly } from '../utils';
 import { dataToOpReturnScriptPubkey } from './embed';
 import { FeeEstimator } from './fee';
 
@@ -88,10 +88,13 @@ export class TxBuilder {
     throw new TxBuildError(ErrorCodes.UNSUPPORTED_OUTPUT);
   }
 
-  async collectInputsAndPayFee(address: string, fee?: number, extraChange?: number): Promise<void> {
-    extraChange = extraChange ?? 0;
-    fee = fee ?? 0;
-
+  async collectInputsAndPayFee(props: {
+    address: string;
+    pubkey?: string;
+    fee?: number;
+    extraChange?: number;
+  }): Promise<void> {
+    const { address, pubkey, fee = 0, extraChange = 0 } = props;
     const outputAmount = this.outputs.reduce((acc, out) => acc + out.value, 0);
     const targetAmount = outputAmount + fee + extraChange;
 
@@ -106,20 +109,15 @@ export class TxBuilder {
 
     const originalInputs = clone(this.inputs);
     utxos.forEach((utxo) => {
-      this.addInput(utxo);
+      this.addInput({
+        ...utxo,
+        pubkey,
+      });
     });
-
-    console.log('----');
-    console.log(
-      `collecting satoshi: ${targetAmount} = outputAmount(${outputAmount}) + fee(${fee}) + + extraChange(${extraChange})`,
-    );
 
     const originalOutputs = clone(this.outputs);
     const changeSatoshi = exceedSatoshi + extraChange;
     const requireChangeUtxo = changeSatoshi > 0;
-    console.log(
-      `collected satoshi: ${satoshi}, collected utxos: [${this.inputs.map((u) => u.utxo.value)}], returning change: ${changeSatoshi}`,
-    );
     if (requireChangeUtxo) {
       this.addOutput({
         address: this.changedAddress,
@@ -129,7 +127,6 @@ export class TxBuilder {
 
     const addressType = getAddressType(address);
     const estimatedFee = await this.calculateFee(addressType);
-    console.log(`expected fee: ${estimatedFee}`);
     if (estimatedFee > fee || changeSatoshi < this.minUtxoSatoshi) {
       this.inputs = originalInputs;
       this.outputs = originalOutputs;
@@ -144,17 +141,18 @@ export class TxBuilder {
         return 0;
       })();
 
-      console.log(`extra collecting satoshi: ${nextExtraChange}`);
-      return await this.collectInputsAndPayFee(address, estimatedFee, nextExtraChange);
+      return await this.collectInputsAndPayFee({
+        address,
+        pubkey,
+        fee: estimatedFee,
+        extraChange: nextExtraChange,
+      });
     }
   }
 
   async calculateFee(addressType: AddressType): Promise<number> {
     const psbt = await this.createEstimatedPsbt(addressType);
     const vSize = psbt.extractTransaction(true).virtualSize();
-    console.log(
-      `calculating vSize, vSize: ${vSize}, feeRate: ${this.feeRate}, rawFee: ${vSize * this.feeRate}, ceilFee: ${Math.ceil(vSize * this.feeRate)}`,
-    );
     return Math.ceil(vSize * this.feeRate);
   }
 
@@ -190,7 +188,7 @@ export class TxBuilder {
   toPsbt(): bitcoin.Psbt {
     const network = toPsbtNetwork(this.networkType);
     const psbt = new bitcoin.Psbt({ network });
-    this.inputs.forEach((input, index) => {
+    this.inputs.forEach((input) => {
       psbt.data.addInput(input.data);
     });
     this.outputs.forEach((output) => {
@@ -207,7 +205,7 @@ export function utxoToInput(utxo: UnspentOutput): TxInput {
       index: utxo.vout,
       witnessUtxo: {
         value: utxo.value,
-        script: Buffer.from(utxo.scriptPk, 'hex'),
+        script: Buffer.from(removeHexPrefix(utxo.scriptPk), 'hex'),
       },
     };
 
@@ -217,15 +215,17 @@ export function utxoToInput(utxo: UnspentOutput): TxInput {
     };
   }
   if (utxo.addressType === AddressType.P2TR) {
+    if (!utxo.pubkey) {
+      throw new TxBuildError(ErrorCodes.MISSING_PUBKEY);
+    }
     const data = {
       hash: utxo.txid,
       index: utxo.vout,
       witnessUtxo: {
         value: utxo.value,
-        script: Buffer.from(utxo.scriptPk, 'hex'),
+        script: Buffer.from(removeHexPrefix(utxo.scriptPk), 'hex'),
       },
-      // TODO: how to obtain pubkey from the utxo directly?
-      // tapInternalKey: toXOnly(Buffer.from(utxo.pubkey, "hex")),
+      tapInternalKey: toXOnly(Buffer.from(removeHexPrefix(utxo.pubkey), 'hex')),
     };
     return {
       data,
