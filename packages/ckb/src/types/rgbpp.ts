@@ -44,14 +44,14 @@ export interface BtcTransferVirtualTxResult {
   // The needPaymasterCell indicates whether a paymaster cell is required
   needPaymasterCell: boolean;
   // The sum capacity of the ckb inputs
-  sumInputsCapacity: bigint;
+  sumInputsCapacity: Hex;
 }
 
 export interface AppendWitnessesParams {
   // CKB raw transaction
   ckbRawTx: CKBComponents.RawTransaction;
   // The sum capacity of the ckb inputs
-  sumInputsCapacity: bigint;
+  sumInputsCapacity: Hex;
   // The needPaymasterCell indicates whether a paymaster cell is required
   needPaymasterCell: boolean;
 }
@@ -62,7 +62,7 @@ export interface AppendPaymasterCellAndSignTxParams {
   // CKB raw transaction
   ckbRawTx: CKBComponents.RawTransaction;
   // The sum capacity of the ckb inputs
-  sumInputsCapacity: bigint;
+  sumInputsCapacity: Hex;
   // The paymaster cell to be inserted into CKB transaction to pay an extra output cell
   paymasterCell: IndexerCell;
   isMainnet?: boolean;
@@ -88,7 +88,7 @@ export interface BtcJumpCkbVirtualTxResult {
   // The needPaymasterCell indicates whether a paymaster cell is required
   needPaymasterCell: boolean;
   // The sum capacity of the ckb inputs
-  sumInputsCapacity: bigint;
+  sumInputsCapacity: Hex;
 }
 
 export interface BtcTimeCellsParams {

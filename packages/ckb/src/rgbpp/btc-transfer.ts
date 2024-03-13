@@ -82,6 +82,6 @@ export const genBtcTransferCkbVirtualTx = async ({
     ckbRawTx,
     commitment,
     needPaymasterCell,
-    sumInputsCapacity,
+    sumInputsCapacity: append0x(sumInputsCapacity.toString(16)),
   };
 };

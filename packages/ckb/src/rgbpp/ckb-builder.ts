@@ -12,6 +12,7 @@ import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 
 //TODO: waiting for SPV btc tx proof
 export const appendCkbTxWitnesses = ({ ckbRawTx, sumInputsCapacity, needPaymasterCell }: AppendWitnessesParams) => {
+  const inputsCapacity = BigInt(sumInputsCapacity);
   if (!needPaymasterCell) {
     let rawTx = ckbRawTx;
     const partialOutputsCapacity = rawTx.outputs
@@ -19,14 +20,14 @@ export const appendCkbTxWitnesses = ({ ckbRawTx, sumInputsCapacity, needPaymaste
       .map((output) => BigInt(output.capacity))
       .reduce((prev, current) => prev + current, BigInt(0));
 
-    if (sumInputsCapacity <= partialOutputsCapacity) {
+    if (inputsCapacity <= partialOutputsCapacity) {
       throw new InputsCapacityNotEnoughError('The sum of inputs capacity is not enough');
     }
 
     const txSize = getTransactionSize(rawTx) + SECP256K1_WITNESS_LOCK_SIZE;
     const estimatedTxFee = calculateTransactionFee(txSize);
 
-    const changeCapacity = sumInputsCapacity - partialOutputsCapacity - estimatedTxFee;
+    const changeCapacity = inputsCapacity - partialOutputsCapacity - estimatedTxFee;
     rawTx.outputs[rawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
     return rawTx;
   }
@@ -43,7 +44,7 @@ export const appendPaymasterCellAndSignCkbTx = async ({
   let rawTx = ckbRawTx;
   const paymasterInput = { previousOutput: paymasterCell.outPoint, since: '0x0' };
   rawTx.inputs = [paymasterInput, ...rawTx.inputs];
-  const inputsCapacity = sumInputsCapacity + BigInt(paymasterCell.output.capacity);
+  const inputsCapacity = BigInt(sumInputsCapacity) + BigInt(paymasterCell.output.capacity);
 
   const sumOutputsCapacity: bigint = rawTx.outputs
     .map((output) => BigInt(output.capacity))
