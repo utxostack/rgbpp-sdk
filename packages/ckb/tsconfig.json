@@ -6,22 +6,28 @@
       "module": "CommonJS"
     }
   },
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "moduleResolution": "Node",
-    "module": "ESNext",
-    "target": "ESNext",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "strict": true,
-    "noEmit": true,
-    "allowJs": true,
-    "sourceMap": true,
-    "skipLibCheck": true,
-    "declaration": false,
-    "preserveSymlinks": true,
-    "esModuleInterop": true,
-    "strictNullChecks": true,
+    "target": "ES2015",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "ES2020",
+    "outDir": "./lib",
+    "composite": false,
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "strictNullChecks": true,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "inlineSources": false,
+    "isolatedModules": true,
+    "moduleResolution": "node",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "preserveWatchOutput": true,
+    "skipLibCheck": true,
+    "strict": true
   },
-  "exclude": ["node_modules", "lib", "example"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "**/*.spec.ts", "example"]
 }

@@ -48,5 +48,5 @@ export const lockScriptFromBtcTimeLockArgs = (args: Hex): CKBComponents.Script =
     throw new Error('Invalid BTC time lock args');
   }
   const lockScript = append0x(temp.substring(0, temp.length - 72));
-  return blockchain.Script.unpack(lockScript);
+  return blockchain.Script.unpack(lockScript) as CKBComponents.Script;
 };
