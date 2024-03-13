@@ -10,7 +10,7 @@ import { append0x, calculateTransactionFee } from '../utils';
 import { InputsCapacityNotEnoughError } from '../error';
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 
-//TODO: waiting for SPV proof
+//TODO: waiting for SPV btc tx proof
 export const appendCkbTxWitnesses = ({ ckbRawTx, sumInputsCapacity, needPaymasterCell }: AppendWitnessesParams) => {
   if (!needPaymasterCell) {
     let rawTx = ckbRawTx;
@@ -32,6 +32,7 @@ export const appendCkbTxWitnesses = ({ ckbRawTx, sumInputsCapacity, needPaymaste
   }
 };
 
+// Append paymaster cell to the ckb transaction inputs and sign the transaction with a secp256k1 private key
 export const appendPaymasterCellAndSignCkbTx = async ({
   secp256k1PrivateKey,
   ckbRawTx,

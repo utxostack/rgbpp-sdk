@@ -18,7 +18,7 @@
   ],
   "dependencies": {
     "@ckb-lumos/base": "0.21.1",
-    "@ckb-lumos/codec": "0.0.0-canary-3f37c5b-20240228111419",
+    "@ckb-lumos/codec": "0.0.0-canary-f2fbef5-20240311091511",
     "@nervosnetwork/ckb-sdk-core": "^0.109.0",
     "@nervosnetwork/ckb-sdk-utils": "^0.109.0",
     "@nervosnetwork/ckb-types": "^0.109.0",
@@ -28,7 +28,7 @@
     "js-sha256": "^0.11.0"
   },
   "devDependencies": {
-    "@ckb-lumos/molecule": "0.0.0-canary-3f37c5b-20240228111419",
+    "@ckb-lumos/molecule": "0.0.0-canary-f2fbef5-20240311091511",
     "@types/lodash": "^4.14.202",
     "vitest": "^1.2.0"
   },

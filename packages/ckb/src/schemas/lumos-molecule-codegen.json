@@ -1,5 +1,6 @@
 {
   "objectKeyFormat": "camelcase",
-  "prepend": "import { Byte32, Script, Bytes } from './blockchain'; import { Uint32, Uint64, Uint128, DepType, HashType } from './customized'",
-  "schemaFile": "rgbpp.mol"
+  "prepend": "import { Uint32, Uint64, Uint128, DepType, HashType } from './customized'",
+  "schemaDir": "schemas",
+  "outDir": "generated"
 }

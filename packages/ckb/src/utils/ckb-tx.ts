@@ -16,11 +16,11 @@ export const calculateTransactionFee = (txSize: number): bigint => {
     code_hash: 
       RGB_lock
     args:
-      out_index | %bitcoin_tx%
+      out_index | bitcoin_tx_id
  */
 const RGBPP_LOCK_SIZE = 32 + 1 + 36;
-export const calculateRgbppCellCapacity = (udtType: CKBComponents.Script): bigint => {
-  const typeArgsSize = remove0x(udtType.args).length / 2;
+export const calculateRgbppCellCapacity = (xudtType: CKBComponents.Script): bigint => {
+  const typeArgsSize = remove0x(xudtType.args).length / 2;
   const udtTypeSize = 33 + typeArgsSize;
   const cellSize = RGBPP_LOCK_SIZE + udtTypeSize + 8 + 16;
   return BigInt(cellSize + 1) * CKB_UNIT;
