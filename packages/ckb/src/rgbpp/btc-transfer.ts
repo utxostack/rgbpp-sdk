@@ -39,7 +39,7 @@ export const genBtcTransferCkbVirtualTx = async ({
   const outputsData = [append0x(u128ToLe(transferAmount))];
   const outputs: CKBComponents.CellOutput[] = [
     {
-      lock: genRgbppLockScript(u32ToLe(1)),
+      lock: genRgbppLockScript(u32ToLe(1), isMainnet),
       type: xudtType,
       capacity: append0x(rpbppCellCapacity.toString(16)),
     },
@@ -47,7 +47,7 @@ export const genBtcTransferCkbVirtualTx = async ({
 
   if (sumAmount > transferAmount) {
     outputs.push({
-      lock: genRgbppLockScript(u32ToLe(2)),
+      lock: genRgbppLockScript(u32ToLe(2), isMainnet),
       type: xudtType,
       capacity: append0x(rpbppCellCapacity.toString(16)),
     });

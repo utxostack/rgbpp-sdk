@@ -24,7 +24,7 @@ export interface BtcTransferVirtualTxParams {
   rgbppLockArgsList: Hex[];
   // The XUDT amount to be transferred
   transferAmount: bigint;
-  isMainnet?: boolean;
+  isMainnet: boolean;
 }
 
 export interface RgbppCkbVirtualTx {
@@ -65,7 +65,7 @@ export interface AppendPaymasterCellAndSignTxParams {
   sumInputsCapacity: Hex;
   // The paymaster cell to be inserted into CKB transaction to pay an extra output cell
   paymasterCell: IndexerCell;
-  isMainnet?: boolean;
+  isMainnet: boolean;
 }
 
 export interface SendCkbTxParams {
@@ -94,7 +94,7 @@ export interface BtcJumpCkbVirtualTxResult {
 export interface BtcTimeCellsParams {
   // The collector that collects CKB live cells and transactions
   btcTimeCells: IndexerCell[];
-  isMainnet?: boolean;
+  isMainnet: boolean;
 }
 
 export interface CkbJumpBtcVirtualTxParams {

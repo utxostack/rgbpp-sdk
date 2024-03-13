@@ -95,18 +95,19 @@ const MainnetInfo = {
   } as CKBComponents.CellDep,
 };
 
-export const getSecp256k1CellDep = (isMainnet = false) =>
+export const getSecp256k1CellDep = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.Secp256k1LockDep : TestnetInfo.Secp256k1LockDep;
 
-export const getXudtTypeScript = (isMainnet = false) =>
+export const getXudtTypeScript = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.XUDTTypeScript : TestnetInfo.XUDTTypeScript;
-export const getXudtDep = (isMainnet = false) => (isMainnet ? MainnetInfo.XUDTTypeDep : TestnetInfo.XUDTTypeDep);
+export const getXudtDep = (isMainnet: boolean) => (isMainnet ? MainnetInfo.XUDTTypeDep : TestnetInfo.XUDTTypeDep);
 
-export const getRgbppLockScript = (isMainnet = false) =>
+export const getRgbppLockScript = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.RgbppLockScript : TestnetInfo.RgbppLockScript;
-export const getRgbppLockDep = (isMainnet = false) => (isMainnet ? MainnetInfo.RgbppLockDep : TestnetInfo.RgbppLockDep);
+export const getRgbppLockDep = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.RgbppLockDep : TestnetInfo.RgbppLockDep;
 
-export const getBtcTimeLockScript = (isMainnet = false) =>
+export const getBtcTimeLockScript = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.BtcTimeLockScript : TestnetInfo.BtcTimeLockScript;
-export const getBtcTimeLockDep = (isMainnet = false) =>
+export const getBtcTimeLockDep = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.BtcTimeLockDep : TestnetInfo.BtcTimeLockDep;

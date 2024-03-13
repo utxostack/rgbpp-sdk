@@ -5,7 +5,7 @@ import { getRgbppLockScript } from '../constants';
 import { hexToBytes, serializeOutPoint, serializeOutputs, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { blockchain } from '@ckb-lumos/base';
 
-export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet?: boolean) => {
+export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
   return {
     ...getRgbppLockScript(isMainnet),
     args: append0x(rgbppLockArgs),
@@ -13,7 +13,7 @@ export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet?: boolean) => {
 };
 
 export const BTC_JUMP_LOCK_TIME = 6;
-export const genBtcTimeLockScript = (toLock: CKBComponents.Script, isMainnet?: boolean) => {
+export const genBtcTimeLockScript = (toLock: CKBComponents.Script, isMainnet: boolean) => {
   const lockArgs = `${append0x(serializeScript(toLock))}${u32ToLe(6)}`;
   return {
     ...getRgbppLockScript(isMainnet),
