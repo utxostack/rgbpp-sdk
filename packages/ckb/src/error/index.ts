@@ -39,3 +39,9 @@ export class InputsCapacityNotEnoughError extends Error {
     super(message);
   }
 }
+
+export class SpvRpcError extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}
