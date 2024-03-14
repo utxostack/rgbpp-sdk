@@ -1,7 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { sha256 } from 'js-sha256';
 import { hexToBytes } from '@nervosnetwork/ckb-sdk-utils';
-import { calculateCommitment, genBtcTimeLockScript, lockScriptFromBtcTimeLockArgs } from './rgbpp';
+import {
+  btcTxIdFromBtcTimeLockArgs,
+  calculateCommitment,
+  genBtcTimeLockScript,
+  lockScriptFromBtcTimeLockArgs,
+} from './rgbpp';
 import { RgbppCkbVirtualTx } from '../types';
 import { calculateUdtCellCapacity } from './ckb-tx';
 
@@ -63,6 +68,13 @@ describe('rgbpp tests', () => {
     const lock = lockScriptFromBtcTimeLockArgs(lockArgs);
     expect(lock.codeHash).toBe('0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8');
     expect(lock.args).toBe('0xe616d1460d634668b8ad81971c3a53e705f51e60');
+  });
+
+  it('btcTxIdFromBtcTimeLockArgs', async () => {
+    const lockArgs =
+      '0x490000001000000030000000310000009bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce80114000000e616d1460d634668b8ad81971c3a53e705f51e60060000003c3199f83af98669e9e6dbf421702379ae530998441a1e0d3b8a0670ef3c2aba';
+    const btcTxId = btcTxIdFromBtcTimeLockArgs(lockArgs);
+    expect(btcTxId).toBe('0x3c3199f83af98669e9e6dbf421702379ae530998441a1e0d3b8a0670ef3c2aba');
   });
 
   it('calculateUdtCellCapacity', async () => {
