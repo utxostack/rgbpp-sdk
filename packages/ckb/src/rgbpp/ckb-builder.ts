@@ -1,4 +1,5 @@
 import {
+  bytesToHex,
   getTransactionSize,
   rawTransactionToHash,
   scriptToHash,
@@ -8,30 +9,59 @@ import {
   AppendBtcTxIdToLockArgsParams,
   AppendPaymasterCellAndSignTxParams,
   AppendWitnessesParams,
+  Hex,
   SendCkbTxParams,
 } from '../types';
 import { SECP256K1_WITNESS_LOCK_SIZE, getRgbppLockScript } from '../constants';
-import { append0x, calculateTransactionFee, isRgbppLockOrBtcTimeLock, remove0x } from '../utils';
+import { append0x, calculateTransactionFee, isRgbppLockOrBtcTimeLock, remove0x, u8ToHex } from '../utils';
 import { InputsCapacityNotEnoughError } from '../error';
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
+import { buildSpvClientCellDep } from '../spv';
+import { RGBPPUnlock, Uint16 } from '../schemas/generated/rgbpp';
 
-// TODO: waiting for SPV btc tx proof
+export const buildRgbppUnlockWitness = (btcTxBytes: Hex, ckbRawTx: CKBComponents.RawTransaction): Hex => {
+  const inputLen = append0x(u8ToHex(ckbRawTx.inputs.length));
+  const outputLen = append0x(u8ToHex(ckbRawTx.outputs.length));
+
+  const version = Uint16.pack([0, 0]);
+  const rgbppUnlock = RGBPPUnlock.pack({ version, extraData: { inputLen, outputLen }, btcTx: btcTxBytes });
+  return append0x(bytesToHex(rgbppUnlock));
+};
+
 /**
  * Append RGBPP unlock witnesses to ckb tx and the tx can be sent to blockchain if the needPaymasterCell is false.
- * And if the needPaymasterCell is true, appending paymaster cell to inputs and signing ckb tx are required
+ * And if the needPaymasterCell is true, appending paymaster cell to inputs and signing ckb tx are required.
+ *
+ * The spvClientCellTxProof can be fetched through the RPC fetchSpvClientCellAndTxProof of the SpvService
  * @param collector The collector that collects CKB live cells and transactions
+ * @param btcTxBytes The hex string of btc transaction, refer to https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/ts_src/transaction.ts#L609
+ * @param spvClientCellTxProof The OutPoint of SPV client cell and btc tx proof that come from SPV RPC service
  * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
  * @param needPaymasterCell The needPaymasterCell indicates whether a paymaster cell is required
  */
-export const appendCkbTxWitnesses = ({ ckbRawTx, sumInputsCapacity, needPaymasterCell }: AppendWitnessesParams) => {
-  const inputsCapacity = BigInt(sumInputsCapacity);
+export const appendCkbTxWitnesses = async ({
+  ckbRawTx,
+  spvService,
+  btcTxBytes,
+  btcTxId,
+  sumInputsCapacity,
+  needPaymasterCell,
+}: AppendWitnessesParams): Promise<CKBComponents.RawTransaction> => {
+  let rawTx = ckbRawTx;
+
+  const spvClientProof = await spvService.fetchSpvClientCellAndTxProof({ btcTxId, confirmBlocks: 0 });
+  rawTx.cellDeps.push(buildSpvClientCellDep(spvClientProof.spvClient));
+
+  const rgbppUnlock = buildRgbppUnlockWitness(btcTxBytes, ckbRawTx);
+  rawTx.witnesses = rawTx.witnesses.map((_) => rgbppUnlock);
+
   if (!needPaymasterCell) {
-    let rawTx = ckbRawTx;
     const partialOutputsCapacity = rawTx.outputs
       .slice(0, rawTx.outputs.length - 1)
       .map((output) => BigInt(output.capacity))
       .reduce((prev, current) => prev + current, BigInt(0));
 
+    const inputsCapacity = BigInt(sumInputsCapacity);
     if (inputsCapacity <= partialOutputsCapacity) {
       throw new InputsCapacityNotEnoughError('The sum of inputs capacity is not enough');
     }
@@ -41,8 +71,9 @@ export const appendCkbTxWitnesses = ({ ckbRawTx, sumInputsCapacity, needPaymaste
 
     const changeCapacity = inputsCapacity - partialOutputsCapacity - estimatedTxFee;
     rawTx.outputs[rawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
-    return rawTx;
   }
+
+  return rawTx;
 };
 
 /**
