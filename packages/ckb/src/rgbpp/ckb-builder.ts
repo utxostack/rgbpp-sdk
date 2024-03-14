@@ -19,12 +19,16 @@ import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 import { buildSpvClientCellDep } from '../spv';
 import { RGBPPUnlock, Uint16 } from '../schemas/generated/rgbpp';
 
-export const buildRgbppUnlockWitness = (btcTxBytes: Hex, ckbRawTx: CKBComponents.RawTransaction): Hex => {
+export const buildRgbppUnlockWitness = (
+  btcTxBytes: Hex,
+  btcTxProof: Hex,
+  ckbRawTx: CKBComponents.RawTransaction,
+): Hex => {
   const inputLen = append0x(u8ToHex(ckbRawTx.inputs.length));
   const outputLen = append0x(u8ToHex(ckbRawTx.outputs.length));
 
   const version = Uint16.pack([0, 0]);
-  const rgbppUnlock = RGBPPUnlock.pack({ version, extraData: { inputLen, outputLen }, btcTx: btcTxBytes });
+  const rgbppUnlock = RGBPPUnlock.pack({ version, extraData: { inputLen, outputLen }, btcTx: btcTxBytes, btcTxProof });
   return append0x(bytesToHex(rgbppUnlock));
 };
 
@@ -35,6 +39,7 @@ export const buildRgbppUnlockWitness = (btcTxBytes: Hex, ckbRawTx: CKBComponents
  * The spvClientCellTxProof can be fetched through the RPC fetchSpvClientCellAndTxProof of the SpvService
  * @param collector The collector that collects CKB live cells and transactions
  * @param btcTxBytes The hex string of btc transaction, refer to https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/ts_src/transaction.ts#L609
+ * @param spvService SPV RPC service
  * @param spvClientCellTxProof The OutPoint of SPV client cell and btc tx proof that come from SPV RPC service
  * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
  * @param needPaymasterCell The needPaymasterCell indicates whether a paymaster cell is required
@@ -49,10 +54,10 @@ export const appendCkbTxWitnesses = async ({
 }: AppendWitnessesParams): Promise<CKBComponents.RawTransaction> => {
   let rawTx = ckbRawTx;
 
-  const spvClientProof = await spvService.fetchSpvClientCellAndTxProof({ btcTxId, confirmBlocks: 0 });
-  rawTx.cellDeps.push(buildSpvClientCellDep(spvClientProof.spvClient));
+  const { spvClient, proof } = await spvService.fetchSpvClientCellAndTxProof({ btcTxId, confirmBlocks: 0 });
+  rawTx.cellDeps.push(buildSpvClientCellDep(spvClient));
 
-  const rgbppUnlock = buildRgbppUnlockWitness(btcTxBytes, ckbRawTx);
+  const rgbppUnlock = buildRgbppUnlockWitness(btcTxBytes, proof, ckbRawTx);
   rawTx.witnesses = rawTx.witnesses.map((_) => rgbppUnlock);
 
   if (!needPaymasterCell) {
