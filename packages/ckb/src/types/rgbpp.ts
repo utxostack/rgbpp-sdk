@@ -1,6 +1,8 @@
 import { Collector } from '../collector';
+import { SPVService } from '../spv';
 import { IndexerCell } from './collector';
 import { Address, Hex } from './common';
+import { SpvClientCellTxProofResponse } from './spv';
 
 export interface ConstructPaymasterParams {
   // The collector that collects CKB live cells and transactions
@@ -50,6 +52,12 @@ export interface BtcTransferVirtualTxResult {
 export interface AppendWitnessesParams {
   // CKB raw transaction
   ckbRawTx: CKBComponents.RawTransaction;
+  // SPV RPC service
+  spvService: SPVService;
+  // The hex string of btc transaction, refer to https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/ts_src/transaction.ts#L609
+  btcTxBytes: Hex;
+  // The BTC transaction id
+  btcTxId: Hex;
   // The sum capacity of the ckb inputs
   sumInputsCapacity: Hex;
   // The needPaymasterCell indicates whether a paymaster cell is required

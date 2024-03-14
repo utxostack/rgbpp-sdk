@@ -1,8 +1,6 @@
 import { Hex } from './common';
 
 export interface SpvClientCellTxProofReq {
-  // The SPV Service url
-  spvServiceUrl: string;
   // The BTC transaction id
   btcTxId: Hex;
   // The BTC confirmation blocks
