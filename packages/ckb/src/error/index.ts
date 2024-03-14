@@ -16,6 +16,12 @@ export class NoLiveCellError extends Error {
   }
 }
 
+export class NoXudtLiveCellError extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
 export class NoRgbppLiveCellError extends Error {
   constructor(message: string) {
     super(message);

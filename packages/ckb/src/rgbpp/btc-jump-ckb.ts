@@ -51,7 +51,7 @@ export const genBtcJumpCkbVirtualTx = async ({
 
   if (sumAmount > transferAmount) {
     outputs.push({
-      lock: genRgbppLockScript(u32ToLe(2)),
+      lock: genRgbppLockScript(u32ToLe(2), isMainnet),
       type: xudtType,
       capacity: append0x(rpbppCellCapacity.toString(16)),
     });
@@ -86,6 +86,6 @@ export const genBtcJumpCkbVirtualTx = async ({
     ckbRawTx,
     commitment,
     needPaymasterCell,
-    sumInputsCapacity,
+    sumInputsCapacity: append0x(sumInputsCapacity.toString(16)),
   };
 };

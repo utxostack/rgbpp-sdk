@@ -26,7 +26,7 @@ cd packages/ckb && pnpm splitCells
 
 ## BTC rgbpp asset transfer
 
-The method `genBtcTransferCkbVirtualTx` can generate a CKB virtual transaction which contains the necessary `inputCells/outputCells` for rgbpp asset transfer and the commitment to be inserted to the BTC OP_RETURN.
+The method `genBtcTransferCkbVirtualTx` can generate a CKB virtual transaction which contains the necessary `inputCells/outputCells` for rgbpp asset transfer and the commitment to be inserted to the BTC tx OP_RETURN.
 
 ```TypeScript
 interface BtcTransferVirtualTxResult {
@@ -59,7 +59,7 @@ const genBtcTransferCkbVirtualTx = async ({
 
 ## BTC rgbpp asset jump to CKB
 
-The method `genBtcJumpCkbVirtualTx` can generate a CKB virtual transaction which contains the necessary `inputCells/outputCells` for rgbpp asset jumping from BTC to CKB and the commitment to be inserted to the BTC OP_RETURN.
+The method `genBtcJumpCkbVirtualTx` can generate a CKB virtual transaction which contains the necessary `inputCells/outputCells` for rgbpp asset jumping from BTC to CKB and the commitment to be inserted to the BTC tx OP_RETURN.
 
 ```TypeScript
 interface BtcJumpCkbVirtualTxResult {
@@ -88,4 +88,29 @@ export const genBtcJumpCkbVirtualTx = async ({
   transferAmount,
   toCkbAddress,
 }: BtcJumpCkbVirtualTxParams): Promise<BtcJumpCkbVirtualTxResult>
+```
+
+## CKB rgbpp asset jump to BTC
+
+The method `genCkbJumpBtcVirtualTx` can generate a CKB transaction for rgbpp assets jumping from CKB to BTC
+
+```TypeScript
+/**
+ * Generate the virtual ckb transaction for the jumping tx from CKB to BTC
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param xudtTypeBytes The serialized hex string of the XUDT type script
+ * @param fromCkbAddress The from ckb address who will use his private key to sign the ckb tx
+ * @param toRgbppLockArgs The receiver rgbpp lock script args whose data structure is: out_index | bitcoin_tx_id
+ * @param transferAmount The XUDT amount to be transferred
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 65(official secp256k1/blake160 lock)
+ * @param isMainnet
+ */
+export const genCkbJumpBtcVirtualTx = async ({
+  collector,
+  xudtTypeBytes,
+  fromCkbAddress,
+  toRgbppLockArgs,
+  transferAmount,
+  witnessLockPlaceholderSize,
+}: CkbJumpBtcVirtualTxParams): Promise<CKBComponents.RawTransaction>
 ```

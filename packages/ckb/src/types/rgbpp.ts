@@ -24,7 +24,7 @@ export interface BtcTransferVirtualTxParams {
   rgbppLockArgsList: Hex[];
   // The XUDT amount to be transferred
   transferAmount: bigint;
-  isMainnet?: boolean;
+  isMainnet: boolean;
 }
 
 export interface RgbppCkbVirtualTx {
@@ -44,14 +44,14 @@ export interface BtcTransferVirtualTxResult {
   // The needPaymasterCell indicates whether a paymaster cell is required
   needPaymasterCell: boolean;
   // The sum capacity of the ckb inputs
-  sumInputsCapacity: bigint;
+  sumInputsCapacity: Hex;
 }
 
 export interface AppendWitnessesParams {
   // CKB raw transaction
   ckbRawTx: CKBComponents.RawTransaction;
   // The sum capacity of the ckb inputs
-  sumInputsCapacity: bigint;
+  sumInputsCapacity: Hex;
   // The needPaymasterCell indicates whether a paymaster cell is required
   needPaymasterCell: boolean;
 }
@@ -62,10 +62,10 @@ export interface AppendPaymasterCellAndSignTxParams {
   // CKB raw transaction
   ckbRawTx: CKBComponents.RawTransaction;
   // The sum capacity of the ckb inputs
-  sumInputsCapacity: bigint;
+  sumInputsCapacity: Hex;
   // The paymaster cell to be inserted into CKB transaction to pay an extra output cell
   paymasterCell: IndexerCell;
-  isMainnet?: boolean;
+  isMainnet: boolean;
 }
 
 export interface SendCkbTxParams {
@@ -88,11 +88,34 @@ export interface BtcJumpCkbVirtualTxResult {
   // The needPaymasterCell indicates whether a paymaster cell is required
   needPaymasterCell: boolean;
   // The sum capacity of the ckb inputs
-  sumInputsCapacity: bigint;
+  sumInputsCapacity: Hex;
 }
 
 export interface BtcTimeCellsParams {
   // The collector that collects CKB live cells and transactions
   btcTimeCells: IndexerCell[];
-  isMainnet?: boolean;
+  isMainnet: boolean;
+}
+
+export interface CkbJumpBtcVirtualTxParams {
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // The serialized hex string of the XUDT type script
+  xudtTypeBytes: Hex;
+  // The from ckb address who will use his private key to sign the ckb tx
+  fromCkbAddress: Address;
+  // The receiver rgbpp lock script args whose data structure is: out_index | bitcoin_tx_id
+  toRgbppLockArgs: Hex;
+  // The XUDT amount to be transferred
+  transferAmount: bigint;
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 65(official secp256k1/blake160 lock)
+  witnessLockPlaceholderSize?: number;
+}
+
+export interface AppendBtcTxIdToLockArgsParams {
+  // CKB raw transaction
+  ckbRawTx: CKBComponents.RawTransaction;
+  // The BTC transaction id
+  btcTxId: Hex;
+  isMainnet: boolean;
 }
