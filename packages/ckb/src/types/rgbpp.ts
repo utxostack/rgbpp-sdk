@@ -118,3 +118,11 @@ export interface CkbJumpBtcVirtualTxResult {
   // The rgbpp commitment to be inserted into BTC op_return
   commitment: Hex;
 }
+
+export interface AppendBtcTxIdToLockArgsParams {
+  // CKB raw transaction
+  ckbRawTx: CKBComponents.RawTransaction;
+  // The BTC transaction id
+  btcTxId: Hex;
+  isMainnet: boolean;
+}
