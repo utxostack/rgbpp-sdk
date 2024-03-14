@@ -1,9 +1,16 @@
 import { CkbJumpBtcVirtualTxParams, RgbppCkbVirtualTx } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
-import { NoXudtLiveCellError } from '../error';
-import { append0x, calculateRgbppCellCapacity, calculateTransactionFee, remove0x, u128ToLe } from '../utils';
+import { NoLiveCellError, NoXudtLiveCellError } from '../error';
+import {
+  append0x,
+  calculateRgbppCellCapacity,
+  calculateTransactionFee,
+  calculateUdtCellCapacity,
+  remove0x,
+  u128ToLe,
+} from '../utils';
 import { genRgbppLockScript } from '../utils/rgbpp';
-import { MAX_FEE, SECP256K1_WITNESS_LOCK_SIZE, getXudtDep } from '../constants';
+import { MAX_FEE, MIN_CAPACITY, SECP256K1_WITNESS_LOCK_SIZE, getXudtDep } from '../constants';
 import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
 /**
@@ -33,7 +40,7 @@ export const genCkbJumpBtcVirtualTx = async ({
     throw new NoXudtLiveCellError('No rgbpp cells found with the xudt type script and the rgbpp lock args');
   }
 
-  const { inputs, sumInputsCapacity, sumAmount } = collector.collectUdtInputs(xudtCells, transferAmount);
+  let { inputs, sumInputsCapacity, sumAmount } = collector.collectUdtInputs(xudtCells, transferAmount);
 
   const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
   const outputsData = [append0x(u128ToLe(transferAmount))];
@@ -48,6 +55,21 @@ export const genCkbJumpBtcVirtualTx = async ({
   ];
 
   let txFee = MAX_FEE;
+  const xudtCellCapacity = calculateUdtCellCapacity(fromLock, xudtType);
+  if (sumInputsCapacity < xudtCellCapacity + rpbppCellCapacity + txFee) {
+    const emptyCells = await collector.getCells({ lock: fromLock });
+    if (!emptyCells || emptyCells.length === 0) {
+      throw new NoLiveCellError('The address has no empty cells');
+    }
+    const { inputs: emptyInputs, sumInputsCapacity: sumEmptyCapacity } = collector.collectInputs(
+      emptyCells,
+      xudtCellCapacity,
+      txFee,
+    );
+    inputs = [...emptyInputs, ...inputs];
+    sumInputsCapacity += sumEmptyCapacity;
+  }
+
   const changeCapacity = sumInputsCapacity - rpbppCellCapacity - txFee;
   outputs.push({
     lock: fromLock,

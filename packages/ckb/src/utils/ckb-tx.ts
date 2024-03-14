@@ -25,3 +25,12 @@ export const calculateRgbppCellCapacity = (xudtType: CKBComponents.Script): bigi
   const cellSize = RGBPP_LOCK_SIZE + udtTypeSize + 8 + 16;
   return BigInt(cellSize + 1) * CKB_UNIT;
 };
+
+// minimum occupied capacity and 1 ckb for transaction fee
+// assume UDT cell data size is 16bytes
+export const calculateUdtCellCapacity = (lock: CKBComponents.Script, udtType: CKBComponents.Script): bigint => {
+  const lockArgsSize = remove0x(lock.args).length / 2;
+  const typeArgsSize = remove0x(udtType.args).length / 2;
+  const cellSize = 33 + lockArgsSize + 33 + typeArgsSize + 8 + 16;
+  return BigInt(cellSize + 1) * CKB_UNIT;
+};
