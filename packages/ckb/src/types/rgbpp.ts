@@ -112,13 +112,6 @@ export interface CkbJumpBtcVirtualTxParams {
   witnessLockPlaceholderSize?: number;
 }
 
-export interface CkbJumpBtcVirtualTxResult {
-  // CKB raw transaction
-  ckbRawTx: CKBComponents.RawTransaction;
-  // The rgbpp commitment to be inserted into BTC op_return
-  commitment: Hex;
-}
-
 export interface AppendBtcTxIdToLockArgsParams {
   // CKB raw transaction
   ckbRawTx: CKBComponents.RawTransaction;

@@ -1,8 +1,8 @@
-import { CkbJumpBtcVirtualTxParams, CkbJumpBtcVirtualTxResult, RgbppCkbVirtualTx } from '../types/rgbpp';
+import { CkbJumpBtcVirtualTxParams, RgbppCkbVirtualTx } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
 import { NoXudtLiveCellError } from '../error';
 import { append0x, calculateRgbppCellCapacity, calculateTransactionFee, remove0x, u128ToLe } from '../utils';
-import { calculateCommitment, genRgbppLockScript } from '../utils/rgbpp';
+import { genRgbppLockScript } from '../utils/rgbpp';
 import { MAX_FEE, SECP256K1_WITNESS_LOCK_SIZE, getXudtDep } from '../constants';
 import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
@@ -23,7 +23,7 @@ export const genCkbJumpBtcVirtualTx = async ({
   toRgbppLockArgs,
   transferAmount,
   witnessLockPlaceholderSize,
-}: CkbJumpBtcVirtualTxParams): Promise<CkbJumpBtcVirtualTxResult> => {
+}: CkbJumpBtcVirtualTxParams): Promise<CKBComponents.RawTransaction> => {
   const isMainnet = fromCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
   const fromLock = addressToScript(fromCkbAddress);
@@ -76,15 +76,5 @@ export const genCkbJumpBtcVirtualTx = async ({
     ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(estimatedChangeCapacity.toString(16));
   }
 
-  const virtualTx: RgbppCkbVirtualTx = {
-    inputs,
-    outputs,
-    outputsData,
-  };
-  const commitment = calculateCommitment(virtualTx);
-
-  return {
-    ckbRawTx,
-    commitment,
-  };
+  return ckbRawTx;
 };
