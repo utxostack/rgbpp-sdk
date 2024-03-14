@@ -92,16 +92,9 @@ export const genBtcJumpCkbVirtualTx = async ({
 
 ## CKB rgbpp asset jump to BTC
 
-The method `genCkbJumpBtcVirtualTx` can generate a CKB virtual transaction which contains the necessary `inputCells/outputCells` for rgbpp asset jumping from CKB to BTC and the commitment to be inserted to the BTC tx OP_RETURN.
+The method `genCkbJumpBtcVirtualTx` can generate a CKB transaction for rgbpp assets jumping from CKB to BTC
 
 ```TypeScript
-export interface CkbJumpBtcVirtualTxResult {
-  // CKB raw transaction
-  ckbRawTx: CKBComponents.RawTransaction;
-  // The rgbpp commitment to be inserted into BTC op_return
-  commitment: Hex;
-}
-
 /**
  * Generate the virtual ckb transaction for the jumping tx from CKB to BTC
  * @param collector The collector that collects CKB live cells and transactions
@@ -119,5 +112,5 @@ export const genCkbJumpBtcVirtualTx = async ({
   toRgbppLockArgs,
   transferAmount,
   witnessLockPlaceholderSize,
-}: CkbJumpBtcVirtualTxParams): Promise<CkbJumpBtcVirtualTxResult>
+}: CkbJumpBtcVirtualTxParams): Promise<CKBComponents.RawTransaction>
 ```
