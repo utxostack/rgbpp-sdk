@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { SpvClientCellTxProofReq, SpvClientCellTxProofResponse } from '../types/spv';
 import { SpvRpcError } from '../error';
-import { append0x, toCamelcase, u8ToHex } from '../utils';
+import { append0x, toCamelcase, u32ToLe, u8ToHex } from '../utils';
 import { blockchain } from '@ckb-lumos/base';
 import { Hex } from '../types';
 
@@ -47,7 +47,7 @@ export const buildSpvClientCellDep = (spvClient: Hex) => {
   const cellDep: CKBComponents.CellDep = {
     outPoint: {
       txHash: outPoint.txHash,
-      index: append0x(u8ToHex(outPoint.index)),
+      index: append0x(u32ToLe(outPoint.index)),
     },
     depType: 'code',
   };
