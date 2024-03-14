@@ -102,6 +102,8 @@ export interface BtcJumpCkbVirtualTxResult {
 export interface BtcTimeCellsParams {
   // The collector that collects CKB live cells and transactions
   btcTimeCells: IndexerCell[];
+  // SPV RPC service
+  spvService: SPVService;
   isMainnet: boolean;
 }
 
