@@ -82,8 +82,9 @@ export const RGBPPUnlock = table(
     version: Uint16,
     extraData: ExtraCommitmentData,
     btcTx: Bytes,
+    btcTxProof: Bytes,
   },
-  ['version', 'extraData', 'btcTx'],
+  ['version', 'extraData', 'btcTx', 'btcTxProof'],
 );
 
 export const BTCTimeLock = table(
