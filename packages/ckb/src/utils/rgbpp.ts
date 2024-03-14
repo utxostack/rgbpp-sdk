@@ -1,7 +1,7 @@
 import { sha256 } from 'js-sha256';
 import { Hex, RgbppCkbVirtualTx } from '../types';
 import { append0x, remove0x, u16ToLe, u32ToLe, u8ToHex, utf8ToHex } from './hex';
-import { getRgbppLockScript } from '../constants';
+import { getBtcTimeLockScript, getRgbppLockScript } from '../constants';
 import { hexToBytes, serializeOutPoint, serializeOutputs, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { blockchain } from '@ckb-lumos/base';
 
@@ -49,4 +49,14 @@ export const lockScriptFromBtcTimeLockArgs = (args: Hex): CKBComponents.Script =
   }
   const lockScript = append0x(temp.substring(0, temp.length - 72));
   return blockchain.Script.unpack(lockScript) as CKBComponents.Script;
+};
+
+export const isRgbppLockOrBtcTimeLock = (lock: CKBComponents.Script, isMainnet: boolean) => {
+  const rgbppLock = getRgbppLockScript(isMainnet);
+  const isRgbppLock = lock.codeHash === rgbppLock.codeHash && lock.hashType === rgbppLock.hashType;
+
+  const btcTimeLock = getBtcTimeLockScript(isMainnet);
+  const isBtcTimeLock = lock.codeHash === btcTimeLock.codeHash && lock.hashType === btcTimeLock.hashType;
+
+  return isRgbppLock || isBtcTimeLock;
 };
