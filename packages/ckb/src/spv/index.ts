@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { SpvClientCellTxProofReq, SpvClientCellTxProofResponse } from '../types/spv';
 import { SpvRpcError } from '../error';
-import { append0x, toCamelcase, u32ToLe, u8ToHex } from '../utils';
+import { append0x, toCamelcase, u32ToLe } from '../utils';
 import { blockchain } from '@ckb-lumos/base';
 import { Hex } from '../types';
 
@@ -17,7 +17,7 @@ export class SPVService {
     confirmBlocks,
   }: SpvClientCellTxProofReq): Promise<SpvClientCellTxProofResponse> => {
     let payload = {
-      id: 1,
+      id: Math.floor(Math.random() * 100000),
       jsonrpc: '2.0',
       method: 'getTxProof',
       params: [btcTxId, confirmBlocks],

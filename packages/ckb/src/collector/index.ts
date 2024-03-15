@@ -58,7 +58,7 @@ export class Collector {
       };
     }
     let payload = {
-      id: 1,
+      id: Math.floor(Math.random() * 100000),
       jsonrpc: '2.0',
       method: 'get_cells',
       params: [param, 'asc', '0x3E8'],
