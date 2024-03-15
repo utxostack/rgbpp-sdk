@@ -52,6 +52,7 @@ export const buildBtcTimeCellsSpentTx = async ({
       witnesses.push('0x');
       continue;
     }
+    lockArgsSet.add(cell.output.lock.args);
     const { spvClient, proof } = await spvService.fetchSpvClientCellAndTxProof({
       btcTxId: btcTxIdFromBtcTimeLockArgs(cell.output.lock.args),
       confirmBlocks: BTC_JUMP_CONFIRMATION_BLOCKS,

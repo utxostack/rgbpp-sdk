@@ -71,6 +71,7 @@ export const genBtcJumpCkbVirtualTx = async ({
     if (lockArgsSet.has(cell.output.lock.args)) {
       witnesses.push('0x');
     } else {
+      lockArgsSet.add(cell.output.lock.args);
       witnesses.push(RGBPP_WITNESS_PLACEHOLDER);
     }
   }
