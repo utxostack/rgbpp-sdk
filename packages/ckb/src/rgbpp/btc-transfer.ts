@@ -2,9 +2,15 @@ import { BtcTransferVirtualTxParams, BtcTransferVirtualTxResult, RgbppCkbVirtual
 import { blockchain } from '@ckb-lumos/base';
 import { NoRgbppLiveCellError } from '../error';
 import { append0x, calculateRgbppCellCapacity, u128ToLe, u32ToLe } from '../utils';
-import { calculateCommitment, compareInputs, genRgbppLockScript } from '../utils/rgbpp';
+import { buildPreLockArgs, calculateCommitment, compareInputs, genRgbppLockScript } from '../utils/rgbpp';
 import { Hex, IndexerCell } from '../types';
-import { RGBPP_WITNESS_PLACEHOLDER, getRgbppLockDep, getSecp256k1CellDep, getXudtDep } from '../constants';
+import {
+  RGBPP_TX_ID_PLACEHOLDER,
+  RGBPP_WITNESS_PLACEHOLDER,
+  getRgbppLockDep,
+  getSecp256k1CellDep,
+  getXudtDep,
+} from '../constants';
 
 /**
  * Generate the virtual ckb transaction for the btc transfer tx
@@ -42,7 +48,7 @@ export const genBtcTransferCkbVirtualTx = async ({
   // The Vouts[0] for OP_RETURN and Vouts[1], Vouts[2] for RGBPP assets
   const outputs: CKBComponents.CellOutput[] = [
     {
-      lock: genRgbppLockScript(u32ToLe(1), isMainnet),
+      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
       type: xudtType,
       capacity: append0x(rpbppCellCapacity.toString(16)),
     },
@@ -50,7 +56,7 @@ export const genBtcTransferCkbVirtualTx = async ({
 
   if (sumAmount > transferAmount) {
     outputs.push({
-      lock: genRgbppLockScript(u32ToLe(2), isMainnet),
+      lock: genRgbppLockScript(buildPreLockArgs(2), isMainnet),
       type: xudtType,
       capacity: append0x(rpbppCellCapacity.toString(16)),
     });
