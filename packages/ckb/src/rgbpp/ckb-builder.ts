@@ -12,7 +12,7 @@ import {
   Hex,
   SendCkbTxParams,
 } from '../types';
-import { SECP256K1_WITNESS_LOCK_SIZE, getRgbppLockScript } from '../constants';
+import { RGBPP_WITNESS_PLACEHOLDER, SECP256K1_WITNESS_LOCK_SIZE, getRgbppLockScript } from '../constants';
 import { append0x, calculateTransactionFee, isRgbppLockOrBtcTimeLock, remove0x, u8ToHex } from '../utils';
 import { InputsCapacityNotEnoughError } from '../error';
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
@@ -56,7 +56,7 @@ export const appendCkbTxWitnesses = async ({
   rawTx.cellDeps.push(buildSpvClientCellDep(spvClient));
 
   const rgbppUnlock = buildRgbppUnlockWitness(btcTxBytes, proof, ckbRawTx);
-  rawTx.witnesses = rawTx.witnesses.map((_) => rgbppUnlock);
+  rawTx.witnesses = rawTx.witnesses.map((witness) => (witness === RGBPP_WITNESS_PLACEHOLDER ? rgbppUnlock : witness));
 
   if (!needPaymasterCell) {
     const partialOutputsCapacity = rawTx.outputs
