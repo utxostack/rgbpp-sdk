@@ -1,7 +1,7 @@
 import { sha256 } from 'js-sha256';
-import { Hex, RgbppCkbVirtualTx } from '../types';
+import { Hex, IndexerCell, RgbppCkbVirtualTx } from '../types';
 import { append0x, remove0x, u16ToLe, u32ToLe, u8ToHex, utf8ToHex } from './hex';
-import { getBtcTimeLockScript, getRgbppLockScript } from '../constants';
+import { BTC_JUMP_CONFIRMATION_BLOCKS, getBtcTimeLockScript, getRgbppLockScript } from '../constants';
 import { hexToBytes, serializeOutPoint, serializeOutputs, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { blockchain } from '@ckb-lumos/base';
 
@@ -12,9 +12,8 @@ export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
   } as CKBComponents.Script;
 };
 
-export const BTC_JUMP_LOCK_TIME = 6;
 export const genBtcTimeLockScript = (toLock: CKBComponents.Script, isMainnet: boolean) => {
-  const lockArgs = `${append0x(serializeScript(toLock))}${u32ToLe(6)}`;
+  const lockArgs = `${append0x(serializeScript(toLock))}${u32ToLe(BTC_JUMP_CONFIRMATION_BLOCKS)}`;
   return {
     ...getRgbppLockScript(isMainnet),
     args: lockArgs,
@@ -51,6 +50,15 @@ export const lockScriptFromBtcTimeLockArgs = (args: Hex): CKBComponents.Script =
   return blockchain.Script.unpack(lockScript) as CKBComponents.Script;
 };
 
+export const btcTxIdFromBtcTimeLockArgs = (args: Hex): Hex => {
+  const temp = remove0x(args);
+  if (temp.length <= 72) {
+    throw new Error('Invalid BTC time lock args');
+  }
+  const btcTxId = append0x(temp.substring(temp.length - 64));
+  return btcTxId;
+};
+
 export const isRgbppLockOrBtcTimeLock = (lock: CKBComponents.Script, isMainnet: boolean) => {
   const rgbppLock = getRgbppLockScript(isMainnet);
   const isRgbppLock = lock.codeHash === rgbppLock.codeHash && lock.hashType === rgbppLock.hashType;
@@ -59,4 +67,14 @@ export const isRgbppLockOrBtcTimeLock = (lock: CKBComponents.Script, isMainnet: 
   const isBtcTimeLock = lock.codeHash === btcTimeLock.codeHash && lock.hashType === btcTimeLock.hashType;
 
   return isRgbppLock || isBtcTimeLock;
+};
+
+export const compareInputs = (a: IndexerCell, b: IndexerCell) => {
+  if (a.output.lock.args < b.output.lock.args) {
+    return -1;
+  }
+  if (a.output.lock.args > b.output.lock.args) {
+    return 1;
+  }
+  return 0;
 };

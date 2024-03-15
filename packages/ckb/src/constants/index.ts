@@ -2,6 +2,9 @@ export const CKB_UNIT = BigInt(10000_0000);
 export const MAX_FEE = BigInt(2000_0000);
 export const MIN_CAPACITY = BigInt(61) * BigInt(10000_0000);
 export const SECP256K1_WITNESS_LOCK_SIZE = 65;
+export const BTC_JUMP_CONFIRMATION_BLOCKS = 6;
+
+export const RGBPP_WITNESS_PLACEHOLDER = '0xFF';
 
 const TestnetInfo = {
   Secp256k1LockDep: {

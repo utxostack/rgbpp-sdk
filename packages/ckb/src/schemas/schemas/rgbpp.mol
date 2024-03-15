@@ -23,6 +23,7 @@ table RGBPPUnlock {
   version: Uint16,
   extra_data: ExtraCommitmentData,
   btc_tx: Bytes,
+  btc_tx_proof: Bytes,
 }
 
 table BTCTimeLock {
