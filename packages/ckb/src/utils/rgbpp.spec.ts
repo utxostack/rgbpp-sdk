@@ -18,7 +18,7 @@ describe('rgbpp tests', () => {
     expect(hash).toBe('c0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f');
   });
 
-  it('calculateCommitment with the test data from RGBPP lock contract test cases', async () => {
+  it('calculateCommitment with the test data which is from RGBPP lock contract test cases', async () => {
     const rgbppVirtualTx: RgbppCkbVirtualTx = {
       inputs: [
         {
