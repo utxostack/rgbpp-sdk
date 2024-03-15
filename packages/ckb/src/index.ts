@@ -6,3 +6,4 @@ export * from './paymaster';
 export * from './types';
 export * from './rgbpp';
 export * from './spv';
+export * from './utils';
