@@ -1,5 +1,5 @@
 import { sha256 } from 'js-sha256';
-import { Hex, RgbppCkbVirtualTx } from '../types';
+import { Hex, IndexerCell, RgbppCkbVirtualTx } from '../types';
 import { append0x, remove0x, u16ToLe, u32ToLe, u8ToHex, utf8ToHex } from './hex';
 import { BTC_JUMP_CONFIRMATION_BLOCKS, getBtcTimeLockScript, getRgbppLockScript } from '../constants';
 import { hexToBytes, serializeOutPoint, serializeOutputs, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
@@ -67,4 +67,14 @@ export const isRgbppLockOrBtcTimeLock = (lock: CKBComponents.Script, isMainnet: 
   const isBtcTimeLock = lock.codeHash === btcTimeLock.codeHash && lock.hashType === btcTimeLock.hashType;
 
   return isRgbppLock || isBtcTimeLock;
+};
+
+export const compareInputs = (a: IndexerCell, b: IndexerCell) => {
+  if (a.output.lock.args < b.output.lock.args) {
+    return -1;
+  }
+  if (a.output.lock.args > b.output.lock.args) {
+    return 1;
+  }
+  return 0;
 };

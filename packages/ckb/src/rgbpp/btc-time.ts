@@ -2,7 +2,13 @@ import { bytesToHex, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 import { BTC_JUMP_CONFIRMATION_BLOCKS, getBtcTimeLockDep, getXudtDep } from '../constants';
 import { BTCTimeUnlock } from '../schemas/generated/rgbpp';
 import { BtcTimeCellsParams, Hex } from '../types';
-import { append0x, btcTxIdFromBtcTimeLockArgs, calculateTransactionFee, lockScriptFromBtcTimeLockArgs } from '../utils';
+import {
+  append0x,
+  btcTxIdFromBtcTimeLockArgs,
+  calculateTransactionFee,
+  compareInputs,
+  lockScriptFromBtcTimeLockArgs,
+} from '../utils';
 import { buildSpvClientCellDep } from '../spv';
 
 export const buildBtcTimeUnlockWitness = (btcTxProof: Hex): Hex => {
@@ -22,32 +28,36 @@ export const buildBtcTimeCellsSpentTx = async ({
   spvService,
   isMainnet,
 }: BtcTimeCellsParams): Promise<CKBComponents.RawTransaction> => {
-  const inputs: CKBComponents.CellInput[] = btcTimeCells.map((cell) => ({
+  const sortedBtcTimeCells = btcTimeCells.sort(compareInputs);
+  const inputs: CKBComponents.CellInput[] = sortedBtcTimeCells.map((cell) => ({
     previousOutput: cell.outPoint,
     since: '0x0',
   }));
 
-  const outputs: CKBComponents.CellOutput[] = btcTimeCells.map((cell) => ({
+  const outputs: CKBComponents.CellOutput[] = sortedBtcTimeCells.map((cell) => ({
     lock: lockScriptFromBtcTimeLockArgs(cell.output.lock.args),
     type: cell.output.type,
     capacity: cell.output.capacity,
   }));
 
-  const outputsData = btcTimeCells.map((cell) => cell.outputData);
+  const outputsData = sortedBtcTimeCells.map((cell) => cell.outputData);
 
   const cellDeps: CKBComponents.CellDep[] = [getBtcTimeLockDep(isMainnet), getXudtDep(isMainnet)];
 
-  const witnesses: Hex[] = inputs.map((_) => '0x');
+  const witnesses: Hex[] = [];
 
-  for await (const cell of btcTimeCells) {
+  const lockArgsSet: Set<string> = new Set();
+  for await (const cell of sortedBtcTimeCells) {
+    if (lockArgsSet.has(cell.output.lock.args)) {
+      witnesses.push('0x');
+      continue;
+    }
     const { spvClient, proof } = await spvService.fetchSpvClientCellAndTxProof({
       btcTxId: btcTxIdFromBtcTimeLockArgs(cell.output.lock.args),
       confirmBlocks: BTC_JUMP_CONFIRMATION_BLOCKS,
     });
     cellDeps.push(buildSpvClientCellDep(spvClient));
-
-    const btcTimeUnlock = buildBtcTimeUnlockWitness(proof);
-    witnesses.push(btcTimeUnlock);
+    witnesses.push(buildBtcTimeUnlockWitness(proof));
   }
 
   const ckbTx: CKBComponents.RawTransaction = {
