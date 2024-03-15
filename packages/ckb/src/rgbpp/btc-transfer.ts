@@ -4,13 +4,7 @@ import { NoRgbppLiveCellError } from '../error';
 import { append0x, calculateRgbppCellCapacity, u128ToLe, u32ToLe } from '../utils';
 import { buildPreLockArgs, calculateCommitment, compareInputs, genRgbppLockScript } from '../utils/rgbpp';
 import { Hex, IndexerCell } from '../types';
-import {
-  RGBPP_TX_ID_PLACEHOLDER,
-  RGBPP_WITNESS_PLACEHOLDER,
-  getRgbppLockDep,
-  getSecp256k1CellDep,
-  getXudtDep,
-} from '../constants';
+import { RGBPP_WITNESS_PLACEHOLDER, getRgbppLockDep, getSecp256k1CellDep, getXudtDep } from '../constants';
 
 /**
  * Generate the virtual ckb transaction for the btc transfer tx

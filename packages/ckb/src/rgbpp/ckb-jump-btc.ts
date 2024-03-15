@@ -1,4 +1,4 @@
-import { CkbJumpBtcVirtualTxParams, RgbppCkbVirtualTx } from '../types/rgbpp';
+import { CkbJumpBtcVirtualTxParams } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
 import { NoLiveCellError, NoXudtLiveCellError } from '../error';
 import {
@@ -10,7 +10,7 @@ import {
   u128ToLe,
 } from '../utils';
 import { buildPreLockArgs, genRgbppLockScript } from '../utils/rgbpp';
-import { MAX_FEE, MIN_CAPACITY, RGBPP_TX_ID_PLACEHOLDER, SECP256K1_WITNESS_LOCK_SIZE, getXudtDep } from '../constants';
+import { MAX_FEE, SECP256K1_WITNESS_LOCK_SIZE, getXudtDep } from '../constants';
 import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
 /**

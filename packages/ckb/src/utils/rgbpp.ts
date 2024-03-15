@@ -1,19 +1,13 @@
 import { sha256 } from 'js-sha256';
 import { Hex, IndexerCell, RgbppCkbVirtualTx } from '../types';
-import { append0x, remove0x, u16ToLe, u32ToLe, u8ToHex, utf8ToHex } from './hex';
+import { append0x, remove0x, u32ToLe, utf8ToHex } from './hex';
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
   RGBPP_TX_ID_PLACEHOLDER,
   getBtcTimeLockScript,
   getRgbppLockScript,
 } from '../constants';
-import {
-  hexToBytes,
-  serializeOutPoint,
-  serializeOutput,
-  serializeOutputs,
-  serializeScript,
-} from '@nervosnetwork/ckb-sdk-utils';
+import { hexToBytes, serializeOutPoint, serializeOutput, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { blockchain } from '@ckb-lumos/base';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
