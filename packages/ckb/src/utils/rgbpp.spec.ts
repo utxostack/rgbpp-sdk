@@ -3,6 +3,7 @@ import { sha256 } from 'js-sha256';
 import { hexToBytes } from '@nervosnetwork/ckb-sdk-utils';
 import {
   btcTxIdFromBtcTimeLockArgs,
+  buildPreLockArgs,
   calculateCommitment,
   genBtcTimeLockScript,
   lockScriptFromBtcTimeLockArgs,
@@ -102,5 +103,12 @@ describe('rgbpp tests', () => {
     };
     const capacity = calculateUdtCellCapacity(joyIDLock, xudtType);
     expect(BigInt(145_0000_0000)).toBe(capacity);
+  });
+
+  it('buildPreLockArgs', async () => {
+    expect('020000000000000000000000000000000000000000000000000000000000000000000000').toBe(buildPreLockArgs(2));
+
+    const lockArgs = buildPreLockArgs('02000000');
+    expect('020000000000000000000000000000000000000000000000000000000000000000000000').toBe(lockArgs);
   });
 });
