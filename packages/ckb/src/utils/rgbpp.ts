@@ -1,8 +1,19 @@
 import { sha256 } from 'js-sha256';
 import { Hex, IndexerCell, RgbppCkbVirtualTx } from '../types';
 import { append0x, remove0x, u16ToLe, u32ToLe, u8ToHex, utf8ToHex } from './hex';
-import { BTC_JUMP_CONFIRMATION_BLOCKS, getBtcTimeLockScript, getRgbppLockScript } from '../constants';
-import { hexToBytes, serializeOutPoint, serializeOutputs, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
+import {
+  BTC_JUMP_CONFIRMATION_BLOCKS,
+  RGBPP_TX_ID_PLACEHOLDER,
+  getBtcTimeLockScript,
+  getRgbppLockScript,
+} from '../constants';
+import {
+  hexToBytes,
+  serializeOutPoint,
+  serializeOutput,
+  serializeOutputs,
+  serializeScript,
+} from '@nervosnetwork/ckb-sdk-utils';
 import { blockchain } from '@ckb-lumos/base';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
@@ -24,14 +35,19 @@ export const genBtcTimeLockScript = (toLock: CKBComponents.Script, isMainnet: bo
 export const calculateCommitment = (rgbppVirtualTx: RgbppCkbVirtualTx | CKBComponents.RawTransaction): Hex => {
   var hash = sha256.create();
   hash.update(hexToBytes(utf8ToHex('RGB++')));
-  const version = u16ToLe(0);
-  const inputsLen = u8ToHex(rgbppVirtualTx.inputs.length);
-  const outputsLen = u8ToHex(rgbppVirtualTx.outputs.length);
-  hash.update(hexToBytes(`0x${version}${inputsLen}${outputsLen}`));
+  const version = [0, 0];
+  hash.update(version);
+  hash.update([rgbppVirtualTx.inputs.length, rgbppVirtualTx.outputs.length]);
+
   for (const input of rgbppVirtualTx.inputs) {
     hash.update(hexToBytes(serializeOutPoint(input.previousOutput)));
   }
-  hash.update(hexToBytes(serializeOutputs(rgbppVirtualTx.outputs)));
+  for (let index = 0; index < rgbppVirtualTx.outputs.length; index++) {
+    const output = rgbppVirtualTx.outputs[index];
+    const outputData = rgbppVirtualTx.outputsData[index];
+    hash.update(hexToBytes(serializeOutput(output)));
+    hash.update(hexToBytes(outputData));
+  }
   // double sha256
   return sha256(hash.array());
 };
@@ -67,6 +83,13 @@ export const isRgbppLockOrBtcTimeLock = (lock: CKBComponents.Script, isMainnet: 
   const isBtcTimeLock = lock.codeHash === btcTimeLock.codeHash && lock.hashType === btcTimeLock.hashType;
 
   return isRgbppLock || isBtcTimeLock;
+};
+
+export const buildPreLockArgs = (outIndex: number | string) => {
+  if (typeof outIndex === 'number') {
+    return `${u32ToLe(outIndex)}${RGBPP_TX_ID_PLACEHOLDER}`;
+  }
+  return `${outIndex}${RGBPP_TX_ID_PLACEHOLDER}`;
 };
 
 export const compareInputs = (a: IndexerCell, b: IndexerCell) => {
