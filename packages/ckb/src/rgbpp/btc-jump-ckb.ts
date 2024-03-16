@@ -1,8 +1,14 @@
 import { RgbppCkbVirtualTx, BtcJumpCkbVirtualTxParams, BtcJumpCkbVirtualTxResult } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
 import { NoRgbppLiveCellError } from '../error';
-import { append0x, calculateRgbppCellCapacity, u128ToLe, u32ToLe } from '../utils';
-import { calculateCommitment, compareInputs, genBtcTimeLockScript, genRgbppLockScript } from '../utils/rgbpp';
+import { append0x, calculateRgbppCellCapacity, u128ToLe } from '../utils';
+import {
+  buildPreLockArgs,
+  calculateCommitment,
+  compareInputs,
+  genBtcTimeLockScript,
+  genRgbppLockScript,
+} from '../utils/rgbpp';
 import { Hex, IndexerCell } from '../types';
 import { RGBPP_WITNESS_PLACEHOLDER, getRgbppLockDep, getSecp256k1CellDep, getXudtDep } from '../constants';
 import { addressToScript } from '@nervosnetwork/ckb-sdk-utils';
@@ -52,7 +58,7 @@ export const genBtcJumpCkbVirtualTx = async ({
 
   if (sumAmount > transferAmount) {
     outputs.push({
-      lock: genRgbppLockScript(u32ToLe(2), isMainnet),
+      lock: genRgbppLockScript(buildPreLockArgs(2), isMainnet),
       type: xudtType,
       capacity: append0x(rpbppCellCapacity.toString(16)),
     });

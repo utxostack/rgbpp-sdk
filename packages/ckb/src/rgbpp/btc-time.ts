@@ -10,9 +10,10 @@ import {
   lockScriptFromBtcTimeLockArgs,
 } from '../utils';
 import { buildSpvClientCellDep } from '../spv';
+import { Bytes } from '../schemas/generated/blockchain';
 
 export const buildBtcTimeUnlockWitness = (btcTxProof: Hex): Hex => {
-  const btcTimeUnlock = BTCTimeUnlock.pack({ btcTxProof });
+  const btcTimeUnlock = BTCTimeUnlock.pack({ btcTxProof: Bytes.pack(btcTxProof) });
   return append0x(bytesToHex(btcTimeUnlock));
 };
 

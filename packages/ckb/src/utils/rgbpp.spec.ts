@@ -3,6 +3,7 @@ import { sha256 } from 'js-sha256';
 import { hexToBytes } from '@nervosnetwork/ckb-sdk-utils';
 import {
   btcTxIdFromBtcTimeLockArgs,
+  buildPreLockArgs,
   calculateCommitment,
   genBtcTimeLockScript,
   lockScriptFromBtcTimeLockArgs,
@@ -17,37 +18,49 @@ describe('rgbpp tests', () => {
     expect(hash).toBe('c0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f');
   });
 
-  // TODO: Check the hash result with the data from the rgbpp lock script test case
-  it('calculateCommitment', async () => {
-    const virtualTx: RgbppCkbVirtualTx = {
+  it('calculateCommitment with the test data which is from RGBPP lock contract test cases', async () => {
+    const rgbppVirtualTx: RgbppCkbVirtualTx = {
       inputs: [
         {
           previousOutput: {
-            index: '0xffffffff',
-            txHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+            txHash: '0xb93dc09afbb463577ca0149726840f204f4cb29490d115a1cf8c1018f05f5296',
+            index: '0x0',
           },
-          since: '0x400',
+          since: '0x0',
         },
       ],
       outputs: [
         {
-          capacity: '0x18e64b61cf',
           lock: {
-            args: '0x',
-            codeHash: '0x28e83a1277d48add8e72fadaa9248559e1b632bab2bd60b27955ebc4c03800a5',
-            hashType: 'data',
+            codeHash: '0x6baadd6f224432eec24b4031b66e1bcef690963205ec3edf6aa0b35570c429f6',
+            hashType: 'type',
+            args: '0x010000000000000000000000000000000000000000000000000000000000000000000000',
           },
+          capacity: '0x0000000000000000',
           type: {
-            args: '0x',
-            codeHash: '0x28e83a1277d48add8e72fadaa9248559e1b632bab2bd60b27955ebc4c03800a5',
-            hashType: 'data',
+            codeHash: '0xdb9b4c309f25738b21e7278c803e00a7dcf81115f448ae87b42463f4136821e7',
+            hashType: 'type',
+            args: '0x385c913dd83f7255922df8f5126511652a3ecf7e015849d9cb90558d9b81c5c2',
+          },
+        },
+        {
+          lock: {
+            codeHash: '0x6baadd6f224432eec24b4031b66e1bcef690963205ec3edf6aa0b35570c429f6',
+            hashType: 'type',
+            args: '0x010000000000000000000000000000000000000000000000000000000000000000000000',
+          },
+          capacity: '0x0000000000000000',
+          type: {
+            codeHash: '0xdb9b4c309f25738b21e7278c803e00a7dcf81115f448ae87b42463f4136821e7',
+            hashType: 'type',
+            args: '0x385c913dd83f7255922df8f5126511652a3ecf7e015849d9cb90558d9b81c5c2',
           },
         },
       ],
-      outputsData: ['0xc0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f'],
+      outputsData: ['0x2c010000000000000000000000000000', '0xbc020000000000000000000000000000'],
     };
-    const hash = calculateCommitment(virtualTx);
-    expect(hash).toBe('6c6077f12059b6d8534a3a6e893a2268fe12d3456d1bf5c029fe66615e016c21');
+    const commitment = calculateCommitment(rgbppVirtualTx);
+    expect('150c5f0856ba6d9148bd2588d8a3d9a1f45eec8a34fe0ca426a1b5193d5a701c').toBe(commitment);
   });
 
   it('genBtcTimeLockScript', async () => {
@@ -90,5 +103,12 @@ describe('rgbpp tests', () => {
     };
     const capacity = calculateUdtCellCapacity(joyIDLock, xudtType);
     expect(BigInt(145_0000_0000)).toBe(capacity);
+  });
+
+  it('buildPreLockArgs', async () => {
+    expect('020000000000000000000000000000000000000000000000000000000000000000000000').toBe(buildPreLockArgs(2));
+
+    const lockArgs = buildPreLockArgs('02000000');
+    expect('020000000000000000000000000000000000000000000000000000000000000000000000').toBe(lockArgs);
   });
 });

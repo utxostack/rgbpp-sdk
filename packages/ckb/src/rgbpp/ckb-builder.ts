@@ -18,17 +18,26 @@ import { InputsCapacityNotEnoughError } from '../error';
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 import { buildSpvClientCellDep } from '../spv';
 import { RGBPPUnlock, Uint16 } from '../schemas/generated/rgbpp';
+import { Bytes } from '@ckb-lumos/base/lib/blockchain';
 
 export const buildRgbppUnlockWitness = (
   btcTxBytes: Hex,
   btcTxProof: Hex,
-  ckbRawTx: CKBComponents.RawTransaction,
+  inputsLen: number,
+  outputsLen: number,
 ): Hex => {
-  const inputLen = append0x(u8ToHex(ckbRawTx.inputs.length));
-  const outputLen = append0x(u8ToHex(ckbRawTx.outputs.length));
+  const inputLen = append0x(u8ToHex(inputsLen));
+  const outputLen = append0x(u8ToHex(outputsLen));
+
+  const btcTx = Bytes.pack(btcTxBytes);
 
   const version = Uint16.pack([0, 0]);
-  const rgbppUnlock = RGBPPUnlock.pack({ version, extraData: { inputLen, outputLen }, btcTx: btcTxBytes, btcTxProof });
+  const rgbppUnlock = RGBPPUnlock.pack({
+    version,
+    extraData: { inputLen, outputLen },
+    btcTx,
+    btcTxProof: Bytes.pack(btcTxProof),
+  });
   return append0x(bytesToHex(rgbppUnlock));
 };
 
@@ -55,7 +64,7 @@ export const appendCkbTxWitnesses = async ({
   const { spvClient, proof } = await spvService.fetchSpvClientCellAndTxProof({ btcTxId, confirmBlocks: 0 });
   rawTx.cellDeps.push(buildSpvClientCellDep(spvClient));
 
-  const rgbppUnlock = buildRgbppUnlockWitness(btcTxBytes, proof, ckbRawTx);
+  const rgbppUnlock = buildRgbppUnlockWitness(btcTxBytes, proof, ckbRawTx.inputs.length, ckbRawTx.outputs.length);
   rawTx.witnesses = rawTx.witnesses.map((witness) => (witness === RGBPP_WITNESS_PLACEHOLDER ? rgbppUnlock : witness));
 
   if (!needPaymasterCell) {

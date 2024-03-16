@@ -1,4 +1,4 @@
-import { CkbJumpBtcVirtualTxParams, RgbppCkbVirtualTx } from '../types/rgbpp';
+import { CkbJumpBtcVirtualTxParams } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
 import { NoLiveCellError, NoXudtLiveCellError } from '../error';
 import {
@@ -9,8 +9,8 @@ import {
   remove0x,
   u128ToLe,
 } from '../utils';
-import { genRgbppLockScript } from '../utils/rgbpp';
-import { MAX_FEE, MIN_CAPACITY, SECP256K1_WITNESS_LOCK_SIZE, getXudtDep } from '../constants';
+import { buildPreLockArgs, genRgbppLockScript } from '../utils/rgbpp';
+import { MAX_FEE, SECP256K1_WITNESS_LOCK_SIZE, getXudtDep } from '../constants';
 import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
 /**
@@ -48,7 +48,7 @@ export const genCkbJumpBtcVirtualTx = async ({
   const outIndex = remove0x(toRgbppLockArgs).substring(0, 8);
   const outputs: CKBComponents.CellOutput[] = [
     {
-      lock: genRgbppLockScript(outIndex, isMainnet),
+      lock: genRgbppLockScript(buildPreLockArgs(outIndex), isMainnet),
       type: xudtType,
       capacity: append0x(rpbppCellCapacity.toString(16)),
     },
