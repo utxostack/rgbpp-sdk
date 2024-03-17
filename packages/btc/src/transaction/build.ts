@@ -95,24 +95,6 @@ export class TxBuilder {
     });
   }
 
-  getLastFixedOutputIndex(): number {
-    return this.outputs.reduce((acc, output, index) => {
-      if (output.fixed) {
-        return index;
-      }
-      return acc;
-    }, -1);
-  }
-
-  getLastProtectedOutputIndex(): number {
-    return this.outputs.reduce((acc, output, index) => {
-      if (output.protected) {
-        return index;
-      }
-      return acc;
-    }, -1);
-  }
-
   async payFee(props: { address: string; publicKey?: string; changeAddress?: string; deductFromOutputs?: boolean }) {
     const { address, publicKey, changeAddress, deductFromOutputs } = props;
     const originalInputs = clone(this.inputs);
@@ -304,70 +286,6 @@ export class TxBuilder {
       this.addOutput({
         address: address,
         value: amount,
-      });
-    }
-  }
-
-  async collectInputsAndPayFee(props: {
-    address: string;
-    pubkey?: string;
-    fee?: number;
-    extraChange?: number;
-    changeAddress?: string;
-  }): Promise<void> {
-    const { address, pubkey, fee = 0, extraChange = 0 } = props;
-    const outputAmount = this.outputs.reduce((acc, out) => acc + out.value, 0);
-    const targetAmount = outputAmount + fee + extraChange;
-    const changeAddress = props.changeAddress ?? address;
-
-    const { utxos, satoshi, exceedSatoshi } = await this.source.collectSatoshi({
-      address,
-      targetAmount: targetAmount,
-      minUtxoSatoshi: this.minUtxoSatoshi,
-    });
-    if (satoshi < targetAmount) {
-      throw new TxBuildError(ErrorCodes.INSUFFICIENT_UTXO);
-    }
-
-    const originalInputs = clone(this.inputs);
-    utxos.forEach((utxo) => {
-      this.addInput({
-        ...utxo,
-        pubkey,
-      });
-    });
-
-    const originalOutputs = clone(this.outputs);
-    const changeSatoshi = exceedSatoshi + extraChange;
-    const requireChangeUtxo = changeSatoshi > 0;
-    if (requireChangeUtxo) {
-      this.addOutput({
-        address: changeAddress,
-        value: changeSatoshi,
-      });
-    }
-
-    const addressType = getAddressType(address);
-    const estimatedFee = await this.calculateFee(addressType);
-    if (estimatedFee > fee || changeSatoshi < this.minUtxoSatoshi) {
-      this.inputs = originalInputs;
-      this.outputs = originalOutputs;
-
-      const nextExtraChange = (() => {
-        if (requireChangeUtxo) {
-          if (changeSatoshi < this.minUtxoSatoshi) {
-            return this.minUtxoSatoshi;
-          }
-          return extraChange;
-        }
-        return 0;
-      })();
-
-      return await this.collectInputsAndPayFee({
-        address,
-        pubkey,
-        fee: estimatedFee,
-        extraChange: nextExtraChange,
       });
     }
   }
