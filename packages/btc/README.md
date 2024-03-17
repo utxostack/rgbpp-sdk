@@ -1,13 +1,13 @@
 # @rgbpp-sdk/btc
 
-This lib provides:
+## About
 
-- APIs for constructing simple BTC transactions
-- APIs for accessing the [btc-assets-api](https://github.com/ckb-cell/btc-assets-api) service in TypeScript
+This is the BTC part of the rgbpp-sdk for:
 
-## Disclaimer
+- BTC/RGBPP transaction construction
+- Wrapped API of the [BtcAssetsApi](https://github.com/ckb-cell/btc-assets-api) service in Node and browser
 
-- The main logic of the `@rgbpp-sdk/btc` lib is referenced and cut/simplified from the [unisat wallet-sdk](https://github.com/unisat-wallet/wallet-sdk) package to adapt to the specific needs of our own projects. The unisat wallet-sdk is using the [ISC license](https://github.com/unisat-wallet/wallet-sdk/blob/master/LICENSE). If we open-source our project in the future, it would be best to include the appropriate license referencing the unisat wallet-sdk.
+This lib is based on the foundation of the [unisat wallet-sdk](https://github.com/unisat-wallet/wallet-sdk) ([license](https://github.com/unisat-wallet/wallet-sdk/blob/master/LICENSE)). We've simplified the logic of transaction construction and fee collection process to adapt to the specific needs of RGBPP. You can refer to the unisat wallet-sdk repo for more difference.
 
 ## Getting started
 
@@ -80,7 +80,6 @@ const networkType = NetworkType.TESTNET;
 const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
 const source = new DataSource(service, networkType);
 
-// Create a PSBT
 const psbt = await sendBtc({
   from: account.address, // your P2WPKH address
   tos: [
@@ -89,13 +88,52 @@ const psbt = await sendBtc({
       value: 1000, // transfer satoshi amount
     },
   ],
-  feeRate: 1, // optional
+  feeRate: 1, // optional, default to 1 sat/vbyte
   networkType,
   source,
 });
 
 // Sign & finalize inputs
 psbt.signAllInputs(account.keyPair);
+psbt.finalizeAllInputs();
+
+// Broadcast transaction
+const tx = psbt.extractTransaction();
+const res = await service.sendTransaction(tx.toHex());
+console.log('txid:', res.txid);
+```
+
+Transfer BTC from a `P2TR` address:
+
+```typescript
+import { sendBtc, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
+
+const networkType = NetworkType.TESTNET;
+
+const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
+const source = new DataSource(service, networkType);
+
+const psbt = await sendBtc({
+  from: account.address, // your P2TR address
+  fromPubkey: account.publicKey, // your public key, this is required for P2TR
+  tos: [
+    {
+      address: 'to_address', // destination btc address
+      value: 1000, // transfer satoshi amount
+    },
+  ],
+  feeRate: 1, // optional, default to 1 sat/vbyte
+  networkType,
+  source,
+});
+
+// Create a tweaked signer
+const tweakedSigner = tweakSigner(account.keyPair, {
+  network,
+});
+
+// Sign & finalize inputs
+psbt.signAllInputs(tweakedSigner);
 psbt.finalizeAllInputs();
 
 // Broadcast transaction
@@ -123,7 +161,59 @@ const psbt = await sendBtc({
       value: 0, // normally the value is 0
     },
   ],
-  feeRate: 1, // optional
+  changeAddress: account.address, // optional, where to send the change
+  feeRate: 1, // optional, default to 1 sat/vbyte
+  networkType,
+  source,
+});
+
+// Sign & finalize inputs
+psbt.signAllInputs(account.keyPair);
+psbt.finalizeAllInputs();
+
+// Broadcast transaction
+const tx = psbt.extractTransaction();
+const res = await service.sendTransaction(tx.toHex());
+console.log('txid:', res.txid);
+```
+
+Transfer with predefined inputs/outputs:
+
+```typescript
+import { sendUtxos, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
+
+const networkType = NetworkType.TESTNET;
+
+const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
+const source = new DataSource(service, networkType);
+
+const psbt = await sendUtxos({
+  inputs: [
+    {
+      txid: 'txid',
+      vout: 1,
+      value: 546,
+      address: 'btc_address',
+      addressType: AddressType.P2WPKH,
+      scriptPk: 'script_publickey_hex',
+    },
+  ],
+  outputs: [
+    {
+      data: Buffer.from('commentment_hex', 'hex'), // RGBPP commitment
+      value: 0,
+      fixed: true, // mark as fixed, so the output.value will not be changed
+    },
+    {
+      address: 'to_address',
+      value: 546,
+      fixed: true,
+      minUtxoSatoshi: 546, // customize the dust limit of the output
+    },
+  ],
+  from: account.address, // provide fee to the transaction
+  changeAddress: account.address, // optional, where to send the change
+  feeRate: 1, // optional, default to 1 sat/vbyte
   networkType,
   source,
 });
@@ -145,18 +235,95 @@ console.log('txid:', res.txid);
 #### sendBtc
 
 ```typescript
-declare function sendBtc(props: {
-  from: string;
-  tos: {
-    address: string;
-    value: number;
-  }[];
-  source: DataSource;
-  networkType: NetworkType;
+interface sendBtc {
+  (props: {
+    from: string;
+    tos: InitOutput[];
+    source: DataSource;
+    networkType: NetworkType;
+    minUtxoSatoshi?: number;
+    changeAddress?: string;
+    fromPubkey?: string;
+    feeRate?: number;
+  }): Promise<bitcoin.Psbt>;
+}
+```
+
+#### sendUtxos
+
+```typescript
+interface sendUtxos {
+  (props: {
+    inputs: Utxo[];
+    outputs: InitOutput[];
+    source: DataSource;
+    networkType: NetworkType;
+    from: string;
+    fromPubkey?: string;
+    changeAddress?: string;
+    minUtxoSatoshi?: number;
+    feeRate?: number;
+  }): Promise<bitcoin.Psbt>;
+}
+```
+
+#### InitOutput
+
+```typescript
+type InitOutput = TxAddressOutput | TxDataOutput | TxScriptOutput;
+```
+
+#### TxAddressOutput / TxDataOutput / TxScriptOutput
+
+```typescript
+interface TxAddressOutput extends BaseOutput {
+  address: string;
+}
+```
+
+```typescript
+interface TxDataOutput extends BaseOutput {
+  data: Buffer | string;
+}
+```
+
+```typescript
+interface TxScriptOutput extends BaseOutput {
+  script: Buffer;
+}
+```
+
+#### BaseOutput
+
+```typescript
+interface BaseOutput {
+  value: number;
+  fixed?: boolean;
+  protected?: boolean;
   minUtxoSatoshi?: number;
-  changeAddress?: string;
-  feeRate?: number;
-}): Promise<bitcoin.Psbt>;
+}
+```
+
+#### DataSource
+
+```typescript
+interface DataSource {
+  constructor(service: BtcAssetsApi, networkType: NetworkType): void;
+  getUtxos(address: string, params?: BtcAssetsApiUtxoParams): Promise<Utxo[]>;
+  collectSatoshi(props: {
+    address: string;
+    targetAmount: number;
+    minUtxoSatoshi?: number;
+    excludeUtxos?: {
+      txid: string;
+      vout: number;
+    }[];
+  }): Promise<{
+    utxos: Utxo[];
+    satoshi: number;
+    exceedSatoshi: number;
+  }>;
+}
 ```
 
 ### Service
@@ -167,8 +334,8 @@ declare function sendBtc(props: {
 interface BtcAssetsApi {
   init(): Promise<void>;
   generateToken(): Promise<BtcAssetsApiToken>;
-  getBalance(address: string): Promise<BtcAssetsApiBalance>;
-  getUtxos(address: string): Promise<BtcAssetsApiUtxo[]>;
+  getBalance(address: string, params?: BtcAssetsApiBalanceParams): Promise<BtcAssetsApiBalance>;
+  getUtxos(address: string, params?: BtcAssetsApiUtxoParams): Promise<BtcAssetsApiUtxo[]>;
   getTransactions(address: string): Promise<BtcAssetsApiTransaction[]>;
   getTransaction(txid: string): Promise<BtcAssetsApiTransaction>;
   sendTransaction(txHex: string): Promise<BtcAssetsApiSentTransaction>;
@@ -183,6 +350,14 @@ interface BtcAssetsApiToken {
 }
 ```
 
+#### BtcAssetsApiBalanceParams
+
+```typescript
+interface BtcAssetsApiBalanceParams {
+  min_satoshi?: number;
+}
+```
+
 #### BtcAssetsApiBalance
 
 ```typescript
@@ -191,6 +366,14 @@ interface BtcAssetsApiBalance {
   satoshi: number;
   pending_satoshi: number;
   utxo_count: number;
+}
+```
+
+#### BtcAssetsApiUtxoParams
+
+```typescript
+interface BtcAssetsApiUtxoParams {
+  min_satoshi?: number;
 }
 ```
 
@@ -262,10 +445,10 @@ interface BtcAssetsApiTransaction {
 
 ### Basic
 
-#### UnspentOutput
+#### Utxo
 
 ```typescript
-interface UnspentOutput {
+interface Utxo {
   txid: string;
   vout: number;
   value: number;
@@ -284,8 +467,6 @@ enum AddressType {
   P2WPKH,
   P2TR,
   P2SH_P2WPKH,
-  M44_P2WPKH, // deprecated
-  M44_P2TR, // deprecated
   P2WSH,
   P2SH,
   UNKNOWN,
