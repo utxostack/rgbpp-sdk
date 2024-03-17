@@ -47,6 +47,6 @@ export function isDomain(domain: string): boolean {
 /**
  * Remove '0x' prefix from a hex string.
  */
-export function removeHexPrefix(hex: string): string {
+export function remove0x(hex: string): string {
   return hex.startsWith('0x') ? hex.slice(2) : hex;
 }

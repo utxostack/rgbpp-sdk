@@ -1,3 +1,4 @@
+import { remove0x } from '../utils';
 import { bitcoin } from '../bitcoin';
 import { ErrorCodes, TxBuildError } from '../error';
 
@@ -10,7 +11,11 @@ import { ErrorCodes, TxBuildError } from '../error';
  * const scriptPk = dataToOpReturnScriptPubkey(data); // <Buffer 6a 04 01 02 03 04>
  * const scriptPkHex = scriptPk.toString('hex'); // 6a0401020304
  */
-export function dataToOpReturnScriptPubkey(data: Buffer): Buffer {
+export function dataToOpReturnScriptPubkey(data: Buffer | string): Buffer {
+  if (typeof data === 'string') {
+    data = Buffer.from(remove0x(data), 'hex');
+  }
+
   const payment = bitcoin.payments.embed({ data: [data] });
   return payment.output!;
 }

@@ -2,7 +2,7 @@ import { bitcoin } from './bitcoin';
 import { AddressType } from './types';
 import { NetworkType, toPsbtNetwork } from './network';
 import { ErrorCodes, TxBuildError } from './error';
-import { removeHexPrefix, toXOnly } from './utils';
+import { remove0x, toXOnly } from './utils';
 
 /**
  * Check weather the address is supported as a from address.
@@ -22,7 +22,7 @@ export function publicKeyToPayment(publicKey: string, addressType: AddressType, 
   }
 
   const network = toPsbtNetwork(networkType);
-  const pubkey = Buffer.from(removeHexPrefix(publicKey), 'hex');
+  const pubkey = Buffer.from(remove0x(publicKey), 'hex');
 
   if (addressType === AddressType.P2PKH) {
     return bitcoin.payments.p2pkh({

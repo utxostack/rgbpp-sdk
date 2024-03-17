@@ -1,4 +1,4 @@
-export interface UnspentOutput {
+export interface Utxo {
   txid: string;
   vout: number;
   value: number;

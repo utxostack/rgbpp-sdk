@@ -31,11 +31,13 @@ function createAccount(privateKey: string, _network?: bitcoin.Network) {
     privateKey,
     publicKey: keyPair.publicKey.toString('hex'),
     p2wpkh: {
+      scriptPubkey: p2wpkh.output!,
       address: p2wpkh.address!,
       pubkey: p2wpkh.pubkey!,
       data: p2wpkh.data!,
     },
     p2tr: {
+      scriptPubkey: p2tr.output!,
       address: p2tr.address!,
       pubkey: p2tr.pubkey!,
       data: p2tr.data!,
