@@ -1,0 +1,14 @@
+{
+  "name": "examples",
+  "version": "0.1.0",
+  "description": "Examples used for RGBPP assets issuance, transfer, and jumping between BTC and CKB",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@ckb-lumos/base": "0.21.1",
+    "@nervosnetwork/ckb-sdk-utils": "^0.109.1",
+    "ckb-omiga": "^0.0.17"
+  }
+}
