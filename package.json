@@ -10,7 +10,7 @@
     "build": "turbo run build",
     "build:packages": "turbo run build --filter=./packages/*",
     "lint:fix": "turbo run lint:fix",
-    "lint:fix-all": "prettier --write '{packages,apps}/**/*.{js,jsx,ts,tsx,md,json}'",
+    "lint:fix-all": "prettier --write '{packages,apps, examples}/**/*.{js,jsx,ts,tsx,md,json}'",
     "clean": "turbo run clean",
     "clean:packages": "turbo run clean --filter=./packags/*",
     "clean:dependencies": "pnpm clean:sub-dependencies && rimraf node_modules",
@@ -28,7 +28,7 @@
     "typescript": "^5.3.3"
   },
   "lint-staged": {
-    "{packages,apps}/**/*.{js,jsx,ts,tsx,md,json}": "prettier --ignore-unknown --write"
+    "{packages,apps, examples}/**/*.{js,jsx,ts,tsx,md,json}": "prettier --ignore-unknown --write"
   },
   "packageManager": "^pnpm@8.0.0",
   "engines": {
