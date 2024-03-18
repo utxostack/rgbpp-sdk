@@ -8,11 +8,12 @@
   "dependencies": {
     "@ckb-lumos/base": "0.21.1",
     "@nervosnetwork/ckb-sdk-utils": "^0.109.1",
+    "axios": "^1.6.8",
     "ckb-omiga": "^0.0.15"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20"
+    "typescript": "^5.4.2",
+    "@types/node": "^20.11.28"
   },
   "publishConfig": {
     "access": "public"
