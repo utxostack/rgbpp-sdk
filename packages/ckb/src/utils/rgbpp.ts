@@ -18,7 +18,7 @@ export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
 };
 
 export const genBtcTimeLockScript = (toLock: CKBComponents.Script, isMainnet: boolean) => {
-  const lockArgs = `${append0x(serializeScript(toLock))}${u32ToLe(BTC_JUMP_CONFIRMATION_BLOCKS)}`;
+  const lockArgs = `${append0x(serializeScript(toLock))}${u32ToLe(BTC_JUMP_CONFIRMATION_BLOCKS)}${RGBPP_TX_ID_PLACEHOLDER}`;
   return {
     ...getRgbppLockScript(isMainnet),
     args: lockArgs,

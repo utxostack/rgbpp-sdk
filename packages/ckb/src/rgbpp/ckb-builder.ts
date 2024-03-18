@@ -6,7 +6,7 @@ import {
   serializeWitnessArgs,
 } from '@nervosnetwork/ckb-sdk-utils';
 import {
-  AppendBtcTxIdToLockArgsParams as ReplaceLockArgsWithRealBtcTxIdParams,
+  UpdateCkbTxWithRealBtcTxIdParams,
   AppendPaymasterCellAndSignTxParams,
   AppendWitnessesParams,
   Hex,
@@ -165,7 +165,7 @@ export const updateCkbTxWithRealBtcTxId = ({
   ckbRawTx,
   btcTxId,
   isMainnet,
-}: ReplaceLockArgsWithRealBtcTxIdParams): CKBComponents.RawTransaction => {
+}: UpdateCkbTxWithRealBtcTxIdParams): CKBComponents.RawTransaction => {
   const outputs = ckbRawTx.outputs
     .filter((output) => isRgbppLockOrBtcTimeLock(output.lock, isMainnet))
     .map((output) => ({

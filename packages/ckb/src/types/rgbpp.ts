@@ -122,7 +122,7 @@ export interface CkbJumpBtcVirtualTxParams {
   witnessLockPlaceholderSize?: number;
 }
 
-export interface AppendBtcTxIdToLockArgsParams {
+export interface UpdateCkbTxWithRealBtcTxIdParams {
   // CKB raw transaction
   ckbRawTx: CKBComponents.RawTransaction;
   // The BTC transaction id
