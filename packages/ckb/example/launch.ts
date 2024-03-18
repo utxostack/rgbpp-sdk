@@ -27,15 +27,13 @@ const launchRgbppAsset = async () => {
     args: '0xaafd7e7eab79726c669d7565888b194dc06bd1dbec16749a721462151e4f1762',
   };
 
-  const { ckbRawTx, commitment } = await genCkbJumpBtcVirtualTx({
+  const ckbRawTx = await genCkbJumpBtcVirtualTx({
     collector,
     fromCkbAddress: address,
     toRgbppLockArgs,
     xudtTypeBytes: serializeScript(xudtType),
     transferAmount: BigInt(200_0000_0000),
   });
-
-  console.log(`The commitment(${commitment}) will be inserted into BTC tx OP_RETURN`);
 
   const emptyWitness = { lock: '', inputType: '', outputType: '' };
   let unsignedTx: CKBComponents.RawTransactionToSign = {
