@@ -14,13 +14,13 @@ const deploy = async () => {
   const address = collector
     .getCkb()
     .utils.privateKeyToAddress(TEST_MAIN_PRIVATE_KEY, { prefix: AddressPrefix.Testnet });
-  // ckt1qrfrwcdnvssswdwpn3s9v8fp87emat306ctjwsm3nmlkjg8qyza2cqgqq98mx5lm42zd7mwyq54pg49cln850mj2957np7az
+  // ckt1qyq0n2dd28k3fymdx0mmhp224ma973arej7s9jvjju
   console.log('address: ', address);
 
   const mintLimit = BigInt(1000) * BigInt(10 ** 8);
-  const inscriptionId = '0xcd89d8f36593a9a82501c024c5cdc4877ca11c5b3d5831b3e78334aecb978f0d';
+  const inscriptionId = '0xd378891e711cf5c612321b7f51529215187403c61cbb27bc4413fded871b73d5';
 
-  const rawTx  = await buildMintTx({ collector, address, inscriptionId, mintLimit });
+  const rawTx = await buildMintTx({ collector, address, inscriptionId, mintLimit });
 
   const secp256k1Dep: CKBComponents.CellDep = {
     outPoint: {
@@ -36,8 +36,6 @@ const deploy = async () => {
     witnesses: [witnessArgs, ...rawTx.witnesses.slice(1)],
   };
   const signedTx = collector.getCkb().signTransaction(TEST_MAIN_PRIVATE_KEY)(unsignedTx);
-
-  console.log(JSON.stringify(signedTx));
 
   let txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
   console.info(`Xudt has been minted with tx hash ${txHash}`);
