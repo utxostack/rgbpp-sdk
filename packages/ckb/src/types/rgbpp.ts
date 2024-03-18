@@ -38,7 +38,7 @@ export interface RgbppCkbVirtualTx {
   outputsData: Hex[];
 }
 
-export interface BtcTransferVirtualTxResult {
+export interface BaseCkbVirtualTxResult {
   // CKB raw transaction
   ckbRawTx: CKBComponents.RawTransaction;
   // The rgbpp commitment to be inserted into BTC op_return
@@ -48,6 +48,8 @@ export interface BtcTransferVirtualTxResult {
   // The sum capacity of the ckb inputs
   sumInputsCapacity: Hex;
 }
+
+export interface BtcTransferVirtualTxResult extends BaseCkbVirtualTxResult {}
 
 export interface AppendWitnessesParams {
   // CKB raw transaction
@@ -88,16 +90,7 @@ export interface BtcJumpCkbVirtualTxParams extends BtcTransferVirtualTxParams {
   toCkbAddress: Address;
 }
 
-export interface BtcJumpCkbVirtualTxResult {
-  // CKB raw transaction
-  ckbRawTx: CKBComponents.RawTransaction;
-  // The rgbpp commitment to be inserted into BTC op_return
-  commitment: Hex;
-  // The needPaymasterCell indicates whether a paymaster cell is required
-  needPaymasterCell: boolean;
-  // The sum capacity of the ckb inputs
-  sumInputsCapacity: Hex;
-}
+export interface BtcJumpCkbVirtualTxResult extends BaseCkbVirtualTxResult {}
 
 export interface BtcTimeCellsParams {
   // The collector that collects CKB live cells and transactions
