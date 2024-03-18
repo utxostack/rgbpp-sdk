@@ -18,7 +18,7 @@ export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
 };
 
 export const genBtcTimeLockScript = (toLock: CKBComponents.Script, isMainnet: boolean) => {
-  const lockArgs = `${append0x(serializeScript(toLock))}${u32ToLe(BTC_JUMP_CONFIRMATION_BLOCKS)}`;
+  const lockArgs = `${append0x(serializeScript(toLock))}${u32ToLe(BTC_JUMP_CONFIRMATION_BLOCKS)}${RGBPP_TX_ID_PLACEHOLDER}`;
   return {
     ...getRgbppLockScript(isMainnet),
     args: lockArgs,
@@ -94,4 +94,16 @@ export const compareInputs = (a: IndexerCell, b: IndexerCell) => {
     return 1;
   }
   return 0;
+};
+
+// RGBPP lock args: out_index | bitcoin_tx_id
+// BTC time lock args: lock_script | after | bitcoin_tx_id
+const RGBPP_MIN_LOCK_ARGS_SIZE = 36 * 2;
+const BTC_TX_ID_SIZE = 32 * 2;
+export const replaceLockArgsWithRealBtcTxId = (lockArgs: Hex, txId: Hex): Hex => {
+  const argsLength = remove0x(lockArgs).length;
+  if (argsLength < RGBPP_MIN_LOCK_ARGS_SIZE) {
+    throw new Error('Rgbpp lock args or BTC time lock args length is invalid');
+  }
+  return `0x${remove0x(lockArgs).substring(0, argsLength - BTC_TX_ID_SIZE)}${remove0x(txId)}`;
 };

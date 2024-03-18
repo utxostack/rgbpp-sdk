@@ -7,6 +7,7 @@ import {
   calculateCommitment,
   genBtcTimeLockScript,
   lockScriptFromBtcTimeLockArgs,
+  replaceLockArgsWithRealBtcTxId,
 } from './rgbpp';
 import { RgbppCkbVirtualTx } from '../types';
 import { calculateUdtCellCapacity } from './ckb-tx';
@@ -71,7 +72,7 @@ describe('rgbpp tests', () => {
     };
     const lock = genBtcTimeLockScript(toLock, false);
     expect(lock.args).toBe(
-      '0x5500000010000000300000003100000028e83a1277d48add8e72fadaa9248559e1b632bab2bd60b27955ebc4c03800a50020000000c0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f06000000',
+      '0x5500000010000000300000003100000028e83a1277d48add8e72fadaa9248559e1b632bab2bd60b27955ebc4c03800a50020000000c0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f060000000000000000000000000000000000000000000000000000000000000000000000',
     );
   });
 
@@ -110,5 +111,19 @@ describe('rgbpp tests', () => {
 
     const lockArgs = buildPreLockArgs('02000000');
     expect('020000000000000000000000000000000000000000000000000000000000000000000000').toBe(lockArgs);
+  });
+
+  it('replaceRealBtcTxId', async () => {
+    const rgbppLockArgs = '0x020000000000000000000000000000000000000000000000000000000000000000000000';
+    const realBtcTxId = '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399';
+    const lockArgs = replaceLockArgsWithRealBtcTxId(rgbppLockArgs, realBtcTxId);
+    expect('0x0200000006ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399').toBe(lockArgs);
+
+    const btcTimeLockArgs =
+      '0x490000001000000030000000310000009bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce80114000000e616d1460d634668b8ad81971c3a53e705f51e60060000000000000000000000000000000000000000000000000000000000000000000000';
+    const args = replaceLockArgsWithRealBtcTxId(btcTimeLockArgs, realBtcTxId);
+    expect(
+      '0x490000001000000030000000310000009bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce80114000000e616d1460d634668b8ad81971c3a53e705f51e600600000006ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
+    ).toBe(args);
   });
 });

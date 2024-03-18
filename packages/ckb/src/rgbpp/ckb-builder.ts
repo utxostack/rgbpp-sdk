@@ -6,14 +6,20 @@ import {
   serializeWitnessArgs,
 } from '@nervosnetwork/ckb-sdk-utils';
 import {
-  AppendBtcTxIdToLockArgsParams,
+  UpdateCkbTxWithRealBtcTxIdParams,
   AppendPaymasterCellAndSignTxParams,
   AppendWitnessesParams,
   Hex,
   SendCkbTxParams,
 } from '../types';
 import { RGBPP_WITNESS_PLACEHOLDER, SECP256K1_WITNESS_LOCK_SIZE, getRgbppLockScript } from '../constants';
-import { append0x, calculateTransactionFee, isRgbppLockOrBtcTimeLock, remove0x, u8ToHex } from '../utils';
+import {
+  append0x,
+  calculateTransactionFee,
+  isRgbppLockOrBtcTimeLock,
+  replaceLockArgsWithRealBtcTxId,
+  u8ToHex,
+} from '../utils';
 import { InputsCapacityNotEnoughError } from '../error';
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 import { buildSpvClientCellDep } from '../spv';
@@ -150,19 +156,23 @@ export const sendCkbTx = async ({ collector, signedTx }: SendCkbTxParams) => {
 };
 
 /**
- * Append BTC transaction id to the rgbpp lock args and BTC time lock args
+ * Replace the RGBPP_TX_ID_PLACEHOLDER with the real btc tx id of the rgbpp lock args and BTC time lock args
  * @param ckbRawTx CKB raw transaction
  * @param btcTxId The BTC transaction id
  * @param isMainnet
  */
-export const appendBtcTxIdToLockArgs = ({ ckbRawTx, btcTxId, isMainnet }: AppendBtcTxIdToLockArgsParams) => {
+export const updateCkbTxWithRealBtcTxId = ({
+  ckbRawTx,
+  btcTxId,
+  isMainnet,
+}: UpdateCkbTxWithRealBtcTxIdParams): CKBComponents.RawTransaction => {
   const outputs = ckbRawTx.outputs
     .filter((output) => isRgbppLockOrBtcTimeLock(output.lock, isMainnet))
     .map((output) => ({
       ...output,
       lock: {
         ...output.lock,
-        args: `${output.lock.args}${remove0x(btcTxId)}`,
+        args: replaceLockArgsWithRealBtcTxId(output.lock.args, btcTxId),
       },
     }));
   const newRawTx: CKBComponents.RawTransaction = {
