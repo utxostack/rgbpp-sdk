@@ -1,12 +1,20 @@
 import { AddressPrefix, addressToScript, privateKeyToAddress, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { Collector, SPVService, appendCkbTxWitnesses, appendPaymasterCellAndSignCkbTx, genBtcJumpCkbVirtualTx, sendCkbTx, updateCkbTxWithRealBtcTxId } from '@rgbpp-sdk/ckb';
+import {
+  Collector,
+  SPVService,
+  appendCkbTxWitnesses,
+  appendPaymasterCellAndSignCkbTx,
+  genBtcJumpCkbVirtualTx,
+  sendCkbTx,
+  updateCkbTxWithRealBtcTxId,
+} from '@rgbpp-sdk/ckb';
 import { sendRgbppUtxos, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
 
 // SECP256K1 private key
 const TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
 
 interface Params {
-  signer: any
+  signer: any;
   rgbppLockArgsList: string[];
   toCkbAddress: string;
   transferAmount: bigint;
@@ -91,3 +99,4 @@ jumpFromBtcToCkb({
   toCkbAddress: 'ckt1qrfrwcdnvssswdwpn3s9v8fp87emat306ctjwsm3nmlkjg8qyza2cqgqq9kxr7vy7yknezj0vj0xptx6thk6pwyr0sxamv6q',
   transferAmount: BigInt(100_0000_0000),
 });
+

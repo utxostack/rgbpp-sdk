@@ -5,7 +5,7 @@ import { buildMintTx, Collector } from 'ckb-omiga';
 // SECP256K1 private key
 const TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
 
-const deploy = async () => {
+const mintXudt = async () => {
   const collector = new Collector({
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
@@ -39,4 +39,5 @@ const deploy = async () => {
   console.info(`Xudt has been minted with tx hash ${txHash}`);
 };
 
-deploy();
+mintXudt();
+
