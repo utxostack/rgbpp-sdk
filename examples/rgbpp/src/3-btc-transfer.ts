@@ -1,12 +1,20 @@
 import { AddressPrefix, addressToScript, privateKeyToAddress, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { Collector, SPVService, appendCkbTxWitnesses, appendPaymasterCellAndSignCkbTx, genBtcTransferCkbVirtualTx, sendCkbTx, updateCkbTxWithRealBtcTxId } from '@rgbpp-sdk/ckb';
+import {
+  Collector,
+  SPVService,
+  appendCkbTxWitnesses,
+  appendPaymasterCellAndSignCkbTx,
+  genBtcTransferCkbVirtualTx,
+  sendCkbTx,
+  updateCkbTxWithRealBtcTxId,
+} from '@rgbpp-sdk/ckb';
 import { sendRgbppUtxos, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
 
 // SECP256K1 private key
 const TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
 
 interface Params {
-  signer: any
+  signer: any;
   rgbppLockArgsList: string[];
   toBtcAddress: string;
   transferAmount: bigint;
@@ -18,7 +26,7 @@ const transferRgbppOnBtc = async ({ signer, rgbppLockArgsList, toBtcAddress, tra
   });
   const address = privateKeyToAddress(TEST_PRIVATE_KEY, { prefix: AddressPrefix.Testnet });
   console.log('address: ', address);
-  const fromLock = addressToScript(address)
+  const fromLock = addressToScript(address);
 
   const networkType = NetworkType.TESTNET;
   // TODO: Use the real btc_assets_api_url and token
@@ -43,7 +51,7 @@ const transferRgbppOnBtc = async ({ signer, rgbppLockArgsList, toBtcAddress, tra
   const { commitment, ckbRawTx, needPaymasterCell, sumInputsCapacity } = ckbVirtualTxResult;
 
   // TODO: call sendRgbppUtxos to build and sign btc tx
-  const {btcTxId, btcTxBytes} = await sendRgbppUtxos({
+  const { btcTxId, btcTxBytes } = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
     tos: [toBtcAddress],
@@ -56,12 +64,19 @@ const transferRgbppOnBtc = async ({ signer, rgbppLockArgsList, toBtcAddress, tra
   // TODO: Use the real spv-service-url
   const spvService = new SPVService('spv-service-url');
 
-  let ckbTx = await appendCkbTxWitnesses({ ckbRawTx: newCkbRawTx, btcTxBytes, spvService, btcTxId, needPaymasterCell, sumInputsCapacity });
+  let ckbTx = await appendCkbTxWitnesses({
+    ckbRawTx: newCkbRawTx,
+    btcTxBytes,
+    spvService,
+    btcTxId,
+    needPaymasterCell,
+    sumInputsCapacity,
+  });
 
   if (needPaymasterCell) {
     const emptyCells = await collector.getCells({ lock: fromLock });
     if (!emptyCells || emptyCells.length === 0) {
-      throw new Error('The address has no empty cells')
+      throw new Error('The address has no empty cells');
     }
     ckbTx = await appendPaymasterCellAndSignCkbTx({
       secp256k1PrivateKey: TEST_PRIVATE_KEY,
@@ -83,3 +98,4 @@ transferRgbppOnBtc({
   toBtcAddress: 'tb1qm06rvrq8jyyckzc5v709u7qpthel9j4d9f7nh3',
   transferAmount: BigInt(100_0000_0000),
 });
+
