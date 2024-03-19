@@ -597,7 +597,7 @@ describe('Transaction', () => {
     });
   });
 
-  describe('sendRgbppUtxos()', () => {
+  describe.todo('sendRgbppUtxos()', () => {
     // TODO: fill tests
   });
 });
