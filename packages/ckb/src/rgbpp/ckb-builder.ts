@@ -100,6 +100,9 @@ export const appendCkbTxWitnesses = async ({
   return rawTx;
 };
 
+const parseWitness = (witness: StructuredWitness) =>
+  typeof witness === 'string' ? witness : serializeWitnessArgs(witness);
+
 /**
  * Append paymaster cell to the ckb transaction inputs and sign the transaction with paymaster cell's secp256k1 private key
  * @param secp256k1PrivateKey The Secp256k1 private key of the paymaster cells maintainer
@@ -113,7 +116,7 @@ export const appendPaymasterCellAndSignCkbTx = async ({
   sumInputsCapacity,
   paymasterCell,
   isMainnet,
-}: AppendPaymasterCellAndSignTxParams) => {
+}: AppendPaymasterCellAndSignTxParams): Promise<CKBComponents.RawTransaction> => {
   let rawTx = ckbRawTx;
   const paymasterInput = { previousOutput: paymasterCell.outPoint, since: '0x0' };
   rawTx.inputs = [paymasterInput, ...rawTx.inputs];
@@ -151,7 +154,9 @@ export const appendPaymasterCellAndSignCkbTx = async ({
   const emptyWitness = { lock: '', inputType: '', outputType: '' };
   const signedTx = {
     ...rawTx,
-    witnesses: signedWitnesses.map((witness, index) => (index === 0 ? serializeWitnessArgs(emptyWitness) : witness)),
+    witnesses: signedWitnesses.map((witness, index) =>
+      index === 0 ? serializeWitnessArgs(emptyWitness) : parseWitness(witness),
+    ),
   };
   return signedTx;
 };
