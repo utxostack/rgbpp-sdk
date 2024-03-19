@@ -4,7 +4,11 @@ import { genCkbJumpBtcVirtualTx, Collector, u32ToLe, getSecp256k1CellDep, remove
 // SECP256K1 private key
 const TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
 
-const jumpFromCkbToBtc = async () => {
+interface Params {
+  outIndex: number,
+  btcTxId: string
+}
+const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: Params) => {
   const collector = new Collector({
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
@@ -12,9 +16,6 @@ const jumpFromCkbToBtc = async () => {
   const address = privateKeyToAddress(TEST_PRIVATE_KEY, { prefix: AddressPrefix.Testnet });
   console.log('address: ', address);
 
-  // TODO: Use real btc utxo information
-  const outIndex = 1;
-  const btcTxId = '0x47448104a611ecb16ab8d8e500b2166689612c93fc7ef18783d8189f3079f447';
   const toRgbppLockArgs = `0x${u32ToLe(outIndex)}${remove0x(btcTxId)}`;
 
   // TODO: Use real XUDT type script
@@ -45,4 +46,8 @@ const jumpFromCkbToBtc = async () => {
   console.info(`Rgbpp asset has been jumping from CKB to BTC and tx hash is ${txHash}`);
 };
 
-jumpFromCkbToBtc();
+// TODO: Use real btc utxo information
+jumpFromCkbToBtc({
+  outIndex: 1,
+  btcTxId: '0x47448104a611ecb16ab8d8e500b2166689612c93fc7ef18783d8189f3079f447'
+});

@@ -118,6 +118,9 @@ importers:
       '@nervosnetwork/ckb-sdk-utils':
         specifier: ^0.109.1
         version: 0.109.1
+      '@rgbpp-sdk/btc':
+        specifier: workspace:^
+        version: link:../../packages/btc
       '@rgbpp-sdk/ckb':
         specifier: workspace:^
         version: link:../../packages/ckb

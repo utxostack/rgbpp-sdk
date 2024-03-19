@@ -10,6 +10,7 @@
     "@ckb-lumos/base": "0.21.1",
     "@nervosnetwork/ckb-sdk-utils": "^0.109.1",
     "@rgbpp-sdk/ckb": "workspace:^",
+    "@rgbpp-sdk/btc": "workspace:^",
     "axios": "^1.6.8",
     "ckb-omiga": "^0.0.15"
   },
