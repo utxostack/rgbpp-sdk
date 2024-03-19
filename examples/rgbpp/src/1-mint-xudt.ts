@@ -3,7 +3,7 @@ import { blockchain } from '@ckb-lumos/base';
 import { buildMintTx, Collector } from 'ckb-omiga';
 
 // SECP256K1 private key
-const TEST_MAIN_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
+const TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
 
 const deploy = async () => {
   const collector = new Collector({
@@ -11,9 +11,7 @@ const deploy = async () => {
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
   });
 
-  const address = collector
-    .getCkb()
-    .utils.privateKeyToAddress(TEST_MAIN_PRIVATE_KEY, { prefix: AddressPrefix.Testnet });
+  const address = collector.getCkb().utils.privateKeyToAddress(TEST_PRIVATE_KEY, { prefix: AddressPrefix.Testnet });
   // ckt1qyq0n2dd28k3fymdx0mmhp224ma973arej7s9jvjju
   console.log('address: ', address);
 
@@ -35,7 +33,7 @@ const deploy = async () => {
     cellDeps: [...rawTx.cellDeps, secp256k1Dep],
     witnesses: [witnessArgs, ...rawTx.witnesses.slice(1)],
   };
-  const signedTx = collector.getCkb().signTransaction(TEST_MAIN_PRIVATE_KEY)(unsignedTx);
+  const signedTx = collector.getCkb().signTransaction(TEST_PRIVATE_KEY)(unsignedTx);
 
   let txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
   console.info(`Xudt has been minted with tx hash ${txHash}`);
