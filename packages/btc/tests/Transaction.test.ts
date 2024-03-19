@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { accounts, network, networkType, service, source } from './shared/env';
+import { accounts, network, service, source } from './shared/env';
 import { ErrorCodes, AddressType, sendBtc, sendUtxos, tweakSigner } from '../src';
 import { bitcoin, ErrorMessages, BTC_UTXO_DUST_LIMIT, RGBPP_UTXO_DUST_LIMIT } from '../src';
 
@@ -26,7 +26,6 @@ describe('Transaction', () => {
                 value: 1000,
               },
             ],
-            networkType,
             source,
           });
 
@@ -51,7 +50,6 @@ describe('Transaction', () => {
             value: 1000,
           },
         ],
-        networkType,
         source,
       });
 
@@ -89,7 +87,6 @@ describe('Transaction', () => {
             },
           ],
           minUtxoSatoshi: balance.satoshi + 1,
-          networkType,
           source,
         }),
       ).rejects.toThrow(ErrorMessages[ErrorCodes.INSUFFICIENT_UTXO]);
@@ -107,7 +104,6 @@ describe('Transaction', () => {
             value: 1000,
           },
         ],
-        networkType,
         source,
       });
 
@@ -161,7 +157,6 @@ describe('Transaction', () => {
             fixed: true,
           },
         ],
-        networkType,
         source,
       });
 
@@ -202,7 +197,6 @@ describe('Transaction', () => {
             fixed: true,
           },
         ],
-        networkType,
         source,
       });
 
@@ -243,7 +237,6 @@ describe('Transaction', () => {
             fixed: true,
           },
         ],
-        networkType,
         source,
       });
 
@@ -288,7 +281,6 @@ describe('Transaction', () => {
             value: 1000,
           },
         ],
-        networkType,
         source,
       });
 
@@ -329,7 +321,6 @@ describe('Transaction', () => {
             protected: true,
           },
         ],
-        networkType,
         source,
       });
 
@@ -369,7 +360,6 @@ describe('Transaction', () => {
             protected: true,
           },
         ],
-        networkType,
         source,
       });
 
@@ -410,7 +400,6 @@ describe('Transaction', () => {
             protected: true,
           },
         ],
-        networkType,
         source,
       });
 
@@ -466,7 +455,6 @@ describe('Transaction', () => {
             protected: true,
           },
         ],
-        networkType,
         source,
       });
 
@@ -520,7 +508,6 @@ describe('Transaction', () => {
             protected: true,
           },
         ],
-        networkType,
         source,
       });
 
@@ -571,7 +558,6 @@ describe('Transaction', () => {
             protected: true,
           },
         ],
-        networkType,
         source,
       });
 
