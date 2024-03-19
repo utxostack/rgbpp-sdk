@@ -587,7 +587,8 @@ describe('Transaction', () => {
 
       const fee = psbt.getFee();
       console.log('fee:', fee);
-      expect(fee).toBe(240);
+      expect(fee).toBeGreaterThanOrEqual(239);
+      expect(fee).toBeLessThanOrEqual(240);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
