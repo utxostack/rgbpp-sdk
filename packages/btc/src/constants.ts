@@ -10,3 +10,8 @@ export const BTC_UTXO_DUST_LIMIT = 1000;
  * RGBPP_UTXOs with satoshi below this constant are considered dust and will not be created.
  */
 export const RGBPP_UTXO_DUST_LIMIT = 546;
+
+/**
+ * An empty placeholder, filled with 0s for the txid of the BTC transaction.
+ */
+export const BTC_TX_ID_PLACEHOLDER = '0x' + '0'.repeat(64);

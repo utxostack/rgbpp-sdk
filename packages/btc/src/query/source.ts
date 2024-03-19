@@ -13,6 +13,26 @@ export class DataSource {
     this.networkType = networkType;
   }
 
+  async getUtxo(hash: string, index: number): Promise<Utxo | undefined> {
+    const tx = await this.service.getTransaction(hash);
+    if (!tx) {
+      return void 0;
+    }
+    const vout = tx.vout[index];
+    if (!vout) {
+      return void 0;
+    }
+
+    return {
+      txid: hash,
+      vout: index,
+      value: vout.value,
+      scriptPk: vout.scriptpubkey,
+      address: vout.scriptpubkey_address,
+      addressType: getAddressType(vout.scriptpubkey_address),
+    };
+  }
+
   async getUtxos(address: string, params?: BtcAssetsApiUtxoParams): Promise<Utxo[]> {
     const utxos = await this.service.getUtxos(address, params);
 

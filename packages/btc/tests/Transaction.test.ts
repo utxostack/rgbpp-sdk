@@ -4,7 +4,7 @@ import { ErrorCodes, AddressType, sendBtc, sendUtxos, tweakSigner } from '../src
 import { bitcoin, ErrorMessages, BTC_UTXO_DUST_LIMIT, RGBPP_UTXO_DUST_LIMIT } from '../src';
 
 describe('Transaction', () => {
-  describe('BTC transfer', () => {
+  describe('sendBtc()', () => {
     describe('Transfer from Native SegWit (P2WPKH) address', () => {
       const addresses = [
         { type: 'Taproot (P2TR)', address: accounts.charlie.p2tr.address },
@@ -140,7 +140,7 @@ describe('Transaction', () => {
     });
   });
 
-  describe('UTXO transfer', () => {
+  describe('sendUtxos()', () => {
     it('Transfer fixed UTXO, sum(ins) = sum(outs)', async () => {
       const psbt = await sendUtxos({
         from: accounts.charlie.p2wpkh.address,
@@ -594,5 +594,9 @@ describe('Transaction', () => {
       // const res = await service.sendTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
+  });
+
+  describe('sendRgbppUtxos()', () => {
+    // TODO: fill tests
   });
 });

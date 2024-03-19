@@ -30,7 +30,7 @@ export function dataToOpReturnScriptPubkey(data: Buffer | string): Buffer {
  */
 export function opReturnScriptPubKeyToData(script: Buffer): Buffer {
   if (!isOpReturnScriptPubkey(script)) {
-    throw new TxBuildError(ErrorCodes.INVALID_OP_RETURN_SCRIPT);
+    throw new TxBuildError(ErrorCodes.UNSUPPORTED_OP_RETURN_SCRIPT);
   }
 
   const [_op, data] = bitcoin.script.decompile(script)!;
