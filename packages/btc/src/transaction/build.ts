@@ -1,7 +1,8 @@
 import clone from 'lodash/cloneDeep';
 import { bitcoin } from '../bitcoin';
 import { DataSource } from '../query/source';
-import { AddressType, Utxo } from '../types';
+import { Utxo } from '../types';
+import { AddressType } from '../address';
 import { ErrorCodes, TxBuildError } from '../error';
 import { NetworkType, toPsbtNetwork } from '../network';
 import { addressToScriptPublicKeyHex, getAddressType, isSupportedFromAddress } from '../address';
@@ -48,9 +49,9 @@ export class TxBuilder {
   minUtxoSatoshi: number;
   feeRate: number;
 
-  constructor(props: { source: DataSource; networkType: NetworkType; minUtxoSatoshi?: number; feeRate?: number }) {
+  constructor(props: { source: DataSource; minUtxoSatoshi?: number; feeRate?: number }) {
     this.source = props.source;
-    this.networkType = props.networkType;
+    this.networkType = this.source.networkType;
 
     this.feeRate = props.feeRate ?? 1;
     this.minUtxoSatoshi = props.minUtxoSatoshi ?? BTC_UTXO_DUST_LIMIT;
@@ -72,7 +73,7 @@ export class TxBuilder {
 
     if ('data' in output) {
       result = {
-        script: dataToOpReturnScriptPubkey(clone(output.data)),
+        script: dataToOpReturnScriptPubkey(output.data),
         value: output.value,
         fixed: output.fixed,
         protected: output.protected,
@@ -331,7 +332,6 @@ export class TxBuilder {
     const tx = new TxBuilder({
       source: this.source,
       feeRate: this.feeRate,
-      networkType: this.networkType,
       minUtxoSatoshi: this.minUtxoSatoshi,
     });
 

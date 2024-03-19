@@ -75,10 +75,8 @@ Transfer BTC from a `P2WPKH` address:
 ```typescript
 import { sendBtc, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
 
-const networkType = NetworkType.TESTNET;
-
 const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
-const source = new DataSource(service, networkType);
+const source = new DataSource(service, NetworkType.TESTNET);
 
 const psbt = await sendBtc({
   from: account.address, // your P2WPKH address
@@ -89,7 +87,6 @@ const psbt = await sendBtc({
     },
   ],
   feeRate: 1, // optional, default to 1 sat/vbyte
-  networkType,
   source,
 });
 
@@ -108,10 +105,8 @@ Transfer BTC from a `P2TR` address:
 ```typescript
 import { sendBtc, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
 
-const networkType = NetworkType.TESTNET;
-
 const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
-const source = new DataSource(service, networkType);
+const source = new DataSource(service, NetworkType.TESTNET);
 
 const psbt = await sendBtc({
   from: account.address, // your P2TR address
@@ -123,7 +118,6 @@ const psbt = await sendBtc({
     },
   ],
   feeRate: 1, // optional, default to 1 sat/vbyte
-  networkType,
   source,
 });
 
@@ -147,10 +141,8 @@ Create an `OP_RETURN` output:
 ```typescript
 import { sendBtc, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
 
-const networkType = NetworkType.TESTNET;
-
 const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
-const source = new DataSource(service, networkType);
+const source = new DataSource(service, NetworkType.TESTNET);
 
 // Create a PSBT
 const psbt = await sendBtc({
@@ -161,9 +153,8 @@ const psbt = await sendBtc({
       value: 0, // normally the value is 0
     },
   ],
-  changeAddress: account.address, // optional, where to send the change
+  changeAddress: account.address, // optional, where to return the change
   feeRate: 1, // optional, default to 1 sat/vbyte
-  networkType,
   source,
 });
 
@@ -182,10 +173,8 @@ Transfer with predefined inputs/outputs:
 ```typescript
 import { sendUtxos, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
 
-const networkType = NetworkType.TESTNET;
-
 const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
-const source = new DataSource(service, networkType);
+const source = new DataSource(service, NetworkType.TESTNET);
 
 const psbt = await sendUtxos({
   inputs: [
@@ -212,9 +201,9 @@ const psbt = await sendUtxos({
     },
   ],
   from: account.address, // provide fee to the transaction
+  fromPubkey: account.publicKey, // optional, required if "from" is a P2TR address
   changeAddress: account.address, // optional, where to send the change
   feeRate: 1, // optional, default to 1 sat/vbyte
-  networkType,
   source,
 });
 
@@ -240,10 +229,9 @@ interface sendBtc {
     from: string;
     tos: InitOutput[];
     source: DataSource;
-    networkType: NetworkType;
-    minUtxoSatoshi?: number;
-    changeAddress?: string;
     fromPubkey?: string;
+    changeAddress?: string;
+    minUtxoSatoshi?: number;
     feeRate?: number;
   }): Promise<bitcoin.Psbt>;
 }
@@ -257,8 +245,32 @@ interface sendUtxos {
     inputs: Utxo[];
     outputs: InitOutput[];
     source: DataSource;
-    networkType: NetworkType;
     from: string;
+    fromPubkey?: string;
+    changeAddress?: string;
+    minUtxoSatoshi?: number;
+    feeRate?: number;
+  }): Promise<bitcoin.Psbt>;
+}
+```
+
+#### sendRgbppUtxos
+
+```typescript
+interface sendRgbppUtxos {
+  (props: {
+    ckbVirtualTx: RawTransaction;
+    paymaster: TxAddressOutput;
+    commitment: Hash;
+    tos?: string[];
+
+    ckbNodeUrl: string;
+    rgbppLockCodeHash: Hash;
+    rgbppTimeLockCodeHash: Hash;
+    rgbppMinUtxoSatoshi?: number;
+
+    from: string;
+    source: DataSource;
     fromPubkey?: string;
     changeAddress?: string;
     minUtxoSatoshi?: number;

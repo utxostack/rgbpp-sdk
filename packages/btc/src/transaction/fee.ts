@@ -1,7 +1,6 @@
-import { bitcoin, ECPair, isTaprootInput } from '../bitcoin';
 import { ECPairInterface } from 'ecpair';
-import { AddressType } from '../types';
-import { publicKeyToAddress } from '../address';
+import { bitcoin, ECPair, isTaprootInput } from '../bitcoin';
+import { AddressType, publicKeyToAddress } from '../address';
 import { NetworkType, toPsbtNetwork } from '../network';
 import { toXOnly, tweakSigner } from '../utils';
 

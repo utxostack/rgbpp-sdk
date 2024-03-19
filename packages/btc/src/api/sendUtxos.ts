@@ -1,6 +1,5 @@
 import { bitcoin } from '../bitcoin';
 import { Utxo } from '../types';
-import { NetworkType } from '../network';
 import { DataSource } from '../query/source';
 import { TxBuilder, InitOutput } from '../transaction/build';
 
@@ -8,7 +7,6 @@ export async function sendUtxos(props: {
   inputs: Utxo[];
   outputs: InitOutput[];
   source: DataSource;
-  networkType: NetworkType;
   from: string;
   fromPubkey?: string;
   changeAddress?: string;
@@ -17,9 +15,8 @@ export async function sendUtxos(props: {
 }): Promise<bitcoin.Psbt> {
   const tx = new TxBuilder({
     source: props.source,
-    networkType: props.networkType,
-    minUtxoSatoshi: props.minUtxoSatoshi,
     feeRate: props.feeRate,
+    minUtxoSatoshi: props.minUtxoSatoshi,
   });
 
   tx.addInputs(props.inputs);

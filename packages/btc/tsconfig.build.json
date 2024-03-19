@@ -6,5 +6,5 @@
     "outDir": "lib",
     "noEmit": false
   },
-  "exclude": ["tests"]
+  "exclude": ["tests", "lib"]
 }

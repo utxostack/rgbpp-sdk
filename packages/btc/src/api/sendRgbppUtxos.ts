@@ -2,7 +2,6 @@ import { helpers, Hash, RawTransaction, RPC } from '@ckb-lumos/lumos';
 import { InitOutput, TxAddressOutput } from '../transaction/build';
 import { ErrorCodes, TxBuildError } from '../error';
 import { DataSource } from '../query/source';
-import { NetworkType } from '../network';
 import { Utxo } from '../types';
 import { bitcoin } from '../bitcoin';
 import { RGBPP_UTXO_DUST_LIMIT } from '../constants';
@@ -24,7 +23,6 @@ export async function sendRgbppUtxos(props: {
 
   from: string;
   source: DataSource;
-  networkType: NetworkType;
   fromPubkey?: string;
   changeAddress?: string;
   minUtxoSatoshi?: number;
@@ -164,7 +162,6 @@ export async function sendRgbppUtxos(props: {
     from: props.from,
     source: props.source,
     fromPubkey: props.fromPubkey,
-    networkType: props.networkType,
     changeAddress: props.changeAddress,
     minUtxoSatoshi: props.minUtxoSatoshi,
     feeRate: props.feeRate,

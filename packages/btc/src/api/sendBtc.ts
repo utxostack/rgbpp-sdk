@@ -1,5 +1,4 @@
 import { bitcoin } from '../bitcoin';
-import { NetworkType } from '../network';
 import { DataSource } from '../query/source';
 import { TxBuilder, InitOutput } from '../transaction/build';
 
@@ -7,7 +6,6 @@ export async function sendBtc(props: {
   from: string;
   tos: InitOutput[];
   source: DataSource;
-  networkType: NetworkType;
   minUtxoSatoshi?: number;
   changeAddress?: string;
   fromPubkey?: string;
@@ -15,7 +13,6 @@ export async function sendBtc(props: {
 }): Promise<bitcoin.Psbt> {
   const tx = new TxBuilder({
     source: props.source,
-    networkType: props.networkType,
     minUtxoSatoshi: props.minUtxoSatoshi,
     feeRate: props.feeRate,
   });
