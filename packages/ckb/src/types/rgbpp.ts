@@ -60,6 +60,8 @@ export interface AppendWitnessesParams {
   btcTxBytes: Hex;
   // The BTC transaction id
   btcTxId: Hex;
+  // The position of this transaction in the block
+  btcTxIndexInBlock: number;
   // The sum capacity of the ckb inputs
   sumInputsCapacity: Hex;
   // The needPaymasterCell indicates whether a paymaster cell is required

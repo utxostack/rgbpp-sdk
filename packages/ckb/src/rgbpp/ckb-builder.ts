@@ -62,12 +62,17 @@ export const appendCkbTxWitnesses = async ({
   spvService,
   btcTxBytes,
   btcTxId,
+  btcTxIndexInBlock,
   sumInputsCapacity,
   needPaymasterCell,
 }: AppendWitnessesParams): Promise<CKBComponents.RawTransaction> => {
   let rawTx = ckbRawTx;
 
-  const { spvClient, proof } = await spvService.fetchSpvClientCellAndTxProof({ btcTxId, confirmBlocks: 0 });
+  const { spvClient, proof } = await spvService.fetchSpvClientCellAndTxProof({
+    btcTxId,
+    btcTxIndexInBlock,
+    confirmBlocks: 0,
+  });
   rawTx.cellDeps.push(buildSpvClientCellDep(spvClient));
 
   const rgbppUnlock = buildRgbppUnlockWitness(btcTxBytes, proof, ckbRawTx.inputs.length, ckbRawTx.outputs.length);
