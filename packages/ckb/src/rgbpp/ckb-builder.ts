@@ -51,9 +51,10 @@ export const buildRgbppUnlockWitness = (
  * Append RGBPP unlock witnesses to ckb tx and the tx can be sent to blockchain if the needPaymasterCell is false.
  * And if the needPaymasterCell is true, appending paymaster cell to inputs and signing ckb tx are required.
  * @param collector The collector that collects CKB live cells and transactions
- * @param btcTxBytes The hex string of btc transaction, refer to https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/ts_src/transaction.ts#L609
  * @param spvService SPV RPC service
- * @param spvClientCellTxProof The OutPoint of SPV client cell and btc tx proof that come from SPV RPC service
+ * @param btcTxBytes The hex string of btc transaction, refer to https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/ts_src/transaction.ts#L609
+ * @param btcTxId    The BTC transaction id
+ * @param btcTxIndexInBlock The position of this BTC transaction in the block
  * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
  * @param needPaymasterCell The needPaymasterCell indicates whether a paymaster cell is required
  */

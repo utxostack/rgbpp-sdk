@@ -60,7 +60,7 @@ export interface AppendWitnessesParams {
   btcTxBytes: Hex;
   // The BTC transaction id
   btcTxId: Hex;
-  // The position of this transaction in the block
+  // The position of this BTC transaction in the block
   btcTxIndexInBlock: number;
   // The sum capacity of the ckb inputs
   sumInputsCapacity: Hex;
@@ -94,9 +94,16 @@ export interface BtcJumpCkbVirtualTxParams extends BtcTransferVirtualTxParams {
 
 export interface BtcJumpCkbVirtualTxResult extends BaseCkbVirtualTxResult {}
 
+export interface BtcTimeCellPair {
+  // The BTC time cell
+  btcTimeCell: IndexerCell;
+  // The position of this BTC transaction in the block
+  btcTxIndexInBlock: number;
+}
+
 export interface BtcTimeCellsParams {
-  // The collector that collects CKB live cells and transactions
-  btcTimeCells: IndexerCell[];
+  // The pairs of the BTC time cell and the related btc tx(which is in the BTC time cell lock args) index in the block
+  btcTimeCellPairs: BtcTimeCellPair[];
   // SPV RPC service
   spvService: SPVService;
   isMainnet: boolean;
