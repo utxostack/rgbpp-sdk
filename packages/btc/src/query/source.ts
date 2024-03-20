@@ -39,9 +39,12 @@ export class DataSource {
     const scriptPk = addressToScriptPublicKeyHex(address, this.networkType);
     return utxos
       .sort((a, b) => {
-        const aOrder = `${a.status.block_height}${a.vout}`;
-        const bOrder = `${b.status.block_height}${b.vout}`;
-        return Number(aOrder) - Number(bOrder);
+        const aBlockHeight = a.status.block_height;
+        const bBlockHeight = b.status.block_height;
+        if (aBlockHeight !== bBlockHeight) {
+          return aBlockHeight - bBlockHeight;
+        }
+        return a.vout - b.vout;
       })
       .map((row): Utxo => {
         return {
