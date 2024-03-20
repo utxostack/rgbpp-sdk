@@ -20,16 +20,19 @@ export const buildBtcTimeUnlockWitness = (btcTxProof: Hex): Hex => {
 /**
  * Collect btc time cells and spend them to create xudt cells for the specific lock scripts in the btc time lock args
  * The btc time lock args data structure is: lock_script | after | new_bitcoin_tx_id
- * @param btcTimeCells The btc time cells which have met the block confirmations and can be spent
+ * @param btcTimeCellPairs The pairs of the BTC time cell and the related btc tx(which is in the BTC time cell lock args) index in the block
  * @param spvService SPV RPC service
  * @param isMainnet
  */
 export const buildBtcTimeCellsSpentTx = async ({
-  btcTimeCells,
+  btcTimeCellPairs,
   spvService,
   isMainnet,
 }: BtcTimeCellsParams): Promise<CKBComponents.RawTransaction> => {
-  const sortedBtcTimeCells = btcTimeCells.sort(compareInputs);
+  const sortedBtcTimeCellPairs = btcTimeCellPairs.sort((pair1, pair2) =>
+    compareInputs(pair1.btcTimeCell, pair2.btcTimeCell),
+  );
+  const sortedBtcTimeCells = sortedBtcTimeCellPairs.map((pair) => pair.btcTimeCell);
   const inputs: CKBComponents.CellInput[] = sortedBtcTimeCells.map((cell) => ({
     previousOutput: cell.outPoint,
     since: '0x0',
@@ -48,14 +51,15 @@ export const buildBtcTimeCellsSpentTx = async ({
   const witnesses: Hex[] = [];
 
   const lockArgsSet: Set<string> = new Set();
-  for await (const cell of sortedBtcTimeCells) {
-    if (lockArgsSet.has(cell.output.lock.args)) {
+  for await (const { btcTimeCell, btcTxIndexInBlock } of sortedBtcTimeCellPairs) {
+    if (lockArgsSet.has(btcTimeCell.output.lock.args)) {
       witnesses.push('0x');
       continue;
     }
-    lockArgsSet.add(cell.output.lock.args);
+    lockArgsSet.add(btcTimeCell.output.lock.args);
     const { spvClient, proof } = await spvService.fetchSpvClientCellAndTxProof({
-      btcTxId: btcTxIdFromBtcTimeLockArgs(cell.output.lock.args),
+      btcTxId: btcTxIdFromBtcTimeLockArgs(btcTimeCell.output.lock.args),
+      btcTxIndexInBlock,
       confirmBlocks: BTC_JUMP_CONFIRMATION_BLOCKS,
     });
     cellDeps.push(buildSpvClientCellDep(spvClient));
