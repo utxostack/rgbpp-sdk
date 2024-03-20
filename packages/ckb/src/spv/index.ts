@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { SpvClientCellTxProofReq, SpvClientCellTxProofResponse } from '../types/spv';
 import { SpvRpcError } from '../error';
-import { append0x, toCamelcase, u32ToLe } from '../utils';
+import { append0x, remove0x, toCamelcase, u32ToLe } from '../utils';
 import { blockchain } from '@ckb-lumos/base';
 import { Hex } from '../types';
 
@@ -14,13 +14,14 @@ export class SPVService {
 
   fetchSpvClientCellAndTxProof = async ({
     btcTxId,
+    btcTxIndexInBlock,
     confirmBlocks,
   }: SpvClientCellTxProofReq): Promise<SpvClientCellTxProofResponse> => {
     let payload = {
       id: Math.floor(Math.random() * 100000),
       jsonrpc: '2.0',
       method: 'getTxProof',
-      params: [btcTxId, confirmBlocks],
+      params: [remove0x(btcTxId), btcTxIndexInBlock, confirmBlocks],
     };
     const body = JSON.stringify(payload, null, '  ');
     const response = await axios({
@@ -42,13 +43,9 @@ export class SPVService {
   };
 }
 
-export const buildSpvClientCellDep = (spvClient: Hex) => {
-  const outPoint = blockchain.OutPoint.unpack(spvClient);
+export const buildSpvClientCellDep = (spvClient: CKBComponents.OutPoint) => {
   const cellDep: CKBComponents.CellDep = {
-    outPoint: {
-      txHash: outPoint.txHash,
-      index: append0x(u32ToLe(outPoint.index)),
-    },
+    outPoint: spvClient,
     depType: 'code',
   };
   return cellDep;
