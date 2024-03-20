@@ -1,9 +1,7 @@
 import axios from 'axios';
 import { SpvClientCellTxProofReq, SpvClientCellTxProofResponse } from '../types/spv';
 import { SpvRpcError } from '../error';
-import { append0x, remove0x, toCamelcase, u32ToLe } from '../utils';
-import { blockchain } from '@ckb-lumos/base';
-import { Hex } from '../types';
+import { remove0x, toCamelcase } from '../utils';
 
 export class SPVService {
   private url: string;
