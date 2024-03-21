@@ -15,3 +15,5 @@ export * from './transaction/embed';
 export * from './transaction/fee';
 
 export * from './api/sendBtc';
+export * from './api/sendUtxos';
+export * from './api/sendRgbppUtxos';

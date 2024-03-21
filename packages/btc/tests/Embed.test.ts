@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { dataToOpReturnScriptPubkey, opReturnScriptPubKeyToData } from '../src/transaction/embed';
+import { dataToOpReturnScriptPubkey, opReturnScriptPubKeyToData } from '../src';
 
 describe('Embed', () => {
   it('Encode UTF-8 data to OP_RETURN script pubkey', () => {

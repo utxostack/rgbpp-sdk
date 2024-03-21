@@ -31,3 +31,10 @@ export function toNetworkType(network: bitcoin.Network): NetworkType {
     return NetworkType.REGTEST;
   }
 }
+
+/**
+ * The rgbpp-sdk/ckb accepts a "isMainnet" property to indicate the network type.
+ */
+export function toIsCkbMainnet(networkType: NetworkType): boolean {
+  return networkType === NetworkType.MAINNET;
+}

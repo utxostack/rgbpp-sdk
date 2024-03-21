@@ -1,4 +1,7 @@
 import { bitcoin, ecc, ECPair } from './bitcoin';
+import { bytes } from '@ckb-lumos/lumos/codec';
+
+const textEncoder = new TextEncoder();
 
 export function toXOnly(pubKey: Buffer): Buffer {
   return pubKey.length === 32 ? pubKey : pubKey.subarray(1, 33);
@@ -36,8 +39,8 @@ export function tweakSigner<T extends bitcoin.Signer>(
 /**
  * Check if target string is a valid domain.
  * @exmaple
- * - Valid: isDomain('google.com')
- * - Invalid: isDomain('https://google.com')
+ * isDomain('google.com') // => true
+ * isDomain('https://google.com') // => false
  */
 export function isDomain(domain: string): boolean {
   const regex = /^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,}$/;
@@ -46,7 +49,26 @@ export function isDomain(domain: string): boolean {
 
 /**
  * Remove '0x' prefix from a hex string.
+ * @example
+ * remove0x('0x1234') // => '1234'
+ * remove0x('1234') // => '1234'
  */
-export function removeHexPrefix(hex: string): string {
+export function remove0x(hex: string): string {
   return hex.startsWith('0x') ? hex.slice(2) : hex;
+}
+
+/**
+ * Convert UTF-8 raw text to buffer (binary bytes).
+ * @example
+ * utf8ToBuffer('0x1234') // => Uint8Array(2) [ 18, 52 ]
+ * utf8ToBuffer('1234') // => Uint8Array(4) [ 49, 50, 51, 52 ]
+ * utf8ToBuffer('hello') // => Uint8Array(5) [ 104, 101, 108, 108, 111 ]
+ */
+export function utf8ToBuffer(text: string): Uint8Array {
+  let result = text.trim();
+  if (result.startsWith('0x')) {
+    return bytes.bytify(result);
+  }
+
+  return textEncoder.encode(result);
 }

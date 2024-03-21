@@ -1,13 +1,14 @@
-import clone from 'lodash/clone';
+import clone from 'lodash/cloneDeep';
 import { bitcoin } from '../bitcoin';
 import { DataSource } from '../query/source';
+import { Utxo } from '../types';
+import { AddressType } from '../address';
 import { ErrorCodes, TxBuildError } from '../error';
-import { AddressType, UnspentOutput } from '../types';
 import { NetworkType, toPsbtNetwork } from '../network';
-import { MIN_COLLECTABLE_SATOSHI } from '../constants';
-import { addressToScriptPublicKeyHex, getAddressType } from '../address';
-import { removeHexPrefix, toXOnly } from '../utils';
+import { addressToScriptPublicKeyHex, getAddressType, isSupportedFromAddress } from '../address';
 import { dataToOpReturnScriptPubkey } from './embed';
+import { BTC_UTXO_DUST_LIMIT, FEE_RATE } from '../constants';
+import { remove0x, toXOnly } from '../utils';
 import { FeeEstimator } from './fee';
 
 interface TxInput {
@@ -17,23 +18,26 @@ interface TxInput {
     witnessUtxo: { value: number; script: Buffer };
     tapInternalKey?: Buffer;
   };
-  utxo: UnspentOutput;
+  utxo: Utxo;
 }
 
 export type TxOutput = TxAddressOutput | TxScriptOutput;
-export interface TxAddressOutput {
-  address: string;
-  value: number;
-}
-export interface TxScriptOutput {
-  script: Buffer;
-  value: number;
-}
+export type InitOutput = TxAddressOutput | TxDataOutput | TxScriptOutput;
 
-export type TxTo = TxAddressOutput | TxDataOutput;
-export interface TxDataOutput {
-  data: Buffer | string;
+export interface BaseOutput {
   value: number;
+  fixed?: boolean;
+  protected?: boolean;
+  minUtxoSatoshi?: number;
+}
+export interface TxAddressOutput extends BaseOutput {
+  address: string;
+}
+export interface TxDataOutput extends BaseOutput {
+  data: Buffer | string;
+}
+export interface TxScriptOutput extends BaseOutput {
+  script: Buffer;
 }
 
 export class TxBuilder {
@@ -42,118 +46,262 @@ export class TxBuilder {
 
   source: DataSource;
   networkType: NetworkType;
-  changedAddress: string;
   minUtxoSatoshi: number;
   feeRate: number;
 
-  constructor(props: {
-    source: DataSource;
-    networkType: NetworkType;
-    changeAddress: string;
-    minUtxoSatoshi?: number;
-    feeRate?: number;
-  }) {
+  constructor(props: { source: DataSource; minUtxoSatoshi?: number; feeRate?: number }) {
     this.source = props.source;
+    this.networkType = this.source.networkType;
 
-    this.feeRate = props.feeRate ?? 1;
-    this.networkType = props.networkType;
-    this.changedAddress = props.changeAddress;
-    this.minUtxoSatoshi = props.minUtxoSatoshi ?? MIN_COLLECTABLE_SATOSHI;
+    this.feeRate = props.feeRate ?? FEE_RATE;
+    this.minUtxoSatoshi = props.minUtxoSatoshi ?? BTC_UTXO_DUST_LIMIT;
   }
 
-  addInput(utxo: UnspentOutput) {
+  addInput(utxo: Utxo) {
     utxo = clone(utxo);
     this.inputs.push(utxoToInput(utxo));
   }
 
-  addOutput(output: TxOutput) {
-    output = clone(output);
-    this.outputs.push(output);
+  addInputs(utxos: Utxo[]) {
+    utxos.forEach((utxo) => {
+      this.addInput(utxo);
+    });
   }
 
-  addTo(to: TxTo) {
-    if ('data' in to) {
-      const data = typeof to.data === 'string' ? Buffer.from(removeHexPrefix(to.data), 'hex') : to.data;
-      const scriptPubkey = dataToOpReturnScriptPubkey(data);
+  addOutput(output: InitOutput) {
+    let result: TxOutput | undefined;
 
-      return this.addOutput({
-        script: scriptPubkey,
-        value: to.value,
-      });
+    if ('data' in output) {
+      result = {
+        script: dataToOpReturnScriptPubkey(output.data),
+        value: output.value,
+        fixed: output.fixed,
+        protected: output.protected,
+        minUtxoSatoshi: output.minUtxoSatoshi,
+      };
     }
-    if ('address' in to) {
-      return this.addOutput(to);
+    if ('address' in output || 'script' in output) {
+      result = clone(output);
+    }
+    if (!result) {
+      throw new TxBuildError(ErrorCodes.UNSUPPORTED_OUTPUT);
     }
 
-    throw new TxBuildError(ErrorCodes.UNSUPPORTED_OUTPUT);
+    this.outputs.push(result);
   }
 
-  async collectInputsAndPayFee(props: {
+  addOutputs(outputs: InitOutput[]) {
+    outputs.forEach((output) => {
+      this.addOutput(output);
+    });
+  }
+
+  async payFee(props: { address: string; publicKey?: string; changeAddress?: string; deductFromOutputs?: boolean }) {
+    const { address, publicKey, changeAddress, deductFromOutputs } = props;
+    const originalInputs = clone(this.inputs);
+    const originalOutputs = clone(this.outputs);
+
+    let previousFee: number = 0;
+    while (true) {
+      const { inputsNeeding, outputsNeeding } = this.summary();
+      if (outputsNeeding > 0) {
+        // If sum(inputs) > sum(outputs), return change while deducting fee
+        // Note, should not deduct fee from outputs while also returning change at the same time
+        const returnAmount = outputsNeeding - previousFee;
+        await this.injectChange({
+          address: changeAddress ?? address,
+          amount: returnAmount,
+          publicKey,
+        });
+      } else {
+        const targetAmount = inputsNeeding + previousFee;
+        await this.injectSatoshi({
+          address,
+          publicKey,
+          targetAmount,
+          changeAddress,
+          deductFromOutputs,
+        });
+      }
+
+      const addressType = getAddressType(address);
+      const fee = await this.calculateFee(addressType);
+      if ([-1, 0, 1].includes(fee - previousFee)) {
+        break;
+      }
+
+      previousFee = fee;
+      this.inputs = clone(originalInputs);
+      this.outputs = clone(originalOutputs);
+    }
+  }
+
+  async injectSatoshi(props: {
     address: string;
-    pubkey?: string;
-    fee?: number;
-    extraChange?: number;
-  }): Promise<void> {
-    const { address, pubkey, fee = 0, extraChange = 0 } = props;
-    const outputAmount = this.outputs.reduce((acc, out) => acc + out.value, 0);
-    const targetAmount = outputAmount + fee + extraChange;
+    publicKey?: string;
+    targetAmount: number;
+    changeAddress?: string;
+    injectCollected?: boolean;
+    deductFromOutputs?: boolean;
+  }) {
+    if (!isSupportedFromAddress(props.address)) {
+      throw new TxBuildError(ErrorCodes.UNSUPPORTED_ADDRESS_TYPE);
+    }
 
-    const { utxos, satoshi, exceedSatoshi } = await this.source.collectSatoshi(
-      address,
-      targetAmount,
-      this.minUtxoSatoshi,
-    );
-    if (satoshi < targetAmount) {
+    const injectCollected = props.injectCollected ?? false;
+    const deductFromOutputs = props.deductFromOutputs ?? true;
+
+    let collected = 0;
+    let changeAmount = 0;
+    let targetAmount = props.targetAmount;
+
+    const _collect = async (_targetAmount: number, stack?: boolean) => {
+      if (stack) {
+        targetAmount += _targetAmount;
+      }
+
+      const { utxos, satoshi } = await this.source.collectSatoshi({
+        address: props.address,
+        targetAmount: _targetAmount,
+        minUtxoSatoshi: this.minUtxoSatoshi,
+        excludeUtxos: this.inputs.map((row) => row.utxo),
+      });
+      utxos.forEach((utxo) => {
+        this.addInput({
+          ...utxo,
+          pubkey: props.publicKey,
+        });
+      });
+
+      collected += satoshi;
+      _updateChangeAmount();
+    };
+    const _updateChangeAmount = () => {
+      if (injectCollected) {
+        changeAmount = collected + targetAmount;
+      } else {
+        changeAmount = collected - targetAmount;
+      }
+    };
+
+    // Collect from outputs
+    if (deductFromOutputs) {
+      for (let i = 0; i < this.outputs.length; i++) {
+        const output = this.outputs[i];
+        if (output.fixed) {
+          continue;
+        }
+        if (collected >= targetAmount) {
+          break;
+        }
+
+        // If output.protected is true, do not destroy the output
+        // Only collect the satoshi from (output.value - minUtxoSatoshi)
+        const minUtxoSatoshi = output.minUtxoSatoshi ?? this.minUtxoSatoshi;
+        const freeAmount = output.value - minUtxoSatoshi;
+        const remain = targetAmount - collected;
+        if (output.protected) {
+          // freeAmount=100, remain=50, collectAmount=50
+          // freeAmount=100, remain=150, collectAmount=100
+          const collectAmount = Math.min(freeAmount, remain);
+          output.value -= collectAmount;
+          collected += collectAmount;
+        } else {
+          // output.value=200, freeAmount=100, remain=50, collectAmount=50
+          // output.value=200, freeAmount=100, remain=150, collectAmount=100
+          // output.value=100, freeAmount=0, remain=150, collectAmount=100
+          const collectAmount = output.value > remain ? Math.min(freeAmount, remain) : output.value;
+          output.value -= collectAmount;
+          collected += collectAmount;
+
+          if (output.value === 0) {
+            this.outputs.splice(i, 1);
+            i--;
+          }
+        }
+      }
+    }
+
+    // Collect target amount of satoshi from DataSource
+    if (collected < targetAmount) {
+      await _collect(targetAmount - collected);
+    }
+
+    // If 0 < change amount < minUtxoSatoshi, collect one more time
+    if (changeAmount > 0 && changeAmount < this.minUtxoSatoshi) {
+      await _collect(this.minUtxoSatoshi - changeAmount);
+    }
+
+    // If not collected enough satoshi, revert to the original state and throw error
+    const insufficientBalance = collected < targetAmount;
+    const insufficientForChange = changeAmount > 0 && changeAmount < this.minUtxoSatoshi;
+    if (insufficientBalance || insufficientForChange) {
       throw new TxBuildError(ErrorCodes.INSUFFICIENT_UTXO);
     }
 
-    const originalInputs = clone(this.inputs);
-    utxos.forEach((utxo) => {
-      this.addInput({
-        ...utxo,
-        pubkey,
-      });
-    });
-
-    const originalOutputs = clone(this.outputs);
-    const changeSatoshi = exceedSatoshi + extraChange;
-    const requireChangeUtxo = changeSatoshi > 0;
-    if (requireChangeUtxo) {
+    // Return change
+    let changeIndex: number = -1;
+    if (changeAmount > 0) {
+      changeIndex = this.outputs.length;
       this.addOutput({
-        address: this.changedAddress,
-        value: changeSatoshi,
+        address: props.changeAddress ?? props.address,
+        value: changeAmount,
       });
     }
 
-    const addressType = getAddressType(address);
-    const estimatedFee = await this.calculateFee(addressType);
-    if (estimatedFee > fee || changeSatoshi < this.minUtxoSatoshi) {
-      this.inputs = originalInputs;
-      this.outputs = originalOutputs;
+    return {
+      collected,
+      changeIndex,
+      changeAmount,
+    };
+  }
 
-      const nextExtraChange = (() => {
-        if (requireChangeUtxo) {
-          if (changeSatoshi < this.minUtxoSatoshi) {
-            return this.minUtxoSatoshi;
-          }
-          return extraChange;
-        }
-        return 0;
-      })();
+  async injectChange(props: { amount: number; address: string; publicKey?: string }) {
+    const { address, publicKey, amount } = props;
 
-      return await this.collectInputsAndPayFee({
+    for (let i = 0; i < this.outputs.length; i++) {
+      const output = this.outputs[i];
+      if (output.fixed) {
+        continue;
+      }
+      if (!('address' in output) || output.address !== address) {
+        continue;
+      }
+
+      output.value += amount;
+      return;
+    }
+
+    if (amount < this.minUtxoSatoshi) {
+      const { collected } = await this.injectSatoshi({
         address,
-        pubkey,
-        fee: estimatedFee,
-        extraChange: nextExtraChange,
+        publicKey,
+        targetAmount: amount,
+        injectCollected: true,
+        deductFromOutputs: false,
+      });
+      if (collected < amount) {
+        throw new TxBuildError(ErrorCodes.INSUFFICIENT_UTXO);
+      }
+    } else {
+      this.addOutput({
+        address: address,
+        value: amount,
       });
     }
   }
 
   async calculateFee(addressType: AddressType): Promise<number> {
     const psbt = await this.createEstimatedPsbt(addressType);
-    const vSize = psbt.extractTransaction(true).virtualSize();
-    return Math.ceil(vSize * this.feeRate);
+    const tx = psbt.extractTransaction(true);
+
+    const inputs = tx.ins.length;
+    const weightWithWitness = tx.byteLength(true);
+    const weightWithoutWitness = tx.byteLength(false);
+
+    const weight = weightWithoutWitness * 3 + weightWithWitness + inputs;
+    const virtualSize = Math.ceil(weight / 4);
+    return Math.ceil(virtualSize * this.feeRate);
   }
 
   async createEstimatedPsbt(addressType: AddressType): Promise<bitcoin.Psbt> {
@@ -173,15 +321,30 @@ export class TxBuilder {
     return psbt;
   }
 
+  summary() {
+    const sumOfInputs = this.inputs.reduce((acc, input) => acc + input.utxo.value, 0);
+    const sumOfOutputs = this.outputs.reduce((acc, output) => acc + output.value, 0);
+
+    return {
+      inputsTotal: sumOfInputs,
+      inputsRemaining: sumOfInputs - sumOfOutputs,
+      inputsNeeding: sumOfOutputs > sumOfInputs ? sumOfOutputs - sumOfInputs : 0,
+      outputsTotal: sumOfOutputs,
+      outputsRemaining: sumOfOutputs - sumOfInputs,
+      outputsNeeding: sumOfInputs > sumOfOutputs ? sumOfInputs - sumOfOutputs : 0,
+    };
+  }
+
   clone(): TxBuilder {
     const tx = new TxBuilder({
       source: this.source,
-      networkType: this.networkType,
-      changeAddress: this.changedAddress,
       feeRate: this.feeRate,
+      minUtxoSatoshi: this.minUtxoSatoshi,
     });
+
     tx.inputs = clone(this.inputs);
     tx.outputs = clone(this.outputs);
+
     return tx;
   }
 
@@ -198,14 +361,14 @@ export class TxBuilder {
   }
 }
 
-export function utxoToInput(utxo: UnspentOutput): TxInput {
+export function utxoToInput(utxo: Utxo): TxInput {
   if (utxo.addressType === AddressType.P2WPKH) {
     const data = {
       hash: utxo.txid,
       index: utxo.vout,
       witnessUtxo: {
         value: utxo.value,
-        script: Buffer.from(removeHexPrefix(utxo.scriptPk), 'hex'),
+        script: Buffer.from(remove0x(utxo.scriptPk), 'hex'),
       },
     };
 
@@ -223,9 +386,9 @@ export function utxoToInput(utxo: UnspentOutput): TxInput {
       index: utxo.vout,
       witnessUtxo: {
         value: utxo.value,
-        script: Buffer.from(removeHexPrefix(utxo.scriptPk), 'hex'),
+        script: Buffer.from(remove0x(utxo.scriptPk), 'hex'),
       },
-      tapInternalKey: toXOnly(Buffer.from(removeHexPrefix(utxo.pubkey), 'hex')),
+      tapInternalKey: toXOnly(Buffer.from(remove0x(utxo.pubkey), 'hex')),
     };
     return {
       data,

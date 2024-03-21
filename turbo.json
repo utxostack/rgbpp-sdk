@@ -14,7 +14,8 @@
     },
     "test": {
       "outputs": ["coverage/**"],
-      "dependsOn": []
+      "dependsOn": ["^build"],
+      "cache": false
     },
     "lint:fix": {
       "cache": false
