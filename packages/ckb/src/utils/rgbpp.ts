@@ -9,6 +9,7 @@ import {
 } from '../constants';
 import { hexToBytes, serializeOutPoint, serializeOutput, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { blockchain } from '@ckb-lumos/base';
+import { Collector } from '../collector';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
   return {
@@ -106,4 +107,20 @@ export const replaceLockArgsWithRealBtcTxId = (lockArgs: Hex, txId: Hex): Hex =>
     throw new Error('Rgbpp lock args or BTC time lock args length is invalid');
   }
   return `0x${remove0x(lockArgs).substring(0, argsLength - BTC_TX_ID_SIZE)}${remove0x(txId)}`;
+};
+
+export const isRgbppLockCell = async (collector: Collector, outPoint: CKBComponents.OutPoint, isMainnet: boolean) => {
+  const rgbppLock = getRgbppLockScript(isMainnet);
+  const rgbppCellLock = (await collector.getLiveCell(outPoint)).output.lock;
+  const isRgbppLock = rgbppCellLock.codeHash === rgbppLock.codeHash && rgbppCellLock.hashType === rgbppLock.hashType;
+  return isRgbppLock;
+};
+
+export const isBtcTimeLockCell = async (collector: Collector, outPoint: CKBComponents.OutPoint, isMainnet: boolean) => {
+  const btcTimeLock = getBtcTimeLockScript(isMainnet);
+  const btcTimeCellLock = (await collector.getLiveCell(outPoint)).output.lock;
+  const isBtcTimeLock =
+    btcTimeCellLock.codeHash === btcTimeLock.codeHash && btcTimeCellLock.hashType === btcTimeLock.hashType;
+
+  return isBtcTimeLock;
 };
