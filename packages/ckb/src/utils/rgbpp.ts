@@ -109,18 +109,14 @@ export const replaceLockArgsWithRealBtcTxId = (lockArgs: Hex, txId: Hex): Hex =>
   return `0x${remove0x(lockArgs).substring(0, argsLength - BTC_TX_ID_SIZE)}${remove0x(txId)}`;
 };
 
-export const isRgbppLockCell = async (collector: Collector, outPoint: CKBComponents.OutPoint, isMainnet: boolean) => {
+export const isRgbppLockCell = (cell: CKBComponents.CellOutput, isMainnet: boolean): boolean => {
   const rgbppLock = getRgbppLockScript(isMainnet);
-  const rgbppCellLock = (await collector.getLiveCell(outPoint)).output.lock;
-  const isRgbppLock = rgbppCellLock.codeHash === rgbppLock.codeHash && rgbppCellLock.hashType === rgbppLock.hashType;
+  const isRgbppLock = cell.lock.codeHash === rgbppLock.codeHash && cell.lock.hashType === rgbppLock.hashType;
   return isRgbppLock;
 };
 
-export const isBtcTimeLockCell = async (collector: Collector, outPoint: CKBComponents.OutPoint, isMainnet: boolean) => {
+export const isBtcTimeLockCell = (cell: CKBComponents.CellOutput, isMainnet: boolean): boolean => {
   const btcTimeLock = getBtcTimeLockScript(isMainnet);
-  const btcTimeCellLock = (await collector.getLiveCell(outPoint)).output.lock;
-  const isBtcTimeLock =
-    btcTimeCellLock.codeHash === btcTimeLock.codeHash && btcTimeCellLock.hashType === btcTimeLock.hashType;
-
+  const isBtcTimeLock = cell.lock.codeHash === btcTimeLock.codeHash && cell.lock.hashType === btcTimeLock.hashType;
   return isBtcTimeLock;
 };
