@@ -2,7 +2,7 @@
   "name": "@rgbpp-sdk/btc",
   "version": "0.1.0",
   "scripts": {
-    "test": "vitest --watch=false",
+    "test": "vitest",
     "build": "tsc -p tsconfig.build.json",
     "lint": "prettier --check '{src,tests}/**/*.{js,jsx,ts,tsx}'",
     "lint:fix": "prettier --write '{src,tests}/**/*.{js,jsx,ts,tsx}'",
