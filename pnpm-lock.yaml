@@ -118,6 +118,9 @@ importers:
       '@ckb-lumos/lumos':
         specifier: 0.22.0-next.5
         version: 0.22.0-next.5
+      '@rgbpp-sdk/ckb':
+        specifier: workspace:^
+        version: link:../ckb
       bip32:
         specifier: ^4.0.0
         version: 4.0.0
@@ -127,9 +130,6 @@ importers:
       ecpair:
         specifier: ^2.1.0
         version: 2.1.0
-      js-sha256:
-        specifier: ^0.11.0
-        version: 0.11.0
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
