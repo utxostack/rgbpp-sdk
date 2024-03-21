@@ -53,27 +53,20 @@ export const buildRgbppUnlockWitness = (
  * @param collector The collector that collects CKB live cells and transactions
  * @param spvService SPV RPC service
  * @param btcTxBytes The hex string of btc transaction, refer to https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/ts_src/transaction.ts#L609
- * @param btcTxId    The BTC transaction id
- * @param btcTxIndexInBlock The position of this BTC transaction in the block
+ * @param spvClientTxPoof    The response of SPV RPC fetchSpvClientCellAndTxProof which includes spv_client and tx_proof
  * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
  * @param needPaymasterCell The needPaymasterCell indicates whether a paymaster cell is required
  */
 export const appendCkbTxWitnesses = async ({
   ckbRawTx,
-  spvService,
+  spvClientTxPoof,
   btcTxBytes,
-  btcTxId,
-  btcTxIndexInBlock,
   sumInputsCapacity,
   needPaymasterCell,
 }: AppendWitnessesParams): Promise<CKBComponents.RawTransaction> => {
   let rawTx = ckbRawTx;
 
-  const { spvClient, proof } = await spvService.fetchSpvClientCellAndTxProof({
-    btcTxId,
-    btcTxIndexInBlock,
-    confirmBlocks: 0,
-  });
+  const { spvClient, proof } = spvClientTxPoof;
   rawTx.cellDeps.push(buildSpvClientCellDep(spvClient));
 
   const rgbppUnlock = buildRgbppUnlockWitness(btcTxBytes, proof, ckbRawTx.inputs.length, ckbRawTx.outputs.length);
