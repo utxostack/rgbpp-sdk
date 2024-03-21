@@ -146,7 +146,7 @@ export function decodeAddress(address: string): {
           addressType = AddressType.P2TR;
         }
       }
-      if (networkType && addressType) {
+      if (networkType !== void 0 && addressType !== void 0) {
         return {
           networkType,
           addressType,
@@ -179,7 +179,7 @@ export function decodeAddress(address: string): {
         addressType = AddressType.P2SH_P2WPKH;
       }
 
-      if (networkType && addressType) {
+      if (networkType !== void 0 && addressType !== void 0) {
         return {
           networkType,
           addressType,
