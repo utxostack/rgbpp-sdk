@@ -1,4 +1,4 @@
-import { Collector, getBtcTimeLockScript, getRgbppLockScript, calculateCommitment } from '@rgbpp-sdk/ckb';
+import { Collector, isRgbppLockCell, isBtcTimeLockCell, calculateCommitment } from '@rgbpp-sdk/ckb';
 import { Hash, RawTransaction } from '@ckb-lumos/lumos';
 import { bitcoin } from '../bitcoin';
 import { Utxo } from '../types';
@@ -33,20 +33,18 @@ export async function sendRgbppUtxos(props: {
 
   const ckbVirtualTx = props.ckbVirtualTx;
   const isCkbMainnet = toIsCkbMainnet(props.source.networkType);
-  const rgbppLock = getRgbppLockScript(isCkbMainnet);
-  const rgbppTimeLock = getBtcTimeLockScript(isCkbMainnet);
 
   // Handle and check inputs
   for (let i = 0; i < ckbVirtualTx.inputs.length; i++) {
     const input = ckbVirtualTx.inputs[i];
 
-    const cell = await props.ckbCollector.getLiveCell(input.previousOutput);
-    const isRgbppLock = cell.output.lock.codeHash === rgbppLock.codeHash;
-    const isRgbppTimeLock = cell.output.lock.codeHash === rgbppLock.codeHash;
+    const liveCell = await props.ckbCollector.getLiveCell(input.previousOutput);
+    const isRgbppLock = isRgbppLockCell(liveCell.output, isCkbMainnet);
+    const isRgbppTimeLock = isBtcTimeLockCell(liveCell.output, isCkbMainnet);
 
     // If input.type !== null, input.lock must be RgbppLock or RgbppTimeLock
-    if (cell.output.type) {
-      if (!isRgbppLock && !isRgbppTimeLock) {
+    if (liveCell.output.type) {
+      if (!isRgbppLock) {
         throw new TxBuildError(ErrorCodes.CKB_INVALID_CELL_LOCK);
       }
 
@@ -58,8 +56,8 @@ export async function sendRgbppUtxos(props: {
     // 1. input.lock.args can be unpacked to RgbppLockArgs
     // 2. utxo can be found via the DataSource.getUtxo() API
     // 3. utxo.scriptPk == addressToScriptPk(props.from)
-    if (isRgbppLock || isRgbppTimeLock) {
-      const args = unpackRgbppLockArgs(cell.output.lock.args);
+    if (isRgbppLock) {
+      const args = unpackRgbppLockArgs(liveCell.output.lock.args);
       const utxo = await props.source.getUtxo(args.btcTxid, args.outIndex);
       if (!utxo) {
         throw new TxBuildError(ErrorCodes.CANNOT_FIND_UTXO);
@@ -83,8 +81,8 @@ export async function sendRgbppUtxos(props: {
   // Handle and check outputs
   for (let i = 0; i < ckbVirtualTx.outputs.length; i++) {
     const output = ckbVirtualTx.outputs[i];
-    const isRgbppLock = output.lock.codeHash === rgbppLock.codeHash;
-    const isRgbppTimeLock = output.lock.codeHash === rgbppTimeLock.codeHash;
+    const isRgbppLock = isRgbppLockCell(output, isCkbMainnet);
+    const isRgbppTimeLock = isBtcTimeLockCell(output, isCkbMainnet);
 
     // If output.type !== null, then the output.lock must be RgbppLock or RgbppTimeLock
     if (output.type) {
