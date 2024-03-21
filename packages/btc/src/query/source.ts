@@ -1,17 +1,21 @@
+import { FeesRecommended } from '@mempool/mempool.js/lib/interfaces/bitcoin/fees';
 import { Utxo } from '../types';
 import { NetworkType } from '../network';
-import { ErrorCodes, TxBuildError } from '../error';
+import { ErrorCodes, ErrorMessages, TxBuildError } from '../error';
 import { addressToScriptPublicKeyHex, getAddressType } from '../address';
 import { BtcAssetsApi, BtcAssetsApiUtxoParams } from './service';
+import { createMempool, MempoolInstance } from './mempool';
 import { remove0x } from '../utils';
 
 export class DataSource {
   public service: BtcAssetsApi;
   public networkType: NetworkType;
+  public mempool: MempoolInstance;
 
   constructor(service: BtcAssetsApi, networkType: NetworkType) {
     this.service = service;
     this.networkType = networkType;
+    this.mempool = createMempool(networkType);
   }
 
   async getUtxo(hash: string, index: number): Promise<Utxo | undefined> {
@@ -109,5 +113,24 @@ export class DataSource {
       satoshi: collectedAmount,
       exceedSatoshi: collectedAmount - targetAmount,
     };
+  }
+
+  // Get recommended fee rates from mempool.space.
+  // From fastest to slowest: fastestFee > halfHourFee > economyFee > hourFee > minimumFee
+  async getRecommendedFeeRates(): Promise<FeesRecommended> {
+    try {
+      return await this.mempool.bitcoin.fees.getFeesRecommended();
+    } catch (err: any) {
+      throw new TxBuildError(
+        ErrorCodes.MEMPOOL_API_RESPONSE_ERROR,
+        `${ErrorMessages[ErrorCodes.MEMPOOL_API_RESPONSE_ERROR]}: ${err.message ?? JSON.stringify(err)}`,
+      );
+    }
+  }
+
+  // Get the recommended average fee rate.
+  async getAverageFeeRate(): Promise<number> {
+    const fees = await this.getRecommendedFeeRates();
+    return fees.halfHourFee;
   }
 }

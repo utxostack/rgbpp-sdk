@@ -3,7 +3,7 @@ import { bitcoin } from '../bitcoin';
 import { DataSource } from '../query/source';
 import { Utxo } from '../types';
 import { AddressType } from '../address';
-import { ErrorCodes, TxBuildError } from '../error';
+import { ErrorCodes, ErrorMessages, TxBuildError } from '../error';
 import { NetworkType, toPsbtNetwork } from '../network';
 import { addressToScriptPublicKeyHex, getAddressType, isSupportedFromAddress } from '../address';
 import { dataToOpReturnScriptPubkey } from './embed';
@@ -47,13 +47,14 @@ export class TxBuilder {
   source: DataSource;
   networkType: NetworkType;
   minUtxoSatoshi: number;
-  feeRate: number;
+  feeRate?: number;
+  defaultFeeRate?: number;
 
   constructor(props: { source: DataSource; minUtxoSatoshi?: number; feeRate?: number }) {
     this.source = props.source;
     this.networkType = this.source.networkType;
 
-    this.feeRate = props.feeRate ?? FEE_RATE;
+    this.feeRate = props.feeRate;
     this.minUtxoSatoshi = props.minUtxoSatoshi ?? BTC_UTXO_DUST_LIMIT;
   }
 
@@ -100,6 +101,12 @@ export class TxBuilder {
     const { address, publicKey, changeAddress, deductFromOutputs } = props;
     const originalInputs = clone(this.inputs);
     const originalOutputs = clone(this.outputs);
+
+    // Get default fee rate from mempool.space if feeRate is not provided
+    // The tx is expected be confirmed within half an hour
+    if (!this.feeRate) {
+      this.defaultFeeRate = await this.source.getAverageFeeRate();
+    }
 
     let previousFee: number = 0;
     while (true) {
@@ -292,6 +299,11 @@ export class TxBuilder {
   }
 
   async calculateFee(addressType: AddressType): Promise<number> {
+    const feeRate = this.feeRate ?? this.defaultFeeRate;
+    if (!feeRate) {
+      throw new TxBuildError(ErrorCodes.INVALID_FEE_RATE, `${ErrorMessages[ErrorCodes.INVALID_FEE_RATE]}: ${feeRate}`);
+    }
+
     const psbt = await this.createEstimatedPsbt(addressType);
     const tx = psbt.extractTransaction(true);
 
@@ -301,7 +313,7 @@ export class TxBuilder {
 
     const weight = weightWithoutWitness * 3 + weightWithWitness + inputs;
     const virtualSize = Math.ceil(weight / 4);
-    return Math.ceil(virtualSize * this.feeRate);
+    return Math.ceil(virtualSize * feeRate);
   }
 
   async createEstimatedPsbt(addressType: AddressType): Promise<bitcoin.Psbt> {

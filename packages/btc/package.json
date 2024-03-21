@@ -18,6 +18,7 @@
   "dependencies": {
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@ckb-lumos/lumos": "0.22.0-next.5",
+    "@mempool/mempool.js": "^2.3.0",
     "@nervosnetwork/ckb-types": "^0.109.1",
     "@rgbpp-sdk/ckb": "workspace:^",
     "bip32": "^4.0.0",
