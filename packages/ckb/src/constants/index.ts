@@ -17,25 +17,25 @@ const TestnetInfo = {
   } as CKBComponents.CellDep,
 
   RgbppLockScript: {
-    codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    codeHash: '0x61ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248',
     hashType: 'type',
     args: '',
   } as CKBComponents.Script,
 
   RgbppLockDep: {
-    outPoint: { txHash: '0x0000000000000000000000000000000000000000000000000000000000000000', index: '0x0' },
-    depType: 'depGroup',
+    outPoint: { txHash: '0x3aba789691d73f00c535bdfda7f59e554ceb733ff6005b67e70dcf33ac7c2b4a', index: '0x0' },
+    depType: 'code',
   } as CKBComponents.CellDep,
 
   BtcTimeLockScript: {
-    codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    codeHash: '0x00cdf8fab0f8ac638758ebf5ea5e4052b1d71e8a77b9f43139718621f6849326',
     hashType: 'type',
     args: '',
   } as CKBComponents.Script,
 
   BtcTimeLockDep: {
-    outPoint: { txHash: '0x0000000000000000000000000000000000000000000000000000000000000000', index: '0x0' },
-    depType: 'depGroup',
+    outPoint: { txHash: '0xbbe74cbade53632c08e84e657a9848eadeb524889e8c0b22e1c7cb679260b06a', index: '0x0' },
+    depType: 'code',
   } as CKBComponents.CellDep,
 
   XUDTTypeScript: {
