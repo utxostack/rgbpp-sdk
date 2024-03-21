@@ -1,5 +1,4 @@
 import { Collector, isRgbppLockCell, isBtcTimeLockCell, calculateCommitment } from '@rgbpp-sdk/ckb';
-import { Hash, RawTransaction } from '@ckb-lumos/lumos';
 import { bitcoin } from '../bitcoin';
 import { Utxo } from '../types';
 import { DataSource } from '../query/source';
@@ -11,9 +10,9 @@ import { sendUtxos } from './sendUtxos';
 import { RGBPP_UTXO_DUST_LIMIT } from '../constants';
 
 export async function sendRgbppUtxos(props: {
-  ckbVirtualTx: RawTransaction;
+  ckbVirtualTx: CKBComponents.RawTransaction;
   paymaster: TxAddressOutput;
-  commitment: Hash;
+  commitment: string;
   tos?: string[];
 
   ckbCollector: Collector;
@@ -38,9 +37,8 @@ export async function sendRgbppUtxos(props: {
   for (let i = 0; i < ckbVirtualTx.inputs.length; i++) {
     const input = ckbVirtualTx.inputs[i];
 
-    const liveCell = await props.ckbCollector.getLiveCell(input.previousOutput);
+    const liveCell = await props.ckbCollector.getLiveCell(input.previousOutput!);
     const isRgbppLock = isRgbppLockCell(liveCell.output, isCkbMainnet);
-    const isRgbppTimeLock = isBtcTimeLockCell(liveCell.output, isCkbMainnet);
 
     // If input.type !== null, input.lock must be RgbppLock or RgbppTimeLock
     if (liveCell.output.type) {
