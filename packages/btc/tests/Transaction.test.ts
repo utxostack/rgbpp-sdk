@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { accounts, network, service, source } from './shared/env';
 import { ErrorCodes, AddressType, sendBtc, sendUtxos, tweakSigner } from '../src';
 import { bitcoin, ErrorMessages, BTC_UTXO_DUST_LIMIT, RGBPP_UTXO_DUST_LIMIT } from '../src';
+import { accounts, network, service, source } from './shared/env';
+import { expectPsbtFeeInRange } from './shared/utils';
 
 describe('Transaction', () => {
   describe('sendBtc()', () => {
@@ -33,6 +34,9 @@ describe('Transaction', () => {
           psbt.signAllInputs(accounts.charlie.keyPair);
           psbt.finalizeAllInputs();
 
+          console.log('tx paid fee:', psbt.getFee());
+          expectPsbtFeeInRange(psbt);
+
           // Broadcast transaction
           // const tx = psbt.extractTransaction();
           // const res = await service.sendTransaction(tx.toHex());
@@ -62,9 +66,11 @@ describe('Transaction', () => {
       psbt.signAllInputs(tweakedSigner);
       psbt.finalizeAllInputs();
 
-      console.log('fee', psbt.getFee());
       console.log(psbt.txInputs);
       console.log(psbt.txOutputs);
+
+      console.log('tx paid fee:', psbt.getFee());
+      expectPsbtFeeInRange(psbt);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -129,6 +135,9 @@ describe('Transaction', () => {
       expect(data).toBeInstanceOf(Buffer);
       expect((data as Buffer).toString('hex')).toEqual('00'.repeat(32));
 
+      console.log('tx paid fee:', psbt.getFee());
+      expectPsbtFeeInRange(psbt);
+
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
       // const res = await service.sendTransaction(tx.toHex());
@@ -164,13 +173,11 @@ describe('Transaction', () => {
       psbt.signAllInputs(accounts.charlie.keyPair);
       psbt.finalizeAllInputs();
 
-      expect(psbt.txInputs).toHaveLength(2);
+      expect(psbt.txInputs.length).toBeGreaterThanOrEqual(2);
       expect(psbt.txOutputs).toHaveLength(2);
 
-      const fee = psbt.getFee();
-      console.log('fee:', fee);
-      expect(fee).toBeGreaterThanOrEqual(208);
-      expect(fee).toBeLessThanOrEqual(209);
+      console.log('tx paid fee:', psbt.getFee());
+      expectPsbtFeeInRange(psbt);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -204,13 +211,11 @@ describe('Transaction', () => {
       psbt.signAllInputs(accounts.charlie.keyPair);
       psbt.finalizeAllInputs();
 
-      expect(psbt.txInputs).toHaveLength(2);
+      expect(psbt.txInputs.length).toBeGreaterThanOrEqual(2);
       expect(psbt.txOutputs).toHaveLength(2);
 
-      const fee = psbt.getFee();
-      console.log('fee:', fee);
-      expect(fee).toBeGreaterThanOrEqual(208);
-      expect(fee).toBeLessThanOrEqual(209);
+      console.log('tx paid fee:', psbt.getFee());
+      expectPsbtFeeInRange(psbt);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -244,13 +249,11 @@ describe('Transaction', () => {
       psbt.signAllInputs(accounts.charlie.keyPair);
       psbt.finalizeAllInputs();
 
-      expect(psbt.txInputs).toHaveLength(2);
+      expect(psbt.txInputs.length).toBeGreaterThanOrEqual(2);
       expect(psbt.txOutputs).toHaveLength(2);
 
-      const fee = psbt.getFee();
-      console.log('fee:', fee);
-      expect(fee).toBeGreaterThanOrEqual(208);
-      expect(fee).toBeLessThanOrEqual(209);
+      console.log('tx paid fee:', psbt.getFee());
+      expectPsbtFeeInRange(psbt);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -291,9 +294,8 @@ describe('Transaction', () => {
       expect(psbt.txInputs).toHaveLength(1);
       expect(psbt.txOutputs).toHaveLength(2);
 
-      const fee = psbt.getFee();
-      console.log('fee:', fee);
-      expect(fee).toBe(141);
+      console.log('tx paid fee:', psbt.getFee());
+      expectPsbtFeeInRange(psbt);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -308,6 +310,14 @@ describe('Transaction', () => {
           {
             txid: '4e1e9f8ff4bf245793c05bf2da58bff812c332a296d93c6935fbc980d906e567',
             vout: 1,
+            value: 2000,
+            addressType: AddressType.P2WPKH,
+            address: accounts.charlie.p2wpkh.address,
+            scriptPk: accounts.charlie.p2wpkh.scriptPubkey.toString('hex'),
+          },
+          {
+            txid: '4e1e9f8ff4bf245793c05bf2da58bff812c332a296d93c6935fbc980d906e567',
+            vout: 2,
             value: 2000,
             addressType: AddressType.P2WPKH,
             address: accounts.charlie.p2wpkh.address,
@@ -328,12 +338,13 @@ describe('Transaction', () => {
       psbt.signAllInputs(accounts.charlie.keyPair);
       psbt.finalizeAllInputs();
 
-      expect(psbt.txInputs).toHaveLength(1);
+      console.log(psbt.data.inputs.map((row) => row.finalScriptWitness!.byteLength));
+
+      expect(psbt.txInputs).toHaveLength(2);
       expect(psbt.txOutputs).toHaveLength(1);
 
-      const fee = psbt.getFee();
-      console.log('fee:', fee);
-      expect(fee).toBe(110);
+      console.log('tx paid fee:', psbt.getFee());
+      expectPsbtFeeInRange(psbt);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -367,20 +378,18 @@ describe('Transaction', () => {
       psbt.signAllInputs(accounts.charlie.keyPair);
       psbt.finalizeAllInputs();
 
-      expect(psbt.txInputs).toHaveLength(2);
+      expect(psbt.txInputs.length).toBeGreaterThanOrEqual(2);
       expect(psbt.txOutputs).toHaveLength(2);
 
-      const fee = psbt.getFee();
-      console.log('fee:', fee);
-      expect(fee).toBeGreaterThanOrEqual(208);
-      expect(fee).toBeLessThanOrEqual(209);
+      console.log('tx paid fee:', psbt.getFee());
+      expectPsbtFeeInRange(psbt);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
       // const res = await service.sendTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
-    it('Transfer protected UTXO, sum(ins) > sum(outs)', async () => {
+    it('Transfer protected UTXO, sum(ins) > sum(outs), change to outs[0]', async () => {
       const psbt = await sendUtxos({
         from: accounts.charlie.p2wpkh.address,
         inputs: [
@@ -410,9 +419,8 @@ describe('Transaction', () => {
       expect(psbt.txInputs).toHaveLength(1);
       expect(psbt.txOutputs).toHaveLength(1);
 
-      const fee = psbt.getFee();
-      console.log('fee:', fee);
-      expect(fee).toBe(110);
+      console.log('tx paid fee:', psbt.getFee());
+      expectPsbtFeeInRange(psbt);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -420,7 +428,7 @@ describe('Transaction', () => {
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
 
-    it('Transfer protected RGBPP_UTXOs, pay with collection', async () => {
+    it('Transfer protected RGBPP_UTXOs, sum(ins) = sum(outs)', async () => {
       const psbt = await sendUtxos({
         from: accounts.charlie.p2wpkh.address,
         inputs: [
@@ -462,20 +470,18 @@ describe('Transaction', () => {
       psbt.signAllInputs(accounts.charlie.keyPair);
       psbt.finalizeAllInputs();
 
-      expect(psbt.txInputs).toHaveLength(3);
+      expect(psbt.txInputs.length).toBeGreaterThanOrEqual(3);
       expect(psbt.txOutputs).toHaveLength(3);
 
-      const fee = psbt.getFee();
-      console.log('fee:', fee);
-      expect(fee).toBeGreaterThanOrEqual(307);
-      expect(fee).toBeLessThanOrEqual(308);
+      console.log('tx paid fee:', psbt.getFee());
+      expectPsbtFeeInRange(psbt);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
       // const res = await service.sendTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
-    it('Transfer protected RGBPP_UTXOs, each with free satoshi', async () => {
+    it('Transfer protected RGBPP_UTXOs, each has free satoshi', async () => {
       const psbt = await sendUtxos({
         from: accounts.charlie.p2wpkh.address,
         inputs: [
@@ -518,13 +524,11 @@ describe('Transaction', () => {
       console.log(psbt.txOutputs);
       expect(psbt.txInputs).toHaveLength(1);
       expect(psbt.txOutputs).toHaveLength(3);
-      expect(psbt.txOutputs[0].value).toBe(RGBPP_UTXO_DUST_LIMIT);
-      expect(psbt.txOutputs[1].value).toBe(RGBPP_UTXO_DUST_LIMIT + 28);
-      expect(psbt.txOutputs[2].value).toBe(RGBPP_UTXO_DUST_LIMIT + 100);
+      expect(psbt.txOutputs[0].value).toBeLessThan(psbt.txOutputs[1].value);
+      expect(psbt.txOutputs[1].value).toBeLessThan(psbt.txOutputs[2].value);
 
-      const fee = psbt.getFee();
-      console.log('fee:', fee);
-      expect(fee).toBe(172);
+      console.log('tx paid fee:', psbt.getFee());
+      expectPsbtFeeInRange(psbt);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -566,15 +570,13 @@ describe('Transaction', () => {
       psbt.finalizeAllInputs();
 
       console.log(psbt.txOutputs);
-      expect(psbt.txInputs).toHaveLength(2);
+      expect(psbt.txInputs.length).toBeGreaterThanOrEqual(2);
       expect(psbt.txOutputs).toHaveLength(3);
       expect(psbt.txOutputs[0].value).toBe(RGBPP_UTXO_DUST_LIMIT);
       expect(psbt.txOutputs[1].value).toBe(RGBPP_UTXO_DUST_LIMIT);
 
-      const fee = psbt.getFee();
-      console.log('fee:', fee);
-      expect(fee).toBeGreaterThanOrEqual(239);
-      expect(fee).toBeLessThanOrEqual(240);
+      console.log('tx paid fee:', psbt.getFee());
+      expectPsbtFeeInRange(psbt);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();

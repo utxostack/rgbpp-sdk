@@ -7,7 +7,7 @@ import { ErrorCodes, TxBuildError } from '../error';
 import { NetworkType, toPsbtNetwork } from '../network';
 import { addressToScriptPublicKeyHex, getAddressType, isSupportedFromAddress } from '../address';
 import { dataToOpReturnScriptPubkey } from './embed';
-import { BTC_UTXO_DUST_LIMIT } from '../constants';
+import { BTC_UTXO_DUST_LIMIT, FEE_RATE } from '../constants';
 import { remove0x, toXOnly } from '../utils';
 import { FeeEstimator } from './fee';
 
@@ -53,7 +53,7 @@ export class TxBuilder {
     this.source = props.source;
     this.networkType = this.source.networkType;
 
-    this.feeRate = props.feeRate ?? 1;
+    this.feeRate = props.feeRate ?? FEE_RATE;
     this.minUtxoSatoshi = props.minUtxoSatoshi ?? BTC_UTXO_DUST_LIMIT;
   }
 
@@ -126,7 +126,7 @@ export class TxBuilder {
 
       const addressType = getAddressType(address);
       const fee = await this.calculateFee(addressType);
-      if (fee <= previousFee) {
+      if ([-1, 0, 1].includes(fee - previousFee)) {
         break;
       }
 
@@ -229,7 +229,7 @@ export class TxBuilder {
 
     // If 0 < change amount < minUtxoSatoshi, collect one more time
     if (changeAmount > 0 && changeAmount < this.minUtxoSatoshi) {
-      await _collect(this.minUtxoSatoshi - changeAmount, true);
+      await _collect(this.minUtxoSatoshi - changeAmount);
     }
 
     // If not collected enough satoshi, revert to the original state and throw error
@@ -293,8 +293,15 @@ export class TxBuilder {
 
   async calculateFee(addressType: AddressType): Promise<number> {
     const psbt = await this.createEstimatedPsbt(addressType);
-    const vSize = psbt.extractTransaction(true).virtualSize();
-    return Math.ceil(vSize * this.feeRate);
+    const tx = psbt.extractTransaction(true);
+
+    const inputs = tx.ins.length;
+    const weightWithWitness = tx.byteLength(true);
+    const weightWithoutWitness = tx.byteLength(false);
+
+    const weight = weightWithoutWitness * 3 + weightWithWitness + inputs;
+    const virtualSize = Math.ceil(weight / 4);
+    return Math.ceil(virtualSize * this.feeRate);
   }
 
   async createEstimatedPsbt(addressType: AddressType): Promise<bitcoin.Psbt> {

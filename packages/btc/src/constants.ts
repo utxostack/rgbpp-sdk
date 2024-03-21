@@ -15,3 +15,9 @@ export const RGBPP_UTXO_DUST_LIMIT = 546;
  * An empty 32-byte placeholder, filled with 0s for the txid of the BTC transaction.
  */
 export const BTC_TX_ID_PLACEHOLDER = '0x' + '0'.repeat(64);
+
+/**
+ * The minimum fee rate that can be declared in a BTC transaction, in satoshi per byte.
+ * Note this value can be different in different networks.
+ */
+export const FEE_RATE = 1;
