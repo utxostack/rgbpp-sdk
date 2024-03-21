@@ -1,8 +1,8 @@
 import { AddressPrefix, privateKeyToAddress, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { genCkbJumpBtcVirtualTx, Collector, u32ToLe, getSecp256k1CellDep, remove0x } from '@rgbpp-sdk/ckb';
 
-// SECP256K1 private key
-const TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
+// CKB SECP256K1 private key
+const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
 
 interface Params {
   outIndex: number,
@@ -13,8 +13,8 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: Params) => {
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
   });
-  const address = privateKeyToAddress(TEST_PRIVATE_KEY, { prefix: AddressPrefix.Testnet });
-  console.log('address: ', address);
+  const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, { prefix: AddressPrefix.Testnet });
+  console.log('ckb address: ', address);
 
   const toRgbppLockArgs = `0x${u32ToLe(outIndex)}${remove0x(btcTxId)}`;
 
@@ -30,7 +30,7 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: Params) => {
     fromCkbAddress: address,
     toRgbppLockArgs,
     xudtTypeBytes: serializeScript(xudtType),
-    transferAmount: BigInt(200_0000_0000),
+    transferAmount: BigInt(800_0000_0000),
   });
 
   const emptyWitness = { lock: '', inputType: '', outputType: '' };
@@ -40,7 +40,7 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: Params) => {
     witnesses: [emptyWitness, ...ckbRawTx.witnesses.slice(1)],
   };
 
-  const signedTx = collector.getCkb().signTransaction(TEST_PRIVATE_KEY)(unsignedTx);
+  const signedTx = collector.getCkb().signTransaction(CKB_TEST_PRIVATE_KEY)(unsignedTx);
 
   let txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
   console.info(`Rgbpp asset has been jumping from CKB to BTC and tx hash is ${txHash}`);
@@ -48,7 +48,7 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: Params) => {
 
 // TODO: Use real btc utxo information
 jumpFromCkbToBtc({
-  outIndex: 1,
-  btcTxId: '0x47448104a611ecb16ab8d8e500b2166689612c93fc7ef18783d8189f3079f447'
+  outIndex: 0,
+  btcTxId: 'b30798e98172dac6d1dae87a49447d612e4e813458d0955c04bbf55907551e05',
 });
 
