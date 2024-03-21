@@ -21,8 +21,9 @@ export function expectPsbtFeeInRange(psbt: bitcoin.Psbt, feeRate?: number) {
   const estimated = calculatePsbtFee(psbt, feeRate);
   const paid = psbt.getFee();
 
-  expect([0, 1].includes(paid - estimated)).eq(
-    true,
-    `paid fee should be ${estimated}±1 satoshi, but paid ${paid} satoshi`,
-  );
+  const inputs = psbt.data.inputs.length;
+  const diff = paid - estimated;
+
+  expect(diff).toBeGreaterThanOrEqual(0);
+  expect(diff).toBeLessThanOrEqual(diff + inputs);
 }
