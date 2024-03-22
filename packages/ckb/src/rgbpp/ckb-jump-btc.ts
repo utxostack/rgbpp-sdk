@@ -6,10 +6,9 @@ import {
   calculateRgbppCellCapacity,
   calculateTransactionFee,
   calculateUdtCellCapacity,
-  remove0x,
   u128ToLe,
 } from '../utils';
-import { buildPreLockArgs, genRgbppLockScript } from '../utils/rgbpp';
+import { genRgbppLockScript } from '../utils/rgbpp';
 import { MAX_FEE, SECP256K1_WITNESS_LOCK_SIZE, getXudtDep } from '../constants';
 import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 

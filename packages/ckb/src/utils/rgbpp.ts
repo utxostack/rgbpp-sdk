@@ -1,6 +1,6 @@
 import { sha256 } from 'js-sha256';
 import { Hex, IndexerCell, RgbppCkbVirtualTx } from '../types';
-import { append0x, remove0x, u32ToLe, utf8ToHex } from './hex';
+import { append0x, remove0x, reverseHex, u32ToLe, utf8ToHex } from './hex';
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
   RGBPP_TX_ID_PLACEHOLDER,
@@ -9,7 +9,6 @@ import {
 } from '../constants';
 import { hexToBytes, serializeOutPoint, serializeOutput, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { blockchain } from '@ckb-lumos/base';
-import { Collector } from '../collector';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
   return {
@@ -66,7 +65,7 @@ export const btcTxIdFromBtcTimeLockArgs = (args: Hex): Hex => {
   if (temp.length <= 72) {
     throw new Error('Invalid BTC time lock args');
   }
-  const btcTxId = append0x(temp.substring(temp.length - 64));
+  const btcTxId = append0x(reverseHex(temp.substring(temp.length - 64)));
   return btcTxId;
 };
 
@@ -106,7 +105,7 @@ export const replaceLockArgsWithRealBtcTxId = (lockArgs: Hex, txId: Hex): Hex =>
   if (argsLength < RGBPP_MIN_LOCK_ARGS_SIZE) {
     throw new Error('Rgbpp lock args or BTC time lock args length is invalid');
   }
-  return `0x${remove0x(lockArgs).substring(0, argsLength - BTC_TX_ID_SIZE)}${remove0x(txId)}`;
+  return `0x${remove0x(lockArgs).substring(0, argsLength - BTC_TX_ID_SIZE)}${remove0x(reverseHex(txId))}`;
 };
 
 export const isRgbppLockCell = (cell: CKBComponents.CellOutput, isMainnet: boolean): boolean => {

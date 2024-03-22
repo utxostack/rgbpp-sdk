@@ -1,4 +1,5 @@
 import { hexToBytes, bytesToHex } from '@nervosnetwork/ckb-sdk-utils';
+import { Hex } from '../types';
 
 export const remove0x = (hex: string): string => {
   if (hex.startsWith('0x')) {
@@ -87,4 +88,8 @@ export const hexToUtf8 = (hex: string) => {
     console.error('hexToUtf8 error:', error);
   }
   return result;
+};
+
+export const reverseHex = (str: Hex) => {
+  return remove0x(str).split('').reverse().join('');
 };

@@ -2,12 +2,12 @@ import { describe, it, expect } from 'vitest';
 import { calculateRgbppCellCapacity, calculateTransactionFee } from './ckb-tx';
 
 describe('ckb tx utils', () => {
-  it('calculateTransactionFee', async () => {
+  it('calculateTransactionFee', () => {
     const fee = calculateTransactionFee(1245);
     expect(BigInt(1370)).toBe(fee);
   });
 
-  it('calculateRgbppCellCapacity', async () => {
+  it('calculateRgbppCellCapacity', () => {
     const xudtType: CKBComponents.Script = {
       codeHash: '0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb',
       hashType: 'type',

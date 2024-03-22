@@ -1,7 +1,7 @@
 import { BtcTransferVirtualTxParams, BtcTransferVirtualTxResult, RgbppCkbVirtualTx } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
 import { NoRgbppLiveCellError } from '../error';
-import { append0x, calculateRgbppCellCapacity, u128ToLe, u32ToLe } from '../utils';
+import { append0x, calculateRgbppCellCapacity, u128ToLe } from '../utils';
 import { buildPreLockArgs, calculateCommitment, compareInputs, genRgbppLockScript } from '../utils/rgbpp';
 import { Hex, IndexerCell } from '../types';
 import {
