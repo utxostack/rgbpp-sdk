@@ -74,7 +74,10 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
   // Send BTC tx
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
-    paymaster: {} as any,
+    paymaster: needPaymasterCell ? {
+      address: btcAddress!,
+      value: 1000,
+    } : void 0,
     commitment,
     tos: [toBtcAddress],
     ckbCollector: collector,
@@ -85,8 +88,8 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
   psbt.finalizeAllInputs()
 
   const btcTx = psbt.extractTransaction()
-  console.log("BTC Tx bytes: ", btcTx.toHex())
-  const btcTxBytes = btcTx.toHex()
+  const btcTxBytes = btcTx['__toBuffer'](void 0, void 0, false).toString('hex')
+  console.log('BTC Tx bytes: ', btcTxBytes);
   const { txid: btcTxId } = await service.sendTransaction(btcTx.toHex());
   console.log("BTC TxId: ", btcTxId)
   
