@@ -54,12 +54,14 @@ export interface BtcTransferVirtualTxResult extends BaseCkbVirtualTxResult {}
 export interface AppendWitnessesParams {
   // CKB raw transaction
   ckbRawTx: CKBComponents.RawTransaction;
-  // The response of SPV RPC fetchSpvClientCellAndTxProof which includes spv_client and tx_proof
-  spvClientTxPoof: SpvClientCellTxProofResponse;
+  // SPV RPC service
+  spvService: SPVService;
   // The hex string of btc transaction, refer to https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/ts_src/transaction.ts#L609
   btcTxBytes: Hex;
   // The BTC transaction id
   btcTxId: Hex;
+  // The position of this BTC transaction in the block
+  btcTxIndexInBlock: number;
   // The sum capacity of the ckb inputs
   sumInputsCapacity: Hex;
   // The needPaymasterCell indicates whether a paymaster cell is required
