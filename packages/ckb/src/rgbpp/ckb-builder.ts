@@ -77,7 +77,8 @@ export const appendCkbTxWitnesses = async ({
   rawTx.cellDeps.push(buildSpvClientCellDep(spvClient));
 
   const rgbppUnlock = buildRgbppUnlockWitness(btcTxBytes, proof, ckbRawTx.inputs.length, ckbRawTx.outputs.length);
-  rawTx.witnesses = rawTx.witnesses.map((witness) => (witness === RGBPP_WITNESS_PLACEHOLDER ? rgbppUnlock : witness));
+  const rgbppWitness = append0x(serializeWitnessArgs({ lock: rgbppUnlock, inputType: '', outputType: '' }));
+  rawTx.witnesses = rawTx.witnesses.map((witness) => (witness === RGBPP_WITNESS_PLACEHOLDER ? rgbppWitness : witness));
 
   if (!needPaymasterCell) {
     const partialOutputsCapacity = rawTx.outputs

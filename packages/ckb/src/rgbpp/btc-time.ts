@@ -1,4 +1,4 @@
-import { bytesToHex, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
+import { bytesToHex, getTransactionSize, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils';
 import { BTC_JUMP_CONFIRMATION_BLOCKS, getBtcTimeLockConfigDep, getBtcTimeLockDep, getXudtDep } from '../constants';
 import { BTCTimeUnlock } from '../schemas/generated/rgbpp';
 import { BtcTimeCellsParams, Hex } from '../types';
@@ -67,7 +67,10 @@ export const buildBtcTimeCellsSpentTx = async ({
       confirmBlocks: BTC_JUMP_CONFIRMATION_BLOCKS,
     });
     cellDeps.push(buildSpvClientCellDep(spvClient));
-    witnesses.push(buildBtcTimeUnlockWitness(proof));
+    const btcTimeWitness = append0x(
+      serializeWitnessArgs({ lock: buildBtcTimeUnlockWitness(proof), inputType: '', outputType: '' }),
+    );
+    witnesses.push(btcTimeWitness);
   }
 
   const ckbTx: CKBComponents.RawTransaction = {
