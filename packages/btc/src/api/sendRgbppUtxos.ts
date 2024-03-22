@@ -95,10 +95,12 @@ export async function sendRgbppUtxos(props: {
     // If output.lock == RgbppLock, generate a corresponding output in outputs
     if (isRgbppLock) {
       const toAddress = props.tos?.[i];
+      const minUtxoSatoshi = props.rgbppMinUtxoSatoshi ?? RGBPP_UTXO_DUST_LIMIT;
       outputs.push({
         protected: true,
         address: toAddress ?? props.from,
-        value: props.rgbppMinUtxoSatoshi ?? RGBPP_UTXO_DUST_LIMIT,
+        value: minUtxoSatoshi,
+        minUtxoSatoshi,
       });
     }
   }
