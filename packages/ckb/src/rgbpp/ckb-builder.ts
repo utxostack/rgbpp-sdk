@@ -55,8 +55,6 @@ export const buildRgbppUnlockWitness = (
  * @param btcTxBytes The hex string of btc transaction, refer to https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/ts_src/transaction.ts#L609
  * @param btcTxId    The BTC transaction id
  * @param btcTxIndexInBlock The position of this BTC transaction in the block
- * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
- * @param needPaymasterCell The needPaymasterCell indicates whether a paymaster cell is required
  */
 export const appendCkbTxWitnesses = async ({
   ckbRawTx,
@@ -64,8 +62,6 @@ export const appendCkbTxWitnesses = async ({
   btcTxBytes,
   btcTxId,
   btcTxIndexInBlock,
-  sumInputsCapacity,
-  needPaymasterCell,
 }: AppendWitnessesParams): Promise<CKBComponents.RawTransaction> => {
   let rawTx = ckbRawTx;
 
@@ -79,24 +75,6 @@ export const appendCkbTxWitnesses = async ({
   const rgbppUnlock = buildRgbppUnlockWitness(btcTxBytes, proof, ckbRawTx.inputs.length, ckbRawTx.outputs.length);
   const rgbppWitness = append0x(serializeWitnessArgs({ lock: rgbppUnlock, inputType: '', outputType: '' }));
   rawTx.witnesses = rawTx.witnesses.map((witness) => (witness === RGBPP_WITNESS_PLACEHOLDER ? rgbppWitness : witness));
-
-  if (!needPaymasterCell) {
-    const partialOutputsCapacity = rawTx.outputs
-      .slice(0, rawTx.outputs.length - 1)
-      .map((output) => BigInt(output.capacity))
-      .reduce((prev, current) => prev + current, BigInt(0));
-
-    const inputsCapacity = BigInt(sumInputsCapacity);
-    if (inputsCapacity <= partialOutputsCapacity) {
-      throw new InputsCapacityNotEnoughError('The sum of inputs capacity is not enough');
-    }
-
-    const txSize = getTransactionSize(rawTx) + SECP256K1_WITNESS_LOCK_SIZE;
-    const estimatedTxFee = calculateTransactionFee(txSize);
-
-    const changeCapacity = inputsCapacity - partialOutputsCapacity - estimatedTxFee;
-    rawTx.outputs[rawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
-  }
 
   return rawTx;
 };
