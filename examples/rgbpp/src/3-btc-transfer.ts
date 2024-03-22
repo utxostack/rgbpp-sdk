@@ -6,7 +6,7 @@ import {
   genBtcTransferCkbVirtualTx,
   reverseHex,
   sendCkbTx,
-  updateCkbTxWithRealBtcTxId,
+  updateCkbTxWithRealBtcTxId, remove0x,
 } from '@rgbpp-sdk/ckb';
 import { sendRgbppUtxos, BtcAssetsApi, DataSource, ECPair, bitcoin, NetworkType } from '@rgbpp-sdk/btc';
 
@@ -119,7 +119,7 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
 // TODO: Use real btc utxo information
 // rgbppLockArgs: outIndexU32 + btcTxId
 transferRgbppOnBtc({
-  rgbppLockArgsList: [`0x00000000${reverseHex('b30798e98172dac6d1dae87a49447d612e4e813458d0955c04bbf55907551e05')}`],
+  rgbppLockArgsList: [`0x00000000${remove0x(reverseHex('b30798e98172dac6d1dae87a49447d612e4e813458d0955c04bbf55907551e05'))}`],
   toBtcAddress: 'tb1qvt7p9g6mw70sealdewtfp0sekquxuru6j3gwmt',
   transferAmount: BigInt(800_0000_0000),
 });
