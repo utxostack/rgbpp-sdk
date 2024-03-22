@@ -91,5 +91,5 @@ export const hexToUtf8 = (hex: string) => {
 };
 
 export const reverseHex = (str: Hex) => {
-  return remove0x(str).split('').reverse().join('');
+  return bytesToHex(hexToBytes(append0x(str)).reverse());
 };

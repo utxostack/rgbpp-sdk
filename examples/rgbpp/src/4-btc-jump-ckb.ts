@@ -6,6 +6,7 @@ import {
   appendPaymasterCellAndSignCkbTx,
   genBtcJumpCkbVirtualTx,
   reverseHex,
+  remove0x,
   sendCkbTx,
   updateCkbTxWithRealBtcTxId,
 } from '@rgbpp-sdk/ckb';
@@ -124,7 +125,7 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
 // TODO: Use real btc utxo information
 // rgbppLockArgs: outIndexU32 + btcTxId
 jumpFromBtcToCkb({
-  rgbppLockArgsList: [`0x01000000${reverseHex('47448104a611ecb16ab8d8e500b2166689612c93fc7ef18783d8189f3079f447')}`],
+  rgbppLockArgsList: [`0x01000000${remove0x(reverseHex('47448104a611ecb16ab8d8e500b2166689612c93fc7ef18783d8189f3079f447'))}`],
   toCkbAddress: 'ckt1qrfrwcdnvssswdwpn3s9v8fp87emat306ctjwsm3nmlkjg8qyza2cqgqq9kxr7vy7yknezj0vj0xptx6thk6pwyr0sxamv6q',
   transferAmount: BigInt(800_0000_0000),
 });
