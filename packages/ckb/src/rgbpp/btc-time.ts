@@ -1,5 +1,5 @@
 import { bytesToHex, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
-import { BTC_JUMP_CONFIRMATION_BLOCKS, getBtcTimeLockDep, getXudtDep } from '../constants';
+import { BTC_JUMP_CONFIRMATION_BLOCKS, getBtcTimeLockConfigDep, getBtcTimeLockDep, getXudtDep } from '../constants';
 import { BTCTimeUnlock } from '../schemas/generated/rgbpp';
 import { BtcTimeCellsParams, Hex } from '../types';
 import {
@@ -46,7 +46,11 @@ export const buildBtcTimeCellsSpentTx = async ({
 
   const outputsData = sortedBtcTimeCells.map((cell) => cell.outputData);
 
-  const cellDeps: CKBComponents.CellDep[] = [getBtcTimeLockDep(isMainnet), getXudtDep(isMainnet)];
+  const cellDeps: CKBComponents.CellDep[] = [
+    getBtcTimeLockDep(isMainnet),
+    getXudtDep(isMainnet),
+    getBtcTimeLockConfigDep(isMainnet),
+  ];
 
   const witnesses: Hex[] = [];
 

@@ -4,7 +4,13 @@ import { NoRgbppLiveCellError } from '../error';
 import { append0x, calculateRgbppCellCapacity, u128ToLe, u32ToLe } from '../utils';
 import { buildPreLockArgs, calculateCommitment, compareInputs, genRgbppLockScript } from '../utils/rgbpp';
 import { Hex, IndexerCell } from '../types';
-import { RGBPP_WITNESS_PLACEHOLDER, getRgbppLockDep, getSecp256k1CellDep, getXudtDep } from '../constants';
+import {
+  RGBPP_WITNESS_PLACEHOLDER,
+  getRgbppLockConfigDep,
+  getRgbppLockDep,
+  getSecp256k1CellDep,
+  getXudtDep,
+} from '../constants';
 
 /**
  * Generate the virtual ckb transaction for the btc transfer tx
@@ -58,7 +64,7 @@ export const genBtcTransferCkbVirtualTx = async ({
     outputsData.push(append0x(u128ToLe(sumAmount - transferAmount)));
   }
 
-  const cellDeps = [getRgbppLockDep(isMainnet), getXudtDep(isMainnet)];
+  const cellDeps = [getRgbppLockDep(isMainnet), getXudtDep(isMainnet), getRgbppLockConfigDep(isMainnet)];
   const needPaymasterCell = inputs.length < outputs.length;
   if (needPaymasterCell) {
     cellDeps.push(getSecp256k1CellDep(isMainnet));
