@@ -11,9 +11,9 @@ import { RGBPP_UTXO_DUST_LIMIT } from '../constants';
 
 export async function sendRgbppUtxos(props: {
   ckbVirtualTx: CKBComponents.RawTransaction;
-  paymaster: TxAddressOutput;
   commitment: string;
   tos?: string[];
+  paymaster?: TxAddressOutput;
 
   ckbCollector: Collector;
   rgbppMinUtxoSatoshi?: number;
