@@ -1,7 +1,7 @@
 import { RgbppCkbVirtualTx, BtcJumpCkbVirtualTxParams, BtcJumpCkbVirtualTxResult } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
 import { NoRgbppLiveCellError } from '../error';
-import { append0x, calculateRgbppCellCapacity, u128ToLe } from '../utils';
+import { append0x, calculateRgbppCellCapacity, calculateTransactionFee, u128ToLe } from '../utils';
 import {
   buildPreLockArgs,
   calculateCommitment,
@@ -11,13 +11,14 @@ import {
 } from '../utils/rgbpp';
 import { Hex, IndexerCell } from '../types';
 import {
+  RGBPP_TX_WITNESS_MAX_SIZE,
   RGBPP_WITNESS_PLACEHOLDER,
   getRgbppLockConfigDep,
   getRgbppLockDep,
   getSecp256k1CellDep,
   getXudtDep,
 } from '../constants';
-import { addressToScript } from '@nervosnetwork/ckb-sdk-utils';
+import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
 /**
  * Generate the virtual ckb transaction for the jumping tx from BTC to CKB
@@ -98,10 +99,16 @@ export const genBtcJumpCkbVirtualTx = async ({
     witnesses,
   };
 
+  if (!needPaymasterCell) {
+    const txSize = getTransactionSize(ckbRawTx) + RGBPP_TX_WITNESS_MAX_SIZE;
+    const estimatedTxFee = calculateTransactionFee(txSize);
+
+    const changeCapacity = sumInputsCapacity - estimatedTxFee;
+    ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
+  }
+
   const virtualTx: RgbppCkbVirtualTx = {
-    inputs,
-    outputs,
-    outputsData,
+    ...ckbRawTx,
   };
   const commitment = calculateCommitment(virtualTx);
 
