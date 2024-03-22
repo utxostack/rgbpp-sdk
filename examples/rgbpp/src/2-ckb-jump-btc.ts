@@ -1,5 +1,5 @@
 import { AddressPrefix, privateKeyToAddress, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { genCkbJumpBtcVirtualTx, Collector, u32ToLe, getSecp256k1CellDep, remove0x } from '@rgbpp-sdk/ckb';
+import { genCkbJumpBtcVirtualTx, Collector, u32ToLe, getSecp256k1CellDep, remove0x, reverseHex } from '@rgbpp-sdk/ckb';
 
 // CKB SECP256K1 private key
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
@@ -16,7 +16,7 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: Params) => {
   const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, { prefix: AddressPrefix.Testnet });
   console.log('ckb address: ', address);
 
-  const toRgbppLockArgs = `0x${u32ToLe(outIndex)}${remove0x(btcTxId)}`;
+  const toRgbppLockArgs = `0x${u32ToLe(outIndex)}${remove0x(reverseHex(btcTxId))}`;
 
   // TODO: Use real XUDT type script
   const xudtType: CKBComponents.Script = {
