@@ -35,14 +35,14 @@ export const buildRgbppUnlockWitness = (
   const inputLen = append0x(u8ToHex(inputsLen));
   const outputLen = append0x(u8ToHex(outputsLen));
 
-  const btcTx = Bytes.pack(btcTxBytes);
+  const btcTx = Bytes.pack(append0x(btcTxBytes));
 
   const version = Uint16.pack([0, 0]);
   const rgbppUnlock = RGBPPUnlock.pack({
     version,
     extraData: { inputLen, outputLen },
     btcTx,
-    btcTxProof: Bytes.pack(btcTxProof),
+    btcTxProof: Bytes.pack(append0x(btcTxProof)),
   });
   return append0x(bytesToHex(rgbppUnlock));
 };
