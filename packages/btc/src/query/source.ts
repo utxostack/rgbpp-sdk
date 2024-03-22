@@ -3,6 +3,7 @@ import { NetworkType } from '../network';
 import { ErrorCodes, TxBuildError } from '../error';
 import { addressToScriptPublicKeyHex, getAddressType } from '../address';
 import { BtcAssetsApi, BtcAssetsApiUtxoParams } from './service';
+import { remove0x } from '../utils';
 
 export class DataSource {
   public service: BtcAssetsApi;
@@ -14,6 +15,8 @@ export class DataSource {
   }
 
   async getUtxo(hash: string, index: number): Promise<Utxo | undefined> {
+    hash = remove0x(hash);
+
     const tx = await this.service.getTransaction(hash);
     if (!tx) {
       return void 0;
