@@ -8,7 +8,7 @@ import {
   sendCkbTx,
   updateCkbTxWithRealBtcTxId, remove0x,
 } from '@rgbpp-sdk/ckb';
-import { sendRgbppUtxos, BtcAssetsApi, DataSource, ECPair, bitcoin, NetworkType } from '@rgbpp-sdk/btc';
+import { transactionToHex, sendRgbppUtxos, BtcAssetsApi, DataSource, ECPair, bitcoin, NetworkType } from '@rgbpp-sdk/btc';
 
 // CKB SECP256K1 private key
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
@@ -88,7 +88,7 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
   psbt.finalizeAllInputs()
 
   const btcTx = psbt.extractTransaction()
-  const btcTxBytes = btcTx['__toBuffer'](void 0, void 0, false).toString('hex')
+  const btcTxBytes = transactionToHex(btcTx, false);
   console.log('BTC Tx bytes: ', btcTxBytes);
   const { txid: btcTxId } = await service.sendTransaction(btcTx.toHex());
   console.log("BTC TxId: ", btcTxId)
