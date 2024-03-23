@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { leToU128, reverseHex, u128ToLe, u32ToLe, u64ToLe } from './hex';
+import { bytesToHex } from '@nervosnetwork/ckb-sdk-utils';
 
 describe('number to little endian', () => {
   it('u32toLe', () => {
@@ -20,6 +21,11 @@ describe('number to little endian', () => {
   it('leToU128', () => {
     const expected = leToU128('0x00b864d9450000000000000000000000');
     expect(BigInt(3000_0000_0000)).toBe(expected);
+  });
+
+  it('bytesToHex', () => {
+    const expected = bytesToHex(new Uint8Array([0x12, 0x34, 0x56]));
+    expect('0x123456').toBe(expected);
   });
 
   it('reverseString', () => {
