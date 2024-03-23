@@ -115,6 +115,9 @@ importers:
       '@ckb-lumos/base':
         specifier: 0.21.1
         version: 0.21.1
+      '@nervosnetwork/ckb-sdk-core':
+        specifier: ^0.109.1
+        version: 0.109.1
       '@nervosnetwork/ckb-sdk-utils':
         specifier: ^0.109.1
         version: 0.109.1

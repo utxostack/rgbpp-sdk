@@ -3,12 +3,12 @@ import {
   Collector,
   SPVService,
   appendCkbTxWitnesses,
-  appendPaymasterCellAndSignCkbTx,
   genBtcJumpCkbVirtualTx,
   reverseHex,
   remove0x,
   sendCkbTx,
   updateCkbTxWithRealBtcTxId,
+  buildRgbppLockArgs,
 } from '@rgbpp-sdk/ckb';
 import {
   sendRgbppUtxos,
@@ -77,7 +77,7 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
     isMainnet: false,
   });
 
-  const { commitment, ckbRawTx, needPaymasterCell, sumInputsCapacity } = ckbVirtualTxResult;
+  const { commitment, ckbRawTx, needPaymasterCell } = ckbVirtualTxResult;
 
   // Send BTC tx
   const psbt = await sendRgbppUtxos({
@@ -96,9 +96,11 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
   psbt.finalizeAllInputs();
 
   const btcTx = psbt.extractTransaction();
+  // Remove the witness from BTC tx for RGBPP unlock
   const btcTxBytes = transactionToHex(btcTx, false);
-  console.log('BTC Tx bytes: ', btcTxBytes);
   const { txid: btcTxId } = await service.sendTransaction(btcTx.toHex());
+
+  console.log('BTC Tx bytes: ', btcTxBytes);
   console.log('BTC TxId: ', btcTxId);
 
   const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet: false });
@@ -112,31 +114,16 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
     spvService,
     btcTxIndexInBlock: 0, // ignore spv proof now
     btcTxId,
-    needPaymasterCell,
-    sumInputsCapacity,
   });
 
-  // if (needPaymasterCell) {
-  //   const emptyCells = await collector.getCells({ lock: fromLock });
-  //   if (!emptyCells || emptyCells.length === 0) {
-  //     throw new Error('The address has no empty cells');
-  //   }
-  //   ckbTx = await appendPaymasterCellAndSignCkbTx({
-  //     secp256k1PrivateKey: CKB_TEST_PRIVATE_KEY,
-  //     ckbRawTx: newCkbRawTx,
-  //     sumInputsCapacity,
-  //     paymasterCell: emptyCells[0],
-  //     isMainnet: false,
-  //   });
-  // }
-
-  await sendCkbTx({ collector, signedTx: ckbTx });
+  const txHash = await sendCkbTx({ collector, signedTx: ckbTx });
+  console.info(`gbpp asset has been jumped from BTC to CKB and tx hash is ${txHash}`);
 };
 
 // TODO: Use real btc utxo information
 // rgbppLockArgs: outIndexU32 + btcTxId
 jumpFromBtcToCkb({
-  rgbppLockArgsList: [`0x01000000${remove0x(reverseHex('47448104a611ecb16ab8d8e500b2166689612c93fc7ef18783d8189f3079f447'))}`],
+  rgbppLockArgsList: [buildRgbppLockArgs(1, '53e7c02eba522d1e3b0698b4bf5405c25c33b32e7df84a1a6c19e2cf165681f0')],
   toCkbAddress: 'ckt1qrfrwcdnvssswdwpn3s9v8fp87emat306ctjwsm3nmlkjg8qyza2cqgqq9kxr7vy7yknezj0vj0xptx6thk6pwyr0sxamv6q',
   transferAmount: BigInt(800_0000_0000),
 });

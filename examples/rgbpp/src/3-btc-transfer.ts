@@ -3,10 +3,12 @@ import {
   Collector,
   SPVService,
   appendCkbTxWitnesses,
+  buildRgbppLockArgs,
   genBtcTransferCkbVirtualTx,
+  remove0x,
   reverseHex,
   sendCkbTx,
-  updateCkbTxWithRealBtcTxId, remove0x,
+  updateCkbTxWithRealBtcTxId,
 } from '@rgbpp-sdk/ckb';
 import { transactionToHex, sendRgbppUtxos, BtcAssetsApi, DataSource, ECPair, bitcoin, NetworkType } from '@rgbpp-sdk/btc';
 
@@ -15,11 +17,11 @@ const CKB_TEST_PRIVATE_KEY = '0x000000000000000000000000000000000000000000000000
 // BTC SECP256K1 private key
 const BTC_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
 
-const BTC_ASSETS_API_URL = 'https://btc-assets-api-url'
+const BTC_ASSETS_API_URL = 'https://btc-assets-api-url';
 
-const BTC_ASSETS_TOKEN ='';
+const BTC_ASSETS_TOKEN = '';
 
-const SPV_SERVICE_URL = 'https://spv-service-url'
+const SPV_SERVICE_URL = 'http://spv-service-url';
 
 interface Params {
   rgbppLockArgsList: string[];
@@ -36,10 +38,7 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
   // const fromLock = addressToScript(ckbAddress);
 
   const network = bitcoin.networks.testnet;
-  const keyPair = ECPair.fromPrivateKey(
-      Buffer.from(BTC_TEST_PRIVATE_KEY, 'hex'),
-      {network}
-    );
+  const keyPair = ECPair.fromPrivateKey(Buffer.from(BTC_TEST_PRIVATE_KEY, 'hex'), { network });
   const { address: btcAddress } = bitcoin.payments.p2wpkh({
     pubkey: keyPair.publicKey,
     network,
@@ -50,9 +49,6 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
   const networkType = NetworkType.TESTNET;
   const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, 'localhost');
   const source = new DataSource(service, networkType);
-
-  const res = await service.getBalance(btcAddress!);
-  console.log(res)
 
   // TODO: Use the real XUDT type script
   const xudtType: CKBComponents.Script = {
@@ -69,15 +65,17 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
     isMainnet: false,
   });
 
-  const { commitment, ckbRawTx, needPaymasterCell, sumInputsCapacity } = ckbVirtualTxResult;
+  const { commitment, ckbRawTx, needPaymasterCell } = ckbVirtualTxResult;
 
   // Send BTC tx
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
-    paymaster: needPaymasterCell ? {
-      address: btcAddress!,
-      value: 1000,
-    } : void 0,
+    paymaster: needPaymasterCell
+      ? {
+          address: btcAddress!,
+          value: 1000,
+        }
+      : void 0,
     commitment,
     tos: [toBtcAddress],
     ckbCollector: collector,
@@ -85,15 +83,15 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
     source,
   });
   psbt.signAllInputs(keyPair);
-  psbt.finalizeAllInputs()
+  psbt.finalizeAllInputs();
 
-  const btcTx = psbt.extractTransaction()
+  const btcTx = psbt.extractTransaction();
+  // Remove the witness from BTC tx for RGBPP unlock
   const btcTxBytes = transactionToHex(btcTx, false);
-  console.log('BTC Tx bytes: ', btcTxBytes);
   const { txid: btcTxId } = await service.sendTransaction(btcTx.toHex());
-  console.log("BTC TxId: ", btcTxId)
-  
 
+  console.log('BTC Tx bytes: ', btcTxBytes);
+  console.log('BTC TxId: ', btcTxId);
 
   // Send CKB tx
   const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet: false });
@@ -106,20 +104,19 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
     spvService,
     btcTxIndexInBlock: 0, // ignore spv proof now
     btcTxId,
-    needPaymasterCell,
-    sumInputsCapacity,
   });
 
-  console.log(JSON.stringify(ckbTx))
+  console.log(JSON.stringify(ckbTx));
 
-  await sendCkbTx({ collector, signedTx: ckbTx });
+  const txHash = await sendCkbTx({ collector, signedTx: ckbTx });
+  console.info(`Rgbpp asset has been transferred on BTC and tx hash is ${txHash}`);
 };
 
 
 // TODO: Use real btc utxo information
 // rgbppLockArgs: outIndexU32 + btcTxId
 transferRgbppOnBtc({
-  rgbppLockArgsList: [`0x00000000${remove0x(reverseHex('b30798e98172dac6d1dae87a49447d612e4e813458d0955c04bbf55907551e05'))}`],
+  rgbppLockArgsList: [buildRgbppLockArgs(1, '53e7c02eba522d1e3b0698b4bf5405c25c33b32e7df84a1a6c19e2cf165681f0')],
   toBtcAddress: 'tb1qvt7p9g6mw70sealdewtfp0sekquxuru6j3gwmt',
   transferAmount: BigInt(800_0000_0000),
 });
