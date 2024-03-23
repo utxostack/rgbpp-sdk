@@ -1,11 +1,9 @@
-import { AddressPrefix, addressToScript, privateKeyToAddress, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
+import { AddressPrefix, privateKeyToAddress, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import {
   Collector,
   SPVService,
   appendCkbTxWitnesses,
   genBtcJumpCkbVirtualTx,
-  reverseHex,
-  remove0x,
   sendCkbTx,
   updateCkbTxWithRealBtcTxId,
   buildRgbppLockArgs,
@@ -24,10 +22,10 @@ import {
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
 // BTC SECP256K1 private key
 const BTC_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
-
-const BTC_ASSETS_API_URL = 'https://btc-assets-api-url'
-
-const BTC_ASSETS_TOKEN ='';
+// https://btc-assets-api-develop.vercel.app/docs/static/index.html
+const BTC_ASSETS_API_URL = 'https://btc-assets-api-url';
+// https://btc-assets-api-develop.vercel.app/docs/static/index.html#/Token/post_token_generate
+const BTC_ASSETS_TOKEN = '';
 
 const SPV_SERVICE_URL = 'https://spv-service-url';
 
@@ -43,7 +41,6 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
   });
   const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, { prefix: AddressPrefix.Testnet });
   console.log('ckb address: ', address);
-  const fromLock = addressToScript(address);
 
   const network = bitcoin.networks.testnet;
   const keyPair = ECPair.fromPrivateKey(Buffer.from(BTC_TEST_PRIVATE_KEY, 'hex'), { network });
@@ -51,17 +48,12 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
     pubkey: keyPair.publicKey,
     network,
   });
-
   console.log('btc address: ', btcAddress);
 
   const networkType = NetworkType.TESTNET;
   const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, 'localhost');
   const source = new DataSource(service, networkType);
 
-  const res = await service.getBalance(btcAddress!);
-  console.log(res);
-
-  // TODO: Use the real XUDT type script
   const xudtType: CKBComponents.Script = {
     codeHash: '0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb',
     hashType: 'type',
@@ -77,15 +69,11 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
     isMainnet: false,
   });
 
-  const { commitment, ckbRawTx, needPaymasterCell } = ckbVirtualTxResult;
+  const { commitment, ckbRawTx } = ckbVirtualTxResult;
 
   // Send BTC tx
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
-    paymaster: needPaymasterCell ? {
-      address: btcAddress!,
-      value: 1000,
-    } : void 0,
     commitment,
     tos: [btcAddress!],
     ckbCollector: collector,
@@ -105,7 +93,6 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
 
   const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet: false });
 
-  // TODO: Use the real spv-service-url
   const spvService = new SPVService(SPV_SERVICE_URL);
 
   let ckbTx = await appendCkbTxWitnesses({
@@ -120,11 +107,13 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
   console.info(`gbpp asset has been jumped from BTC to CKB and tx hash is ${txHash}`);
 };
 
-// TODO: Use real btc utxo information
+// Use your real BTC UTXO information
 // rgbppLockArgs: outIndexU32 + btcTxId
 jumpFromBtcToCkb({
+  // The BTC txId should be same as the btcTxId of 3-btc-transfer.ts
   rgbppLockArgsList: [buildRgbppLockArgs(1, '53e7c02eba522d1e3b0698b4bf5405c25c33b32e7df84a1a6c19e2cf165681f0')],
   toCkbAddress: 'ckt1qrfrwcdnvssswdwpn3s9v8fp87emat306ctjwsm3nmlkjg8qyza2cqgqq9kxr7vy7yknezj0vj0xptx6thk6pwyr0sxamv6q',
+  // To simplify, keep the transferAmount the same as 2-ckb-jump-btc
   transferAmount: BigInt(800_0000_0000),
 });
 
