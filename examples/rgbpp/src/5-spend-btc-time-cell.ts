@@ -15,6 +15,7 @@ const CKB_TEST_PRIVATE_KEY = '0x000000000000000000000000000000000000000000000000
 
 const SPV_SERVICE_URL = 'https://spv-service-url';
 
+// Warning: Wait at least 6 BTC confirmation blocks to spend the BTC time cells after 4-btc-jump-ckb.ts
 const spendBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }) => {
   const collector = new Collector({
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
@@ -61,5 +62,5 @@ const spendBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }
 // The btcTimeCellArgs is from the outputs[0].lock.args(BTC Time lock args) of the 4-btc-jump-ckb.ts CKB transaction
 spendBtcTimeCell({
   btcTimeCellArgs:
-    '0x7f000000100000005b0000005f0000004b000000100000003000000031000000d23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac011600000000016c61f984f12d3c8a4f649e60acda5deda0b8837c060000004abc778213bc4da692f93745c2b07410ef2bfaee70417784d4ee8969fb258001',
+    '0x7f000000100000005b0000005f0000004b000000100000003000000031000000d23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac011600000000016c61f984f12d3c8a4f649e60acda5deda0b8837c06000000149f4cddd3ca021c741549a6ade8d3def97a17ff0db57569a50483fdadb34640',
 });

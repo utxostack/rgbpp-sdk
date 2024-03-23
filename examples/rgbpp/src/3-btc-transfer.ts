@@ -45,7 +45,7 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
   console.log('btc address: ', btcAddress);
 
   const networkType = NetworkType.TESTNET;
-  const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, 'localhost');
+  const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, 'http://localhost');
   const source = new DataSource(service, networkType);
 
   const xudtType: CKBComponents.Script = {
@@ -90,7 +90,7 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
   const spvService = new SPVService(SPV_SERVICE_URL);
   // Use an exist BTC transaction id to get the tx proof and the contract will not verify the tx proof now
   btcTxId = '018025fb6989eed484774170eefa2bef1074b0c24537f992a64dbc138277bc4a';
-  
+
   let ckbTx = await appendCkbTxWitnesses({
     ckbRawTx: newCkbRawTx,
     btcTxBytes,
