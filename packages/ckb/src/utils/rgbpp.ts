@@ -15,7 +15,9 @@ import {
   serializeScript,
 } from '@nervosnetwork/ckb-sdk-utils';
 import { BTCTimeLock } from '../schemas/generated/rgbpp';
-import { Byte32, Bytes, Script } from '../schemas/generated/blockchain';
+import { Byte32, Script } from '../schemas/generated/blockchain';
+import { blockchain } from '@ckb-lumos/base';
+import { bytes } from '@ckb-lumos/codec';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
   return {
@@ -25,7 +27,7 @@ export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
 };
 
 export const genBtcTimeLockArgs = (lock: CKBComponents.Script, btcTxId: Hex, after: number): Hex => {
-  const btcTxid = Byte32.pack(append0x(btcTxId));
+  const btcTxid = Byte32.pack(reverseHex(btcTxId));
   const lockScript = Script.unpack(serializeScript(lock));
   return bytesToHex(BTCTimeLock.pack({ lockScript, after, btcTxid }));
 };
@@ -66,7 +68,6 @@ export const calculateCommitment = (rgbppVirtualTx: RgbppCkbVirtualTx | CKBCompo
   return sha256(hash.array());
 };
 
-const BYTES_LENGTH_SIZE = 4 * 2; // The length of Bytes molecule type is 4 bytes
 /**
  * table BTCTimeLock {
     lock_script: Script,
@@ -78,7 +79,7 @@ export const lockScriptFromBtcTimeLockArgs = (args: Hex): CKBComponents.Script =
   const { lockScript } = BTCTimeLock.unpack(append0x(args));
   return {
     ...lockScript,
-    args: append0x(remove0x(lockScript.args).substring(BYTES_LENGTH_SIZE)),
+    args: bytes.hexify(blockchain.Bytes.unpack(lockScript.args)),
   };
 };
 

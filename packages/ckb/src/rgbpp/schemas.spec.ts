@@ -17,8 +17,8 @@ describe('RGBPP schemas', () => {
   });
 
   it('buildBtcTimeUnlockWitness', () => {
-    const txProof = '0xb93dc09afbb463577ca0149726840f204f4cb29490d115a1cf8c1018f05f5296';
+    const txProof = '0x0102030405060708';
     const btcTimeUnlock = buildBtcTimeUnlockWitness(txProof);
-    expect('0x2800000008000000b93dc09afbb463577ca0149726840f204f4cb29490d115a1cf8c1018f05f5296').toBe(btcTimeUnlock);
+    expect('0x1400000008000000080000000102030405060708').toBe(btcTimeUnlock);
   });
 });

@@ -10,10 +10,10 @@ import {
   lockScriptFromBtcTimeLockArgs,
 } from '../utils';
 import { buildSpvClientCellDep } from '../spv';
-import { Bytes } from '../schemas/generated/blockchain';
+import { blockchain } from '@ckb-lumos/base';
 
 export const buildBtcTimeUnlockWitness = (btcTxProof: Hex): Hex => {
-  const btcTimeUnlock = BTCTimeUnlock.pack({ btcTxProof: Bytes.pack(btcTxProof) });
+  const btcTimeUnlock = BTCTimeUnlock.pack({ btcTxProof: blockchain.Bytes.pack(btcTxProof) });
   return append0x(bytesToHex(btcTimeUnlock));
 };
 

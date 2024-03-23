@@ -80,6 +80,20 @@ describe('rgbpp tests', () => {
     );
   });
 
+  it('genBtcTimeLockArgs2', () => {
+    const toLock: CKBComponents.Script = {
+      args: '0x00016c61f984f12d3c8a4f649e60acda5deda0b8837c',
+      codeHash: '0xd23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac',
+      hashType: 'type',
+    };
+    const btcTxId = '018025fb6989eed484774170eefa2bef1074b0c24537f992a64dbc138277bc4a';
+    const after = 0x6;
+    const args = genBtcTimeLockArgs(toLock, btcTxId, after);
+    expect(args).toBe(
+      '0x7f000000100000005b0000005f0000004b000000100000003000000031000000d23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac011600000000016c61f984f12d3c8a4f649e60acda5deda0b8837c060000004abc778213bc4da692f93745c2b07410ef2bfaee70417784d4ee8969fb258001',
+    );
+  });
+
   it('genBtcTimeLockScript', () => {
     const lock: CKBComponents.Script = {
       args: '0xc0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f',
