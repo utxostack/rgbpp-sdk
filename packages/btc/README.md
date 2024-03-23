@@ -202,7 +202,7 @@ const res = await service.sendTransaction(tx.toHex());
 console.log('txid:', res.txid);
 ```
 
-Construct a RGBPP sync transaction from a CKB virtual transaction:
+Construct a isomorphic RGBPP BTC transaction from a CKB virtual transaction:
 
 ```typescript
 import { sendRgbppUtxos, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
@@ -293,9 +293,9 @@ interface sendUtxos {
 interface sendRgbppUtxos {
   (props: {
     ckbVirtualTx: RawTransaction;
-    paymaster: TxAddressOutput;
     commitment: Hash;
     tos?: string[];
+    paymaster?: TxAddressOutput;
 
     ckbNodeUrl: string;
     rgbppLockCodeHash: Hash;
