@@ -2,7 +2,9 @@
 
 **All examples are just to demonstrate the use of RGBPP SDK. SPV proof is not ready yet, so these examples do not involve the verification of SPV proof.**
 
-### Mint XUDT： To simplify, we reuse the Omiga protocol to quickly issue XUDT assets on CKB
+### Mint XUDT
+As a simple example, Omiga protocol is reused for a quick demonstration of XUDT asset insurance.
+Developers have the option to utilize an existing XUDT (User-Defined Token) on CKB.
 
 ```shell
 npx ts-node examples/rgbpp/src/1-mint-xudt.ts 
