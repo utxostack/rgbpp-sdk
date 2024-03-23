@@ -28,7 +28,7 @@ describe('number to little endian', () => {
     expect('0x123456').toBe(expected);
   });
 
-  it('reverseString', () => {
+  it('reverseHex', () => {
     const expected1 = reverseHex('0x2f061a27abcab1d1d146514ffada6a83c0d974fe0813835ad8be2a39a6b1a6ee');
     expect(expected1).toBe('0xeea6b1a6392abed85a831308fe74d9c0836adafa4f5146d1d1b1caab271a062f');
 

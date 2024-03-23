@@ -7,15 +7,27 @@ import {
   getBtcTimeLockScript,
   getRgbppLockScript,
 } from '../constants';
-import { bytesToHex, hexToBytes, serializeOutPoint, serializeOutput } from '@nervosnetwork/ckb-sdk-utils';
+import {
+  bytesToHex,
+  hexToBytes,
+  serializeOutPoint,
+  serializeOutput,
+  serializeScript,
+} from '@nervosnetwork/ckb-sdk-utils';
 import { BTCTimeLock } from '../schemas/generated/rgbpp';
-import { Byte32 } from '../schemas/generated/blockchain';
+import { Byte32, Script } from '../schemas/generated/blockchain';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
   return {
     ...getRgbppLockScript(isMainnet),
     args: append0x(rgbppLockArgs),
   } as CKBComponents.Script;
+};
+
+export const genBtcTimeLockArgs = (lock: CKBComponents.Script, btcTxId: Hex, after: number): Hex => {
+  const btcTxid = Byte32.pack(append0x(btcTxId));
+  const lockScript = Script.unpack(serializeScript(lock));
+  return bytesToHex(BTCTimeLock.pack({ lockScript, after, btcTxid }));
 };
 
 /**
@@ -26,11 +38,10 @@ export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
   }
  */
 export const genBtcTimeLockScript = (toLock: CKBComponents.Script, isMainnet: boolean) => {
-  const btcTxid = Byte32.pack(append0x(RGBPP_TX_ID_PLACEHOLDER));
-  const lockArgs = bytesToHex(BTCTimeLock.pack({ lockScript: toLock, after: BTC_JUMP_CONFIRMATION_BLOCKS, btcTxid }));
+  const args = genBtcTimeLockArgs(toLock, RGBPP_TX_ID_PLACEHOLDER, BTC_JUMP_CONFIRMATION_BLOCKS);
   return {
     ...getBtcTimeLockScript(isMainnet),
-    args: lockArgs,
+    args,
   } as CKBComponents.Script;
 };
 
