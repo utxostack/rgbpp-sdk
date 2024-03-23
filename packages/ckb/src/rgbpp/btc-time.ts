@@ -1,7 +1,22 @@
-import { bytesToHex, getTransactionSize, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils';
-import { BTC_JUMP_CONFIRMATION_BLOCKS, getBtcTimeLockConfigDep, getBtcTimeLockDep, getXudtDep } from '../constants';
+import {
+  addressToScript,
+  bytesToHex,
+  getTransactionSize,
+  rawTransactionToHash,
+  scriptToHash,
+  serializeWitnessArgs,
+} from '@nervosnetwork/ckb-sdk-utils';
+import {
+  BTC_JUMP_CONFIRMATION_BLOCKS,
+  SECP256K1_WITNESS_LOCK_SIZE,
+  getBtcTimeLockConfigDep,
+  getBtcTimeLockDep,
+  getBtcTimeLockScript,
+  getSecp256k1CellDep,
+  getXudtDep,
+} from '../constants';
 import { BTCTimeUnlock } from '../schemas/generated/rgbpp';
-import { BtcTimeCellsParams, Hex } from '../types';
+import { Address, BtcTimeCellsParams, Hex, SignBtcTimeCellsTxParams } from '../types';
 import {
   append0x,
   btcTxIdFromBtcTimeLockArgs,
@@ -11,6 +26,7 @@ import {
 } from '../utils';
 import { buildSpvClientCellDep } from '../spv';
 import { blockchain } from '@ckb-lumos/base';
+import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 
 export const buildBtcTimeUnlockWitness = (btcTxProof: Hex): Hex => {
   const btcTimeUnlock = BTCTimeUnlock.pack({ btcTxProof: blockchain.Bytes.pack(btcTxProof) });
@@ -83,10 +99,75 @@ export const buildBtcTimeCellsSpentTx = async ({
     witnesses,
   };
 
-  const txSize = getTransactionSize(ckbTx);
-  const estimatedTxFee = calculateTransactionFee(txSize);
-  const lastOutputCapacity = BigInt(outputs[outputs.length - 1].capacity) - estimatedTxFee;
-  ckbTx.outputs[outputs.length - 1].capacity = append0x(lastOutputCapacity.toString(16));
-
   return ckbTx;
+};
+
+/**
+ * Sign the BTC time cells spent transaction with Secp256k1 private key
+ * @param secp256k1PrivateKey The Secp256k1 private key of the master address
+ * @param ckbRawTx The CKB raw transaction to be signed
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param masterCkbAddress The master CKB address
+ * @param isMainnet
+ */
+export const signBtcTimeCellSpentTx = async ({
+  secp256k1PrivateKey,
+  ckbRawTx,
+  collector,
+  masterCkbAddress,
+  isMainnet,
+}: SignBtcTimeCellsTxParams): Promise<CKBComponents.RawTransaction> => {
+  const masterLock = addressToScript(masterCkbAddress);
+  const emptyCells = await collector.getCells({
+    lock: masterLock,
+  });
+  if (!emptyCells || emptyCells.length === 0) {
+    throw new Error('No empty cell found');
+  }
+  const emptyInput: CKBComponents.CellInput = {
+    previousOutput: emptyCells[0].outPoint,
+    since: '0x0',
+  };
+
+  const changeOutput = emptyCells[0].output;
+  const rawTx = {
+    ...ckbRawTx,
+    cellDeps: [getSecp256k1CellDep(isMainnet), ...ckbRawTx.cellDeps],
+    inputs: [emptyInput, ...ckbRawTx.inputs],
+    outputs: [changeOutput, ...ckbRawTx.outputs],
+    outputsData: ['0x', ...ckbRawTx.outputsData],
+    witnesses: [{ lock: '', inputType: '', outputType: '' }, ...ckbRawTx.witnesses],
+  };
+
+  const txSize = getTransactionSize(rawTx) + SECP256K1_WITNESS_LOCK_SIZE;
+  const estimatedTxFee = calculateTransactionFee(txSize);
+
+  const changeCapacity = BigInt(emptyCells[0].output.capacity) - estimatedTxFee;
+  rawTx.outputs[0].capacity = append0x(changeCapacity.toString(16));
+
+  let keyMap = new Map<string, string>();
+  keyMap.set(scriptToHash(masterLock), secp256k1PrivateKey);
+  keyMap.set(scriptToHash(getBtcTimeLockScript(isMainnet)), '');
+
+  const cells = ckbRawTx.inputs.map((input, index) => ({
+    outPoint: input.previousOutput,
+    lock: index === 0 ? masterLock : getBtcTimeLockScript(isMainnet),
+  }));
+
+  const transactionHash = rawTransactionToHash(ckbRawTx);
+  const signedWitnesses = signWitnesses(keyMap)({
+    transactionHash,
+    witnesses: ckbRawTx.witnesses,
+    inputCells: cells,
+    skipMissingKeys: true,
+  });
+
+  const signedTx = {
+    ...ckbRawTx,
+    witnesses: signedWitnesses.map((witness) =>
+      typeof witness !== 'string' ? serializeWitnessArgs(witness) : witness,
+    ),
+  } as CKBComponents.RawTransaction;
+
+  return signedTx;
 };

@@ -105,6 +105,18 @@ export interface BtcTimeCellsParams {
   isMainnet: boolean;
 }
 
+export interface SignBtcTimeCellsTxParams {
+  // The Secp256k1 private key of the master address
+  secp256k1PrivateKey: Hex;
+  // CKB raw transaction
+  ckbRawTx: CKBComponents.RawTransaction;
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // The master CKB address to pay the time cells spent tx fee
+  masterCkbAddress: Address;
+  isMainnet: boolean;
+}
+
 export interface CkbJumpBtcVirtualTxParams {
   // The collector that collects CKB live cells and transactions
   collector: Collector;
