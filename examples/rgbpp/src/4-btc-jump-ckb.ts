@@ -86,7 +86,7 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
   const btcTx = psbt.extractTransaction();
   // Remove the witness from BTC tx for RGBPP unlock
   const btcTxBytes = transactionToHex(btcTx, false);
-  const { txid: btcTxId } = await service.sendTransaction(btcTx.toHex());
+  let { txid: btcTxId } = await service.sendTransaction(btcTx.toHex());
 
   console.log('BTC Tx bytes: ', btcTxBytes);
   console.log('BTC TxId: ', btcTxId);
@@ -94,7 +94,9 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
   const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet: false });
 
   const spvService = new SPVService(SPV_SERVICE_URL);
-
+  // Use an exist BTC transaction id to get the tx proof and the contract will not verify the tx proof now
+  btcTxId = '018025fb6989eed484774170eefa2bef1074b0c24537f992a64dbc138277bc4a';
+  
   let ckbTx = await appendCkbTxWitnesses({
     ckbRawTx: newCkbRawTx,
     btcTxBytes,
