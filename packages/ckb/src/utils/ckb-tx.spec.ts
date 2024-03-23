@@ -14,6 +14,6 @@ describe('ckb tx utils', () => {
       args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
     };
     const capacity = calculateRgbppCellCapacity(xudtType);
-    expect(BigInt(159_0000_0000)).toBe(capacity);
+    expect(BigInt(254_0000_0000)).toBe(capacity);
   });
 });

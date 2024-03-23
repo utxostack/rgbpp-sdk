@@ -9,8 +9,12 @@ export const calculateTransactionFee = (txSize: number): bigint => {
   return BigInt(fee.toFixed(0, BigNumber.ROUND_CEIL).toString());
 };
 
-// minimum occupied capacity and 1 ckb for transaction fee
-// assume UDT cell data size is 16bytes
+// The BTC_TIME_CELL_INCREASED_SIZE is related to the specific lock script.
+// We have left some redundancy based on the commonly used lock scripts.
+const BTC_TIME_CELL_INCREASED_SIZE = 95;
+
+// For simplicity, we keep the capacity of the RGBPP cell the same as the BTC time cell
+// minimum occupied capacity and 1 ckb for transaction fee and assume UDT cell data size is 16bytes
 /**
  * RGB_lock:
     code_hash: 
@@ -22,7 +26,7 @@ const RGBPP_LOCK_SIZE = 32 + 1 + 36;
 export const calculateRgbppCellCapacity = (xudtType: CKBComponents.Script): bigint => {
   const typeArgsSize = remove0x(xudtType.args).length / 2;
   const udtTypeSize = 33 + typeArgsSize;
-  const cellSize = RGBPP_LOCK_SIZE + udtTypeSize + 8 + 16;
+  const cellSize = RGBPP_LOCK_SIZE + udtTypeSize + 8 + 16 + BTC_TIME_CELL_INCREASED_SIZE;
   return BigInt(cellSize + 1) * CKB_UNIT;
 };
 
