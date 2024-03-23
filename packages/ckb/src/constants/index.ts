@@ -17,33 +17,39 @@ const TestnetInfo = {
     depType: 'depGroup',
   } as CKBComponents.CellDep,
 
+  // This RGBPP Lock script does not currently support SPV proof
   RgbppLockScript: {
     codeHash: '0xaddb21cf401d1a609e60198f850c4417ff03f98462ba4a3f101fa2741f481228',
     hashType: 'type',
     args: '',
   } as CKBComponents.Script,
 
+  // This RGBPP Lock script does not currently support SPV proof
   RgbppLockDep: {
     outPoint: { txHash: '0x934f3f7cd08166cf9922187f5abb4e20327a3e599630e5acd1e790842ddd2237', index: '0x0' },
     depType: 'code',
   } as CKBComponents.CellDep,
 
+  // This RGBPP Lock script does not currently support SPV proof
   RgbppLockConfigDep: {
     outPoint: { txHash: '0x934f3f7cd08166cf9922187f5abb4e20327a3e599630e5acd1e790842ddd2237', index: '0x1' },
     depType: 'code',
   } as CKBComponents.CellDep,
 
+  // This BTC Time Lock script does not currently support SPV proof
   BtcTimeLockScript: {
     codeHash: '0x28af93094395eb9d6ddabcca367efffebf92ceae9f974bbb594f5c5fcdeecb8c',
     hashType: 'type',
     args: '',
   } as CKBComponents.Script,
 
+  // This BTC Time Lock script does not currently support SPV proof
   BtcTimeLockDep: {
     outPoint: { txHash: '0x53acc673bf936d48f8deb436921d2d0bef82a11c4b15841902cc19d245f69c59', index: '0x0' },
     depType: 'code',
   } as CKBComponents.CellDep,
 
+  // This BTC Time Lock script does not currently support SPV proof
   BtcTimeLockConfigDep: {
     outPoint: { txHash: '0x53acc673bf936d48f8deb436921d2d0bef82a11c4b15841902cc19d245f69c59', index: '0x1' },
     depType: 'code',
