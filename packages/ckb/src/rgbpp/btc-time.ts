@@ -16,7 +16,7 @@ import {
   getXudtDep,
 } from '../constants';
 import { BTCTimeUnlock } from '../schemas/generated/rgbpp';
-import { Address, BtcTimeCellsParams, Hex, SignBtcTimeCellsTxParams } from '../types';
+import { BtcTimeCellsParams, Hex, SignBtcTimeCellsTxParams } from '../types';
 import {
   append0x,
   btcTxIdFromBtcTimeLockArgs,
@@ -132,7 +132,7 @@ export const signBtcTimeCellSpentTx = async ({
   const changeOutput = emptyCells[0].output;
   const rawTx = {
     ...ckbRawTx,
-    cellDeps: [getSecp256k1CellDep(isMainnet), ...ckbRawTx.cellDeps],
+    cellDeps: [...ckbRawTx.cellDeps, getSecp256k1CellDep(isMainnet)],
     inputs: [emptyInput, ...ckbRawTx.inputs],
     outputs: [changeOutput, ...ckbRawTx.outputs],
     outputsData: ['0x', ...ckbRawTx.outputsData],
@@ -149,21 +149,21 @@ export const signBtcTimeCellSpentTx = async ({
   keyMap.set(scriptToHash(masterLock), secp256k1PrivateKey);
   keyMap.set(scriptToHash(getBtcTimeLockScript(isMainnet)), '');
 
-  const cells = ckbRawTx.inputs.map((input, index) => ({
+  const cells = rawTx.inputs.map((input, index) => ({
     outPoint: input.previousOutput,
     lock: index === 0 ? masterLock : getBtcTimeLockScript(isMainnet),
   }));
 
-  const transactionHash = rawTransactionToHash(ckbRawTx);
+  const transactionHash = rawTransactionToHash(rawTx);
   const signedWitnesses = signWitnesses(keyMap)({
     transactionHash,
-    witnesses: ckbRawTx.witnesses,
+    witnesses: rawTx.witnesses,
     inputCells: cells,
     skipMissingKeys: true,
   });
 
   const signedTx = {
-    ...ckbRawTx,
+    ...rawTx,
     witnesses: signedWitnesses.map((witness) =>
       typeof witness !== 'string' ? serializeWitnessArgs(witness) : witness,
     ),

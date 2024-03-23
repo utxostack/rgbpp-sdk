@@ -44,7 +44,7 @@ export class Collector {
         script_type: 'lock',
         filter: {
           script: type ? parseScript(type) : null,
-          output_data_len_range: isDataEmpty || !type ? ['0x0', '0x1'] : null,
+          output_data_len_range: isDataEmpty && !type ? ['0x0', '0x1'] : null,
         },
       };
     } else if (type) {
