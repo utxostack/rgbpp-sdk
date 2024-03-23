@@ -15,7 +15,7 @@ import {
   serializeScript,
 } from '@nervosnetwork/ckb-sdk-utils';
 import { BTCTimeLock } from '../schemas/generated/rgbpp';
-import { Byte32, Script } from '../schemas/generated/blockchain';
+import { Script } from '../schemas/generated/blockchain';
 import { blockchain } from '@ckb-lumos/base';
 import { bytes } from '@ckb-lumos/codec';
 
@@ -27,7 +27,7 @@ export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
 };
 
 export const genBtcTimeLockArgs = (lock: CKBComponents.Script, btcTxId: Hex, after: number): Hex => {
-  const btcTxid = Byte32.pack(reverseHex(btcTxId));
+  const btcTxid = blockchain.Byte32.pack(reverseHex(btcTxId));
   const lockScript = Script.unpack(serializeScript(lock));
   return bytesToHex(BTCTimeLock.pack({ lockScript, after, btcTxid }));
 };

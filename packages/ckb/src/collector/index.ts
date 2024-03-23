@@ -28,27 +28,24 @@ export class Collector {
   async getCells({
     lock,
     type,
+    isDataEmpty = true,
   }: {
     lock?: CKBComponents.Script;
     type?: CKBComponents.Script;
+    isDataEmpty?: boolean;
   }): Promise<IndexerCell[] | undefined> {
     let param: any = {
       script_search_mode: 'exact',
     };
     if (lock) {
-      const filter = type
-        ? {
-            script: parseScript(type),
-          }
-        : {
-            script: null,
-            output_data_len_range: ['0x0', '0x1'],
-          };
       param = {
         ...param,
         script: parseScript(lock),
         script_type: 'lock',
-        filter,
+        filter: {
+          script: type ? parseScript(type) : null,
+          output_data_len_range: isDataEmpty || !type ? ['0x0', '0x1'] : null,
+        },
       };
     } else if (type) {
       param = {
