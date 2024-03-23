@@ -72,3 +72,12 @@ export function utf8ToBuffer(text: string): Uint8Array {
 
   return textEncoder.encode(result);
 }
+
+/**
+ * Convert a bitcoin.Transaction to hex string.
+ * Note if using for RGBPP proof, shouldn't set the "withWitness" param to "true".
+ */
+export function transactionToHex(tx: bitcoin.Transaction, withWitness?: boolean): string {
+  const buffer: Buffer = tx['__toBuffer'](void 0, void 0, withWitness ?? false);
+  return buffer.toString('hex');
+}
