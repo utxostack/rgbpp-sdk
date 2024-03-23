@@ -13,22 +13,7 @@ This lib is based on the foundation of the [unisat wallet-sdk](https://github.co
 
 ### Using the `btc-assets-api` service
 
-If you don't have a token (API-Key) of the service for your app:
-
-```typescript
-import { BtcAssetsApi } from '@rgbpp-sdk/btc';
-
-const service = new BtcAssetsApi({
-  url: 'https://your-btc-assets-api.url',
-  app: 'your-test-app-name',
-  domain: 'your.app',
-});
-
-// Generate a token for your app
-await service.init();
-```
-
-Instead, if you already have a token for your app:
+Initialize BtcAssetsApi service with your access token (API-Key):
 
 ```typescript
 import { BtcAssetsApi } from '@rgbpp-sdk/btc';
@@ -217,6 +202,54 @@ const res = await service.sendTransaction(tx.toHex());
 console.log('txid:', res.txid);
 ```
 
+Construct a isomorphic RGBPP BTC transaction from a CKB virtual transaction:
+
+```typescript
+import { sendRgbppUtxos, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
+import { RGBPP_UTXO_DUST_LIMIT, BTC_UTXO_DUST_LIMIT } from '@rgbpp-sdk/btc';
+import { Collector } from '@rgbpp-sdk/ckb';
+
+const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
+const source = new DataSource(service, NetworkType.TESTNET);
+
+const ckbVirtualTx: RawTransaction = {
+  // ...
+  inputs: [
+    /* RgbppLock cells, and an optional paymaster cell */
+  ],
+  outputs: [
+    /* RgbppLock/RgbppTimeLock cells, and an optional change cell */
+  ],
+} as any;
+const ckbCollector = new Collector({
+  ckbNodeUrl: 'ckb_node_url',
+  ckbIndexerUrl: 'ckb_indexer_url',
+});
+
+const psbt = await sendRgbppUtxos({
+  ckbVirtualTx, // a CKB virtual tx containing "L1 -> L1" or "L1 -> L2" action
+  paymaster: {
+    // if paymaster cell was included in the ckbVirtualTx, pay to paymaster
+    address: 'paymaster_btc_address',
+    value: 10000,
+  },
+  commitment: 'rgbpp_tx_commitment',
+  tos: [
+    // the address of the generating outputs, optional, default is "from"
+    'transfer_rgbpp_to_btc_address',
+  ],
+
+  source,
+  ckbCollector,
+  from: accounts.address,
+  fromPubkey: account.publicKey, // if "from" is a P2TR address, "fromPubkey" is required
+  changeAddress: 'address_to_return_change', // optional, where should the change satoshi be returned to
+  minUtxoSatoshi: BTC_UTXO_DUST_LIMIT, // optional, default to 1000, officially should be 1,0000
+  rgbppMinUtxoSatoshi: RGBPP_UTXO_DUST_LIMIT, // optional, default to 546
+  feeRate: 1, // optional, default to 1 sat/vbyte
+});
+```
+
 ## Types
 
 ### Transaction
@@ -260,9 +293,9 @@ interface sendUtxos {
 interface sendRgbppUtxos {
   (props: {
     ckbVirtualTx: RawTransaction;
-    paymaster: TxAddressOutput;
     commitment: Hash;
     tos?: string[];
+    paymaster?: TxAddressOutput;
 
     ckbNodeUrl: string;
     rgbppLockCodeHash: Hash;
