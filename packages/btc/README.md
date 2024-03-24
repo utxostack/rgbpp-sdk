@@ -9,34 +9,63 @@ This is the BTC part of the rgbpp-sdk for:
 
 This lib is based on the foundation of the [unisat wallet-sdk](https://github.com/unisat-wallet/wallet-sdk) ([license](https://github.com/unisat-wallet/wallet-sdk/blob/master/LICENSE)). We've simplified the logic of transaction construction and fee collection process to adapt to the specific needs of RGBPP. You can refer to the unisat wallet-sdk repo for more difference.
 
-## Getting started
+## Installation
 
-### Using the `btc-assets-api` service
+```bash
+# Install via npm:
+$ npm i @rgbpp-sdk/btc
+# Install via yarn:
+$ yarn add @rgbpp-sdk/btc
+# Install via pnpm:
+$ pnpm add @rgbpp-sdk/btc
+```
 
-Initialize BtcAssetsApi service with your access token (API-Key):
+## BtcAssetsApi
+
+### Get an access token
+
+The BtcAssetsApi is currently limited to verified apps only.
+If you're a developer and want to access the BtcAssetsApi service,
+please email us to request a JWT token for your app: cipher@cell.studio.
+
+In the email, you should provide us some information about your app:
+
+- `name`: Your app name, e.g. "rgbpp-app"
+- `domain`: Your app domain, e.g. "rgbpp.app" (without protocol)
+
+### Initialize the service
+
+#### Browser
+
+Initialize BtcAssetsApi service with your access token:
 
 ```typescript
 import { BtcAssetsApi } from '@rgbpp-sdk/btc';
 
-const service = BtcAssetsApi.fromToken('https://your-btc-assets-api.url', 'token');
+const service = BtcAssetsApi.fromToken('https://your-btc-assets-api.url', 'your_access_token');
 ```
 
-When initializing the service in Node.js, you should pass an extra `origin` param, which should be a URL matching your domain, or matching the domain of your token:
+#### Node.js
+
+You should pass `origin` when initializing BtcAssetsApi service in Node.js:
 
 ```typescript
 import { BtcAssetsApi } from '@rgbpp-sdk/btc';
 
-// Without token
-const service = new BtcAssetsApi({
-  url: 'https://your-btc-assets-api.url',
-  app: 'your-test-app-name',
-  domain: 'your.app',
-  origin: 'https://your.app',
-});
-
-// With token
-const service = BtcAssetsApi.fromToken('https://your-btc-assets-api.url', 'token', 'https://your.app');
+const service = BtcAssetsApi.fromToken('https://your-btc-assets-api.url', 'your_access_token', 'https://your.app');
 ```
+
+The `origin` prop is used to verify your token's corresponding `domain`.
+For example, if your token was generated in the domain of `your.app`,
+you should pass `https://your.app` as the `origin` prop.
+Otherwise, the service will reject your request.
+
+Note the format difference `domain` and `origin`:
+
+- `domain`: `your.app`, without protocol (`https://`, `http://`, etc.)
+- `origin`: `https://your.app`, with protocol `https://`
+
+### Start using the service
 
 Once the initialization is complete, you can query from the service:
 
@@ -53,9 +82,11 @@ console.log(res);
 // }
 ```
 
-### Constructing transaction
+All available APIs in the [BtcAssetsApi](#btcassetsapi-1) section.
 
-Transfer BTC from a `P2WPKH` address:
+## Transaction
+
+### Transfer BTC from a `P2WPKH` address
 
 ```typescript
 import { sendBtc, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
@@ -85,7 +116,7 @@ const res = await service.sendTransaction(tx.toHex());
 console.log('txid:', res.txid);
 ```
 
-Transfer BTC from a `P2TR` address:
+### Transfer BTC from a `P2TR` address
 
 ```typescript
 import { sendBtc, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
@@ -121,7 +152,7 @@ const res = await service.sendTransaction(tx.toHex());
 console.log('txid:', res.txid);
 ```
 
-Create an `OP_RETURN` output:
+### Create an `OP_RETURN` output
 
 ```typescript
 import { sendBtc, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
@@ -153,7 +184,7 @@ const res = await service.sendTransaction(tx.toHex());
 console.log('txid:', res.txid);
 ```
 
-Transfer with predefined inputs/outputs:
+### Transfer with predefined inputs/outputs
 
 ```typescript
 import { sendUtxos, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
@@ -202,7 +233,7 @@ const res = await service.sendTransaction(tx.toHex());
 console.log('txid:', res.txid);
 ```
 
-Construct a isomorphic RGBPP BTC transaction from a CKB virtual transaction:
+### Construct a isomorphic RGBPP transaction
 
 ```typescript
 import { sendRgbppUtxos, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
