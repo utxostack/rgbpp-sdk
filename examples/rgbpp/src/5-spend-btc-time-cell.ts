@@ -12,8 +12,8 @@ import {
 
 // CKB SECP256K1 private key
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
-
-const SPV_SERVICE_URL = 'https://spv-service-url';
+// See https://github.com/ckb-cell/ckb-bitcoin-spv-service#json-rpc-api-reference
+const SPV_SERVICE_URL = 'https://ckb-bitcoin-spv-service.testnet.mibao.pro';
 
 // Warning: Wait at least 6 BTC confirmation blocks to spend the BTC time cells after 4-btc-jump-ckb.ts
 const spendBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }) => {
