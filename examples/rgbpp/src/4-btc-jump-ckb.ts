@@ -105,7 +105,7 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
     btcTxId,
   });
 
-  console.log('BTC time lock args: ', ckbRawTx.outputs[0].lock.args);
+  console.log('BTC time lock args: ', newCkbRawTx.outputs[0].lock.args);
 
   const txHash = await sendCkbTx({ collector, signedTx: ckbTx });
   console.info(`gbpp asset has been jumped from BTC to CKB and tx hash is ${txHash}`);
