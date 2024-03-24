@@ -105,10 +105,8 @@ export async function sendRgbppUtxos(props: {
     }
   }
 
-  // By rules, the outputs.length should be >= 1,
-  // if recipients is provided, the outputs.length should be >= recipients.length
-  const recipientsLength = props.tos?.length ?? 0;
-  if (outputs.length < recipientsLength) {
+  // By rules, the length of type outputs should be >= 1
+  if (lastTypeOutputIndex < 1) {
     throw new TxBuildError(ErrorCodes.CKB_INVALID_OUTPUTS);
   }
 
