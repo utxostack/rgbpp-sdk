@@ -106,7 +106,8 @@ export async function sendRgbppUtxos(props: {
   }
 
   // By rules, the length of type outputs should be >= 1
-  if (lastTypeOutputIndex < 1) {
+  // The "lastTypeOutputIndex" is -1 by default so if (index < 0) it's invalid
+  if (lastTypeOutputIndex < 0) {
     throw new TxBuildError(ErrorCodes.CKB_INVALID_OUTPUTS);
   }
 
