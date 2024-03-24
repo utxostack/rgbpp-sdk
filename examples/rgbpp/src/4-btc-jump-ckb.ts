@@ -75,7 +75,7 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
-    tos: [], // should be [btcAddress!], but there is a bug in @rgbpp-sdk/btc and we will fix it ASAP
+    tos: [btcAddress!], 
     ckbCollector: collector,
     from: btcAddress!,
     source,
