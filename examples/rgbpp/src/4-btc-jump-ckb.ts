@@ -26,8 +26,8 @@ const BTC_TEST_PRIVATE_KEY = '0x000000000000000000000000000000000000000000000000
 const BTC_ASSETS_API_URL = 'https://btc-assets-api-url';
 // https://btc-assets-api-develop.vercel.app/docs/static/index.html#/Token/post_token_generate
 const BTC_ASSETS_TOKEN = '';
-
-const SPV_SERVICE_URL = 'https://spv-service-url';
+// See https://github.com/ckb-cell/ckb-bitcoin-spv-service#json-rpc-api-reference
+const SPV_SERVICE_URL = 'https://ckb-bitcoin-spv-service.testnet.mibao.pro';
 
 interface Params {
   rgbppLockArgsList: string[];

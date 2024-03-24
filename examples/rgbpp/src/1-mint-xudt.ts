@@ -5,7 +5,7 @@ import { buildMintTx, Collector } from 'ckb-omiga';
 // CKB SECP256K1 private key
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
 
-// To simplify, we reuse the Omiga protocol to quickly issue XUDT assets on CKB
+// To simplify, we reuse the Omiga protocol to quickly issue XUDT assets on Testnet CKB
 const mintXudt = async () => {
   const collector = new Collector({
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
