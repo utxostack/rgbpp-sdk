@@ -75,7 +75,7 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
-    tos: [btcAddress!],
+    tos: [], // should be [btcAddress!], but there is a bug in @rgbpp-sdk/btc and we will fix it ASAP
     ckbCollector: collector,
     from: btcAddress!,
     source,
@@ -111,10 +111,10 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
   console.info(`gbpp asset has been jumped from BTC to CKB and tx hash is ${txHash}`);
 };
 
-// Use your real BTC UTXO information
 // rgbppLockArgs: outIndexU32 + btcTxId
 jumpFromBtcToCkb({
-  // The BTC txId should be same as the btcTxId of 3-btc-transfer.ts
+  // If the `3-btc-transfer.ts` has been executed, the BTC txId should be the new generated BTC txId by the `3-btc-transfer.ts`
+  // Otherwise the BTC txId should be same as the the BTC txId of the `2-ckb-jump-btc.ts`
   rgbppLockArgsList: [buildRgbppLockArgs(1, '53e7c02eba522d1e3b0698b4bf5405c25c33b32e7df84a1a6c19e2cf165681f0')],
   toCkbAddress: 'ckt1qrfrwcdnvssswdwpn3s9v8fp87emat306ctjwsm3nmlkjg8qyza2cqgqq9kxr7vy7yknezj0vj0xptx6thk6pwyr0sxamv6q',
   // To simplify, keep the transferAmount the same as 2-ckb-jump-btc
