@@ -11,9 +11,9 @@ import { RGBPP_UTXO_DUST_LIMIT } from '../constants';
 
 export async function sendRgbppUtxos(props: {
   ckbVirtualTx: CKBComponents.RawTransaction;
-  paymaster: TxAddressOutput;
   commitment: string;
   tos?: string[];
+  paymaster?: TxAddressOutput;
 
   ckbCollector: Collector;
   rgbppMinUtxoSatoshi?: number;
@@ -95,18 +95,19 @@ export async function sendRgbppUtxos(props: {
     // If output.lock == RgbppLock, generate a corresponding output in outputs
     if (isRgbppLock) {
       const toAddress = props.tos?.[i];
+      const minUtxoSatoshi = props.rgbppMinUtxoSatoshi ?? RGBPP_UTXO_DUST_LIMIT;
       outputs.push({
         protected: true,
         address: toAddress ?? props.from,
-        value: props.rgbppMinUtxoSatoshi ?? RGBPP_UTXO_DUST_LIMIT,
+        value: minUtxoSatoshi,
+        minUtxoSatoshi,
       });
     }
   }
 
-  // By rules, the outputs.length should be >= 1,
-  // if recipients is provided, the outputs.length should be >= recipients.length
-  const recipientsLength = props.tos?.length ?? 0;
-  if (outputs.length < recipientsLength) {
+  // By rules, the length of type outputs should be >= 1
+  // The "lastTypeOutputIndex" is -1 by default so if (index < 0) it's invalid
+  if (lastTypeOutputIndex < 0) {
     throw new TxBuildError(ErrorCodes.CKB_INVALID_OUTPUTS);
   }
 

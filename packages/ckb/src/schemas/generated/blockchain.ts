@@ -41,7 +41,7 @@ export const ProposalShortIdVec = vector(ProposalShortId);
 export const Script = table(
   {
     codeHash: Byte32,
-    hashType: byte,
+    hashType: HashType,
     args: Bytes,
   },
   ['codeHash', 'hashType', 'args'],
@@ -66,7 +66,7 @@ export const CellInput = struct(
 export const CellDep = struct(
   {
     outPoint: OutPoint,
-    depType: byte,
+    depType: DepType,
   },
   ['outPoint', 'depType'],
 );

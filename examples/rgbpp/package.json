@@ -1,0 +1,18 @@
+{
+  "name": "rgbpp-examples",
+  "version": "0.1.0",
+  "description": "Examples used for RGBPP assets issuance, transfer, and jumping between BTC and CKB",
+  "private": true,
+  "dependencies": {
+    "@ckb-lumos/base": "0.21.1",
+    "@nervosnetwork/ckb-sdk-utils": "^0.109.1",
+    "@rgbpp-sdk/ckb": "workspace:^",
+    "@rgbpp-sdk/btc": "workspace:^",
+    "axios": "^1.6.8",
+    "ckb-omiga": "^0.0.12"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.2",
+    "@types/node": "^20.11.28"
+  }
+}

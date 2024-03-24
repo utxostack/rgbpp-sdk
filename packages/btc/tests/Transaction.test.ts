@@ -92,7 +92,7 @@ describe('Transaction', () => {
               value: 1000,
             },
           ],
-          minUtxoSatoshi: balance.satoshi + 1,
+          minUtxoSatoshi: balance.satoshi + balance.pending_satoshi + 1,
           source,
         }),
       ).rejects.toThrow(ErrorMessages[ErrorCodes.INSUFFICIENT_UTXO]);

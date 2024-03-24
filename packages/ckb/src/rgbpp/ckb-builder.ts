@@ -35,14 +35,14 @@ export const buildRgbppUnlockWitness = (
   const inputLen = append0x(u8ToHex(inputsLen));
   const outputLen = append0x(u8ToHex(outputsLen));
 
-  const btcTx = Bytes.pack(btcTxBytes);
+  const btcTx = Bytes.pack(append0x(btcTxBytes));
 
   const version = Uint16.pack([0, 0]);
   const rgbppUnlock = RGBPPUnlock.pack({
     version,
     extraData: { inputLen, outputLen },
     btcTx,
-    btcTxProof: Bytes.pack(btcTxProof),
+    btcTxProof: Bytes.pack(append0x(btcTxProof)),
   });
   return append0x(bytesToHex(rgbppUnlock));
 };
@@ -55,8 +55,6 @@ export const buildRgbppUnlockWitness = (
  * @param btcTxBytes The hex string of btc transaction, refer to https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/ts_src/transaction.ts#L609
  * @param btcTxId    The BTC transaction id
  * @param btcTxIndexInBlock The position of this BTC transaction in the block
- * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
- * @param needPaymasterCell The needPaymasterCell indicates whether a paymaster cell is required
  */
 export const appendCkbTxWitnesses = async ({
   ckbRawTx,
@@ -64,8 +62,6 @@ export const appendCkbTxWitnesses = async ({
   btcTxBytes,
   btcTxId,
   btcTxIndexInBlock,
-  sumInputsCapacity,
-  needPaymasterCell,
 }: AppendWitnessesParams): Promise<CKBComponents.RawTransaction> => {
   let rawTx = ckbRawTx;
 
@@ -77,28 +73,14 @@ export const appendCkbTxWitnesses = async ({
   rawTx.cellDeps.push(buildSpvClientCellDep(spvClient));
 
   const rgbppUnlock = buildRgbppUnlockWitness(btcTxBytes, proof, ckbRawTx.inputs.length, ckbRawTx.outputs.length);
-  rawTx.witnesses = rawTx.witnesses.map((witness) => (witness === RGBPP_WITNESS_PLACEHOLDER ? rgbppUnlock : witness));
-
-  if (!needPaymasterCell) {
-    const partialOutputsCapacity = rawTx.outputs
-      .slice(0, rawTx.outputs.length - 1)
-      .map((output) => BigInt(output.capacity))
-      .reduce((prev, current) => prev + current, BigInt(0));
-
-    const inputsCapacity = BigInt(sumInputsCapacity);
-    if (inputsCapacity <= partialOutputsCapacity) {
-      throw new InputsCapacityNotEnoughError('The sum of inputs capacity is not enough');
-    }
-
-    const txSize = getTransactionSize(rawTx) + SECP256K1_WITNESS_LOCK_SIZE;
-    const estimatedTxFee = calculateTransactionFee(txSize);
-
-    const changeCapacity = inputsCapacity - partialOutputsCapacity - estimatedTxFee;
-    rawTx.outputs[rawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
-  }
+  const rgbppWitness = append0x(serializeWitnessArgs({ lock: rgbppUnlock, inputType: '', outputType: '' }));
+  rawTx.witnesses = rawTx.witnesses.map((witness) => (witness === RGBPP_WITNESS_PLACEHOLDER ? rgbppWitness : witness));
 
   return rawTx;
 };
+
+const parseWitness = (witness: StructuredWitness) =>
+  typeof witness === 'string' ? witness : serializeWitnessArgs(witness);
 
 /**
  * Append paymaster cell to the ckb transaction inputs and sign the transaction with paymaster cell's secp256k1 private key
@@ -113,7 +95,7 @@ export const appendPaymasterCellAndSignCkbTx = async ({
   sumInputsCapacity,
   paymasterCell,
   isMainnet,
-}: AppendPaymasterCellAndSignTxParams) => {
+}: AppendPaymasterCellAndSignTxParams): Promise<CKBComponents.RawTransaction> => {
   let rawTx = ckbRawTx;
   const paymasterInput = { previousOutput: paymasterCell.outPoint, since: '0x0' };
   rawTx.inputs = [paymasterInput, ...rawTx.inputs];
@@ -151,7 +133,9 @@ export const appendPaymasterCellAndSignCkbTx = async ({
   const emptyWitness = { lock: '', inputType: '', outputType: '' };
   const signedTx = {
     ...rawTx,
-    witnesses: signedWitnesses.map((witness, index) => (index === 0 ? serializeWitnessArgs(emptyWitness) : witness)),
+    witnesses: signedWitnesses.map((witness, index) =>
+      index === 0 ? serializeWitnessArgs(emptyWitness) : parseWitness(witness),
+    ),
   };
   return signedTx;
 };

@@ -3,6 +3,7 @@ export const MAX_FEE = BigInt(2000_0000);
 export const MIN_CAPACITY = BigInt(61) * BigInt(10000_0000);
 export const SECP256K1_WITNESS_LOCK_SIZE = 65;
 export const BTC_JUMP_CONFIRMATION_BLOCKS = 6;
+export const RGBPP_TX_WITNESS_MAX_SIZE = 3000;
 
 export const RGBPP_WITNESS_PLACEHOLDER = '0xFF';
 export const RGBPP_TX_ID_PLACEHOLDER = '0000000000000000000000000000000000000000000000000000000000000000';
@@ -16,25 +17,41 @@ const TestnetInfo = {
     depType: 'depGroup',
   } as CKBComponents.CellDep,
 
+  // This RGBPP Lock script does not currently support SPV proof
   RgbppLockScript: {
-    codeHash: '0x61ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248',
+    codeHash: '0xaddb21cf401d1a609e60198f850c4417ff03f98462ba4a3f101fa2741f481228',
     hashType: 'type',
     args: '',
   } as CKBComponents.Script,
 
+  // This RGBPP Lock script does not currently support SPV proof
   RgbppLockDep: {
-    outPoint: { txHash: '0x3aba789691d73f00c535bdfda7f59e554ceb733ff6005b67e70dcf33ac7c2b4a', index: '0x0' },
+    outPoint: { txHash: '0x934f3f7cd08166cf9922187f5abb4e20327a3e599630e5acd1e790842ddd2237', index: '0x0' },
     depType: 'code',
   } as CKBComponents.CellDep,
 
+  // This RGBPP Lock script does not currently support SPV proof
+  RgbppLockConfigDep: {
+    outPoint: { txHash: '0x934f3f7cd08166cf9922187f5abb4e20327a3e599630e5acd1e790842ddd2237', index: '0x1' },
+    depType: 'code',
+  } as CKBComponents.CellDep,
+
+  // This BTC Time Lock script does not currently support SPV proof
   BtcTimeLockScript: {
-    codeHash: '0x00cdf8fab0f8ac638758ebf5ea5e4052b1d71e8a77b9f43139718621f6849326',
+    codeHash: '0x28af93094395eb9d6ddabcca367efffebf92ceae9f974bbb594f5c5fcdeecb8c',
     hashType: 'type',
     args: '',
   } as CKBComponents.Script,
 
+  // This BTC Time Lock script does not currently support SPV proof
   BtcTimeLockDep: {
-    outPoint: { txHash: '0xbbe74cbade53632c08e84e657a9848eadeb524889e8c0b22e1c7cb679260b06a', index: '0x0' },
+    outPoint: { txHash: '0x53acc673bf936d48f8deb436921d2d0bef82a11c4b15841902cc19d245f69c59', index: '0x0' },
+    depType: 'code',
+  } as CKBComponents.CellDep,
+
+  // This BTC Time Lock script does not currently support SPV proof
+  BtcTimeLockConfigDep: {
+    outPoint: { txHash: '0x53acc673bf936d48f8deb436921d2d0bef82a11c4b15841902cc19d245f69c59', index: '0x1' },
     depType: 'code',
   } as CKBComponents.CellDep,
 
@@ -73,6 +90,11 @@ const MainnetInfo = {
     depType: 'depGroup',
   } as CKBComponents.CellDep,
 
+  RgbppLockConfigDep: {
+    outPoint: { txHash: '0x0000000000000000000000000000000000000000000000000000000000000000', index: '0x1' },
+    depType: 'depGroup',
+  } as CKBComponents.CellDep,
+
   BtcTimeLockScript: {
     codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
     hashType: 'type',
@@ -81,6 +103,11 @@ const MainnetInfo = {
 
   BtcTimeLockDep: {
     outPoint: { txHash: '0x0000000000000000000000000000000000000000000000000000000000000000', index: '0x0' },
+    depType: 'depGroup',
+  } as CKBComponents.CellDep,
+
+  BtcTimeLockConfigDep: {
+    outPoint: { txHash: '0x0000000000000000000000000000000000000000000000000000000000000000', index: '0x1' },
     depType: 'depGroup',
   } as CKBComponents.CellDep,
 
@@ -111,7 +138,13 @@ export const getRgbppLockScript = (isMainnet: boolean) =>
 export const getRgbppLockDep = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.RgbppLockDep : TestnetInfo.RgbppLockDep;
 
+export const getRgbppLockConfigDep = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.RgbppLockConfigDep : TestnetInfo.RgbppLockConfigDep;
+
 export const getBtcTimeLockScript = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.BtcTimeLockScript : TestnetInfo.BtcTimeLockScript;
 export const getBtcTimeLockDep = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.BtcTimeLockDep : TestnetInfo.BtcTimeLockDep;
+
+export const getBtcTimeLockConfigDep = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.BtcTimeLockConfigDep : TestnetInfo.BtcTimeLockConfigDep;

@@ -1,4 +1,4 @@
-import { BytesLike, UnpackResult } from '@ckb-lumos/lumos/codec';
+import { bytes, BytesLike, UnpackResult } from '@ckb-lumos/lumos/codec';
 import { RGBPPLock } from '@rgbpp-sdk/ckb';
 import { ErrorCodes, TxBuildError } from '../error';
 
@@ -7,7 +7,12 @@ import { ErrorCodes, TxBuildError } from '../error';
  */
 export function unpackRgbppLockArgs(source: BytesLike): UnpackResult<typeof RGBPPLock> {
   try {
-    return RGBPPLock.unpack(source);
+    const unpacked = RGBPPLock.unpack(source);
+    const reversedTxId = bytes.bytify(unpacked.btcTxid).reverse();
+    return {
+      btcTxid: bytes.hexify(reversedTxId),
+      outIndex: unpacked.outIndex,
+    };
   } catch {
     throw new TxBuildError(ErrorCodes.CKB_RGBPP_LOCK_UNPACK_ERROR);
   }

@@ -4,7 +4,9 @@ import { hexToBytes } from '@nervosnetwork/ckb-sdk-utils';
 import {
   btcTxIdFromBtcTimeLockArgs,
   buildPreLockArgs,
+  buildRgbppLockArgs,
   calculateCommitment,
+  genBtcTimeLockArgs,
   genBtcTimeLockScript,
   lockScriptFromBtcTimeLockArgs,
   replaceLockArgsWithRealBtcTxId,
@@ -13,13 +15,13 @@ import { RgbppCkbVirtualTx } from '../types';
 import { calculateUdtCellCapacity } from './ckb-tx';
 
 describe('rgbpp tests', () => {
-  it('sha256', async () => {
+  it('sha256', () => {
     const message = '0x2f061a27abcab1d1d146514ffada6a83c0d974fe0813835ad8be2a39a6b1a6ee';
     const hash = sha256(hexToBytes(message));
     expect(hash).toBe('c0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f');
   });
 
-  it('calculateCommitment with the test data which is from RGBPP lock contract test cases', async () => {
+  it('calculateCommitment with the test data which is from RGBPP lock contract test cases', () => {
     const rgbppVirtualTx: RgbppCkbVirtualTx = {
       inputs: [
         {
@@ -64,34 +66,62 @@ describe('rgbpp tests', () => {
     expect('150c5f0856ba6d9148bd2588d8a3d9a1f45eec8a34fe0ca426a1b5193d5a701c').toBe(commitment);
   });
 
-  it('genBtcTimeLockScript', async () => {
+  it('genBtcTimeLockArgs', () => {
     const toLock: CKBComponents.Script = {
+      args: '0x0202020202020202020202020202020202020202',
+      codeHash: '0x0101010101010101010101010101010101010101010101010101010101010101',
+      hashType: 'type',
+    };
+    const btcTxId = '0x0303030303030303030303030303030303030303030303030303030303030303';
+    const after = 0x2a;
+    const args = genBtcTimeLockArgs(toLock, btcTxId, after);
+    expect(args).toBe(
+      '0x7d00000010000000590000005d000000490000001000000030000000310000000101010101010101010101010101010101010101010101010101010101010101011400000002020202020202020202020202020202020202022a0000000303030303030303030303030303030303030303030303030303030303030303',
+    );
+  });
+
+  it('genBtcTimeLockArgs2', () => {
+    const toLock: CKBComponents.Script = {
+      args: '0x00016c61f984f12d3c8a4f649e60acda5deda0b8837c',
+      codeHash: '0xd23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac',
+      hashType: 'type',
+    };
+    const btcTxId = '018025fb6989eed484774170eefa2bef1074b0c24537f992a64dbc138277bc4a';
+    const after = 0x6;
+    const args = genBtcTimeLockArgs(toLock, btcTxId, after);
+    expect(args).toBe(
+      '0x7f000000100000005b0000005f0000004b000000100000003000000031000000d23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac011600000000016c61f984f12d3c8a4f649e60acda5deda0b8837c060000004abc778213bc4da692f93745c2b07410ef2bfaee70417784d4ee8969fb258001',
+    );
+  });
+
+  it('genBtcTimeLockScript', () => {
+    const lock: CKBComponents.Script = {
       args: '0xc0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f',
       codeHash: '0x28e83a1277d48add8e72fadaa9248559e1b632bab2bd60b27955ebc4c03800a5',
       hashType: 'data',
     };
-    const lock = genBtcTimeLockScript(toLock, false);
-    expect(lock.args).toBe(
-      '0x5500000010000000300000003100000028e83a1277d48add8e72fadaa9248559e1b632bab2bd60b27955ebc4c03800a50020000000c0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f060000000000000000000000000000000000000000000000000000000000000000000000',
+    const btcTimeLock = genBtcTimeLockScript(lock, false);
+    expect(btcTimeLock.args).toBe(
+      '0x890000001000000065000000690000005500000010000000300000003100000028e83a1277d48add8e72fadaa9248559e1b632bab2bd60b27955ebc4c03800a50020000000c0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f060000000000000000000000000000000000000000000000000000000000000000000000',
     );
   });
 
-  it('lockScriptFromBtcTimeLockArgs', async () => {
+  it('lockScriptFromBtcTimeLockArgs', () => {
     const lockArgs =
-      '0x490000001000000030000000310000009bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce80114000000e616d1460d634668b8ad81971c3a53e705f51e60060000003c3199f83af98669e9e6dbf421702379ae530998441a1e0d3b8a0670ef3c2aba';
+      '0x7d00000010000000590000005d000000490000001000000030000000310000000101010101010101010101010101010101010101010101010101010101010101011400000002020202020202020202020202020202020202022a0000000303030303030303030303030303030303030303030303030303030303030303';
     const lock = lockScriptFromBtcTimeLockArgs(lockArgs);
-    expect(lock.codeHash).toBe('0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8');
-    expect(lock.args).toBe('0xe616d1460d634668b8ad81971c3a53e705f51e60');
+    expect(lock.codeHash).toBe('0x0101010101010101010101010101010101010101010101010101010101010101');
+    expect(lock.args).toBe('0x0202020202020202020202020202020202020202');
   });
 
-  it('btcTxIdFromBtcTimeLockArgs', async () => {
+  it('btcTxIdFromBtcTimeLockArgs', () => {
     const lockArgs =
-      '0x490000001000000030000000310000009bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce80114000000e616d1460d634668b8ad81971c3a53e705f51e60060000003c3199f83af98669e9e6dbf421702379ae530998441a1e0d3b8a0670ef3c2aba';
+      '0x850000001000000061000000650000005100000010000000300000003100000028e83a1277d48add8e72fadaa9248559e1b632bab2bd60b27955ebc4c03800a500c0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f0600000006ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399';
     const btcTxId = btcTxIdFromBtcTimeLockArgs(lockArgs);
-    expect(btcTxId).toBe('0x3c3199f83af98669e9e6dbf421702379ae530998441a1e0d3b8a0670ef3c2aba');
+    expect(btcTxId).toBe('0x9993846c9008f0f3a46631bf5171220d499c27ffa195e2a3bb00f1dec222ec06');
   });
 
-  it('calculateUdtCellCapacity', async () => {
+  it('calculateUdtCellCapacity', () => {
     const joyIDLock: CKBComponents.Script = {
       codeHash: '0xd23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac',
       hashType: 'type',
@@ -106,24 +136,26 @@ describe('rgbpp tests', () => {
     expect(BigInt(145_0000_0000)).toBe(capacity);
   });
 
-  it('buildPreLockArgs', async () => {
-    expect('020000000000000000000000000000000000000000000000000000000000000000000000').toBe(buildPreLockArgs(2));
-
-    const lockArgs = buildPreLockArgs('02000000');
-    expect('020000000000000000000000000000000000000000000000000000000000000000000000').toBe(lockArgs);
+  it('buildRgbppLockArgs', () => {
+    const expected = buildRgbppLockArgs(2, '0x9993846c9008f0f3a46631bf5171220d499c27ffa195e2a3bb00f1dec222ec06');
+    expect('0x0200000006ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399').toBe(expected);
   });
 
-  it('replaceRealBtcTxId', async () => {
+  it('buildPreLockArgs', () => {
+    expect('0x020000000000000000000000000000000000000000000000000000000000000000000000').toBe(buildPreLockArgs(2));
+  });
+
+  it('replaceRealBtcTxId', () => {
     const rgbppLockArgs = '0x020000000000000000000000000000000000000000000000000000000000000000000000';
-    const realBtcTxId = '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399';
+    const realBtcTxId = '0x9993846c9008f0f3a46631bf5171220d499c27ffa195e2a3bb00f1dec222ec06';
     const lockArgs = replaceLockArgsWithRealBtcTxId(rgbppLockArgs, realBtcTxId);
     expect('0x0200000006ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399').toBe(lockArgs);
 
     const btcTimeLockArgs =
-      '0x490000001000000030000000310000009bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce80114000000e616d1460d634668b8ad81971c3a53e705f51e60060000000000000000000000000000000000000000000000000000000000000000000000';
+      '0x850000001000000061000000650000005100000010000000300000003100000028e83a1277d48add8e72fadaa9248559e1b632bab2bd60b27955ebc4c03800a500c0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f060000000000000000000000000000000000000000000000000000000000000000000000';
     const args = replaceLockArgsWithRealBtcTxId(btcTimeLockArgs, realBtcTxId);
     expect(
-      '0x490000001000000030000000310000009bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce80114000000e616d1460d634668b8ad81971c3a53e705f51e600600000006ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
+      '0x850000001000000061000000650000005100000010000000300000003100000028e83a1277d48add8e72fadaa9248559e1b632bab2bd60b27955ebc4c03800a500c0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f0600000006ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
     ).toBe(args);
   });
 });

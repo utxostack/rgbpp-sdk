@@ -6,10 +6,9 @@ import {
   calculateRgbppCellCapacity,
   calculateTransactionFee,
   calculateUdtCellCapacity,
-  remove0x,
   u128ToLe,
 } from '../utils';
-import { buildPreLockArgs, genRgbppLockScript } from '../utils/rgbpp';
+import { genRgbppLockScript } from '../utils/rgbpp';
 import { MAX_FEE, SECP256K1_WITNESS_LOCK_SIZE, getXudtDep } from '../constants';
 import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
@@ -45,10 +44,9 @@ export const genCkbJumpBtcVirtualTx = async ({
   const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
   const outputsData = [append0x(u128ToLe(transferAmount))];
 
-  const outIndex = remove0x(toRgbppLockArgs).substring(0, 8);
   const outputs: CKBComponents.CellOutput[] = [
     {
-      lock: genRgbppLockScript(buildPreLockArgs(outIndex), isMainnet),
+      lock: genRgbppLockScript(toRgbppLockArgs, isMainnet),
       type: xudtType,
       capacity: append0x(rpbppCellCapacity.toString(16)),
     },
@@ -70,13 +68,21 @@ export const genCkbJumpBtcVirtualTx = async ({
     sumInputsCapacity += sumEmptyCapacity;
   }
 
-  const changeCapacity = sumInputsCapacity - rpbppCellCapacity - txFee;
+  let changeCapacity = sumInputsCapacity - rpbppCellCapacity - txFee;
+  if (sumAmount > transferAmount) {
+    outputs.push({
+      lock: fromLock,
+      type: xudtType,
+      capacity: append0x(xudtCellCapacity.toString(16)),
+    });
+    outputsData.push(append0x(u128ToLe(sumAmount - transferAmount)));
+    changeCapacity -= xudtCellCapacity;
+  }
   outputs.push({
     lock: fromLock,
-    type: xudtType,
     capacity: append0x(changeCapacity.toString(16)),
   });
-  outputsData.push(append0x(u128ToLe(sumAmount - transferAmount)));
+  outputsData.push('0x');
 
   const cellDeps = [getXudtDep(isMainnet)];
   const witnesses = inputs.map((_) => '0x');

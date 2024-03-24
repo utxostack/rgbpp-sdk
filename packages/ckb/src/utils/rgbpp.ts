@@ -1,15 +1,23 @@
 import { sha256 } from 'js-sha256';
 import { Hex, IndexerCell, RgbppCkbVirtualTx } from '../types';
-import { append0x, remove0x, u32ToLe, utf8ToHex } from './hex';
+import { append0x, remove0x, reverseHex, u32ToLe, utf8ToHex } from './hex';
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
   RGBPP_TX_ID_PLACEHOLDER,
   getBtcTimeLockScript,
   getRgbppLockScript,
 } from '../constants';
-import { hexToBytes, serializeOutPoint, serializeOutput, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
+import {
+  bytesToHex,
+  hexToBytes,
+  serializeOutPoint,
+  serializeOutput,
+  serializeScript,
+} from '@nervosnetwork/ckb-sdk-utils';
+import { BTCTimeLock } from '../schemas/generated/rgbpp';
+import { Script } from '../schemas/generated/blockchain';
 import { blockchain } from '@ckb-lumos/base';
-import { Collector } from '../collector';
+import { bytes } from '@ckb-lumos/codec';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
   return {
@@ -18,11 +26,24 @@ export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
   } as CKBComponents.Script;
 };
 
+export const genBtcTimeLockArgs = (lock: CKBComponents.Script, btcTxId: Hex, after: number): Hex => {
+  const btcTxid = blockchain.Byte32.pack(reverseHex(btcTxId));
+  const lockScript = Script.unpack(serializeScript(lock));
+  return bytesToHex(BTCTimeLock.pack({ lockScript, after, btcTxid }));
+};
+
+/**
+ * table BTCTimeLock {
+    lock_script: Script,
+    after: Uint32,
+    btc_txid: Byte32,
+  }
+ */
 export const genBtcTimeLockScript = (toLock: CKBComponents.Script, isMainnet: boolean) => {
-  const lockArgs = `${append0x(serializeScript(toLock))}${u32ToLe(BTC_JUMP_CONFIRMATION_BLOCKS)}${RGBPP_TX_ID_PLACEHOLDER}`;
+  const args = genBtcTimeLockArgs(toLock, RGBPP_TX_ID_PLACEHOLDER, BTC_JUMP_CONFIRMATION_BLOCKS);
   return {
-    ...getRgbppLockScript(isMainnet),
-    args: lockArgs,
+    ...getBtcTimeLockScript(isMainnet),
+    args,
   } as CKBComponents.Script;
 };
 
@@ -48,26 +69,23 @@ export const calculateCommitment = (rgbppVirtualTx: RgbppCkbVirtualTx | CKBCompo
 };
 
 /**
- * BTC_TIME_lock:
-	  args: lock_script | after | %bitcoin_tx_id%
- *  after: Uint32, bitcoin_tx_id: Byte32
+ * table BTCTimeLock {
+    lock_script: Script,
+    after: Uint32,
+    btc_txid: Byte32,
+  }
  */
 export const lockScriptFromBtcTimeLockArgs = (args: Hex): CKBComponents.Script => {
-  const temp = remove0x(args);
-  if (temp.length <= 72) {
-    throw new Error('Invalid BTC time lock args');
-  }
-  const lockScript = append0x(temp.substring(0, temp.length - 72));
-  return blockchain.Script.unpack(lockScript) as CKBComponents.Script;
+  const { lockScript } = BTCTimeLock.unpack(append0x(args));
+  return {
+    ...lockScript,
+    args: bytes.hexify(blockchain.Bytes.unpack(lockScript.args)),
+  };
 };
 
 export const btcTxIdFromBtcTimeLockArgs = (args: Hex): Hex => {
-  const temp = remove0x(args);
-  if (temp.length <= 72) {
-    throw new Error('Invalid BTC time lock args');
-  }
-  const btcTxId = append0x(temp.substring(temp.length - 64));
-  return btcTxId;
+  const btcTimeLockArgs = BTCTimeLock.unpack(append0x(args));
+  return reverseHex(append0x(btcTimeLockArgs.btcTxid));
 };
 
 export const isRgbppLockOrBtcTimeLock = (lock: CKBComponents.Script, isMainnet: boolean) => {
@@ -80,11 +98,17 @@ export const isRgbppLockOrBtcTimeLock = (lock: CKBComponents.Script, isMainnet: 
   return isRgbppLock || isBtcTimeLock;
 };
 
-export const buildPreLockArgs = (outIndex: number | string) => {
-  if (typeof outIndex === 'number') {
-    return `${u32ToLe(outIndex)}${RGBPP_TX_ID_PLACEHOLDER}`;
-  }
-  return `${outIndex}${RGBPP_TX_ID_PLACEHOLDER}`;
+/**
+ * https://learnmeabitcoin.com/technical/general/byte-order/
+ * Whenever you're working with transaction/block hashes internally (e.g. inside raw bitcoin data), you use the natural byte order.
+ * Whenever you're displaying or searching for transaction/block hashes, you use the reverse byte order.
+ */
+export const buildRgbppLockArgs = (outIndex: number, btcTxId: Hex): Hex => {
+  return `0x${u32ToLe(outIndex)}${remove0x(reverseHex(btcTxId))}`;
+};
+
+export const buildPreLockArgs = (outIndex: number) => {
+  return buildRgbppLockArgs(outIndex, RGBPP_TX_ID_PLACEHOLDER);
 };
 
 export const compareInputs = (a: IndexerCell, b: IndexerCell) => {
@@ -97,8 +121,14 @@ export const compareInputs = (a: IndexerCell, b: IndexerCell) => {
   return 0;
 };
 
-// RGBPP lock args: out_index | bitcoin_tx_id
-// BTC time lock args: lock_script | after | bitcoin_tx_id
+/**
+ * RGBPP lock args: out_index | bitcoin_tx_id
+ * BTC time lock args: lock_script | after | bitcoin_tx_id
+ *
+ * https://learnmeabitcoin.com/technical/general/byte-order/
+ * Whenever you're working with transaction/block hashes internally (e.g. inside raw bitcoin data), you use the natural byte order.
+ * Whenever you're displaying or searching for transaction/block hashes, you use the reverse byte order.
+ */
 const RGBPP_MIN_LOCK_ARGS_SIZE = 36 * 2;
 const BTC_TX_ID_SIZE = 32 * 2;
 export const replaceLockArgsWithRealBtcTxId = (lockArgs: Hex, txId: Hex): Hex => {
@@ -106,7 +136,7 @@ export const replaceLockArgsWithRealBtcTxId = (lockArgs: Hex, txId: Hex): Hex =>
   if (argsLength < RGBPP_MIN_LOCK_ARGS_SIZE) {
     throw new Error('Rgbpp lock args or BTC time lock args length is invalid');
   }
-  return `0x${remove0x(lockArgs).substring(0, argsLength - BTC_TX_ID_SIZE)}${remove0x(txId)}`;
+  return `0x${remove0x(lockArgs).substring(0, argsLength - BTC_TX_ID_SIZE)}${remove0x(reverseHex(txId))}`;
 };
 
 export const isRgbppLockCell = (cell: CKBComponents.CellOutput, isMainnet: boolean): boolean => {
