@@ -108,8 +108,8 @@ export const appendPaymasterCellAndSignCkbTx = async ({
   if (inputsCapacity <= sumOutputsCapacity) {
     throw new InputsCapacityNotEnoughError('The sum of inputs capacity is not enough');
   }
-  const changeCapacity = inputsCapacity - sumOutputsCapacity - estimatedTxFee;
-  rawTx.outputs[rawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
+  const lastOutputCapacity = BigInt(rawTx.outputs[rawTx.outputs.length - 1].capacity) - estimatedTxFee;
+  rawTx.outputs[rawTx.outputs.length - 1].capacity = append0x(lastOutputCapacity.toString(16));
 
   let keyMap = new Map<string, string>();
   keyMap.set(scriptToHash(paymasterCell.output.lock), secp256k1PrivateKey);
