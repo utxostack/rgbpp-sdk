@@ -12,7 +12,7 @@ import {
   Hex,
   SendCkbTxParams,
 } from '../types';
-import { RGBPP_WITNESS_PLACEHOLDER, SECP256K1_WITNESS_LOCK_SIZE, getRgbppLockScript } from '../constants';
+import { MIN_CAPACITY, RGBPP_WITNESS_PLACEHOLDER, SECP256K1_WITNESS_LOCK_SIZE, getRgbppLockScript } from '../constants';
 import {
   append0x,
   calculateTransactionFee,
@@ -102,14 +102,22 @@ export const appendPaymasterCellAndSignCkbTx = async ({
     .map((output) => BigInt(output.capacity))
     .reduce((prev, current) => prev + current, BigInt(0));
 
-  const txSize = getTransactionSize(rawTx) + SECP256K1_WITNESS_LOCK_SIZE;
-  const estimatedTxFee = calculateTransactionFee(txSize);
-
-  if (inputsCapacity <= sumOutputsCapacity) {
+  if (inputsCapacity <= sumOutputsCapacity + MIN_CAPACITY) {
     throw new InputsCapacityNotEnoughError('The sum of inputs capacity is not enough');
   }
-  const lastOutputCapacity = BigInt(rawTx.outputs[rawTx.outputs.length - 1].capacity) - estimatedTxFee;
-  rawTx.outputs[rawTx.outputs.length - 1].capacity = append0x(lastOutputCapacity.toString(16));
+
+  let changeCapacity = inputsCapacity - sumOutputsCapacity;
+  const changeOutput = {
+    lock: paymasterCell.output.lock,
+    capacity: append0x(changeCapacity.toString(16)),
+  };
+  rawTx.outputs = [...rawTx.outputs, changeOutput];
+  rawTx.outputsData = [...rawTx.outputsData, '0x'];
+
+  const txSize = getTransactionSize(rawTx) + SECP256K1_WITNESS_LOCK_SIZE;
+  const estimatedTxFee = calculateTransactionFee(txSize);
+  changeCapacity -= estimatedTxFee;
+  rawTx.outputs[rawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
 
   let keyMap = new Map<string, string>();
   keyMap.set(scriptToHash(paymasterCell.output.lock), secp256k1PrivateKey);
