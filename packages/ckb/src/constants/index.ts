@@ -19,39 +19,39 @@ const TestnetInfo = {
 
   // This RGBPP Lock script does not currently support SPV proof
   RgbppLockScript: {
-    codeHash: '0xaddb21cf401d1a609e60198f850c4417ff03f98462ba4a3f101fa2741f481228',
+    codeHash: '0x61ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248',
     hashType: 'type',
     args: '',
   } as CKBComponents.Script,
 
   // This RGBPP Lock script does not currently support SPV proof
   RgbppLockDep: {
-    outPoint: { txHash: '0x934f3f7cd08166cf9922187f5abb4e20327a3e599630e5acd1e790842ddd2237', index: '0x0' },
+    outPoint: { txHash: '0xcee20188f48bb77461eb749de4dcbec055d6d24cc4f60afdd97ea930d301b642', index: '0x0' },
     depType: 'code',
   } as CKBComponents.CellDep,
 
   // This RGBPP Lock script does not currently support SPV proof
   RgbppLockConfigDep: {
-    outPoint: { txHash: '0x934f3f7cd08166cf9922187f5abb4e20327a3e599630e5acd1e790842ddd2237', index: '0x1' },
+    outPoint: { txHash: '0xcee20188f48bb77461eb749de4dcbec055d6d24cc4f60afdd97ea930d301b642', index: '0x1' },
     depType: 'code',
   } as CKBComponents.CellDep,
 
   // This BTC Time Lock script does not currently support SPV proof
   BtcTimeLockScript: {
-    codeHash: '0x28af93094395eb9d6ddabcca367efffebf92ceae9f974bbb594f5c5fcdeecb8c',
+    codeHash: '0x00cdf8fab0f8ac638758ebf5ea5e4052b1d71e8a77b9f43139718621f6849326',
     hashType: 'type',
     args: '',
   } as CKBComponents.Script,
 
   // This BTC Time Lock script does not currently support SPV proof
   BtcTimeLockDep: {
-    outPoint: { txHash: '0x53acc673bf936d48f8deb436921d2d0bef82a11c4b15841902cc19d245f69c59', index: '0x0' },
+    outPoint: { txHash: '0x2d7b90168542a296ac690867e86c37c99e1cf978a709413d8e347c7bcf5722db', index: '0x0' },
     depType: 'code',
   } as CKBComponents.CellDep,
 
   // This BTC Time Lock script does not currently support SPV proof
   BtcTimeLockConfigDep: {
-    outPoint: { txHash: '0x53acc673bf936d48f8deb436921d2d0bef82a11c4b15841902cc19d245f69c59', index: '0x1' },
+    outPoint: { txHash: '0x2d7b90168542a296ac690867e86c37c99e1cf978a709413d8e347c7bcf5722db', index: '0x1' },
     depType: 'code',
   } as CKBComponents.CellDep,
 
