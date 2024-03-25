@@ -42,7 +42,7 @@ export const buildRgbppUnlockWitness = (
     version,
     extraData: { inputLen, outputLen },
     btcTx,
-    btcTxProof: Bytes.pack(append0x(btcTxProof)),
+    btcTxProof: bytesToHex(Bytes.pack(append0x(btcTxProof))),
   });
   return append0x(bytesToHex(rgbppUnlock));
 };
