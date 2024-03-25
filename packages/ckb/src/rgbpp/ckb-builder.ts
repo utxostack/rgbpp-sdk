@@ -79,9 +79,6 @@ export const appendCkbTxWitnesses = async ({
   return rawTx;
 };
 
-const parseWitness = (witness: StructuredWitness) =>
-  typeof witness === 'string' ? witness : serializeWitnessArgs(witness);
-
 /**
  * Append paymaster cell to the ckb transaction inputs and sign the transaction with paymaster cell's secp256k1 private key
  * @param secp256k1PrivateKey The Secp256k1 private key of the paymaster cells maintainer
@@ -96,7 +93,7 @@ export const appendPaymasterCellAndSignCkbTx = async ({
   paymasterCell,
   isMainnet,
 }: AppendPaymasterCellAndSignTxParams): Promise<CKBComponents.RawTransaction> => {
-  let rawTx = ckbRawTx;
+  let rawTx = ckbRawTx as CKBComponents.RawTransactionToSign;
   const paymasterInput = { previousOutput: paymasterCell.outPoint, since: '0x0' };
   rawTx.inputs = [paymasterInput, ...rawTx.inputs];
   const inputsCapacity = BigInt(sumInputsCapacity) + BigInt(paymasterCell.output.capacity);
@@ -118,10 +115,13 @@ export const appendPaymasterCellAndSignCkbTx = async ({
   keyMap.set(scriptToHash(paymasterCell.output.lock), secp256k1PrivateKey);
   keyMap.set(scriptToHash(getRgbppLockScript(isMainnet)), '');
 
-  const cells = ckbRawTx.inputs.map((input, index) => ({
+  const cells = rawTx.inputs.map((input, index) => ({
     outPoint: input.previousOutput,
     lock: index === 0 ? paymasterCell.output.lock : getRgbppLockScript(isMainnet),
   }));
+
+  const emptyWitness = { lock: '', inputType: '', outputType: '' };
+  rawTx.witnesses = [emptyWitness, ...rawTx.witnesses];
 
   const transactionHash = rawTransactionToHash(rawTx);
   const signedWitnesses = signWitnesses(keyMap)({
@@ -130,11 +130,11 @@ export const appendPaymasterCellAndSignCkbTx = async ({
     inputCells: cells,
     skipMissingKeys: true,
   });
-  const emptyWitness = { lock: '', inputType: '', outputType: '' };
+
   const signedTx = {
     ...rawTx,
-    witnesses: signedWitnesses.map((witness, index) =>
-      index === 0 ? serializeWitnessArgs(emptyWitness) : parseWitness(witness),
+    witnesses: signedWitnesses.map((witness) =>
+      typeof witness !== 'string' ? serializeWitnessArgs(witness) : witness,
     ),
   };
   return signedTx;
