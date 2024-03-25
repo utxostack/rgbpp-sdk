@@ -95,7 +95,7 @@ export const appendPaymasterCellAndSignCkbTx = async ({
 }: AppendPaymasterCellAndSignTxParams): Promise<CKBComponents.RawTransaction> => {
   let rawTx = ckbRawTx as CKBComponents.RawTransactionToSign;
   const paymasterInput = { previousOutput: paymasterCell.outPoint, since: '0x0' };
-  rawTx.inputs = [paymasterInput, ...rawTx.inputs];
+  rawTx.inputs = [...rawTx.inputs, paymasterInput];
   const inputsCapacity = BigInt(sumInputsCapacity) + BigInt(paymasterCell.output.capacity);
 
   const sumOutputsCapacity: bigint = rawTx.outputs
@@ -115,13 +115,14 @@ export const appendPaymasterCellAndSignCkbTx = async ({
   keyMap.set(scriptToHash(paymasterCell.output.lock), secp256k1PrivateKey);
   keyMap.set(scriptToHash(getRgbppLockScript(isMainnet)), '');
 
+  const paymasterCellIndex = rawTx.inputs.length - 1;
   const cells = rawTx.inputs.map((input, index) => ({
     outPoint: input.previousOutput,
-    lock: index === 0 ? paymasterCell.output.lock : getRgbppLockScript(isMainnet),
+    lock: index === paymasterCellIndex ? paymasterCell.output.lock : getRgbppLockScript(isMainnet),
   }));
 
   const emptyWitness = { lock: '', inputType: '', outputType: '' };
-  rawTx.witnesses = [emptyWitness, ...rawTx.witnesses];
+  rawTx.witnesses = [...rawTx.witnesses, emptyWitness];
 
   const transactionHash = rawTransactionToHash(rawTx);
   const signedWitnesses = signWitnesses(keyMap)({
