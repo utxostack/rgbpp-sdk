@@ -6,5 +6,4 @@ export * from './paymaster';
 export * from './types';
 export * from './rgbpp';
 export * from './utils';
-export * from './queue';
 export * from './constants';
