@@ -1,7 +1,14 @@
 import { RgbppCkbVirtualTx, BtcJumpCkbVirtualTxParams, BtcJumpCkbVirtualTxResult } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
 import { NoRgbppLiveCellError } from '../error';
-import { append0x, calculateRgbppCellCapacity, calculateTransactionFee, u128ToLe } from '../utils';
+import {
+  append0x,
+  calculateRgbppCellCapacity,
+  calculateTransactionFee,
+  isLockArgsSizeExceeded,
+  remove0x,
+  u128ToLe,
+} from '../utils';
 import {
   buildPreLockArgs,
   calculateCommitment,
@@ -55,6 +62,9 @@ export const genBtcJumpCkbVirtualTx = async ({
   const outputsData = [append0x(u128ToLe(transferAmount))];
 
   const toLock = addressToScript(toCkbAddress);
+  if (isLockArgsSizeExceeded(toLock.args)) {
+    throw new Error('The lock script size of the to ckb address is too large');
+  }
   const outputs: CKBComponents.CellOutput[] = [
     {
       lock: genBtcTimeLockScript(toLock, isMainnet),

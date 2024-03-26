@@ -4,6 +4,7 @@ import {
   getTransactionSize,
   rawTransactionToHash,
   scriptToHash,
+  serializeOutPoint,
   serializeWitnessArgs,
 } from '@nervosnetwork/ckb-sdk-utils';
 import {
@@ -71,6 +72,7 @@ export const buildBtcTimeCellsSpentTx = async ({
   const witnesses: Hex[] = [];
 
   const lockArgsSet: Set<string> = new Set();
+  const cellDepsSet: Set<string> = new Set();
   for await (const { btcTimeCell, btcTxIndexInBlock } of sortedBtcTimeCellPairs) {
     if (lockArgsSet.has(btcTimeCell.output.lock.args)) {
       witnesses.push('0x');
@@ -82,7 +84,12 @@ export const buildBtcTimeCellsSpentTx = async ({
       btcTxIndexInBlock,
       confirmBlocks: BTC_JUMP_CONFIRMATION_BLOCKS,
     });
-    cellDeps.push(buildSpvClientCellDep(spvClient));
+
+    if (!cellDepsSet.has(serializeOutPoint(spvClient))) {
+      cellDeps.push(buildSpvClientCellDep(spvClient));
+      cellDepsSet.add(serializeOutPoint(spvClient));
+    }
+
     const btcTimeWitness = append0x(
       serializeWitnessArgs({ lock: buildBtcTimeUnlockWitness(proof), inputType: '', outputType: '' }),
     );

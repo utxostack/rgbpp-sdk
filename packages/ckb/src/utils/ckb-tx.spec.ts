@@ -1,10 +1,18 @@
 import { describe, it, expect } from 'vitest';
-import { calculateRgbppCellCapacity, calculateTransactionFee } from './ckb-tx';
+import { calculateRgbppCellCapacity, calculateTransactionFee, isLockArgsSizeExceeded } from './ckb-tx';
 
 describe('ckb tx utils', () => {
   it('calculateTransactionFee', () => {
     const fee = calculateTransactionFee(1245);
     expect(BigInt(1370)).toBe(fee);
+  });
+
+  it('calculateTransactionFee', () => {
+    const longLockArgs = '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399';
+    expect(true).toBe(isLockArgsSizeExceeded(longLockArgs));
+
+    const shortLockArgs = '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3';
+    expect(false).toBe(isLockArgsSizeExceeded(shortLockArgs));
   });
 
   it('calculateRgbppCellCapacity', () => {
