@@ -3,8 +3,11 @@ import { calculateRgbppCellCapacity, calculateTransactionFee, isLockArgsSizeExce
 
 describe('ckb tx utils', () => {
   it('calculateTransactionFee', () => {
-    const fee = calculateTransactionFee(1245);
-    expect(BigInt(1370)).toBe(fee);
+    const fee1 = calculateTransactionFee(1245);
+    expect(BigInt(1245)).toBe(fee1);
+
+    const fee2 = calculateTransactionFee(1245, BigInt(1100));
+    expect(BigInt(1370)).toBe(fee2);
   });
 
   it('calculateTransactionFee', () => {
