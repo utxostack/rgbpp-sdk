@@ -1,6 +1,6 @@
 import { sha256 } from 'js-sha256';
 import { Hex, IndexerCell, RgbppCkbVirtualTx, SpvClientCellTxProof } from '../types';
-import { append0x, remove0x, reverseHex, u32ToLe, utf8ToHex } from './hex';
+import { append0x, remove0x, reverseHex, u32ToLe, u32ToLeHex, utf8ToHex } from './hex';
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
   RGBPP_TX_ID_PLACEHOLDER,
@@ -162,7 +162,7 @@ export const transformSpvProof = (spvProof: RgbppApiSpvProof): SpvClientCellTxPr
     ...result,
     spvClient: {
       ...result.spvClient,
-      index: append0x(u32ToLe(result.spvClient.index)),
+      index: u32ToLeHex(result.spvClient.index),
     },
   } as SpvClientCellTxProof;
 };
