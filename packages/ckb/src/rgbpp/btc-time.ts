@@ -17,12 +17,13 @@ import {
   getXudtDep,
 } from '../constants';
 import { BTCTimeUnlock } from '../schemas/generated/rgbpp';
-import { BtcTimeCellsParams, Hex, SignBtcTimeCellsTxParams } from '../types';
+import { BtcTimeCellStatusParams, BtcTimeCellsParams, Hex, SignBtcTimeCellsTxParams } from '../types';
 import {
   append0x,
   btcTxIdFromBtcTimeLockArgs,
   calculateTransactionFee,
   compareInputs,
+  genBtcTimeLockArgs,
   lockScriptFromBtcTimeLockArgs,
 } from '../utils';
 import { buildSpvClientCellDep } from '../spv';
@@ -177,4 +178,26 @@ export const signBtcTimeCellSpentTx = async ({
   } as CKBComponents.RawTransaction;
 
   return signedTx;
+};
+
+/**
+ * Check if the BTC time cells have been spent. If so, it means the RGB++ asset jumping(from BTC to CKB) has been successful.
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param ckbAddress The CKB address
+ * @param btcTxId The BTC transaction id
+ */
+export const isBtcTimeCellsSpent = async ({
+  collector,
+  ckbAddress,
+  btcTxId,
+}: BtcTimeCellStatusParams): Promise<boolean> => {
+  const isMainnet = ckbAddress.startsWith('ckb');
+  const lock = addressToScript(ckbAddress);
+  const btcTimeLock: CKBComponents.Script = {
+    ...getBtcTimeLockScript(isMainnet),
+    args: genBtcTimeLockArgs(lock, btcTxId, BTC_JUMP_CONFIRMATION_BLOCKS),
+  };
+  const btcTimeCells = await collector.getCells({ lock: btcTimeLock, isDataEmpty: false });
+  const isSpent = !btcTimeCells || btcTimeCells.length === 0;
+  return isSpent;
 };
