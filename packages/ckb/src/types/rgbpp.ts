@@ -139,3 +139,12 @@ export interface UpdateCkbTxWithRealBtcTxIdParams {
   btcTxId: Hex;
   isMainnet: boolean;
 }
+
+export interface BtcTimeCellStatusParams {
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // The ckb address who is the receiver of the btc time lock args
+  ckbAddress: Address;
+  // The BTC transaction id
+  btcTxId: Hex;
+}
