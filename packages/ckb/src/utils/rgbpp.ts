@@ -157,7 +157,14 @@ export const isBtcTimeLockCell = (cell: CKBComponents.CellOutput, isMainnet: boo
 };
 
 export const transformSpvProof = (spvProof: RgbppApiSpvProof): SpvClientCellTxProof => {
-  return toCamelcase(spvProof) as SpvClientCellTxProof;
+  const result = toCamelcase(spvProof) as SpvClientCellTxProof;
+  return {
+    ...result,
+    spvClient: {
+      ...result.spvClient,
+      index: append0x(u32ToLe(result.spvClient.index)),
+    },
+  } as SpvClientCellTxProof;
 };
 
 export const buildSpvClientCellDep = (spvClient: CKBComponents.OutPoint) => {

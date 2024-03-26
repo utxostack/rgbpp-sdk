@@ -10,6 +10,7 @@ import {
   genBtcTimeLockScript,
   lockScriptFromBtcTimeLockArgs,
   replaceLockArgsWithRealBtcTxId,
+  transformSpvProof,
 } from './rgbpp';
 import { RgbppCkbVirtualTx } from '../types';
 import { calculateUdtCellCapacity } from './ckb-tx';
@@ -157,5 +158,18 @@ describe('rgbpp tests', () => {
     expect(
       '0x850000001000000061000000650000005100000010000000300000003100000028e83a1277d48add8e72fadaa9248559e1b632bab2bd60b27955ebc4c03800a500c0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f0600000006ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
     ).toBe(args);
+  });
+
+  it('transformSpvProof', () => {
+    const expected = transformSpvProof({
+      spv_client: {
+        tx_hash: '0x047b6894a0b7a4d7a73b1503d1ae35c51fc5fa6306776dcf22b1fb3daaa32a29',
+        index: 300,
+      },
+      proof: '0x2f061a27abcab1d1d146514ffada6a83c0d974fe0813835ad8be2a39a6b1a6ee',
+    });
+    expect('0x047b6894a0b7a4d7a73b1503d1ae35c51fc5fa6306776dcf22b1fb3daaa32a29').toBe(expected.spvClient.txHash);
+    expect('0x2c010000').toBe(expected.spvClient.index);
+    expect('0x2f061a27abcab1d1d146514ffada6a83c0d974fe0813835ad8be2a39a6b1a6ee').toBe(expected.proof);
   });
 });
