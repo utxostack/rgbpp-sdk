@@ -136,6 +136,9 @@ importers:
       '@rgbpp-sdk/ckb':
         specifier: workspace:^
         version: link:../../packages/ckb
+      '@rgbpp-sdk/service':
+        specifier: workspace:^
+        version: link:../../packages/service
       axios:
         specifier: ^1.6.8
         version: 1.6.8
@@ -220,6 +223,9 @@ importers:
       '@ckb-lumos/molecule':
         specifier: 0.22.0-next.5
         version: 0.22.0-next.5
+      '@rgbpp-sdk/service':
+        specifier: workspace:^
+        version: link:../service
       '@types/lodash':
         specifier: ^4.14.202
         version: 4.14.202

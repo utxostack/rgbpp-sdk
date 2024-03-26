@@ -1,7 +1,6 @@
 import { AddressPrefix, privateKeyToAddress, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import {
   Collector,
-  SPVService,
   appendCkbTxWitnesses,
   genBtcJumpCkbVirtualTx,
   sendCkbTx,
@@ -10,13 +9,13 @@ import {
 } from '@rgbpp-sdk/ckb';
 import {
   sendRgbppUtxos,
-  BtcAssetsApi,
   DataSource,
   NetworkType,
   bitcoin,
   ECPair,
   transactionToHex,
 } from '@rgbpp-sdk/btc';
+import { BtcAssetsApi } from '@rgbpp-sdk/service'
 
 // CKB SECP256K1 private key
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
@@ -26,8 +25,6 @@ const BTC_TEST_PRIVATE_KEY = '0x000000000000000000000000000000000000000000000000
 const BTC_ASSETS_API_URL = 'https://btc-assets-api-url';
 // https://btc-assets-api-develop.vercel.app/docs/static/index.html#/Token/post_token_generate
 const BTC_ASSETS_TOKEN = '';
-// See https://github.com/ckb-cell/ckb-bitcoin-spv-service#json-rpc-api-reference
-const SPV_SERVICE_URL = 'https://ckb-bitcoin-spv-service.testnet.mibao.pro';
 
 interface Params {
   rgbppLockArgsList: string[];
@@ -86,23 +83,19 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
   const btcTx = psbt.extractTransaction();
   // Remove the witness from BTC tx for RGBPP unlock
   const btcTxBytes = transactionToHex(btcTx, false);
-  let { txid: btcTxId } = await service.sendTransaction(btcTx.toHex());
+  const { txid: btcTxId } = await service.sendBtcTransaction(btcTx.toHex());
 
   console.log('BTC Tx bytes: ', btcTxBytes);
   console.log('BTC TxId: ', btcTxId);
 
   const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet: false });
 
-  const spvService = new SPVService(SPV_SERVICE_URL);
-  // Use an exist BTC transaction id to get the tx proof and the contract will not verify the tx proof now
-  btcTxId = '018025fb6989eed484774170eefa2bef1074b0c24537f992a64dbc138277bc4a';
+  const rgbppApiSpvProof = await service.getRgbppSpvProof(btcTxId, 0);
 
-  let ckbTx = await appendCkbTxWitnesses({
+  const ckbTx = await appendCkbTxWitnesses({
     ckbRawTx: newCkbRawTx,
     btcTxBytes,
-    spvService,
-    btcTxIndexInBlock: 0, // ignore spv proof now
-    btcTxId,
+    rgbppApiSpvProof,
   });
 
   console.log('BTC time lock args: ', newCkbRawTx.outputs[0].lock.args);

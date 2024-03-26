@@ -3,17 +3,19 @@ import {
 } from '@nervosnetwork/ckb-sdk-utils';
 import {
   Collector,
-  SPVService,
   sendCkbTx,
   buildBtcTimeCellsSpentTx,
   getBtcTimeLockScript,
   signBtcTimeCellSpentTx,
 } from '@rgbpp-sdk/ckb';
+import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
 // CKB SECP256K1 private key
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
-// See https://github.com/ckb-cell/ckb-bitcoin-spv-service#json-rpc-api-reference
-const SPV_SERVICE_URL = 'https://ckb-bitcoin-spv-service.testnet.mibao.pro';
+// https://btc-assets-api-develop.vercel.app/docs/static/index.html
+const BTC_ASSETS_API_URL = 'https://btc-assets-api-url';
+// https://btc-assets-api-develop.vercel.app/docs/static/index.html#/Token/post_token_generate
+const BTC_ASSETS_TOKEN = '';
 
 // Warning: Wait at least 6 BTC confirmation blocks to spend the BTC time cells after 4-btc-jump-ckb.ts
 const spendBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }) => {
@@ -35,13 +37,12 @@ const spendBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }
   if (!btcTimeCells || btcTimeCells.length === 0) {
     throw new Error('No btc time cell found');
   }
-  // ignore spv proof now
-  const btcTimeCellPairs = [{ btcTimeCell: btcTimeCells[0], btcTxIndexInBlock: 0 }];
+  
+  const btcAssetsApi = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, 'http://localhost');
 
-  const spvService = new SPVService(SPV_SERVICE_URL);
   let ckbRawTx: CKBComponents.RawTransaction = await buildBtcTimeCellsSpentTx({
-    btcTimeCellPairs,
-    spvService,
+    btcTimeCells,
+    btcAssetsApi,
     isMainnet: false,
   });
 
