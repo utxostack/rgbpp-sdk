@@ -1,5 +1,5 @@
 import { sha256 } from 'js-sha256';
-import { Hex, IndexerCell, RgbppCkbVirtualTx } from '../types';
+import { Hex, IndexerCell, RgbppCkbVirtualTx, SpvClientCellTxProof } from '../types';
 import { append0x, remove0x, reverseHex, u32ToLe, utf8ToHex } from './hex';
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
@@ -18,6 +18,8 @@ import { BTCTimeLock } from '../schemas/generated/rgbpp';
 import { Script } from '../schemas/generated/blockchain';
 import { blockchain } from '@ckb-lumos/base';
 import { bytes } from '@ckb-lumos/codec';
+import { RgbppApiSpvProof } from '@rgbpp-sdk/service';
+import { toCamelcase } from './case-parser';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
   return {
@@ -152,4 +154,16 @@ export const isBtcTimeLockCell = (cell: CKBComponents.CellOutput, isMainnet: boo
   const btcTimeLock = getBtcTimeLockScript(isMainnet);
   const isBtcTimeLock = cell.lock.codeHash === btcTimeLock.codeHash && cell.lock.hashType === btcTimeLock.hashType;
   return isBtcTimeLock;
+};
+
+export const transformSpvProof = (spvProof: RgbppApiSpvProof): SpvClientCellTxProof => {
+  return toCamelcase(spvProof) as SpvClientCellTxProof;
+};
+
+export const buildSpvClientCellDep = (spvClient: CKBComponents.OutPoint) => {
+  const cellDep: CKBComponents.CellDep = {
+    outPoint: spvClient,
+    depType: 'code',
+  };
+  return cellDep;
 };

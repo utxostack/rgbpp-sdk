@@ -1,8 +1,8 @@
+import { BtcAssetsApi, RgbppApiSpvProof } from '@rgbpp-sdk/service';
 import { Collector } from '../collector';
-import { SPVService } from '../spv';
 import { IndexerCell } from './collector';
 import { Address, Hex } from './common';
-import { SpvClientCellTxProofResponse } from './spv';
+import { SpvClientCellTxProof } from './spv';
 
 export interface ConstructPaymasterParams {
   // The collector that collects CKB live cells and transactions
@@ -54,14 +54,10 @@ export interface BtcTransferVirtualTxResult extends BaseCkbVirtualTxResult {}
 export interface AppendWitnessesParams {
   // CKB raw transaction
   ckbRawTx: CKBComponents.RawTransaction;
-  // SPV RPC service
-  spvService: SPVService;
+  // The SPV client cell and tx proof which is from BTCAssetsApi
+  rgbppApiSpvProof: RgbppApiSpvProof;
   // The hex string of btc transaction, refer to https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/ts_src/transaction.ts#L609
   btcTxBytes: Hex;
-  // The BTC transaction id
-  btcTxId: Hex;
-  // The position of this BTC transaction in the block
-  btcTxIndexInBlock: number;
 }
 
 export interface AppendPaymasterCellAndSignTxParams {
@@ -90,18 +86,11 @@ export interface BtcJumpCkbVirtualTxParams extends BtcTransferVirtualTxParams {
 
 export interface BtcJumpCkbVirtualTxResult extends BaseCkbVirtualTxResult {}
 
-export interface BtcTimeCellPair {
-  // The BTC time cell
-  btcTimeCell: IndexerCell;
-  // The position of this BTC transaction in the block
-  btcTxIndexInBlock: number;
-}
-
 export interface BtcTimeCellsParams {
-  // The pairs of the BTC time cell and the related btc tx(which is in the BTC time cell lock args) index in the block
-  btcTimeCellPairs: BtcTimeCellPair[];
-  // SPV RPC service
-  spvService: SPVService;
+  // The BTC time cells
+  btcTimeCells: IndexerCell[];
+  // BTC Assets Api
+  btcAssetsApi: BtcAssetsApi;
   isMainnet: boolean;
 }
 
