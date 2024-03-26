@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { remove0x } from './hex';
 import { CKB_UNIT } from '../constants';
+import { Hex } from '../types';
 
 export const calculateTransactionFee = (txSize: number): bigint => {
   const ratio = BigNumber(1000);
@@ -10,7 +11,10 @@ export const calculateTransactionFee = (txSize: number): bigint => {
 };
 
 // The BTC_TIME_CELL_INCREASED_SIZE is related to the specific lock script.
-// We have left some redundancy based on the commonly used lock scripts.
+// We assume that the maximum length of lock script args is 26 bytes. If it exceeds, an error will be thrown.
+const LOCK_ARGS_HEX_MAX_SIZE = 26 * 2;
+export const isLockArgsSizeExceeded = (args: Hex) => remove0x(args).length > LOCK_ARGS_HEX_MAX_SIZE;
+
 const BTC_TIME_CELL_INCREASED_SIZE = 95;
 
 // For simplicity, we keep the capacity of the RGBPP cell the same as the BTC time cell
