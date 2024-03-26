@@ -21,6 +21,7 @@
     "@mempool/mempool.js": "^2.3.0",
     "@nervosnetwork/ckb-types": "^0.109.1",
     "@rgbpp-sdk/ckb": "workspace:^",
+    "@rgbpp-sdk/service": "workspace:^",
     "bip32": "^4.0.0",
     "bitcoinjs-lib": "^6.1.5",
     "ecpair": "^2.1.0",

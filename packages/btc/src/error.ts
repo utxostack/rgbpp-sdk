@@ -10,11 +10,6 @@ export enum ErrorCodes {
   UNSUPPORTED_OP_RETURN_SCRIPT,
   INVALID_FEE_RATE,
 
-  ASSETS_API_RESPONSE_ERROR,
-  ASSETS_API_UNAUTHORIZED,
-  ASSETS_API_INVALID_PARAM,
-  ASSETS_API_RESPONSE_DECODE_ERROR,
-
   CKB_CANNOT_FIND_OUTPOINT,
   CKB_INVALID_CELL_LOCK,
   CKB_INVALID_INPUTS,
@@ -36,11 +31,6 @@ export const ErrorMessages = {
   [ErrorCodes.UNSUPPORTED_ADDRESS_TYPE]: 'Unsupported address type',
   [ErrorCodes.UNSUPPORTED_OP_RETURN_SCRIPT]: 'Unsupported OP_RETURN script format',
   [ErrorCodes.INVALID_FEE_RATE]: 'Invalid fee rate provided or recommended',
-
-  [ErrorCodes.ASSETS_API_UNAUTHORIZED]: 'BtcAssetsAPI unauthorized, please check your token/origin',
-  [ErrorCodes.ASSETS_API_INVALID_PARAM]: 'Invalid param(s) was provided to the BtcAssetsAPI',
-  [ErrorCodes.ASSETS_API_RESPONSE_ERROR]: 'BtcAssetsAPI returned an error',
-  [ErrorCodes.ASSETS_API_RESPONSE_DECODE_ERROR]: 'Failed to decode the response of BtcAssetsAPI',
 
   [ErrorCodes.CKB_CANNOT_FIND_OUTPOINT]: 'Cannot find CKB cell by OutPoint, it may not exist or is not live',
   [ErrorCodes.CKB_INVALID_CELL_LOCK]: 'Invalid CKB cell lock, it should be RgbppLock, RgbppTimeLock or null',

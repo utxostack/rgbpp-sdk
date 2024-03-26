@@ -1,4 +1,5 @@
-import { bitcoin, ECPair, BtcAssetsApi, DataSource, toNetworkType, toXOnly } from '../../src';
+import { BtcAssetsApi } from '@rgbpp-sdk/service';
+import { bitcoin, ECPair, DataSource, toNetworkType, toXOnly } from '../../src';
 
 export const network = bitcoin.networks.testnet;
 export const networkType = toNetworkType(network);

@@ -7,7 +7,6 @@ export * from './bitcoin';
 export * from './network';
 export * from './address';
 
-export * from './query/service';
 export * from './query/source';
 
 export * from './transaction/build';

@@ -1,9 +1,9 @@
 import { FeesRecommended } from '@mempool/mempool.js/lib/interfaces/bitcoin/fees';
+import { BtcAssetsApi, BtcApiUtxoParams } from '@rgbpp-sdk/service';
 import { Utxo } from '../types';
 import { NetworkType } from '../network';
 import { ErrorCodes, ErrorMessages, TxBuildError } from '../error';
 import { addressToScriptPublicKeyHex, getAddressType } from '../address';
-import { BtcAssetsApi, BtcAssetsApiUtxoParams } from './service';
 import { createMempool, MempoolInstance } from './mempool';
 import { remove0x } from '../utils';
 
@@ -21,7 +21,7 @@ export class DataSource {
   async getUtxo(hash: string, index: number): Promise<Utxo | undefined> {
     hash = remove0x(hash);
 
-    const tx = await this.service.getTransaction(hash);
+    const tx = await this.service.getBtcTransaction(hash);
     if (!tx) {
       return void 0;
     }
@@ -40,8 +40,8 @@ export class DataSource {
     };
   }
 
-  async getUtxos(address: string, params?: BtcAssetsApiUtxoParams): Promise<Utxo[]> {
-    const utxos = await this.service.getUtxos(address, params);
+  async getUtxos(address: string, params?: BtcApiUtxoParams): Promise<Utxo[]> {
+    const utxos = await this.service.getBtcUtxos(address, params);
 
     const scriptPk = addressToScriptPublicKeyHex(address, this.networkType);
     return utxos

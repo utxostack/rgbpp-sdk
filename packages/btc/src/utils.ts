@@ -37,17 +37,6 @@ export function tweakSigner<T extends bitcoin.Signer>(
 }
 
 /**
- * Check if target string is a valid domain.
- * @exmaple
- * isDomain('google.com') // => true
- * isDomain('https://google.com') // => false
- */
-export function isDomain(domain: string): boolean {
-  const regex = /^(?:[-A-Za-z0-9]+\.)+[A-Za-z]{2,}$/;
-  return regex.test(domain);
-}
-
-/**
  * Remove '0x' prefix from a hex string.
  * @example
  * remove0x('0x1234') // => '1234'
