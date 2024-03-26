@@ -192,9 +192,6 @@ importers:
       axios:
         specifier: ^1.6.8
         version: 1.6.8
-      bignumber.js:
-        specifier: ^9.1.1
-        version: 9.1.1
       camelcase-keys:
         specifier: ^7.0.2
         version: 7.0.2
@@ -2099,10 +2096,6 @@ packages:
 
   /bignumber.js@4.0.4:
     resolution: {integrity: sha512-LDXpJKVzEx2/OqNbG9mXBNvHuiRL4PzHCGfnANHMJ+fv68Ads3exDVJeGDJws+AoNEuca93bU3q+S0woeUaCdg==}
-    dev: false
-
-  /bignumber.js@9.1.1:
-    resolution: {integrity: sha512-pHm4LsMJ6lzgNGVfZHjMoO8sdoRhOzOH4MLmY65Jg70bpxCKu5iOHNJyfF6OyvYw7t8Fpf35RuzUyqnQsj8Vig==}
     dev: false
 
   /bip174@2.1.1:

@@ -1,13 +1,12 @@
-import BigNumber from 'bignumber.js';
+import { calculateTransactionFee as calculateTxFee } from '@nervosnetwork/ckb-sdk-utils/lib/calculateTransactionFee';
 import { remove0x } from './hex';
 import { CKB_UNIT } from '../constants';
 import { Hex } from '../types';
 
-export const calculateTransactionFee = (txSize: number): bigint => {
-  const ratio = BigNumber(1000);
-  const defaultFeeRate = BigNumber(1100);
-  const fee = BigNumber(txSize).multipliedBy(defaultFeeRate).div(ratio);
-  return BigInt(fee.toFixed(0, BigNumber.ROUND_CEIL).toString());
+export const calculateTransactionFee = (txSize: number, feeRate?: bigint): bigint => {
+  const rate = feeRate ?? BigInt(1000);
+  const fee = calculateTxFee(BigInt(txSize), rate);
+  return BigInt(fee);
 };
 
 // The BTC_TIME_CELL_INCREASED_SIZE is related to the specific lock script.
