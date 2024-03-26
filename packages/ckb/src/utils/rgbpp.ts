@@ -62,6 +62,9 @@ export const calculateCommitment = (rgbppVirtualTx: RgbppCkbVirtualTx | CKBCompo
     const output = rgbppVirtualTx.outputs[index];
     const outputData = rgbppVirtualTx.outputsData[index];
     hash.update(hexToBytes(serializeOutput(output)));
+
+    const outputDataLen = u32ToLe(remove0x(outputData).length / 2);
+    hash.update(hexToBytes(append0x(outputDataLen)));
     hash.update(hexToBytes(outputData));
   }
   // double sha256
