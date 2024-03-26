@@ -8,6 +8,7 @@ export enum ErrorCodes {
   UNSUPPORTED_OUTPUT,
   UNSUPPORTED_ADDRESS_TYPE,
   UNSUPPORTED_OP_RETURN_SCRIPT,
+  INVALID_FEE_RATE,
 
   ASSETS_API_RESPONSE_ERROR,
   ASSETS_API_UNAUTHORIZED,
@@ -20,6 +21,8 @@ export enum ErrorCodes {
   CKB_INVALID_OUTPUTS,
   CKB_UNMATCHED_COMMITMENT,
   CKB_RGBPP_LOCK_UNPACK_ERROR,
+
+  MEMPOOL_API_RESPONSE_ERROR,
 }
 
 export const ErrorMessages = {
@@ -32,6 +35,7 @@ export const ErrorMessages = {
   [ErrorCodes.UNSUPPORTED_OUTPUT]: 'Unsupported output format',
   [ErrorCodes.UNSUPPORTED_ADDRESS_TYPE]: 'Unsupported address type',
   [ErrorCodes.UNSUPPORTED_OP_RETURN_SCRIPT]: 'Unsupported OP_RETURN script format',
+  [ErrorCodes.INVALID_FEE_RATE]: 'Invalid fee rate provided or recommended',
 
   [ErrorCodes.ASSETS_API_UNAUTHORIZED]: 'BtcAssetsAPI unauthorized, please check your token/origin',
   [ErrorCodes.ASSETS_API_INVALID_PARAM]: 'Invalid param(s) was provided to the BtcAssetsAPI',
@@ -44,6 +48,8 @@ export const ErrorMessages = {
   [ErrorCodes.CKB_INVALID_OUTPUTS]: 'Invalid output(s) found in the CKB VirtualTx',
   [ErrorCodes.CKB_UNMATCHED_COMMITMENT]: 'Invalid commitment found in the CKB VirtualTx',
   [ErrorCodes.CKB_RGBPP_LOCK_UNPACK_ERROR]: 'Failed to unpack RgbppLockArgs from the CKB cell lock',
+
+  [ErrorCodes.MEMPOOL_API_RESPONSE_ERROR]: 'Mempool.space API returned an error',
 };
 
 export class TxBuildError extends Error {
