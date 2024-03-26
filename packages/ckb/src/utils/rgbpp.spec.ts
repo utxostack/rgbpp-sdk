@@ -164,12 +164,12 @@ describe('rgbpp tests', () => {
     const expected = transformSpvProof({
       spv_client: {
         tx_hash: '0x047b6894a0b7a4d7a73b1503d1ae35c51fc5fa6306776dcf22b1fb3daaa32a29',
-        index: 300,
+        index: 10,
       },
       proof: '0x2f061a27abcab1d1d146514ffada6a83c0d974fe0813835ad8be2a39a6b1a6ee',
     });
     expect('0x047b6894a0b7a4d7a73b1503d1ae35c51fc5fa6306776dcf22b1fb3daaa32a29').toBe(expected.spvClient.txHash);
-    expect('0x2c01').toBe(expected.spvClient.index);
+    expect('0xa').toBe(expected.spvClient.index);
     expect('0x2f061a27abcab1d1d146514ffada6a83c0d974fe0813835ad8be2a39a6b1a6ee').toBe(expected.proof);
   });
 });

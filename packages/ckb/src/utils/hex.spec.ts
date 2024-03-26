@@ -9,10 +9,9 @@ describe('number to little endian', () => {
   });
 
   it('u32toLeHex', () => {
-    const expected = u32ToLeHex(300);
-    expect('0x2c01').toBe(expected);
-
-    expect('0x01').toBe(u32ToLeHex(1));
+    expect('0x2c01').toBe(u32ToLeHex(300));
+    expect('0x1').toBe(u32ToLeHex(1));
+    expect('0xe803').toBe(u32ToLeHex(1000));
   });
 
   it('u64ToLe', () => {
