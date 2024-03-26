@@ -20,6 +20,6 @@ describe('DataSource', () => {
 
     expect(averageFeeRate).toBeTypeOf('number');
     expect(feeRates.halfHourFee).toBeTypeOf('number');
-    expect(averageFeeRate).toEqual(feeRates.minimumFee);
+    expect(averageFeeRate).toEqual(feeRates.halfHourFee);
   });
 });
