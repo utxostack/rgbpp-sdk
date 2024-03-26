@@ -39,7 +39,7 @@ describe('Transaction', () => {
 
           // Broadcast transaction
           // const tx = psbt.extractTransaction();
-          // const res = await service.sendTransaction(tx.toHex());
+          // const res = await service.sendBtcTransaction(tx.toHex());
           // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
         }, 10000);
       });
@@ -74,12 +74,12 @@ describe('Transaction', () => {
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
-      // const res = await service.sendTransaction(tx.toHex());
+      // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
 
     it('Transfer with an impossible "minUtxoSatoshi" filter', async () => {
-      const balance = await service.getBalance(accounts.charlie.p2wpkh.address, {
+      const balance = await service.getBtcBalance(accounts.charlie.p2wpkh.address, {
         min_satoshi: BTC_UTXO_DUST_LIMIT,
       });
 
@@ -140,7 +140,7 @@ describe('Transaction', () => {
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
-      // const res = await service.sendTransaction(tx.toHex());
+      // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
   });
@@ -181,7 +181,7 @@ describe('Transaction', () => {
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
-      // const res = await service.sendTransaction(tx.toHex());
+      // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
     it('Transfer fixed UTXO, sum(ins) < sum(outs)', async () => {
@@ -219,7 +219,7 @@ describe('Transaction', () => {
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
-      // const res = await service.sendTransaction(tx.toHex());
+      // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
     it('Transfer fixed UTXO, sum(ins) > sum(outs)', async () => {
@@ -257,7 +257,7 @@ describe('Transaction', () => {
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
-      // const res = await service.sendTransaction(tx.toHex());
+      // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
     it('Transfer fixed UTXO, and the fee is prepaid', async () => {
@@ -299,7 +299,7 @@ describe('Transaction', () => {
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
-      // const res = await service.sendTransaction(tx.toHex());
+      // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
 
@@ -348,7 +348,7 @@ describe('Transaction', () => {
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
-      // const res = await service.sendTransaction(tx.toHex());
+      // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
     it('Transfer protected UTXO, sum(ins) < sum(outs)', async () => {
@@ -386,7 +386,7 @@ describe('Transaction', () => {
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
-      // const res = await service.sendTransaction(tx.toHex());
+      // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
     it('Transfer protected UTXO, sum(ins) > sum(outs), change to outs[0]', async () => {
@@ -424,7 +424,7 @@ describe('Transaction', () => {
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
-      // const res = await service.sendTransaction(tx.toHex());
+      // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
 
@@ -478,7 +478,7 @@ describe('Transaction', () => {
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
-      // const res = await service.sendTransaction(tx.toHex());
+      // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
     it('Transfer protected RGBPP_UTXOs, each has free satoshi', async () => {
@@ -532,7 +532,7 @@ describe('Transaction', () => {
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
-      // const res = await service.sendTransaction(tx.toHex());
+      // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
     it('Transfer protected RGBPP_UTXOs, with insufficient free satoshi', async () => {
@@ -580,7 +580,7 @@ describe('Transaction', () => {
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
-      // const res = await service.sendTransaction(tx.toHex());
+      // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
   });

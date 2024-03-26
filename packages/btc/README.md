@@ -2,10 +2,7 @@
 
 ## About
 
-This is the BTC part of the rgbpp-sdk for:
-
-- BTC/RGBPP transaction construction
-- Wrapped API of the [BtcAssetsApi](https://github.com/ckb-cell/btc-assets-api) service in Node and browser
+This is the BTC part of the rgbpp-sdk for BTC/RGBPP transaction construction.
 
 This lib is based on the foundation of the [unisat wallet-sdk](https://github.com/unisat-wallet/wallet-sdk) ([license](https://github.com/unisat-wallet/wallet-sdk/blob/master/LICENSE)). We've simplified the logic of transaction construction and fee collection process to adapt to the specific needs of RGBPP. You can refer to the unisat wallet-sdk repo for more difference.
 
@@ -20,76 +17,13 @@ $ yarn add @rgbpp-sdk/btc
 $ pnpm add @rgbpp-sdk/btc
 ```
 
-## BtcAssetsApi
-
-### Get an access token
-
-The BtcAssetsApi is currently limited to verified apps only.
-If you're a developer and want to access the BtcAssetsApi service,
-please email us to request a JWT token for your app: cipher@cell.studio.
-
-In the email, you should provide us some information about your app:
-
-- `name`: Your app name, e.g. "rgbpp-app"
-- `domain`: Your app domain, e.g. "rgbpp.app" (without protocol)
-
-### Initialize the service
-
-#### Browser
-
-Initialize BtcAssetsApi service with your access token:
-
-```typescript
-import { BtcAssetsApi } from '@rgbpp-sdk/btc';
-
-const service = BtcAssetsApi.fromToken('https://your-btc-assets-api.url', 'your_access_token');
-```
-
-#### Node.js
-
-You should pass `origin` when initializing BtcAssetsApi service in Node.js:
-
-```typescript
-import { BtcAssetsApi } from '@rgbpp-sdk/btc';
-
-const service = BtcAssetsApi.fromToken('https://your-btc-assets-api.url', 'your_access_token', 'https://your.app');
-```
-
-The `origin` prop is used to verify your token's corresponding `domain`.
-For example, if your token was generated in the domain of `your.app`,
-you should pass `https://your.app` as the `origin` prop.
-Otherwise, the service will reject your request.
-
-Note the format difference `domain` and `origin`:
-
-- `domain`: `your.app`, without protocol (`https://`, `http://`, etc.)
-- `origin`: `https://your.app`, with protocol `https://`
-
-### Start using the service
-
-Once the initialization is complete, you can query from the service:
-
-```typescript
-// Query the balance of an address
-const res = await service.getBalance('tb1qm06rvrq8jyyckzc5v709u7qpthel9j4d9f7nh3');
-
-console.log(res);
-// {
-//   address: 'tb1qm06rvrq8jyyckzc5v709u7qpthel9j4d9f7nh3',
-//   satoshi: 72921,
-//   pending_satoshi: 0,
-//   utxo_count: 5
-// }
-```
-
-All available APIs in the [BtcAssetsApi](#btcassetsapi-1) section.
-
 ## Transaction
 
 ### Transfer BTC from a `P2WPKH` address
 
 ```typescript
-import { sendBtc, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
+import { sendBtc, DataSource, NetworkType } from '@rgbpp-sdk/btc';
+import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
 const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
 const source = new DataSource(service, NetworkType.TESTNET);
@@ -119,7 +53,8 @@ console.log('txid:', res.txid);
 ### Transfer BTC from a `P2TR` address
 
 ```typescript
-import { sendBtc, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
+import { sendBtc, DataSource, NetworkType } from '@rgbpp-sdk/btc';
+import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
 const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
 const source = new DataSource(service, NetworkType.TESTNET);
@@ -155,7 +90,8 @@ console.log('txid:', res.txid);
 ### Create an `OP_RETURN` output
 
 ```typescript
-import { sendBtc, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
+import { sendBtc, DataSource, NetworkType } from '@rgbpp-sdk/btc';
+import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
 const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
 const source = new DataSource(service, NetworkType.TESTNET);
@@ -187,7 +123,8 @@ console.log('txid:', res.txid);
 ### Transfer with predefined inputs/outputs
 
 ```typescript
-import { sendUtxos, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
+import { sendUtxos, DataSource, NetworkType } from '@rgbpp-sdk/btc';
+import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
 const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
 const source = new DataSource(service, NetworkType.TESTNET);
@@ -236,9 +173,9 @@ console.log('txid:', res.txid);
 ### Construct a isomorphic RGBPP transaction
 
 ```typescript
-import { sendRgbppUtxos, BtcAssetsApi, DataSource, NetworkType } from '@rgbpp-sdk/btc';
+import { sendRgbppUtxos, DataSource, Collector, NetworkType } from '@rgbpp-sdk/btc';
 import { RGBPP_UTXO_DUST_LIMIT, BTC_UTXO_DUST_LIMIT } from '@rgbpp-sdk/btc';
-import { Collector } from '@rgbpp-sdk/ckb';
+import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
 const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
 const source = new DataSource(service, NetworkType.TESTNET);
@@ -412,123 +349,6 @@ interface FeesRecommended {
   halfHourFee: number;
   hourFee: number;
   minimumFee: number;
-}
-```
-
-### Service
-
-#### BtcAssetsApi
-
-```typescript
-interface BtcAssetsApi {
-  init(): Promise<void>;
-  generateToken(): Promise<BtcAssetsApiToken>;
-  getBalance(address: string, params?: BtcAssetsApiBalanceParams): Promise<BtcAssetsApiBalance>;
-  getUtxos(address: string, params?: BtcAssetsApiUtxoParams): Promise<BtcAssetsApiUtxo[]>;
-  getTransactions(address: string): Promise<BtcAssetsApiTransaction[]>;
-  getTransaction(txid: string): Promise<BtcAssetsApiTransaction>;
-  sendTransaction(txHex: string): Promise<BtcAssetsApiSentTransaction>;
-}
-```
-
-#### BtcAssetsApiToken
-
-```typescript
-interface BtcAssetsApiToken {
-  token: string;
-}
-```
-
-#### BtcAssetsApiBalanceParams
-
-```typescript
-interface BtcAssetsApiBalanceParams {
-  min_satoshi?: number;
-}
-```
-
-#### BtcAssetsApiBalance
-
-```typescript
-interface BtcAssetsApiBalance {
-  address: string;
-  satoshi: number;
-  pending_satoshi: number;
-  utxo_count: number;
-}
-```
-
-#### BtcAssetsApiUtxoParams
-
-```typescript
-interface BtcAssetsApiUtxoParams {
-  min_satoshi?: number;
-}
-```
-
-#### BtcAssetsApiUtxo
-
-```typescript
-interface BtcAssetsApiUtxo {
-  txid: string;
-  vout: number;
-  value: number;
-  status: {
-    confirmed: boolean;
-    block_height: number;
-    block_hash: string;
-    block_time: number;
-  };
-}
-```
-
-#### BtcAssetsApiSentTransaction
-
-```typescript
-interface BtcAssetsApiSentTransaction {
-  txid: string;
-}
-```
-
-#### BtcAssetsApiTransaction
-
-```typescript
-interface BtcAssetsApiTransaction {
-  txid: string;
-  version: number;
-  locktime: number;
-  vin: {
-    txid: string;
-    vout: number;
-    prevout: {
-      scriptpubkey: string;
-      scriptpubkey_asm: string;
-      scriptpubkey_type: string;
-      scriptpubkey_address: string;
-      value: number;
-    };
-    scriptsig: string;
-    scriptsig_asm: string;
-    witness: string[];
-    is_coinbase: boolean;
-    sequence: number;
-  }[];
-  vout: {
-    scriptpubkey: string;
-    scriptpubkey_asm: string;
-    scriptpubkey_type: string;
-    scriptpubkey_address: string;
-    value: number;
-  }[];
-  weight: number;
-  size: number;
-  fee: number;
-  status: {
-    confirmed: boolean;
-    block_height: number;
-    block_hash: string;
-    block_time: number;
-  };
 }
 ```
 
