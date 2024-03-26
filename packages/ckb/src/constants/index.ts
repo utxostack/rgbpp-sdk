@@ -24,12 +24,12 @@ const TestnetInfo = {
   } as CKBComponents.Script,
 
   RgbppLockDep: {
-    outPoint: { txHash: '0x40889c7e5900b94252bb621bf287c8ed55ef3dd01fb36ba947a4a4fbf3102fbf', index: '0x0' },
+    outPoint: { txHash: '0xf1de59e973b85791ec32debbba08dff80c63197e895eb95d67fc1e9f6b413e00', index: '0x0' },
     depType: 'code',
   } as CKBComponents.CellDep,
 
   RgbppLockConfigDep: {
-    outPoint: { txHash: '0x40889c7e5900b94252bb621bf287c8ed55ef3dd01fb36ba947a4a4fbf3102fbf', index: '0x1' },
+    outPoint: { txHash: '0xf1de59e973b85791ec32debbba08dff80c63197e895eb95d67fc1e9f6b413e00', index: '0x1' },
     depType: 'code',
   } as CKBComponents.CellDep,
 
@@ -40,12 +40,12 @@ const TestnetInfo = {
   } as CKBComponents.Script,
 
   BtcTimeLockDep: {
-    outPoint: { txHash: '0xb85a83c323fb818a146a195ed794bb48e5aabe26ef30dab95d939feddb29db29', index: '0x0' },
+    outPoint: { txHash: '0xde0f87878a97500f549418e5d46d2f7704c565a262aa17036c9c1c13ad638529', index: '0x0' },
     depType: 'code',
   } as CKBComponents.CellDep,
 
   BtcTimeLockConfigDep: {
-    outPoint: { txHash: '0xb85a83c323fb818a146a195ed794bb48e5aabe26ef30dab95d939feddb29db29', index: '0x1' },
+    outPoint: { txHash: '0xde0f87878a97500f549418e5d46d2f7704c565a262aa17036c9c1c13ad638529', index: '0x1' },
     depType: 'code',
   } as CKBComponents.CellDep,
 

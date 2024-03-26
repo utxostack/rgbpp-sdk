@@ -2,7 +2,6 @@ import { BtcAssetsApi, RgbppApiSpvProof } from '@rgbpp-sdk/service';
 import { Collector } from '../collector';
 import { IndexerCell } from './collector';
 import { Address, Hex } from './common';
-import { SpvClientCellTxProof } from './spv';
 
 export interface ConstructPaymasterParams {
   // The collector that collects CKB live cells and transactions
