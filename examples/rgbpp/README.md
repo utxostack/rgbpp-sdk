@@ -30,25 +30,25 @@ As a simple example, Omiga protocol is reused for a quick demonstration of XUDT 
 Developers have the option to utilize an existing XUDT (User-Defined Token) on CKB.
 
 ```shell
-npx ts-node examples/rgbpp/src/1-mint-xudt.ts 
+npx ts-node examples/rgbpp/local/1-mint-xudt.ts 
 ```
 
 ### Jump XUDT from CKB to BTC
 
 ```shell
-npx ts-node examples/rgbpp/src/2-ckb-jump-btc.ts 
+npx ts-node examples/rgbpp/local/2-ckb-jump-btc.ts 
 ```
 
 ### Transfer RGB++ asset on BTC
 
 ```shell
-npx ts-node examples/rgbpp/src/3-btc-transfer.ts 
+npx ts-node examples/rgbpp/local/3-btc-transfer.ts 
 ```
 
 ### Jump RGB++ asset from BTC to CKB
 
 ```shell
-npx ts-node examples/rgbpp/src/4-btc-jump-ckb.ts 
+npx ts-node examples/rgbpp/local/4-btc-jump-ckb.ts 
 ```
 
 ### Unlock BTC time cells on CKB
@@ -56,5 +56,5 @@ npx ts-node examples/rgbpp/src/4-btc-jump-ckb.ts
 **Warning: Wait at least 6 BTC confirmation blocks to unlock the BTC time cells after 4-btc-jump-ckb.ts**
 
 ```shell
-npx ts-node examples/rgbpp/src/5-spend-btc-time-cell.ts 
+npx ts-node examples/rgbpp/local/5-spend-btc-time-cell.ts 
 ```
