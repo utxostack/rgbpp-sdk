@@ -1,22 +1,16 @@
 import { Cell } from '@ckb-lumos/lumos';
 
 export interface RgbppApis {
-  getRgbppTransactionHash(btcTxId: string): Promise<RgbppApiCkbTransactionHash>;
-  getRgbppTransactionState(btcTxId: string): Promise<RgbppApiTransactionState>;
+  getRgbppTransactionHash(btcTxId: string): Promise<RgbppApiCkbTransactionHash | undefined>;
+  getRgbppTransactionState(btcTxId: string): Promise<RgbppApiTransactionState | undefined>;
   getRgbppAssetsByBtcTxId(btcTxId: string): Promise<Cell[]>;
   getRgbppAssetsByBtcUtxo(btcTxId: string, vout: number): Promise<Cell[]>;
   getRgbppAssetsByBtcAddress(btcAddress: string, params?: RgbppApiAssetsByAddressParams): Promise<Cell[]>;
-  getRgbppSpvProof(btcTxId: string, confirmations: number): Promise<RgbppApiSpvProof>;
+  getRgbppSpvProof(btcTxId: string, confirmations: number): Promise<RgbppApiSpvProof | undefined>;
   sendRgbppCkbTransaction(payload: RgbppApiSendCkbTransactionPayload): Promise<RgbppApiTransactionState>;
 }
 
-export enum RgbppTransactionState {
-  Completed = 'completed',
-  Failed = 'failed',
-  Delayed = 'delayed',
-  Active = 'active',
-  Waiting = 'waiting',
-}
+export type RgbppTransactionState = 'completed' | 'failed' | 'delayed' | 'active' | 'waiting';
 
 export interface RgbppApiCkbTransactionHash {
   txhash: string;
@@ -34,13 +28,16 @@ export interface RgbppApiSpvProof {
   proof: string;
   spv_client: {
     tx_hash: string;
-    index: number;
+    index: string;
   };
 }
 
 export interface RgbppApiSendCkbTransactionPayload {
-  ckbRawTx: CKBComponents.RawTransaction;
-  needPaymasterCell: boolean;
-  sumInputsCapacity: string;
-  commitment: string;
+  btc_txid: string;
+  ckb_virtual_result: {
+    ckbRawTx: CKBComponents.RawTransaction;
+    needPaymasterCell: boolean;
+    sumInputsCapacity: string;
+    commitment: string;
+  };
 }

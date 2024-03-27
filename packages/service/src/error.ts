@@ -26,8 +26,8 @@ export class BtcAssetsApiError extends Error {
     Object.setPrototypeOf(this, BtcAssetsApiError.prototype);
   }
 
-  static withComment(code: ErrorCodes, comment: string): BtcAssetsApiError {
+  static withComment(code: ErrorCodes, comment?: string): BtcAssetsApiError {
     const message = ErrorMessages[code] || 'Unknown error';
-    return new BtcAssetsApiError(code, `${message}: ${comment}`);
+    return new BtcAssetsApiError(code, comment ? `${message}: ${comment}` : message);
   }
 }
