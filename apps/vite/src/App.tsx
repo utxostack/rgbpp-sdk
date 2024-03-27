@@ -1,5 +1,7 @@
 import './App.css';
-import { sendBtc, NetworkType, DataSource, BtcAssetsApi } from '@rgbpp-sdk/btc';
+import { sendBtc, NetworkType, DataSource } from '@rgbpp-sdk/btc';
+import { BtcAssetsApi } from '@rgbpp-sdk/service';
+
 function App() {
   async function send() {
     const networkType = NetworkType.TESTNET;
@@ -15,7 +17,6 @@ function App() {
           value: 1000,
         },
       ],
-      networkType,
       source,
     });
 

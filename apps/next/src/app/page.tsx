@@ -1,5 +1,6 @@
 'use client';
-import { sendBtc, NetworkType, DataSource, BtcAssetsApi } from '@rgbpp-sdk/btc';
+import { sendBtc, NetworkType, DataSource } from '@rgbpp-sdk/btc';
+import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
 export default function Home() {
   async function send() {
@@ -19,7 +20,6 @@ export default function Home() {
           value: 1000,
         },
       ],
-      networkType,
       source,
     });
 

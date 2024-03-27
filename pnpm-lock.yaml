@@ -38,6 +38,12 @@ importers:
       '@rgbpp-sdk/btc':
         specifier: workspace:^
         version: link:../../packages/btc
+      '@rgbpp-sdk/ckb':
+        specifier: workspace:^
+        version: link:../../packages/ckb
+      '@rgbpp-sdk/service':
+        specifier: workspace:^
+        version: link:../../packages/service
       next:
         specifier: 14.1.2
         version: 14.1.2(react-dom@18.2.0)(react@18.2.0)
@@ -64,8 +70,14 @@ importers:
   apps/vite:
     dependencies:
       '@rgbpp-sdk/btc':
-        specifier: ^0.0.0-snap-20240306090350
-        version: 0.0.0-snap-20240306090350
+        specifier: workspace:^
+        version: link:../../packages/btc
+      '@rgbpp-sdk/ckb':
+        specifier: workspace:^
+        version: link:../../packages/ckb
+      '@rgbpp-sdk/service':
+        specifier: workspace:^
+        version: link:../../packages/service
       buffer:
         specifier: ^6.0.3
         version: 6.0.3
@@ -1407,16 +1419,6 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
-
-  /@rgbpp-sdk/btc@0.0.0-snap-20240306090350:
-    resolution: {integrity: sha512-J2A4YMie3XzMn2Ib5kl2Ch+1/8BsmFVv8bzxQera3w5jPTP+FHIrTUivEud6YVC495b8fiwTXHGcuYumTVGLrA==}
-    dependencies:
-      '@bitcoinerlab/secp256k1': 1.1.1
-      bip32: 4.0.0
-      bitcoinjs-lib: 6.1.5
-      ecpair: 2.1.0
-      lodash: 4.17.21
-    dev: false
 
   /@rollup/plugin-inject@5.0.5:
     resolution: {integrity: sha512-2+DEJbNBoPROPkgTDNe8/1YXWcqxbN5DTjASVIOx8HS+pITXushyNiBV56RB08zuptzz8gT3YfkqriTBVycepg==}

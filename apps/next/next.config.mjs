@@ -4,6 +4,13 @@ const nextConfig = {
     config.experiments = {
       layers: true,
     };
+    config.resolve = {
+      fallback: {
+        net: false,
+        tls: false,
+      },
+    };
+
     return config;
   }
 };

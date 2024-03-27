@@ -3,16 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 5000",
+    "dev": "next dev --port 12345",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@rgbpp-sdk/service": "workspace:^",
+    "@rgbpp-sdk/btc": "workspace:^",
+    "@rgbpp-sdk/ckb": "workspace:^",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.1.2",
-    "@rgbpp-sdk/btc": "workspace:^"
+    "next": "14.1.2"
   },
   "devDependencies": {
     "typescript": "^5",
