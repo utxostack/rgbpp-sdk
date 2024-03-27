@@ -82,9 +82,6 @@ export const buildBtcTimeCellsSpentTx = async ({
       btcTxIdFromBtcTimeLockArgs(btcTimeCell.output.lock.args),
       BTC_JUMP_CONFIRMATION_BLOCKS,
     );
-    if (!result) {
-      throw new Error('Get SPV proof error');
-    }
     const { spvClient, proof } = transformSpvProof(result);
 
     if (!cellDepsSet.has(serializeOutPoint(spvClient))) {
