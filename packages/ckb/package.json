@@ -23,13 +23,13 @@
     "@nervosnetwork/ckb-sdk-core": "^0.109.1",
     "@nervosnetwork/ckb-sdk-utils": "^0.109.1",
     "@nervosnetwork/ckb-types": "^0.109.1",
+    "@rgbpp-sdk/service": "workspace:^",
     "axios": "^1.6.8",
     "camelcase-keys": "^7.0.2",
     "js-sha256": "^0.11.0"
   },
   "devDependencies": {
     "@ckb-lumos/molecule": "0.22.0-next.5",
-    "@rgbpp-sdk/service": "workspace:^",
     "@types/lodash": "^4.14.202",
     "vitest": "^1.4.0"
   },
