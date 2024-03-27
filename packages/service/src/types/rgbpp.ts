@@ -39,8 +39,11 @@ export interface RgbppApiSpvProof {
 }
 
 export interface RgbppApiSendCkbTransactionPayload {
-  ckbRawTx: CKBComponents.RawTransaction;
-  needPaymasterCell: boolean;
-  sumInputsCapacity: string;
-  commitment: string;
+  btc_txid: string;
+  ckb_virtual_result: {
+    ckbRawTx: CKBComponents.RawTransaction;
+    needPaymasterCell: boolean;
+    sumInputsCapacity: string;
+    commitment: string;
+  };
 }
