@@ -1,12 +1,12 @@
 import { Cell } from '@ckb-lumos/lumos';
 
 export interface RgbppApis {
-  getRgbppTransactionHash(btcTxId: string): Promise<RgbppApiCkbTransactionHash | undefined>;
-  getRgbppTransactionState(btcTxId: string): Promise<RgbppApiTransactionState | undefined>;
+  getRgbppTransactionHash(btcTxId: string): Promise<RgbppApiCkbTransactionHash>;
+  getRgbppTransactionState(btcTxId: string): Promise<RgbppApiTransactionState>;
   getRgbppAssetsByBtcTxId(btcTxId: string): Promise<Cell[]>;
   getRgbppAssetsByBtcUtxo(btcTxId: string, vout: number): Promise<Cell[]>;
   getRgbppAssetsByBtcAddress(btcAddress: string, params?: RgbppApiAssetsByAddressParams): Promise<Cell[]>;
-  getRgbppSpvProof(btcTxId: string, confirmations: number): Promise<RgbppApiSpvProof | undefined>;
+  getRgbppSpvProof(btcTxId: string, confirmations: number): Promise<RgbppApiSpvProof>;
   sendRgbppCkbTransaction(payload: RgbppApiSendCkbTransactionPayload): Promise<RgbppApiTransactionState>;
 }
 
