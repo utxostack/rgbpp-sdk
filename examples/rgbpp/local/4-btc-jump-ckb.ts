@@ -21,8 +21,8 @@ import { BtcAssetsApi } from '@rgbpp-sdk/service'
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
 // BTC SECP256K1 private key
 const BTC_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
-// https://btc-assets-api-develop.vercel.app/docs/static/index.html
-const BTC_ASSETS_API_URL = 'https://btc-assets-api-url';
+// https://btc-assets-api.testnet.mibao.pro/docs/static/index.html
+const BTC_ASSETS_API_URL = 'https://btc-assets-api.testnet.mibao.pro/';
 const BTC_ASSETS_TOKEN = '';
 
 interface Params {
