@@ -142,11 +142,17 @@ describe(
         }),
       );
 
+      const emptyBtcTxId = '0000000000000000000000000000000000000000000000000000000000000001';
+
       it('Get the hash of RGBPP CKB_TX', async () => {
         const res = await service.getRgbppTransactionHash(rgbppBtcTxId);
         expect(res).toBeDefined();
         expect(res.txhash).toBeTypeOf('string');
         expect(res.txhash).toHaveLength(66);
+      });
+      it('Try to get the hash of RGBPP CKB_TX and returned undefined', async () => {
+        const res = await service.getRgbppTransactionHash(emptyBtcTxId);
+        expect(res).toBeUndefined();
       });
       // TODO: make a record and remove the "skip" marker
       it.skip('Get the state of RGBPP CKB_TX', async () => {
@@ -192,6 +198,10 @@ describe(
         expect(res.spv_client).toBeDefined();
         expect(res.spv_client.index).toBeTypeOf('string');
         expect(res.spv_client.tx_hash).toBeTypeOf('string');
+      });
+      it('Try to get RGBPP SPV proof and returned undefined', async () => {
+        const res = await service.getRgbppSpvProof(emptyBtcTxId, 6);
+        expect(res).toBeUndefined();
       });
     });
   },

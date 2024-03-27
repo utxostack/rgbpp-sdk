@@ -23,7 +23,7 @@ export class BtcAssetsApiBase implements BaseApis {
   }
 
   async request<T>(route: string, options?: BaseApiRequestOptions): Promise<T> {
-    const { requireToken = true, method = 'GET', headers, params, ...otherOptions } = options ?? {};
+    const { requireToken = true, allow404 = false, method = 'GET', headers, params, ...otherOptions } = options ?? {};
     if (requireToken && !this.token && !(this.app && this.domain)) {
       throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_INVALID_PARAM, 'app, domain');
     }
@@ -44,17 +44,6 @@ export class BtcAssetsApiBase implements BaseApis {
       ...otherOptions,
     } as RequestInit);
 
-    const status = res.status;
-    if (status === 401) {
-      throw new BtcAssetsApiError(ErrorCodes.ASSETS_API_UNAUTHORIZED);
-    }
-    if (status === 404) {
-      throw new BtcAssetsApiError(ErrorCodes.ASSETS_API_RESOURCE_NOT_FOUND);
-    }
-    if (status !== 200) {
-      throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_RESPONSE_ERROR, `status code ${status}`);
-    }
-
     let text: string | undefined;
     let json: Record<string, any> | undefined;
     let ok: boolean = false;
@@ -66,15 +55,33 @@ export class BtcAssetsApiBase implements BaseApis {
       // do nothing
     }
 
+    const status = res.status;
+    let comment: string | undefined;
+
     if (!json) {
-      const message = text ? `(${status}) ${text}` : `${status}`;
-      throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_RESPONSE_ERROR, message);
+      comment = text ? `(${status}) ${text}` : `${status}`;
     }
     if (json && !ok) {
-      const innerError = json?.error?.error ? `(${json.error.error.code}) ${json.error.error.message}` : void 0;
       const directError = typeof json?.error === 'string' ? json.error : void 0;
-      const message = json.message ?? innerError ?? directError ?? JSON.stringify(json);
-      throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_RESPONSE_ERROR, message);
+      const codeMessageError = json.code && json.message ? `(${json.code}) ${json.message}` : void 0;
+      const wrappedInnerError = json?.error?.error ? `(${json.error.error.code}) ${json.error.error.message}` : void 0;
+      comment = codeMessageError ?? wrappedInnerError ?? directError ?? JSON.stringify(json);
+    }
+
+    if (status === 200 && !json) {
+      throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_RESPONSE_DECODE_ERROR, comment);
+    }
+    if (status === 401) {
+      throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_UNAUTHORIZED, comment);
+    }
+    if (status === 404 && !allow404) {
+      throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_RESOURCE_NOT_FOUND, comment);
+    }
+    if (status !== 200 && status !== 404 && !allow404) {
+      throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_RESPONSE_ERROR, comment);
+    }
+    if (status !== 200) {
+      return void 0 as T;
     }
 
     return json! as T;

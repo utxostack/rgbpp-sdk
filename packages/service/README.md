@@ -244,22 +244,16 @@ interface BtcApiTransaction {
 
 ```typescript
 interface RgbppApis {
-  getRgbppTransactionHash(btcTxId: string): Promise<RgbppApiCkbTransactionHash>;
-  getRgbppTransactionState(btcTxId: string): Promise<RgbppApiTransactionState>;
+  getRgbppTransactionHash(btcTxId: string): Promise<RgbppApiCkbTransactionHash | undefined>;
+  getRgbppTransactionState(btcTxId: string): Promise<RgbppApiTransactionState | undefined>;
   getRgbppAssetsByBtcTxId(btcTxId: string): Promise<Cell[]>;
   getRgbppAssetsByBtcUtxo(btcTxId: string, vout: number): Promise<Cell[]>;
   getRgbppAssetsByBtcAddress(btcAddress: string, params?: RgbppApiAssetsByAddressParams): Promise<Cell[]>;
-  getRgbppSpvProof(btcTxId: string, confirmations: number): Promise<RgbppApiSpvProof>;
+  getRgbppSpvProof(btcTxId: string, confirmations: number): Promise<RgbppApiSpvProof | undefined>;
   sendRgbppCkbTransaction(payload: RgbppApiSendCkbTransactionPayload): Promise<RgbppApiTransactionState>;
 }
 
-enum RgbppTransactionState {
-  Completed = 'completed',
-  Failed = 'failed',
-  Delayed = 'delayed',
-  Active = 'active',
-  Waiting = 'waiting',
-}
+type RgbppTransactionState = 'completed' | 'failed' | 'delayed' | 'active' | 'waiting';
 
 interface RgbppApiCkbTransactionHash {
   txhash: string;
@@ -277,7 +271,7 @@ interface RgbppApiSpvProof {
   proof: string;
   spv_client: {
     tx_hash: string;
-    index: number;
+    index: string;
   };
 }
 

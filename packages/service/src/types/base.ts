@@ -9,6 +9,7 @@ export interface BaseApiRequestOptions extends RequestInit {
   params?: Record<string, any>;
   method?: 'GET' | 'POST';
   requireToken?: boolean;
+  allow404?: boolean;
 }
 
 export interface BtcAssetsApiToken {
