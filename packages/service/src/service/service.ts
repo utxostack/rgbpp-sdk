@@ -89,15 +89,11 @@ export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis
    */
 
   getRgbppTransactionHash(btcTxId: string) {
-    return this.request<RgbppApiCkbTransactionHash>(`/rgbpp/v1/transaction/${btcTxId}`, {
-      allow404: true,
-    });
+    return this.request<RgbppApiCkbTransactionHash>(`/rgbpp/v1/transaction/${btcTxId}`);
   }
 
   getRgbppTransactionState(btcTxId: string) {
-    return this.request<RgbppApiTransactionState>(`/rgbpp/v1/transaction/${btcTxId}/job`, {
-      allow404: true,
-    });
+    return this.request<RgbppApiTransactionState>(`/rgbpp/v1/transaction/${btcTxId}/job`);
   }
 
   getRgbppAssetsByBtcTxId(btcTxId: string) {
@@ -116,7 +112,6 @@ export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis
 
   getRgbppSpvProof(btcTxId: string, confirmations: number) {
     return this.request<RgbppApiSpvProof>('/rgbpp/v1/btc-spv/proof', {
-      allow404: true,
       params: {
         txid: btcTxId,
         confirmations,

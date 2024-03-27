@@ -1,7 +1,7 @@
 import { Cell } from '@ckb-lumos/lumos';
 import { blockchain, bytes } from '@ckb-lumos/lumos/codec';
 import { describe, expect, it } from 'vitest';
-import { BtcAssetsApi, ErrorCodes, ErrorMessages, RgbppTransactionState } from '../src';
+import { BtcAssetsApi, ErrorCodes, ErrorMessages } from '../src';
 
 describe(
   'BtcServiceApi',
@@ -150,19 +150,26 @@ describe(
         expect(res.txhash).toBeTypeOf('string');
         expect(res.txhash).toHaveLength(66);
       });
-      it('Try to get the hash of RGBPP CKB_TX and returned undefined', async () => {
-        const res = await service.getRgbppTransactionHash(emptyBtcTxId);
-        expect(res).toBeUndefined();
+      it('Try to get the hash of non-existent RGBPP CKB_TX', async () => {
+        await expect(() => service.getRgbppTransactionHash(emptyBtcTxId)).rejects.toHaveProperty(
+          'code',
+          ErrorCodes.ASSETS_API_RESOURCE_NOT_FOUND,
+        );
       });
       // TODO: make a record and remove the "skip" marker
       it.skip('Get the state of RGBPP CKB_TX', async () => {
         const res = await service.getRgbppTransactionState(rgbppBtcTxId);
-        console.log(res);
         expect(res).toBeDefined();
         expect(res.state).toBeTypeOf('string');
         expect(res.state).toSatisfy(
-          (state: string) => RgbppTransactionState[state] !== void 0,
+          (state: string) => ['completed', 'failed', 'delayed', 'active', 'waiting'].includes(state),
           `state "${res.state}" should be one of the RgbppTransactionState enum`,
+        );
+      });
+      it('Try to get the state of non-existent RGBPP CKB_TX', async () => {
+        await expect(() => service.getRgbppTransactionState(emptyBtcTxId)).rejects.toHaveProperty(
+          'code',
+          ErrorCodes.ASSETS_API_RESOURCE_NOT_FOUND,
         );
       });
       it('Get RGBPP cells by BTC_TX_ID', async () => {
@@ -199,9 +206,11 @@ describe(
         expect(res.spv_client.index).toBeTypeOf('string');
         expect(res.spv_client.tx_hash).toBeTypeOf('string');
       });
-      it('Try to get RGBPP SPV proof and returned undefined', async () => {
-        const res = await service.getRgbppSpvProof(emptyBtcTxId, 6);
-        expect(res).toBeUndefined();
+      it('Try to get non-existent RGBPP SPV proof', async () => {
+        await expect(() => service.getRgbppSpvProof(emptyBtcTxId, 0)).rejects.toHaveProperty(
+          'code',
+          ErrorCodes.ASSETS_API_RESOURCE_NOT_FOUND,
+        );
       });
     });
   },
