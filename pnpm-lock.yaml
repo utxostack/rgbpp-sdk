@@ -136,6 +136,9 @@ importers:
       '@rgbpp-sdk/ckb':
         specifier: workspace:^
         version: link:../../packages/ckb
+      '@rgbpp-sdk/service':
+        specifier: workspace:^
+        version: link:../../packages/service
       axios:
         specifier: ^1.6.8
         version: 1.6.8
@@ -207,6 +210,9 @@ importers:
       '@nervosnetwork/ckb-types':
         specifier: ^0.109.1
         version: 0.109.1
+      '@rgbpp-sdk/service':
+        specifier: workspace:^
+        version: link:../service
       axios:
         specifier: ^1.6.8
         version: 1.6.8

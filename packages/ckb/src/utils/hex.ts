@@ -45,6 +45,12 @@ export const u32ToLe = (u32: string | number): string => {
   return u32ToHex(u32, true);
 };
 
+export const u32ToLeHex = (u32: string | number): string => {
+  const hex = u32ToBe(u32);
+  const le = reverseHex(parseInt(hex, 16).toString(16));
+  return append0x(parseInt(le, 16).toString(16));
+};
+
 export const leToU32 = (leHex: string): number => {
   const bytes = hexToBytes(append0x(leHex));
   const beHex = `0x${bytes.reduceRight((pre, cur) => pre + cur.toString(16).padStart(2, '0'), '')}`;

@@ -18,11 +18,12 @@ import {
   calculateTransactionFee,
   isRgbppLockOrBtcTimeLock,
   replaceLockArgsWithRealBtcTxId,
+  transformSpvProof,
   u8ToHex,
 } from '../utils';
 import { InputsCapacityNotEnoughError } from '../error';
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
-import { buildSpvClientCellDep } from '../spv';
+import { buildSpvClientCellDep } from '../utils';
 import { RGBPPUnlock, Uint16 } from '../schemas/generated/rgbpp';
 import { Bytes } from '@ckb-lumos/base/lib/blockchain';
 
@@ -42,7 +43,7 @@ export const buildRgbppUnlockWitness = (
     version,
     extraData: { inputLen, outputLen },
     btcTx,
-    btcTxProof: Bytes.pack(append0x(btcTxProof)),
+    btcTxProof: bytesToHex(Bytes.pack(append0x(btcTxProof))),
   });
   return append0x(bytesToHex(rgbppUnlock));
 };
@@ -53,23 +54,16 @@ export const buildRgbppUnlockWitness = (
  * @param collector The collector that collects CKB live cells and transactions
  * @param spvService SPV RPC service
  * @param btcTxBytes The hex string of btc transaction, refer to https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/ts_src/transaction.ts#L609
- * @param btcTxId    The BTC transaction id
- * @param btcTxIndexInBlock The position of this BTC transaction in the block
+ * @param rgbppApiSpvProof The SPV client cell and tx proof which is from BTCAssetsApi
  */
 export const appendCkbTxWitnesses = async ({
   ckbRawTx,
-  spvService,
   btcTxBytes,
-  btcTxId,
-  btcTxIndexInBlock,
+  rgbppApiSpvProof,
 }: AppendWitnessesParams): Promise<CKBComponents.RawTransaction> => {
   let rawTx = ckbRawTx;
 
-  const { spvClient, proof } = await spvService.fetchSpvClientCellAndTxProof({
-    btcTxId,
-    btcTxIndexInBlock,
-    confirmBlocks: 0,
-  });
+  const { spvClient, proof } = transformSpvProof(rgbppApiSpvProof);
   rawTx.cellDeps.push(buildSpvClientCellDep(spvClient));
 
   const rgbppUnlock = buildRgbppUnlockWitness(btcTxBytes, proof, ckbRawTx.inputs.length, ckbRawTx.outputs.length);

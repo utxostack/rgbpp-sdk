@@ -25,8 +25,9 @@ import {
   compareInputs,
   genBtcTimeLockArgs,
   lockScriptFromBtcTimeLockArgs,
+  transformSpvProof,
 } from '../utils';
-import { buildSpvClientCellDep } from '../spv';
+import { buildSpvClientCellDep } from '../utils';
 import { blockchain } from '@ckb-lumos/base';
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 
@@ -39,18 +40,15 @@ export const buildBtcTimeUnlockWitness = (btcTxProof: Hex): Hex => {
  * Collect btc time cells and spend them to create xudt cells for the specific lock scripts in the btc time lock args
  * The btc time lock args data structure is: lock_script | after | new_bitcoin_tx_id
  * @param btcTimeCellPairs The pairs of the BTC time cell and the related btc tx(which is in the BTC time cell lock args) index in the block
- * @param spvService SPV RPC service
+ * @param btcAssetsApi BTC Assets Api
  * @param isMainnet
  */
 export const buildBtcTimeCellsSpentTx = async ({
-  btcTimeCellPairs,
-  spvService,
+  btcTimeCells,
+  btcAssetsApi,
   isMainnet,
 }: BtcTimeCellsParams): Promise<CKBComponents.RawTransaction> => {
-  const sortedBtcTimeCellPairs = btcTimeCellPairs.sort((pair1, pair2) =>
-    compareInputs(pair1.btcTimeCell, pair2.btcTimeCell),
-  );
-  const sortedBtcTimeCells = sortedBtcTimeCellPairs.map((pair) => pair.btcTimeCell);
+  const sortedBtcTimeCells = btcTimeCells.sort(compareInputs);
   const inputs: CKBComponents.CellInput[] = sortedBtcTimeCells.map((cell) => ({
     previousOutput: cell.outPoint,
     since: '0x0',
@@ -74,17 +72,17 @@ export const buildBtcTimeCellsSpentTx = async ({
 
   const lockArgsSet: Set<string> = new Set();
   const cellDepsSet: Set<string> = new Set();
-  for await (const { btcTimeCell, btcTxIndexInBlock } of sortedBtcTimeCellPairs) {
+  for await (const btcTimeCell of sortedBtcTimeCells) {
     if (lockArgsSet.has(btcTimeCell.output.lock.args)) {
       witnesses.push('0x');
       continue;
     }
     lockArgsSet.add(btcTimeCell.output.lock.args);
-    const { spvClient, proof } = await spvService.fetchSpvClientCellAndTxProof({
-      btcTxId: btcTxIdFromBtcTimeLockArgs(btcTimeCell.output.lock.args),
-      btcTxIndexInBlock,
-      confirmBlocks: BTC_JUMP_CONFIRMATION_BLOCKS,
-    });
+    const result = await btcAssetsApi.getRgbppSpvProof(
+      btcTxIdFromBtcTimeLockArgs(btcTimeCell.output.lock.args),
+      BTC_JUMP_CONFIRMATION_BLOCKS,
+    );
+    const { spvClient, proof } = transformSpvProof(result);
 
     if (!cellDepsSet.has(serializeOutPoint(spvClient))) {
       cellDeps.push(buildSpvClientCellDep(spvClient));

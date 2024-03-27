@@ -13,7 +13,7 @@ const mintXudt = async () => {
   });
 
   const address = collector.getCkb().utils.privateKeyToAddress(CKB_TEST_PRIVATE_KEY, { prefix: AddressPrefix.Testnet });
-  // ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqt4z78ng4yutl5u6xsv27ht6q08mhujf8s2r0n40
+  // ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq0e4xk4rmg5jdkn8aams492a7jlg73ue0gc0ddfj
   console.log('ckb address: ', address);
 
   const mintLimit = BigInt(1000) * BigInt(10 ** 8);

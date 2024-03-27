@@ -4,7 +4,7 @@ import { CKB_UNIT } from '../constants';
 import { Hex } from '../types';
 
 export const calculateTransactionFee = (txSize: number, feeRate?: bigint): bigint => {
-  const rate = feeRate ?? BigInt(1000);
+  const rate = feeRate ?? BigInt(1100);
   const fee = calculateTxFee(BigInt(txSize), rate);
   return BigInt(fee);
 };

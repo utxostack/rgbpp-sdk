@@ -10,6 +10,7 @@ import {
   genBtcTimeLockScript,
   lockScriptFromBtcTimeLockArgs,
   replaceLockArgsWithRealBtcTxId,
+  transformSpvProof,
 } from './rgbpp';
 import { RgbppCkbVirtualTx } from '../types';
 import { calculateUdtCellCapacity } from './ckb-tx';
@@ -26,7 +27,7 @@ describe('rgbpp tests', () => {
       inputs: [
         {
           previousOutput: {
-            txHash: '0xb93dc09afbb463577ca0149726840f204f4cb29490d115a1cf8c1018f05f5296',
+            txHash: '0x047b6894a0b7a4d7a73b1503d1ae35c51fc5fa6306776dcf22b1fb3daaa32a29',
             index: '0x0',
           },
           since: '0x0',
@@ -35,35 +36,35 @@ describe('rgbpp tests', () => {
       outputs: [
         {
           lock: {
-            codeHash: '0x6baadd6f224432eec24b4031b66e1bcef690963205ec3edf6aa0b35570c429f6',
+            codeHash: '0xd5a4e241104041f6f12f11bddcf30bd7b2f818722f78353fde019f5081cd6b49',
             hashType: 'type',
             args: '0x010000000000000000000000000000000000000000000000000000000000000000000000',
           },
           capacity: '0x0000000000000000',
           type: {
-            codeHash: '0xdb9b4c309f25738b21e7278c803e00a7dcf81115f448ae87b42463f4136821e7',
+            codeHash: '0xc4957f239eb3db9f5c5fb949e9dd99adbb8068b8ac7fe7ae49495486d5e5d235',
             hashType: 'type',
-            args: '0x385c913dd83f7255922df8f5126511652a3ecf7e015849d9cb90558d9b81c5c2',
+            args: '0x43094caf2f2bcdf6f5ab02c2de744936897278d558a2b6924db98a4f27d629e2',
           },
         },
         {
           lock: {
-            codeHash: '0x6baadd6f224432eec24b4031b66e1bcef690963205ec3edf6aa0b35570c429f6',
+            codeHash: '0xd5a4e241104041f6f12f11bddcf30bd7b2f818722f78353fde019f5081cd6b49',
             hashType: 'type',
             args: '0x010000000000000000000000000000000000000000000000000000000000000000000000',
           },
           capacity: '0x0000000000000000',
           type: {
-            codeHash: '0xdb9b4c309f25738b21e7278c803e00a7dcf81115f448ae87b42463f4136821e7',
+            codeHash: '0xc4957f239eb3db9f5c5fb949e9dd99adbb8068b8ac7fe7ae49495486d5e5d235',
             hashType: 'type',
-            args: '0x385c913dd83f7255922df8f5126511652a3ecf7e015849d9cb90558d9b81c5c2',
+            args: '0x43094caf2f2bcdf6f5ab02c2de744936897278d558a2b6924db98a4f27d629e2',
           },
         },
       ],
       outputsData: ['0x2c010000000000000000000000000000', '0xbc020000000000000000000000000000'],
     };
     const commitment = calculateCommitment(rgbppVirtualTx);
-    expect('150c5f0856ba6d9148bd2588d8a3d9a1f45eec8a34fe0ca426a1b5193d5a701c').toBe(commitment);
+    expect('7cdecc8cc293d491a0cbf44e92feabfc29e79408c1d2f7547b334c42efe13131').toBe(commitment);
   });
 
   it('genBtcTimeLockArgs', () => {
@@ -157,5 +158,18 @@ describe('rgbpp tests', () => {
     expect(
       '0x850000001000000061000000650000005100000010000000300000003100000028e83a1277d48add8e72fadaa9248559e1b632bab2bd60b27955ebc4c03800a500c0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f0600000006ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
     ).toBe(args);
+  });
+
+  it('transformSpvProof', () => {
+    const expected = transformSpvProof({
+      spv_client: {
+        tx_hash: '0x047b6894a0b7a4d7a73b1503d1ae35c51fc5fa6306776dcf22b1fb3daaa32a29',
+        index: '0xa',
+      },
+      proof: '0x2f061a27abcab1d1d146514ffada6a83c0d974fe0813835ad8be2a39a6b1a6ee',
+    });
+    expect('0x047b6894a0b7a4d7a73b1503d1ae35c51fc5fa6306776dcf22b1fb3daaa32a29').toBe(expected.spvClient.txHash);
+    expect('0xa').toBe(expected.spvClient.index);
+    expect('0x2f061a27abcab1d1d146514ffada6a83c0d974fe0813835ad8be2a39a6b1a6ee').toBe(expected.proof);
   });
 });

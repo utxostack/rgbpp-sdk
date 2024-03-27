@@ -1,11 +1,17 @@
 import { describe, it, expect } from 'vitest';
-import { leToU128, reverseHex, u128ToLe, u32ToLe, u64ToLe } from './hex';
+import { leToU128, reverseHex, u128ToLe, u32ToLe, u32ToLeHex, u64ToLe } from './hex';
 import { bytesToHex } from '@nervosnetwork/ckb-sdk-utils';
 
 describe('number to little endian', () => {
   it('u32toLe', () => {
     const expected = u32ToLe(21000000);
     expect('406f4001').toBe(expected);
+  });
+
+  it('u32toLeHex', () => {
+    expect('0x2c01').toBe(u32ToLeHex(300));
+    expect('0x1').toBe(u32ToLeHex(1));
+    expect('0xe803').toBe(u32ToLeHex(1000));
   });
 
   it('u64ToLe', () => {

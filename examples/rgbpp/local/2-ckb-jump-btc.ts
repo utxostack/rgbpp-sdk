@@ -26,6 +26,7 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTx
     toRgbppLockArgs,
     xudtTypeBytes: serializeScript(xudtType),
     transferAmount: BigInt(800_0000_0000),
+    witnessLockPlaceholderSize: 1000
   });
 
   const emptyWitness = { lock: '', inputType: '', outputType: '' };
@@ -44,6 +45,6 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTx
 // Use your real BTC UTXO information on the BTC Testnet
 jumpFromCkbToBtc({
   outIndex: 1,
-  btcTxId: 'dad1814249f3bcbcb1e26436108c8f48b9d71456938cf62e122357caf7913013',
+  btcTxId: '70b250e2a3cc7a33b47f7a4e94e41e1ee2501ce73b393d824db1dd4c872c5348',
 });
 
