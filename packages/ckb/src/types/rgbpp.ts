@@ -23,9 +23,11 @@ export interface BtcTransferVirtualTxParams {
   xudtTypeBytes: Hex;
   // The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
   rgbppLockArgsList: Hex[];
-  // The XUDT amount to be transferred
+  // The XUDT amount to be transferred, if the noMergeOutputCells is true, the transferAmount will be ignored
   transferAmount: bigint;
   isMainnet: boolean;
+  // The noMergeOutputCells indicates whether the CKB outputs need to be merged. By default, the outputs will be merged.
+  noMergeOutputCells?: boolean;
 }
 
 export interface RgbppCkbVirtualTx {

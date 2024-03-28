@@ -19,8 +19,9 @@ import { getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
  * @param collector The collector that collects CKB live cells and transactions
  * @param xudtTypeBytes The serialized hex string of the XUDT type script
  * @param rgbppLockArgsList The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
- * @param transferAmount The XUDT amount to be transferred
+ * @param transferAmount The XUDT amount to be transferred, if the noMergeOutputCells is true, the transferAmount will be ignored
  * @param isMainnet
+ * @param noMergeOutputCells The noMergeOutputCells indicates whether the CKB outputs need to be merged. By default, the outputs will be merged.
  */
 export const genBtcTransferCkbVirtualTx = async ({
   collector,
@@ -28,6 +29,7 @@ export const genBtcTransferCkbVirtualTx = async ({
   rgbppLockArgsList,
   transferAmount,
   isMainnet,
+  noMergeOutputCells,
 }: BtcTransferVirtualTxParams): Promise<BtcTransferVirtualTxResult> => {
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
 
@@ -42,31 +44,53 @@ export const genBtcTransferCkbVirtualTx = async ({
   }
   rgbppCells = rgbppCells.sort(compareInputs);
 
-  const { inputs, sumInputsCapacity, sumAmount } = collector.collectUdtInputs(rgbppCells, transferAmount);
-  rgbppCells = rgbppCells.slice(0, inputs.length);
+  let inputs: CKBComponents.CellInput[] = [];
+  let sumInputsCapacity = BigInt(0);
+  let outputs: CKBComponents.CellOutput[] = [];
+  let outputsData: Hex[] = [];
+  let changeCapacity = BigInt(0);
 
-  const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
-  const outputsData = [append0x(u128ToLe(transferAmount))];
+  if (noMergeOutputCells) {
+    for (const [index, rgbppCell] of rgbppCells.entries()) {
+      inputs.push({
+        previousOutput: rgbppCell.outPoint,
+        since: '0x0',
+      });
+      sumInputsCapacity += BigInt(rgbppCell.output.capacity);
+      outputs.push({
+        ...rgbppCell.output,
+        // The Vouts[0] for OP_RETURN and Vouts[1], Vouts[2], ... for RGBPP assets
+        lock: genRgbppLockScript(buildPreLockArgs(index + 1), isMainnet),
+      });
+      outputsData.push(rgbppCell.outputData);
+    }
+    changeCapacity = BigInt(rgbppCells[rgbppCells.length - 1].output.capacity);
+  } else {
+    const collectResult = collector.collectUdtInputs(rgbppCells, transferAmount);
+    inputs = collectResult.inputs;
+    sumInputsCapacity = collectResult.sumInputsCapacity;
 
-  let changeCapacity = sumInputsCapacity;
+    rgbppCells = rgbppCells.slice(0, inputs.length);
 
-  // The Vouts[0] for OP_RETURN and Vouts[1], Vouts[2] for RGBPP assets
-  const outputs: CKBComponents.CellOutput[] = [
-    {
+    const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
+    outputsData.push(append0x(u128ToLe(transferAmount)));
+
+    changeCapacity = sumInputsCapacity;
+    // The Vouts[0] for OP_RETURN and Vouts[1], Vouts[2], ... for RGBPP assets
+    outputs.push({
       lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
       type: xudtType,
       capacity: append0x(rpbppCellCapacity.toString(16)),
-    },
-  ];
-
-  if (sumAmount > transferAmount) {
-    outputs.push({
-      lock: genRgbppLockScript(buildPreLockArgs(2), isMainnet),
-      type: xudtType,
-      capacity: append0x(rpbppCellCapacity.toString(16)),
     });
-    outputsData.push(append0x(u128ToLe(sumAmount - transferAmount)));
-    changeCapacity -= rpbppCellCapacity;
+    if (collectResult.sumAmount > transferAmount) {
+      outputs.push({
+        lock: genRgbppLockScript(buildPreLockArgs(2), isMainnet),
+        type: xudtType,
+        capacity: append0x(rpbppCellCapacity.toString(16)),
+      });
+      outputsData.push(append0x(u128ToLe(collectResult.sumAmount - transferAmount)));
+      changeCapacity -= rpbppCellCapacity;
+    }
   }
 
   const cellDeps = [getRgbppLockDep(isMainnet), getXudtDep(isMainnet), getRgbppLockConfigDep(isMainnet)];
