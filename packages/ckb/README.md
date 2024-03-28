@@ -24,12 +24,12 @@ The `example/paymaster.ts` demonstrates how to use `@rgbpp-sdk/ckb` SDK to split
 cd packages/ckb && pnpm splitCells
 ```
 
-## BTC rgbpp asset transfer
+## RGB++ assetS transfer on BTC
 
 The method `genBtcTransferCkbVirtualTx` can generate a CKB virtual transaction which contains the necessary `inputCells/outputCells` for rgbpp asset transfer and the commitment to be inserted to the BTC tx OP_RETURN.
 
 ```TypeScript
-interface BtcTransferVirtualTxResult {
+export interface BtcTransferVirtualTxResult {
   // CKB raw transaction
   ckbRawTx: CKBComponents.RawTransaction;
   // The rgbpp commitment to be inserted into BTC op_return
@@ -37,7 +37,7 @@ interface BtcTransferVirtualTxResult {
   // The needPaymasterCell indicates whether a paymaster cell is required
   needPaymasterCell: boolean;
   // The sum capacity of the ckb inputs
-  sumInputsCapacity: bigint;
+  sumInputsCapacity: Hex;
 }
 
 /**
@@ -45,19 +45,21 @@ interface BtcTransferVirtualTxResult {
  * @param collector The collector that collects CKB live cells and transactions
  * @param xudtTypeBytes The serialized hex string of the XUDT type script
  * @param rgbppLockArgsList The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
- * @param transferAmount The XUDT amount to be transferred
+ * @param transferAmount The XUDT amount to be transferred, if the noMergeOutputCells is true, the transferAmount will be ignored
  * @param isMainnet
+ * @param noMergeOutputCells The noMergeOutputCells indicates whether the CKB outputs need to be merged. By default, the outputs will be merged.
  */
-const genBtcTransferCkbVirtualTx = async ({
+export const genBtcTransferCkbVirtualTx = async ({
   collector,
   xudtTypeBytes,
   rgbppLockArgsList,
   transferAmount,
   isMainnet,
+  noMergeOutputCells,
 }: BtcTransferVirtualTxParams): Promise<BtcTransferVirtualTxResult>
 ```
 
-## BTC rgbpp asset jump to CKB
+## RGB++ assets jump from BTC to CKB
 
 The method `genBtcJumpCkbVirtualTx` can generate a CKB virtual transaction which contains the necessary `inputCells/outputCells` for rgbpp asset jumping from BTC to CKB and the commitment to be inserted to the BTC tx OP_RETURN.
 
@@ -70,9 +72,8 @@ interface BtcJumpCkbVirtualTxResult {
   // The needPaymasterCell indicates whether a paymaster cell is required
   needPaymasterCell: boolean;
   // The sum capacity of the ckb inputs
-  sumInputsCapacity: bigint;
+  sumInputsCapacity: Hex;
 }
-
 /**
  * Generate the virtual ckb transaction for the jumping tx from BTC to CKB
  * @param collector The collector that collects CKB live cells and transactions
@@ -90,7 +91,7 @@ export const genBtcJumpCkbVirtualTx = async ({
 }: BtcJumpCkbVirtualTxParams): Promise<BtcJumpCkbVirtualTxResult>
 ```
 
-## CKB rgbpp asset jump to BTC
+## RGB++ assets jump from CKB to BTC
 
 The method `genCkbJumpBtcVirtualTx` can generate a CKB transaction for rgbpp assets jumping from CKB to BTC
 
@@ -102,7 +103,7 @@ The method `genCkbJumpBtcVirtualTx` can generate a CKB transaction for rgbpp ass
  * @param fromCkbAddress The from ckb address who will use his private key to sign the ckb tx
  * @param toRgbppLockArgs The receiver rgbpp lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 65(official secp256k1/blake160 lock)
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
  * @param isMainnet
  */
 export const genCkbJumpBtcVirtualTx = async ({
