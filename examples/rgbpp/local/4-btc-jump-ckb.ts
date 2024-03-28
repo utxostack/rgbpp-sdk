@@ -20,7 +20,7 @@ import { BtcAssetsApi } from '@rgbpp-sdk/service'
 // CKB SECP256K1 private key
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
 // BTC SECP256K1 private key
-const BTC_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
+const BTC_TEST_PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000001';
 // API docs: https://btc-assets-api.testnet.mibao.pro/docs
 const BTC_ASSETS_API_URL = 'https://btc-assets-api.testnet.mibao.pro/';
 // https://btc-assets-api.testnet.mibao.pro/docs/static/index.html#/Token/post_token_generate
@@ -113,7 +113,7 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
   // console.log('BTC time lock args: ', newCkbRawTx.outputs[0].lock.args);
 
   // const txHash = await sendCkbTx({ collector, signedTx: ckbTx });
-  // console.info(`gbpp asset has been jumped from BTC to CKB and tx hash is ${txHash}`);
+  // console.info(`Rgbpp asset has been jumped from BTC to CKB and tx hash is ${txHash}`);
 };
 
 // rgbppLockArgs: outIndexU32 + btcTxId
