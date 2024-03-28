@@ -11,9 +11,9 @@ import {
 import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
 // CKB SECP256K1 private key
-const CKB_TEST_PRIVATE_KEY = '';
+const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
 // API docs: https://btc-assets-api.testnet.mibao.pro/docs
-const BTC_ASSETS_API_URL = 'https://btc-assets-api.testnet.mibao.pro/';
+const BTC_ASSETS_API_URL = 'https://btc-assets-api.testnet.mibao.pro';
 // https://btc-assets-api.testnet.mibao.pro/docs/static/index.html#/Token/post_token_generate
 const BTC_ASSETS_TOKEN = '';
 

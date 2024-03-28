@@ -15,13 +15,13 @@ const splitPaymasterCells = async () => {
   const address = privateKeyToAddress(MASTER_SECP256K1_PRIVATE_KEY, { prefix: AddressPrefix.Testnet });
   console.log('master address: ', address);
 
-  // Split 200 cells whose capacity are 220CKB for the receiver address
+  // Split 200 cells whose capacity are 316CKB for the receiver address
   await splitMultiCellsWithSecp256k1({
     masterPrivateKey: MASTER_SECP256K1_PRIVATE_KEY,
     collector,
     receiverAddress: RECEIVER_ADDRESS,
-    capacityWithCKB: 220,
-    cellAmount: 2,
+    capacityWithCKB: 316,
+    cellAmount: 200,
   });
 };
 

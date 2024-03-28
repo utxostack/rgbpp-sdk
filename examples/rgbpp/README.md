@@ -54,7 +54,9 @@ npx ts-node examples/rgbpp/queue/4-btc-jump-ckb.ts
 ```
 
 ### Unlock BTC time cells on CKB
-A cron job in RGB++ queue service will construct a transaction unlocking the mature btc_time_lock cells to the their `target_ckb_address`.
+
+A cron job in RGB++ Queue service will construct a transaction unlocking the mature BTC time cells to the their `target_ckb_address`.
+
 ## Local Examples
 
 ### Mint XUDT
