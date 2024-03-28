@@ -4,15 +4,13 @@ import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
 // BTC SECP256K1 private key
 const BTC_TEST_PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000001';
-
 // https://btc-assets-api-develop.vercel.app/docs/static/index.html
 const BTC_ASSETS_API_URL = 'https://btc-assets-api.testnet.mibao.pro';
-
 // https://btc-assets-api.testnet.mibao.pro/docs/static/index.html#/Token/post_token_generate
 const BTC_ASSETS_TOKEN = '';
 
-
-const transfer = async () => {
+// This example shows how to transfer BTC on testnet
+const transferBtc = async () => {
   const network = bitcoin.networks.testnet;
   const keyPair = ECPair.fromPrivateKey(Buffer.from(BTC_TEST_PRIVATE_KEY, 'hex'), { network });
   const { address: btcAddress } = bitcoin.payments.p2wpkh({
@@ -43,8 +41,8 @@ const transfer = async () => {
 
   // Broadcast transaction
   const tx = psbt.extractTransaction();
-  const res = await service.sendBtcTransaction(tx.toHex());
-  console.log('txid:', res.txid);
+  const { txid: txId} = await service.sendBtcTransaction(tx.toHex());
+  console.log('txId:', txId);
 }
 
-transfer()
+transferBtc();
