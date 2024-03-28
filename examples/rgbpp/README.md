@@ -53,14 +53,6 @@ npx ts-node examples/rgbpp/queue/3-btc-transfer.ts
 npx ts-node examples/rgbpp/queue/4-btc-jump-ckb.ts 
 ```
 
-### Unlock BTC time cells on CKB
-
-**Warning: Wait at least 6 BTC confirmation blocks to unlock the BTC time cells after 4-btc-jump-ckb.ts**
-
-```shell
-npx ts-node examples/rgbpp/queue/5-spend-btc-time-cell.ts 
-```
-
 ## Local Examples
 
 ### Mint XUDT
