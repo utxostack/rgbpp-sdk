@@ -4,7 +4,7 @@
 
 ## What you must know about BTC transaction id
 
-**The btc tx transaction id(hash) displayed on BTC explorer is different from the btc transaction id(hash) in RGB++ lock args. They are in reverse byte order.**
+**The BTC transaction id(hash) displayed on BTC explorer is different from the BTC transaction id(hash) in RGB++ lock args. They are in reverse byte order.**
 
 We follow the following two rules： 
 
