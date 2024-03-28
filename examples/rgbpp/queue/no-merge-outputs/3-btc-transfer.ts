@@ -1,9 +1,5 @@
 import { AddressPrefix, privateKeyToAddress, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import {
-  Collector,
-  buildRgbppLockArgs,
-  genBtcTransferCkbVirtualTx,
-} from '@rgbpp-sdk/ckb';
+import { Collector, buildRgbppLockArgs, genBtcTransferCkbVirtualTx } from '@rgbpp-sdk/ckb';
 import { sendRgbppUtxos, DataSource, ECPair, bitcoin, NetworkType } from '@rgbpp-sdk/btc';
 import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
@@ -55,6 +51,7 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
     xudtTypeBytes: serializeScript(xudtType),
     transferAmount,
     isMainnet: false,
+    noMergeOutputCells: true
   });
 
   const { commitment, ckbRawTx } = ckbVirtualTxResult;
@@ -82,7 +79,7 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
       const { state, failedReason } = await service.getRgbppTransactionState(btcTxId);
       console.log('state', state);
       if (state === 'completed' || state === 'failed') {
-        clearInterval(interval)
+        clearInterval(interval);
         if (state === 'completed') {
           const { txhash: txHash } = await service.getRgbppTransactionHash(btcTxId);
           console.info(`Rgbpp asset has been transferred on BTC and the related CKB tx hash is ${txHash}`);
@@ -90,19 +87,20 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
           console.warn(`Rgbpp CKB transaction failed and the reason is ${failedReason} `);
         }
       }
-    }, 30 * 1000)
+    }, 30 * 1000);
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
 };
-
 
 // Use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 transferRgbppOnBtc({
-  rgbppLockArgsList: [buildRgbppLockArgs(1, '64252b582aea1249ed969a20385fae48bba35bf1ab9b3df3b0fcddc754ccf592')],
+  rgbppLockArgsList: [
+    buildRgbppLockArgs(0, '4ff1855b64b309afa19a8b9be3d4da99dcb18b083b65d2d851662995c7d99e7a'),
+    buildRgbppLockArgs(1, '4ff1855b64b309afa19a8b9be3d4da99dcb18b083b65d2d851662995c7d99e7a'),
+  ],
   toBtcAddress: 'tb1qvt7p9g6mw70sealdewtfp0sekquxuru6j3gwmt',
-  // To simplify, keep the transferAmount the same as 2-ckb-jump-btc
-  transferAmount: BigInt(800_0000_0000),
+  // the transferAmount will be ignored
+  transferAmount: BigInt(0),
 });
-

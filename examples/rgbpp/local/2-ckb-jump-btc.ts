@@ -45,6 +45,6 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTx
 // Use your real BTC UTXO information on the BTC Testnet
 jumpFromCkbToBtc({
   outIndex: 1,
-  btcTxId: '70b250e2a3cc7a33b47f7a4e94e41e1ee2501ce73b393d824db1dd4c872c5348',
+  btcTxId: '4ff1855b64b309afa19a8b9be3d4da99dcb18b083b65d2d851662995c7d99e7a',
 });
 
