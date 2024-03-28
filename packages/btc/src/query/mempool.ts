@@ -23,7 +23,7 @@ export const mempoolConfigs: Record<'mainnet' | 'testnet', MempoolConfig> = {
  * Get predefined mempool config by network type.
  * If the network is regtest, it will use the testnet config.
  */
-export function getMempoolConfig(network: NetworkType) {
+export function networkTypeToMempoolConfig(network: NetworkType) {
   if (network === NetworkType.MAINNET) {
     return mempoolConfigs.mainnet;
   }
@@ -36,6 +36,6 @@ export function getMempoolConfig(network: NetworkType) {
  * Create a mempool instance by network type.
  */
 export function createMempool(network: NetworkType) {
-  const config = getMempoolConfig(network);
+  const config = networkTypeToMempoolConfig(network);
   return Mempool(config);
 }
