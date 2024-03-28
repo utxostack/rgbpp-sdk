@@ -9,7 +9,7 @@ import {
   u128ToLe,
 } from '../utils';
 import { genRgbppLockScript } from '../utils/rgbpp';
-import { MAX_FEE, SECP256K1_WITNESS_LOCK_SIZE, getXudtDep } from '../constants';
+import { MAX_FEE, RGBPP_TX_WITNESS_MAX_SIZE, getXudtDep } from '../constants';
 import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
 /**
@@ -98,7 +98,7 @@ export const genCkbJumpBtcVirtualTx = async ({
   };
 
   if (txFee === MAX_FEE) {
-    const txSize = getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? SECP256K1_WITNESS_LOCK_SIZE);
+    const txSize = getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? RGBPP_TX_WITNESS_MAX_SIZE);
     const estimatedTxFee = calculateTransactionFee(txSize);
     const estimatedChangeCapacity = changeCapacity + (MAX_FEE - estimatedTxFee);
     ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(estimatedChangeCapacity.toString(16));

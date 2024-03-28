@@ -1,10 +1,10 @@
-## RGB++ Examples
+# RGB++ Examples
 
 **All examples are just to demonstrate the use of RGB++ SDK. SPV proof is not ready yet, so these examples do not involve the verification of SPV proof.**
 
-### What you must know about BTC transaction id
+## What you must know about BTC transaction id
 
-**The btc tx transaction id(hash) displayed on BTC explorer is different from the btc transaction id(hash) in RGB++ lock args. They are in reverse byte order.**
+**The BTC transaction id(hash) displayed on BTC explorer is different from the BTC transaction id(hash) in RGB++ lock args. They are in reverse byte order.**
 
 We follow the following two rules： 
 
@@ -24,6 +24,38 @@ But when you're searching for this transaction in [Bitcoin Core](https://bitcoin
 ```
 018025fb6989eed484774170eefa2bef1074b0c24537f992a64dbc138277bc4a
 ```
+
+## Examples with Queue service(Recommended)
+
+### Mint XUDT
+As a simple example, Omiga protocol is reused for a quick demonstration of XUDT asset insurance.
+Developers have the option to utilize an existing XUDT (User-Defined Token) on CKB.
+
+```shell
+npx ts-node examples/rgbpp/queue/1-mint-xudt.ts 
+```
+
+### Jump XUDT from CKB to BTC
+
+```shell
+npx ts-node examples/rgbpp/queue/2-ckb-jump-btc.ts 
+```
+
+### Transfer RGB++ asset on BTC
+
+```shell
+npx ts-node examples/rgbpp/queue/3-btc-transfer.ts 
+```
+
+### Jump RGB++ asset from BTC to CKB
+
+```shell
+npx ts-node examples/rgbpp/queue/4-btc-jump-ckb.ts 
+```
+
+### Unlock BTC time cells on CKB
+A cron job in RGB++ queue service will construct a transaction unlocking the mature btc_time_lock cells to the their `target_ckb_address`.
+## Local Examples
 
 ### Mint XUDT
 As a simple example, Omiga protocol is reused for a quick demonstration of XUDT asset insurance.
