@@ -1,7 +1,8 @@
 import { ECPairInterface } from 'ecpair';
-import { bitcoin, ECPair, isTaprootInput } from '../bitcoin';
+import { NetworkType } from '../preset/types';
+import { networkTypeToNetwork } from '../preset/network';
 import { AddressType, publicKeyToAddress } from '../address';
-import { NetworkType, toPsbtNetwork } from '../network';
+import { bitcoin, ECPair, isTaprootInput } from '../bitcoin';
 import { toXOnly, tweakSigner } from '../utils';
 
 export class FeeEstimator {
@@ -14,7 +15,7 @@ export class FeeEstimator {
   public address: string;
 
   constructor(wif: string, networkType: NetworkType, addressType: AddressType) {
-    const network = toPsbtNetwork(networkType);
+    const network = networkTypeToNetwork(networkType);
     const keyPair = ECPair.fromWIF(wif, network);
 
     this.keyPair = keyPair;
@@ -27,7 +28,7 @@ export class FeeEstimator {
   }
 
   static fromRandom(addressType: AddressType, networkType: NetworkType) {
-    const network = toPsbtNetwork(networkType);
+    const network = networkTypeToNetwork(networkType);
     const keyPair = ECPair.makeRandom({ network });
     return new FeeEstimator(keyPair.toWIF(), networkType, addressType);
   }
@@ -42,7 +43,7 @@ export class FeeEstimator {
         const tapInternalKey = toXOnly(Buffer.from(this.publicKey, 'hex'));
         const { output } = bitcoin.payments.p2tr({
           internalPubkey: tapInternalKey,
-          network: toPsbtNetwork(this.networkType),
+          network: networkTypeToNetwork(this.networkType),
         });
         if (v.witnessUtxo?.script.toString('hex') == output?.toString('hex')) {
           v.tapInternalKey = tapInternalKey;

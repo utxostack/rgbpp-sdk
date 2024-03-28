@@ -1,5 +1,5 @@
 import Mempool from '@mempool/mempool.js';
-import { NetworkType } from '../network';
+import { NetworkType } from '../preset/types';
 
 export type MempoolInstance = ReturnType<typeof Mempool>;
 

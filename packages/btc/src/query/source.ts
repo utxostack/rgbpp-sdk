@@ -1,7 +1,7 @@
 import { FeesRecommended } from '@mempool/mempool.js/lib/interfaces/bitcoin/fees';
 import { BtcAssetsApi, BtcApiUtxoParams } from '@rgbpp-sdk/service';
-import { Utxo } from '../types';
-import { NetworkType } from '../network';
+import { Utxo } from '../transaction/utxo';
+import { NetworkType } from '../preset/types';
 import { ErrorCodes, ErrorMessages, TxBuildError } from '../error';
 import { addressToScriptPublicKeyHex, getAddressType } from '../address';
 import { createMempool, MempoolInstance } from './mempool';

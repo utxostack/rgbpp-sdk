@@ -1,24 +1,25 @@
 export enum ErrorCodes {
   UNKNOWN,
 
-  MISSING_PUBKEY,
+  MISSING_PUBKEY = 20,
   CANNOT_FIND_UTXO,
   INSUFFICIENT_UTXO,
   REFERENCED_UNPROVABLE_UTXO,
   DUPLICATED_UTXO,
   UNSUPPORTED_OUTPUT,
+  UNSUPPORTED_NETWORK_TYPE,
   UNSUPPORTED_ADDRESS_TYPE,
   UNSUPPORTED_OP_RETURN_SCRIPT,
   INVALID_FEE_RATE,
 
-  CKB_CANNOT_FIND_OUTPOINT,
+  CKB_CANNOT_FIND_OUTPOINT = 40,
   CKB_INVALID_CELL_LOCK,
   CKB_INVALID_INPUTS,
   CKB_INVALID_OUTPUTS,
   CKB_UNMATCHED_COMMITMENT,
   CKB_RGBPP_LOCK_UNPACK_ERROR,
 
-  MEMPOOL_API_RESPONSE_ERROR,
+  MEMPOOL_API_RESPONSE_ERROR = 60,
 }
 
 export const ErrorMessages = {
@@ -30,6 +31,7 @@ export const ErrorMessages = {
   [ErrorCodes.REFERENCED_UNPROVABLE_UTXO]: 'Cannot reference a UTXO that does not belongs to "from"',
   [ErrorCodes.DUPLICATED_UTXO]: 'Cannot reference the same UTXO twice',
   [ErrorCodes.UNSUPPORTED_OUTPUT]: 'Unsupported output format',
+  [ErrorCodes.UNSUPPORTED_NETWORK_TYPE]: 'Unsupported network type',
   [ErrorCodes.UNSUPPORTED_ADDRESS_TYPE]: 'Unsupported address type',
   [ErrorCodes.UNSUPPORTED_OP_RETURN_SCRIPT]: 'Unsupported OP_RETURN script format',
   [ErrorCodes.INVALID_FEE_RATE]: 'Invalid fee rate provided or recommended',

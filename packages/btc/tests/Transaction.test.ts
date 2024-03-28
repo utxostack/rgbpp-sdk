@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { ErrorCodes, AddressType, sendBtc, sendUtxos, tweakSigner } from '../src';
-import { bitcoin, ErrorMessages, BTC_UTXO_DUST_LIMIT, RGBPP_UTXO_DUST_LIMIT } from '../src';
-import { accounts, network, service, source } from './shared/env';
 import { expectPsbtFeeInRange } from './shared/utils';
+import { accounts, config, network, service, source } from './shared/env';
+import { bitcoin, ErrorMessages, ErrorCodes, AddressType, sendBtc, sendUtxos, tweakSigner } from '../src';
+
+const BTC_UTXO_DUST_LIMIT = config.btcUtxoDustLimit;
+const RGBPP_UTXO_DUST_LIMIT = config.rgbppUtxoDustLimit;
 
 describe('Transaction', () => {
   describe('sendBtc()', () => {

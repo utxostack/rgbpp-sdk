@@ -1,13 +1,13 @@
 import { Collector, isRgbppLockCell, isBtcTimeLockCell, calculateCommitment } from '@rgbpp-sdk/ckb';
 import { bitcoin } from '../bitcoin';
-import { Utxo } from '../types';
+import { Utxo } from '../transaction/utxo';
 import { DataSource } from '../query/source';
 import { ErrorCodes, TxBuildError } from '../error';
 import { InitOutput, TxAddressOutput } from '../transaction/build';
+import { networkTypeToIsCkbMainnet } from '../preset/network';
+import { networkTypeToConfig } from '../preset/config';
 import { unpackRgbppLockArgs } from '../ckb/molecule';
-import { toIsCkbMainnet } from '../network';
 import { sendUtxos } from './sendUtxos';
-import { RGBPP_UTXO_DUST_LIMIT } from '../constants';
 
 export async function sendRgbppUtxos(props: {
   ckbVirtualTx: CKBComponents.RawTransaction;
@@ -31,7 +31,8 @@ export async function sendRgbppUtxos(props: {
   let lastTypeOutputIndex = -1;
 
   const ckbVirtualTx = props.ckbVirtualTx;
-  const isCkbMainnet = toIsCkbMainnet(props.source.networkType);
+  const config = networkTypeToConfig(props.source.networkType);
+  const isCkbMainnet = networkTypeToIsCkbMainnet(props.source.networkType);
 
   // Handle and check inputs
   for (let i = 0; i < ckbVirtualTx.inputs.length; i++) {
@@ -101,7 +102,7 @@ export async function sendRgbppUtxos(props: {
     // If output.lock == RgbppLock, generate a corresponding output in outputs
     if (isRgbppLock) {
       const toAddress = props.tos?.[i];
-      const minUtxoSatoshi = props.rgbppMinUtxoSatoshi ?? RGBPP_UTXO_DUST_LIMIT;
+      const minUtxoSatoshi = props.rgbppMinUtxoSatoshi ?? config.rgbppUtxoDustLimit;
       outputs.push({
         protected: true,
         address: toAddress ?? props.from,
