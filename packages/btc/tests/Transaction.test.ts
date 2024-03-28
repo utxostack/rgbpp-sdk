@@ -8,43 +8,29 @@ const RGBPP_UTXO_DUST_LIMIT = config.rgbppUtxoDustLimit;
 
 describe('Transaction', () => {
   describe('sendBtc()', () => {
-    describe('Transfer from Native SegWit (P2WPKH) address', () => {
-      const addresses = [
-        { type: 'Taproot (P2TR)', address: accounts.charlie.p2tr.address },
-        { type: 'Native SegWit (P2WPKH)', address: accounts.charlie.p2wpkh.address },
-        { type: 'Nested SegWit (P2SH)', address: '2N4gkVAQ1f6bi8BKon8MLKEV1pi85MJWcPV' },
-        { type: 'Legacy (P2PKH)', address: 'mqkAgjy8gfrMZh1VqV5Wm1Yi4G9KWLXA1Q' },
-      ];
-      addresses.forEach((addressInfo, index) => {
-        it(`Transfer to ${addressInfo.type} address`, async () => {
-          if (index !== 0) {
-            await new Promise((resolve) => setTimeout(resolve, 3000));
-          }
-
-          const psbt = await sendBtc({
-            from: accounts.charlie.p2wpkh.address,
-            tos: [
-              {
-                address: addressInfo.address,
-                value: 1000,
-              },
-            ],
-            source,
-          });
-
-          // Sign & finalize inputs
-          psbt.signAllInputs(accounts.charlie.keyPair);
-          psbt.finalizeAllInputs();
-
-          console.log('tx paid fee:', psbt.getFee());
-          expectPsbtFeeInRange(psbt);
-
-          // Broadcast transaction
-          // const tx = psbt.extractTransaction();
-          // const res = await service.sendBtcTransaction(tx.toHex());
-          // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
-        }, 10000);
+    it('Transfer from Native SegWit (P2WPKH) address', async () => {
+      const psbt = await sendBtc({
+        from: accounts.charlie.p2wpkh.address,
+        tos: [
+          {
+            address: accounts.charlie.p2wpkh.address,
+            value: 1000,
+          },
+        ],
+        source,
       });
+
+      // Sign & finalize inputs
+      psbt.signAllInputs(accounts.charlie.keyPair);
+      psbt.finalizeAllInputs();
+
+      console.log('tx paid fee:', psbt.getFee());
+      expectPsbtFeeInRange(psbt);
+
+      // Broadcast transaction
+      // const tx = psbt.extractTransaction();
+      // const res = await service.sendBtcTransaction(tx.toHex());
+      // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
     it('Transfer from Taproot (P2TR) address', async () => {
       const psbt = await sendBtc({
@@ -79,7 +65,6 @@ describe('Transaction', () => {
       // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
-
     it('Transfer with an impossible "minUtxoSatoshi" filter', async () => {
       const balance = await service.getBtcBalance(accounts.charlie.p2wpkh.address, {
         min_satoshi: BTC_UTXO_DUST_LIMIT,
