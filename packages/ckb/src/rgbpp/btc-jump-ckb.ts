@@ -65,6 +65,8 @@ export const genBtcJumpCkbVirtualTx = async ({
   if (isLockArgsSizeExceeded(toLock.args)) {
     throw new Error('The lock script size of the to ckb address is too large');
   }
+
+  let changeCapacity = sumInputsCapacity;
   const outputs: CKBComponents.CellOutput[] = [
     {
       lock: genBtcTimeLockScript(toLock, isMainnet),
@@ -80,6 +82,7 @@ export const genBtcJumpCkbVirtualTx = async ({
       capacity: append0x(rpbppCellCapacity.toString(16)),
     });
     outputsData.push(append0x(u128ToLe(sumAmount - transferAmount)));
+    changeCapacity -= rpbppCellCapacity;
   }
 
   const cellDeps = [getRgbppLockDep(isMainnet), getXudtDep(isMainnet), getRgbppLockConfigDep(isMainnet)];
@@ -113,7 +116,7 @@ export const genBtcJumpCkbVirtualTx = async ({
     const txSize = getTransactionSize(ckbRawTx) + RGBPP_TX_WITNESS_MAX_SIZE;
     const estimatedTxFee = calculateTransactionFee(txSize);
 
-    const changeCapacity = sumInputsCapacity - estimatedTxFee;
+    changeCapacity -= estimatedTxFee;
     ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
   }
 

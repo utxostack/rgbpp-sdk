@@ -48,6 +48,8 @@ export const genBtcTransferCkbVirtualTx = async ({
   const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
   const outputsData = [append0x(u128ToLe(transferAmount))];
 
+  let changeCapacity = sumInputsCapacity;
+
   // The Vouts[0] for OP_RETURN and Vouts[1], Vouts[2] for RGBPP assets
   const outputs: CKBComponents.CellOutput[] = [
     {
@@ -64,6 +66,7 @@ export const genBtcTransferCkbVirtualTx = async ({
       capacity: append0x(rpbppCellCapacity.toString(16)),
     });
     outputsData.push(append0x(u128ToLe(sumAmount - transferAmount)));
+    changeCapacity -= rpbppCellCapacity;
   }
 
   const cellDeps = [getRgbppLockDep(isMainnet), getXudtDep(isMainnet), getRgbppLockConfigDep(isMainnet)];
@@ -96,7 +99,7 @@ export const genBtcTransferCkbVirtualTx = async ({
     const txSize = getTransactionSize(ckbRawTx) + RGBPP_TX_WITNESS_MAX_SIZE;
     const estimatedTxFee = calculateTransactionFee(txSize);
 
-    const changeCapacity = sumInputsCapacity - estimatedTxFee;
+    changeCapacity -= estimatedTxFee;
     ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
   }
 
