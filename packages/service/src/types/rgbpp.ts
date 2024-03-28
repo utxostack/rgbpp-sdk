@@ -18,6 +18,7 @@ export interface RgbppApiCkbTransactionHash {
 
 export interface RgbppApiTransactionState {
   state: RgbppTransactionState;
+  failedReason: string;
 }
 
 export interface RgbppApiAssetsByAddressParams {
