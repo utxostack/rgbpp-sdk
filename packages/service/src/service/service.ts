@@ -79,7 +79,7 @@ export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis
   sendBtcTransaction(txHex: string) {
     return this.post<BtcApiSentTransaction>('/bitcoin/v1/transaction', {
       body: JSON.stringify({
-        txHex,
+        txhex: txHex,
       }),
     });
   }
@@ -113,7 +113,7 @@ export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis
   getRgbppSpvProof(btcTxId: string, confirmations: number) {
     return this.request<RgbppApiSpvProof>('/rgbpp/v1/btc-spv/proof', {
       params: {
-        txid: btcTxId,
+        btc_txid: btcTxId,
         confirmations,
       },
     });
