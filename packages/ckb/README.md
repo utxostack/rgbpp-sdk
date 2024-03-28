@@ -24,7 +24,7 @@ The `example/paymaster.ts` demonstrates how to use `@rgbpp-sdk/ckb` SDK to split
 cd packages/ckb && pnpm splitCells
 ```
 
-## RGB++ assetS transfer on BTC
+## RGB++ assets transfer on BTC
 
 The method `genBtcTransferCkbVirtualTx` can generate a CKB virtual transaction which contains the necessary `inputCells/outputCells` for rgbpp asset transfer and the commitment to be inserted to the BTC tx OP_RETURN.
 
