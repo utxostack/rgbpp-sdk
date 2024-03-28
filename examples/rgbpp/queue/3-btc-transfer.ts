@@ -85,7 +85,7 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
         clearInterval(interval)
         if (state === 'completed') {
           const { txhash: txHash } = await service.getRgbppTransactionHash(btcTxId);
-          console.info(`Rgbpp asset has been transferred on BTC and tx hash and tx hash is ${txHash}`);
+          console.info(`Rgbpp asset has been transferred on BTC and the related CKB tx hash is ${txHash}`);
         } else {
           console.warn(`Rgbpp CKB transaction failed and the reason is ${failedReason} `);
         }
