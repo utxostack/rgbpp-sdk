@@ -90,7 +90,7 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
         clearInterval(interval);
         if (state === 'completed') {
           const { txhash: txHash } = await service.getRgbppTransactionHash(btcTxId);
-          console.info(`Rgbpp asset has been jumped from BTC to CKB and tx hash is ${txHash}`);
+          console.info(`Rgbpp asset has been jumped from BTC to CKB and the related CKB tx hash is ${txHash}`);
         } else {
           console.warn(`Rgbpp CKB transaction failed and the reason is ${failedReason} `);
         }
