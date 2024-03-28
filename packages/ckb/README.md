@@ -17,7 +17,7 @@ $ pnpm add @rgbpp-sdk/ckb
 The `example/paymaster.ts` demonstrates how to use `@rgbpp-sdk/ckb` SDK to split multiple cells and you can set the parameters as blow:
 
 - `receiverAddress`: The receiver ckb address
-- `capacityWithCKB`: The capacity(unit is CKB) of each cell, for example: 220CKB
+- `capacityWithCKB`: The capacity(unit is CKB) of each cell, for example: 316CKB
 - `cellAmount`: The amount of cells to be split
 
 ```bash
