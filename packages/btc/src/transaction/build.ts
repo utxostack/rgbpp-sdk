@@ -1,7 +1,7 @@
 import clone from 'lodash/cloneDeep';
 import { bitcoin } from '../bitcoin';
-import { addressToScriptPublicKeyHex, AddressType, getAddressType, isSupportedFromAddress } from '../address';
 import { DataSource } from '../query/source';
+import { addressToScriptPublicKeyHex, AddressType, getAddressType, isSupportedFromAddress } from '../address';
 import { NetworkType, RgbppBtcConfig } from '../preset/types';
 import { ErrorCodes, ErrorMessages, TxBuildError } from '../error';
 import { networkTypeToConfig } from '../preset/config';
@@ -121,7 +121,10 @@ export class TxBuilder {
     changeAddress?: string;
     deductFromOutputs?: boolean;
     feeRate?: number;
-  }) {
+  }): Promise<{
+    fee: number;
+    feeRate: number;
+  }> {
     const { address, publicKey, feeRate, changeAddress, deductFromOutputs } = props;
     const originalInputs = clone(this.inputs);
     const originalOutputs = clone(this.outputs);
@@ -133,6 +136,11 @@ export class TxBuilder {
       averageFeeRate = await this.source.getAverageFeeRate();
     }
 
+    // Use the feeRate it is specified,
+    // otherwise use the average fee rate from the DataSource
+    const currentFeeRate = feeRate ?? this.feeRate ?? averageFeeRate!;
+
+    let currentFee: number = 0;
     let previousFee: number = 0;
     while (true) {
       const { inputsNeeding, outputsNeeding } = this.summary();
@@ -157,16 +165,20 @@ export class TxBuilder {
       }
 
       const addressType = getAddressType(address);
-      const currentFeeRate = feeRate ?? averageFeeRate;
-      const fee = await this.calculateFee(addressType, currentFeeRate);
-      if ([-1, 0, 1].includes(fee - previousFee)) {
+      currentFee = await this.calculateFee(addressType, currentFeeRate);
+      if ([-1, 0, 1].includes(currentFee - previousFee)) {
         break;
       }
 
-      previousFee = fee;
+      previousFee = currentFee;
       this.inputs = clone(originalInputs);
       this.outputs = clone(originalOutputs);
     }
+
+    return {
+      fee: currentFee,
+      feeRate: currentFeeRate,
+    };
   }
 
   async injectSatoshi(props: {

@@ -3,7 +3,7 @@ import { Utxo } from '../transaction/utxo';
 import { DataSource } from '../query/source';
 import { TxBuilder, InitOutput } from '../transaction/build';
 
-export async function sendUtxos(props: {
+export interface SendUtxosProps {
   inputs: Utxo[];
   outputs: InitOutput[];
   source: DataSource;
@@ -12,7 +12,13 @@ export async function sendUtxos(props: {
   changeAddress?: string;
   minUtxoSatoshi?: number;
   feeRate?: number;
-}): Promise<bitcoin.Psbt> {
+}
+
+export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
+  builder: TxBuilder;
+  feeRate: number;
+  fee: number;
+}> {
   const tx = new TxBuilder({
     source: props.source,
     feeRate: props.feeRate,
@@ -22,11 +28,20 @@ export async function sendUtxos(props: {
   tx.addInputs(props.inputs);
   tx.addOutputs(props.outputs);
 
-  await tx.payFee({
+  const paid = await tx.payFee({
     address: props.from,
     publicKey: props.fromPubkey,
     changeAddress: props.changeAddress,
   });
 
-  return tx.toPsbt();
+  return {
+    builder: tx,
+    fee: paid.fee,
+    feeRate: paid.feeRate,
+  };
+}
+
+export async function sendUtxos(props: SendUtxosProps): Promise<bitcoin.Psbt> {
+  const { builder } = await createSendUtxosBuilder(props);
+  return builder.toPsbt();
 }

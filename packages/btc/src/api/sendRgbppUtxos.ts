@@ -4,12 +4,12 @@ import { Utxo } from '../transaction/utxo';
 import { DataSource } from '../query/source';
 import { NetworkType } from '../preset/types';
 import { ErrorCodes, TxBuildError } from '../error';
-import { InitOutput, TxAddressOutput } from '../transaction/build';
+import { InitOutput, TxAddressOutput, TxBuilder } from '../transaction/build';
 import { networkTypeToConfig } from '../preset/config';
 import { unpackRgbppLockArgs } from '../ckb/molecule';
-import { sendUtxos } from './sendUtxos';
+import { createSendUtxosBuilder } from './sendUtxos';
 
-export async function sendRgbppUtxos(props: {
+export interface SendRgbppUtxosProps {
   ckbVirtualTx: CKBComponents.RawTransaction;
   commitment: string;
   tos?: string[];
@@ -24,7 +24,13 @@ export async function sendRgbppUtxos(props: {
   changeAddress?: string;
   minUtxoSatoshi?: number;
   feeRate?: number;
-}): Promise<bitcoin.Psbt> {
+}
+
+export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise<{
+  builder: TxBuilder;
+  feeRate: number;
+  fee: number;
+}> {
   const inputs: Utxo[] = [];
   const outputs: InitOutput[] = [];
   let lastTypeInputIndex = -1;
@@ -152,7 +158,7 @@ export async function sendRgbppUtxos(props: {
     return merged;
   })();
 
-  return await sendUtxos({
+  return await createSendUtxosBuilder({
     inputs,
     outputs: mergedOutputs,
     from: props.from,
@@ -162,4 +168,9 @@ export async function sendRgbppUtxos(props: {
     minUtxoSatoshi: props.minUtxoSatoshi,
     feeRate: props.feeRate,
   });
+}
+
+export async function sendRgbppUtxos(props: SendRgbppUtxosProps): Promise<bitcoin.Psbt> {
+  const { builder } = await sendRgbppUtxosBuilder(props);
+  return builder.toPsbt();
 }

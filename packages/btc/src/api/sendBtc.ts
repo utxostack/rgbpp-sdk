@@ -1,8 +1,8 @@
 import { bitcoin } from '../bitcoin';
 import { DataSource } from '../query/source';
-import { TxBuilder, InitOutput } from '../transaction/build';
+import { InitOutput, TxBuilder } from '../transaction/build';
 
-export async function sendBtc(props: {
+export interface SendBtcProps {
   from: string;
   tos: InitOutput[];
   source: DataSource;
@@ -10,7 +10,13 @@ export async function sendBtc(props: {
   changeAddress?: string;
   fromPubkey?: string;
   feeRate?: number;
-}): Promise<bitcoin.Psbt> {
+}
+
+export async function createSendBtcBuilder(props: SendBtcProps): Promise<{
+  builder: TxBuilder;
+  feeRate: number;
+  fee: number;
+}> {
   const tx = new TxBuilder({
     source: props.source,
     minUtxoSatoshi: props.minUtxoSatoshi,
@@ -24,11 +30,20 @@ export async function sendBtc(props: {
     });
   });
 
-  await tx.payFee({
+  const paid = await tx.payFee({
     address: props.from,
     publicKey: props.fromPubkey,
     changeAddress: props.changeAddress,
   });
 
-  return tx.toPsbt();
+  return {
+    builder: tx,
+    fee: paid.fee,
+    feeRate: paid.feeRate,
+  };
+}
+
+export async function sendBtc(props: SendBtcProps): Promise<bitcoin.Psbt> {
+  const { builder } = await createSendBtcBuilder(props);
+  return builder.toPsbt();
 }
