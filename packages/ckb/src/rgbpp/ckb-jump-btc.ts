@@ -9,7 +9,7 @@ import {
   u128ToLe,
 } from '../utils';
 import { genRgbppLockScript } from '../utils/rgbpp';
-import { MAX_FEE, RGBPP_TX_WITNESS_MAX_SIZE, getXudtDep } from '../constants';
+import { MAX_FEE, MIN_CAPACITY, RGBPP_TX_WITNESS_MAX_SIZE, getXudtDep } from '../constants';
 import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
 /**
@@ -54,7 +54,7 @@ export const genCkbJumpBtcVirtualTx = async ({
 
   let txFee = MAX_FEE;
   const xudtCellCapacity = calculateUdtCellCapacity(fromLock, xudtType);
-  if (sumInputsCapacity < xudtCellCapacity + rpbppCellCapacity + txFee) {
+  if (sumInputsCapacity < xudtCellCapacity + rpbppCellCapacity + MIN_CAPACITY + txFee) {
     const emptyCells = await collector.getCells({ lock: fromLock });
     if (!emptyCells || emptyCells.length === 0) {
       throw new NoLiveCellError('The address has no empty cells');
