@@ -54,6 +54,7 @@ export async function sendRgbppUtxos(props: {
     // 1. input.lock.args can be unpacked to RgbppLockArgs
     // 2. utxo can be found via the DataSource.getUtxo() API
     // 3. utxo.scriptPk == addressToScriptPk(props.from)
+    // 4. utxo is not duplicated in the inputs
     if (isRgbppLock) {
       const args = unpackRgbppLockArgs(liveCell.output.lock.args);
       const utxo = await props.source.getUtxo(args.btcTxid, args.outIndex);
@@ -62,6 +63,11 @@ export async function sendRgbppUtxos(props: {
       }
       if (utxo.address !== props.from) {
         throw new TxBuildError(ErrorCodes.REFERENCED_UNPROVABLE_UTXO);
+      }
+
+      const foundInInputs = inputs.some((v) => v.txid === utxo.txid && v.vout === utxo.vout);
+      if (foundInInputs) {
+        continue;
       }
 
       inputs.push({
