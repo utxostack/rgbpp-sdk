@@ -61,7 +61,7 @@ export const genCkbJumpBtcVirtualTx = async ({
     }
     const { inputs: emptyInputs, sumInputsCapacity: sumEmptyCapacity } = collector.collectInputs(
       emptyCells,
-      xudtCellCapacity,
+      rpbppCellCapacity,
       txFee,
     );
     inputs = [...emptyInputs, ...inputs];
