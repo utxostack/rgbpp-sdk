@@ -1,12 +1,11 @@
 import clone from 'lodash/cloneDeep';
 import { bitcoin } from '../bitcoin';
-import { AddressType } from '../address';
+import { addressToScriptPublicKeyHex, AddressType, getAddressType, isSupportedFromAddress } from '../address';
 import { DataSource } from '../query/source';
 import { NetworkType, RgbppBtcConfig } from '../preset/types';
 import { ErrorCodes, ErrorMessages, TxBuildError } from '../error';
-import { addressToScriptPublicKeyHex, getAddressType, isSupportedFromAddress } from '../address';
 import { networkTypeToConfig } from '../preset/config';
-import { dataToOpReturnScriptPubkey } from './embed';
+import { dataToOpReturnScriptPubkey, isOpReturnScriptPubkey } from './embed';
 import { Utxo, utxoToInput } from './utxo';
 import { FeeEstimator } from './fee';
 
@@ -96,6 +95,15 @@ export class TxBuilder {
     }
     if (!result) {
       throw new TxBuildError(ErrorCodes.UNSUPPORTED_OUTPUT);
+    }
+
+    const minUtxoSatoshi = result.minUtxoSatoshi ?? this.minUtxoSatoshi;
+    const isOpReturnOutput = 'script' in result && isOpReturnScriptPubkey(result.script);
+    if (!isOpReturnOutput && result.value < minUtxoSatoshi) {
+      throw new TxBuildError(
+        ErrorCodes.DUST_OUTPUT,
+        `${ErrorMessages[ErrorCodes.DUST_OUTPUT]}: expected ${minUtxoSatoshi}, but defined ${result.value}`,
+      );
     }
 
     this.outputs.push(result);

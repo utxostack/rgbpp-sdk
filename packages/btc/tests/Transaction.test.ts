@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { expectPsbtFeeInRange } from './shared/utils';
 import { accounts, config, network, service, source } from './shared/env';
-import { bitcoin, ErrorMessages, ErrorCodes, AddressType, sendBtc, sendUtxos, tweakSigner } from '../src';
+import { AddressType, bitcoin, ErrorCodes, ErrorMessages, sendBtc, sendUtxos, tweakSigner } from '../src';
 
 const BTC_UTXO_DUST_LIMIT = config.btcUtxoDustLimit;
 const RGBPP_UTXO_DUST_LIMIT = config.rgbppUtxoDustLimit;
@@ -9,14 +9,16 @@ const RGBPP_UTXO_DUST_LIMIT = config.rgbppUtxoDustLimit;
 describe('Transaction', () => {
   describe('sendBtc()', () => {
     it('Transfer from Native SegWit (P2WPKH) address', async () => {
+      const feeRate = await source.getAverageFeeRate();
       const psbt = await sendBtc({
         from: accounts.charlie.p2wpkh.address,
         tos: [
           {
             address: accounts.charlie.p2wpkh.address,
-            value: 1000,
+            value: 10000,
           },
         ],
+        feeRate,
         source,
       });
 
@@ -25,7 +27,7 @@ describe('Transaction', () => {
       psbt.finalizeAllInputs();
 
       console.log('tx paid fee:', psbt.getFee());
-      expectPsbtFeeInRange(psbt);
+      expectPsbtFeeInRange(psbt, feeRate);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -65,10 +67,26 @@ describe('Transaction', () => {
       // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
+    it('Transfer with defined value < minUtxoSatoshi', async () => {
+      await expect(() =>
+        sendBtc({
+          from: accounts.charlie.p2wpkh.address,
+          tos: [
+            {
+              address: accounts.charlie.p2wpkh.address,
+              value: 546,
+            },
+          ],
+          source,
+        }),
+      ).rejects.toThrow();
+    });
     it('Transfer with an impossible "minUtxoSatoshi" filter', async () => {
       const balance = await service.getBtcBalance(accounts.charlie.p2wpkh.address, {
         min_satoshi: BTC_UTXO_DUST_LIMIT,
       });
+
+      const impossibleLimit = balance.satoshi + balance.pending_satoshi + 1;
 
       await expect(() =>
         sendBtc({
@@ -76,10 +94,10 @@ describe('Transaction', () => {
           tos: [
             {
               address: accounts.charlie.p2wpkh.address,
-              value: 1000,
+              value: impossibleLimit,
             },
           ],
-          minUtxoSatoshi: balance.satoshi + balance.pending_satoshi + 1,
+          minUtxoSatoshi: impossibleLimit,
           source,
         }),
       ).rejects.toThrow(ErrorMessages[ErrorCodes.INSUFFICIENT_UTXO]);
