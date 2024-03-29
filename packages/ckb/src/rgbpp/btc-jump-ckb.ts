@@ -77,7 +77,8 @@ export const genBtcJumpCkbVirtualTx = async ({
 
   if (sumAmount > transferAmount) {
     outputs.push({
-      lock: genRgbppLockScript(buildPreLockArgs(2), isMainnet),
+      // The Vouts[0] for OP_RETURN and Vouts[1] for RGBPP assets, BTC time cells don't need btc tx out_index
+      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
       type: xudtType,
       capacity: append0x(rpbppCellCapacity.toString(16)),
     });
