@@ -58,7 +58,18 @@ export class TxBuilder {
     this.minUtxoSatoshi = props.minUtxoSatoshi ?? BTC_UTXO_DUST_LIMIT;
   }
 
+  hasInput(hash: string, index: number): boolean {
+    return this.inputs.some((input) => input.data.hash === hash && input.data.index === index);
+  }
+
   addInput(utxo: Utxo) {
+    if (this.hasInput(utxo.txid, utxo.vout)) {
+      throw new TxBuildError(
+        ErrorCodes.DUPLICATED_UTXO,
+        `${ErrorMessages[ErrorCodes.DUPLICATED_UTXO]}: hash: ${utxo.txid}, index: ${utxo.vout}`,
+      );
+    }
+
     utxo = clone(utxo);
     this.inputs.push(utxoToInput(utxo));
   }
