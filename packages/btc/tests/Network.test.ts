@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { bitcoin, NetworkType, networkTypeToConfig, networkToConfig } from '../src';
-import { networkToNetworkType, networkTypeToIsCkbMainnet, networkTypeToNetwork } from '../src';
+import { networkToNetworkType, networkTypeToNetwork } from '../src';
 
 describe('Network', () => {
   it('networkTypeToConfig()', () => {
@@ -46,10 +46,5 @@ describe('Network', () => {
     expect(mainnet).toEqual(NetworkType.MAINNET);
 
     expect(() => networkToNetworkType(bitcoin.networks.regtest)).toThrow();
-  });
-  it('networkTypeToIsCkbMainnet()', () => {
-    expect(networkTypeToIsCkbMainnet(NetworkType.TESTNET)).toBe(false);
-    expect(networkTypeToIsCkbMainnet(NetworkType.MAINNET)).toBe(true);
-    expect(() => networkTypeToIsCkbMainnet(NetworkType.REGTEST)).toThrow();
   });
 });

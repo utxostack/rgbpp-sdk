@@ -2,9 +2,9 @@ import { Collector, isRgbppLockCell, isBtcTimeLockCell, calculateCommitment } fr
 import { bitcoin } from '../bitcoin';
 import { Utxo } from '../transaction/utxo';
 import { DataSource } from '../query/source';
+import { NetworkType } from '../preset/types';
 import { ErrorCodes, TxBuildError } from '../error';
 import { InitOutput, TxAddressOutput } from '../transaction/build';
-import { networkTypeToIsCkbMainnet } from '../preset/network';
 import { networkTypeToConfig } from '../preset/config';
 import { unpackRgbppLockArgs } from '../ckb/molecule';
 import { sendUtxos } from './sendUtxos';
@@ -32,7 +32,7 @@ export async function sendRgbppUtxos(props: {
 
   const ckbVirtualTx = props.ckbVirtualTx;
   const config = networkTypeToConfig(props.source.networkType);
-  const isCkbMainnet = networkTypeToIsCkbMainnet(props.source.networkType);
+  const isCkbMainnet = props.source.networkType === NetworkType.MAINNET;
 
   // Handle and check inputs
   for (let i = 0; i < ckbVirtualTx.inputs.length; i++) {
