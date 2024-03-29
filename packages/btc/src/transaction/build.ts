@@ -328,9 +328,8 @@ export class TxBuilder {
     if (!feeRate && !this.feeRate) {
       throw new TxBuildError(ErrorCodes.INVALID_FEE_RATE, `${ErrorMessages[ErrorCodes.INVALID_FEE_RATE]}: ${feeRate}`);
     }
-    if (!feeRate) {
-      feeRate = this.feeRate!;
-    }
+
+    const currentFeeRate = feeRate ?? this.feeRate!;
 
     const psbt = await this.createEstimatedPsbt(addressType);
     const tx = psbt.extractTransaction(true);
@@ -341,7 +340,7 @@ export class TxBuilder {
 
     const weight = weightWithoutWitness * 3 + weightWithWitness + inputs;
     const virtualSize = Math.ceil(weight / 4);
-    return Math.ceil(virtualSize * feeRate);
+    return Math.ceil(virtualSize * currentFeeRate);
   }
 
   async createEstimatedPsbt(addressType: AddressType): Promise<bitcoin.Psbt> {
