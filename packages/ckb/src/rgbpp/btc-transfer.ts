@@ -1,7 +1,13 @@
 import { BtcTransferVirtualTxParams, BtcTransferVirtualTxResult, RgbppCkbVirtualTx } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
-import { NoRgbppLiveCellError } from '../error';
-import { append0x, calculateRgbppCellCapacity, calculateTransactionFee, u128ToLe } from '../utils';
+import { NoRgbppLiveCellError, TypeAssetNotSupportedError } from '../error';
+import {
+  append0x,
+  calculateRgbppCellCapacity,
+  calculateTransactionFee,
+  isTypeAssetSupported,
+  u128ToLe,
+} from '../utils';
 import { buildPreLockArgs, calculateCommitment, compareInputs, genRgbppLockScript } from '../utils/rgbpp';
 import { Hex, IndexerCell } from '../types';
 import {
@@ -32,6 +38,10 @@ export const genBtcTransferCkbVirtualTx = async ({
   noMergeOutputCells,
 }: BtcTransferVirtualTxParams): Promise<BtcTransferVirtualTxResult> => {
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
+
+  if (!isTypeAssetSupported(xudtType, isMainnet)) {
+    throw new TypeAssetNotSupportedError('The type script asset is not supported now');
+  }
 
   const rgbppLocks = rgbppLockArgsList.map((args) => genRgbppLockScript(args, isMainnet));
   let rgbppCells: IndexerCell[] = [];
