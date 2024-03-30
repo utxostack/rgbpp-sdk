@@ -224,61 +224,91 @@ const psbt = await sendRgbppUtxos({
 
 ### Transaction
 
-#### sendBtc
+#### sendBtc / createSendBtcBuilder / SendBtcProps
 
 ```typescript
-interface sendBtc {
-  (props: {
-    from: string;
-    tos: InitOutput[];
-    source: DataSource;
-    fromPubkey?: string;
-    changeAddress?: string;
-    minUtxoSatoshi?: number;
-    feeRate?: number;
-  }): Promise<bitcoin.Psbt>;
+declare function sendBtc(props: SendBtcProps): Promise<bitcoin.Psbt>;
+```
+
+```typescript
+declare function createSendBtcBuilder(props: SendBtcProps): Promise<{
+  builder: TxBuilder;
+  feeRate: number;
+  fee: number;
+}>;
+```
+
+```typescript
+interface SendBtcProps {
+  from: string;
+  tos: InitOutput[];
+  source: DataSource;
+  fromPubkey?: string;
+  changeAddress?: string;
+  minUtxoSatoshi?: number;
+  feeRate?: number;
 }
 ```
 
-#### sendUtxos
+#### sendUtxos / createSendUtxosBuilder / SendUtxosProps
 
 ```typescript
-interface sendUtxos {
-  (props: {
-    inputs: Utxo[];
-    outputs: InitOutput[];
-    source: DataSource;
-    from: string;
-    fromPubkey?: string;
-    changeAddress?: string;
-    minUtxoSatoshi?: number;
-    feeRate?: number;
-  }): Promise<bitcoin.Psbt>;
+declare function sendUtxos(props: SendUtxosProps): Promise<bitcoin.Psbt>;
+```
+
+```typescript
+declare function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
+  builder: TxBuilder;
+  feeRate: number;
+  fee: number;
+}>;
+```
+
+```typescript
+interface SendUtxosProps {
+  inputs: Utxo[];
+  outputs: InitOutput[];
+  source: DataSource;
+  from: string;
+  fromPubkey?: string;
+  changeAddress?: string;
+  minUtxoSatoshi?: number;
+  feeRate?: number;
 }
 ```
 
-#### sendRgbppUtxos
+#### sendRgbppUtxos / createSendRgbppUtxosBuilder / SendRgbppUtxosProps
 
 ```typescript
-interface sendRgbppUtxos {
-  (props: {
-    ckbVirtualTx: RawTransaction;
-    commitment: Hash;
-    tos?: string[];
-    paymaster?: TxAddressOutput;
+declare function sendRgbppUtxos(props: SendRgbppUtxosProps): Promise<bitcoin.Psbt>;
+```
 
-    ckbNodeUrl: string;
-    rgbppLockCodeHash: Hash;
-    rgbppTimeLockCodeHash: Hash;
-    rgbppMinUtxoSatoshi?: number;
+```typescript
+declare function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise<{
+  builder: TxBuilder;
+  feeRate: number;
+  fee: number;
+}>;
+```
 
-    from: string;
-    source: DataSource;
-    fromPubkey?: string;
-    changeAddress?: string;
-    minUtxoSatoshi?: number;
-    feeRate?: number;
-  }): Promise<bitcoin.Psbt>;
+```typescript
+interface SendRgbppUtxosProps {
+  ckbVirtualTx: RawTransaction;
+  commitment: Hash;
+  tos?: string[];
+  paymaster?: TxAddressOutput;
+
+  ckbNodeUrl: string;
+  rgbppLockCodeHash: Hash;
+  rgbppTimeLockCodeHash: Hash;
+  rgbppMinUtxoSatoshi?: number;
+
+  from: string;
+  source: DataSource;
+  fromPubkey?: string;
+  changeAddress?: string;
+  minUtxoSatoshi?: number;
+  feeRate?: number;
 }
 ```
 

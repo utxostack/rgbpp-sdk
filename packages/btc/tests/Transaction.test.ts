@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { expectPsbtFeeInRange } from './shared/utils';
 import { accounts, config, network, service, source } from './shared/env';
-import { AddressType, bitcoin, ErrorCodes, ErrorMessages, sendBtc, sendUtxos, tweakSigner } from '../src';
+import { bitcoin, ErrorMessages, ErrorCodes, AddressType, createSendUtxosBuilder } from '../src';
+import { createSendBtcBuilder, sendBtc, sendUtxos, tweakSigner } from '../src';
 
 const BTC_UTXO_DUST_LIMIT = config.btcUtxoDustLimit;
 const RGBPP_UTXO_DUST_LIMIT = config.rgbppUtxoDustLimit;
@@ -9,20 +10,19 @@ const RGBPP_UTXO_DUST_LIMIT = config.rgbppUtxoDustLimit;
 describe('Transaction', () => {
   describe('sendBtc()', () => {
     it('Transfer from Native SegWit (P2WPKH) address', async () => {
-      const feeRate = await source.getAverageFeeRate();
-      const psbt = await sendBtc({
+      const { builder, feeRate } = await createSendBtcBuilder({
         from: accounts.charlie.p2wpkh.address,
         tos: [
           {
             address: accounts.charlie.p2wpkh.address,
-            value: 10000,
+            value: 1000,
           },
         ],
-        feeRate,
         source,
       });
 
       // Sign & finalize inputs
+      const psbt = builder.toPsbt();
       psbt.signAllInputs(accounts.charlie.keyPair);
       psbt.finalizeAllInputs();
 
@@ -152,7 +152,7 @@ describe('Transaction', () => {
 
   describe('sendUtxos()', () => {
     it('Transfer fixed UTXO, sum(ins) = sum(outs)', async () => {
-      const psbt = await sendUtxos({
+      const { builder, feeRate } = await createSendUtxosBuilder({
         from: accounts.charlie.p2wpkh.address,
         inputs: [
           {
@@ -175,6 +175,7 @@ describe('Transaction', () => {
       });
 
       // Sign & finalize inputs
+      const psbt = builder.toPsbt();
       psbt.signAllInputs(accounts.charlie.keyPair);
       psbt.finalizeAllInputs();
 
@@ -182,7 +183,7 @@ describe('Transaction', () => {
       expect(psbt.txOutputs).toHaveLength(2);
 
       console.log('tx paid fee:', psbt.getFee());
-      expectPsbtFeeInRange(psbt);
+      expectPsbtFeeInRange(psbt, feeRate);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
