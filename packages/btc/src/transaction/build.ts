@@ -129,14 +129,14 @@ export class TxBuilder {
     const originalInputs = clone(this.inputs);
     const originalOutputs = clone(this.outputs);
 
-    // Use the average fee rate if feeRate is not provided
+    // Fetch the latest average fee rate if feeRate param is not provided
     // The transaction is expected be confirmed within half an hour with the fee rate
     let averageFeeRate: number | undefined;
     if (!feeRate && !this.feeRate) {
       averageFeeRate = await this.source.getAverageFeeRate();
     }
 
-    // Use the feeRate it is specified,
+    // Use the feeRate param if it is specified,
     // otherwise use the average fee rate from the DataSource
     const currentFeeRate = feeRate ?? this.feeRate ?? averageFeeRate!;
 
