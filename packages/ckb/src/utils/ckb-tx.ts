@@ -1,7 +1,8 @@
 import { calculateTransactionFee as calculateTxFee } from '@nervosnetwork/ckb-sdk-utils/lib/calculateTransactionFee';
 import { remove0x } from './hex';
-import { CKB_UNIT } from '../constants';
+import { CKB_UNIT, getXudtTypeScript } from '../constants';
 import { Hex } from '../types';
+import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 
 export const calculateTransactionFee = (txSize: number, feeRate?: bigint): bigint => {
   const rate = feeRate ?? BigInt(1100);
@@ -40,4 +41,14 @@ export const calculateUdtCellCapacity = (lock: CKBComponents.Script, udtType: CK
   const typeArgsSize = remove0x(udtType.args).length / 2;
   const cellSize = 33 + lockArgsSize + 33 + typeArgsSize + 8 + 16;
   return BigInt(cellSize + 1) * CKB_UNIT;
+};
+
+export const isTypeAssetSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
+  const xudtType = getXudtTypeScript(isMainnet);
+  const typeAsset = {
+    ...type,
+    args: '',
+  };
+  const isXudt = serializeScript(xudtType) === serializeScript(typeAsset);
+  return isXudt;
 };
