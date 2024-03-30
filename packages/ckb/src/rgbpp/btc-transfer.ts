@@ -66,7 +66,11 @@ export const genBtcTransferCkbVirtualTx = async ({
     }
     changeCapacity = BigInt(rgbppCells[rgbppCells.length - 1].output.capacity);
   } else {
-    const collectResult = collector.collectUdtInputs(rgbppCells, transferAmount);
+    const collectResult = collector.collectUdtInputs({
+      liveCells: rgbppCells,
+      needAmount: transferAmount,
+      isMax: true,
+    });
     inputs = collectResult.inputs;
     sumInputsCapacity = collectResult.sumInputsCapacity;
 

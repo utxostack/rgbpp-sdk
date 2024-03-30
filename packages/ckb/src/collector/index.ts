@@ -110,7 +110,15 @@ export class Collector {
     return { inputs, sumInputsCapacity };
   }
 
-  collectUdtInputs(liveCells: IndexerCell[], needAmount: bigint): CollectUdtResult {
+  collectUdtInputs({
+    liveCells,
+    needAmount,
+    isMax,
+  }: {
+    liveCells: IndexerCell[];
+    needAmount: bigint;
+    isMax?: boolean;
+  }): CollectUdtResult {
     let inputs: CKBComponents.CellInput[] = [];
     let sumInputsCapacity = BigInt(0);
     let sumAmount = BigInt(0);
@@ -124,7 +132,7 @@ export class Collector {
       });
       sumInputsCapacity = sumInputsCapacity + BigInt(cell.output.capacity);
       sumAmount += leToU128(cell.outputData);
-      if (sumAmount >= needAmount) {
+      if (sumAmount >= needAmount && !isMax) {
         break;
       }
     }

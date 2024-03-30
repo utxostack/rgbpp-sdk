@@ -39,7 +39,10 @@ export const genCkbJumpBtcVirtualTx = async ({
     throw new NoXudtLiveCellError('No rgbpp cells found with the xudt type script and the rgbpp lock args');
   }
 
-  let { inputs, sumInputsCapacity, sumAmount } = collector.collectUdtInputs(xudtCells, transferAmount);
+  let { inputs, sumInputsCapacity, sumAmount } = collector.collectUdtInputs({
+    liveCells: xudtCells,
+    needAmount: transferAmount,
+  });
 
   const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
   const outputsData = [append0x(u128ToLe(transferAmount))];
