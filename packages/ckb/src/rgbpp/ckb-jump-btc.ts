@@ -1,11 +1,12 @@
 import { CkbJumpBtcVirtualTxParams } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
-import { NoLiveCellError, NoXudtLiveCellError } from '../error';
+import { NoLiveCellError, NoXudtLiveCellError, TypeAssetNotSupportedError } from '../error';
 import {
   append0x,
   calculateRgbppCellCapacity,
   calculateTransactionFee,
   calculateUdtCellCapacity,
+  isTypeAssetSupported,
   u128ToLe,
 } from '../utils';
 import { genRgbppLockScript } from '../utils/rgbpp';
@@ -32,6 +33,10 @@ export const genCkbJumpBtcVirtualTx = async ({
 }: CkbJumpBtcVirtualTxParams): Promise<CKBComponents.RawTransaction> => {
   const isMainnet = fromCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
+  if (!isTypeAssetSupported(xudtType, isMainnet)) {
+    throw new TypeAssetNotSupportedError('The type script asset is not supported now');
+  }
+
   const fromLock = addressToScript(fromCkbAddress);
 
   const xudtCells = await collector.getCells({ lock: fromLock, type: xudtType });

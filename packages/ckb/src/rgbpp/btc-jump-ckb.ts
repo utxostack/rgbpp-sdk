@@ -1,11 +1,12 @@
 import { RgbppCkbVirtualTx, BtcJumpCkbVirtualTxParams, BtcJumpCkbVirtualTxResult } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
-import { NoRgbppLiveCellError } from '../error';
+import { NoRgbppLiveCellError, TypeAssetNotSupportedError } from '../error';
 import {
   append0x,
   calculateRgbppCellCapacity,
   calculateTransactionFee,
   isLockArgsSizeExceeded,
+  isTypeAssetSupported,
   remove0x,
   u128ToLe,
 } from '../utils';
@@ -44,6 +45,10 @@ export const genBtcJumpCkbVirtualTx = async ({
 }: BtcJumpCkbVirtualTxParams): Promise<BtcJumpCkbVirtualTxResult> => {
   const isMainnet = toCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
+
+  if (!isTypeAssetSupported(xudtType, isMainnet)) {
+    throw new TypeAssetNotSupportedError('The type script asset is not supported now');
+  }
 
   const rgbppLocks = rgbppLockArgsList.map((args) => genRgbppLockScript(args, isMainnet));
   let rgbppCells: IndexerCell[] = [];

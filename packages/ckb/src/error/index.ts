@@ -40,7 +40,7 @@ export class InputsCapacityNotEnoughError extends Error {
   }
 }
 
-export class SpvRpcError extends Error {
+export class TypeAssetNotSupportedError extends Error {
   constructor(message: string) {
     super(message);
   }
