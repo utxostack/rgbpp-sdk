@@ -1,5 +1,5 @@
 import { bitcoin } from '../bitcoin';
-import { Utxo } from '../types';
+import { Utxo } from '../transaction/utxo';
 import { DataSource } from '../query/source';
 import { TxBuilder, InitOutput } from '../transaction/build';
 

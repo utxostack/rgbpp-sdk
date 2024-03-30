@@ -1,5 +1,6 @@
 import { bitcoin } from './bitcoin';
-import { NetworkType, toPsbtNetwork } from './network';
+import { NetworkType } from './preset/types';
+import { networkTypeToNetwork } from './preset/network';
 import { ErrorCodes, TxBuildError } from './error';
 import { remove0x, toXOnly } from './utils';
 
@@ -30,7 +31,7 @@ export function publicKeyToPayment(publicKey: string, addressType: AddressType, 
     return void 0;
   }
 
-  const network = toPsbtNetwork(networkType);
+  const network = networkTypeToNetwork(networkType);
   const pubkey = Buffer.from(remove0x(publicKey), 'hex');
 
   if (addressType === AddressType.P2PKH) {
@@ -82,7 +83,7 @@ export function publicKeyToAddress(publicKey: string, addressType: AddressType, 
  * Convert bitcoin address to scriptPk.
  */
 export function addressToScriptPublicKey(address: string, networkType: NetworkType): Buffer {
-  const network = toPsbtNetwork(networkType);
+  const network = networkTypeToNetwork(networkType);
   return bitcoin.address.toOutputScript(address, network);
 }
 
@@ -99,7 +100,7 @@ export function addressToScriptPublicKeyHex(address: string, networkType: Networ
  */
 export function isValidAddress(address: string, networkType: NetworkType) {
   try {
-    bitcoin.address.toOutputScript(address, toPsbtNetwork(networkType));
+    bitcoin.address.toOutputScript(address, networkTypeToNetwork(networkType));
     return true;
   } catch {
     return false;

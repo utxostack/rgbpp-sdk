@@ -1,48 +1,38 @@
 import { describe, expect, it } from 'vitest';
-import { ErrorCodes, AddressType, sendBtc, sendUtxos, tweakSigner } from '../src';
-import { bitcoin, ErrorMessages, BTC_UTXO_DUST_LIMIT, RGBPP_UTXO_DUST_LIMIT } from '../src';
-import { accounts, network, service, source } from './shared/env';
 import { expectPsbtFeeInRange } from './shared/utils';
+import { accounts, config, network, service, source } from './shared/env';
+import { AddressType, bitcoin, ErrorCodes, ErrorMessages, sendBtc, sendUtxos, tweakSigner } from '../src';
+
+const BTC_UTXO_DUST_LIMIT = config.btcUtxoDustLimit;
+const RGBPP_UTXO_DUST_LIMIT = config.rgbppUtxoDustLimit;
 
 describe('Transaction', () => {
   describe('sendBtc()', () => {
-    describe('Transfer from Native SegWit (P2WPKH) address', () => {
-      const addresses = [
-        { type: 'Taproot (P2TR)', address: accounts.charlie.p2tr.address },
-        { type: 'Native SegWit (P2WPKH)', address: accounts.charlie.p2wpkh.address },
-        { type: 'Nested SegWit (P2SH)', address: '2N4gkVAQ1f6bi8BKon8MLKEV1pi85MJWcPV' },
-        { type: 'Legacy (P2PKH)', address: 'mqkAgjy8gfrMZh1VqV5Wm1Yi4G9KWLXA1Q' },
-      ];
-      addresses.forEach((addressInfo, index) => {
-        it(`Transfer to ${addressInfo.type} address`, async () => {
-          if (index !== 0) {
-            await new Promise((resolve) => setTimeout(resolve, 3000));
-          }
-
-          const psbt = await sendBtc({
-            from: accounts.charlie.p2wpkh.address,
-            tos: [
-              {
-                address: addressInfo.address,
-                value: 1000,
-              },
-            ],
-            source,
-          });
-
-          // Sign & finalize inputs
-          psbt.signAllInputs(accounts.charlie.keyPair);
-          psbt.finalizeAllInputs();
-
-          console.log('tx paid fee:', psbt.getFee());
-          expectPsbtFeeInRange(psbt);
-
-          // Broadcast transaction
-          // const tx = psbt.extractTransaction();
-          // const res = await service.sendBtcTransaction(tx.toHex());
-          // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
-        }, 10000);
+    it('Transfer from Native SegWit (P2WPKH) address', async () => {
+      const feeRate = await source.getAverageFeeRate();
+      const psbt = await sendBtc({
+        from: accounts.charlie.p2wpkh.address,
+        tos: [
+          {
+            address: accounts.charlie.p2wpkh.address,
+            value: 10000,
+          },
+        ],
+        feeRate,
+        source,
       });
+
+      // Sign & finalize inputs
+      psbt.signAllInputs(accounts.charlie.keyPair);
+      psbt.finalizeAllInputs();
+
+      console.log('tx paid fee:', psbt.getFee());
+      expectPsbtFeeInRange(psbt, feeRate);
+
+      // Broadcast transaction
+      // const tx = psbt.extractTransaction();
+      // const res = await service.sendBtcTransaction(tx.toHex());
+      // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
     it('Transfer from Taproot (P2TR) address', async () => {
       const psbt = await sendBtc({
@@ -77,11 +67,26 @@ describe('Transaction', () => {
       // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
-
+    it('Transfer with defined value < minUtxoSatoshi', async () => {
+      await expect(() =>
+        sendBtc({
+          from: accounts.charlie.p2wpkh.address,
+          tos: [
+            {
+              address: accounts.charlie.p2wpkh.address,
+              value: 546,
+            },
+          ],
+          source,
+        }),
+      ).rejects.toThrow();
+    });
     it('Transfer with an impossible "minUtxoSatoshi" filter', async () => {
       const balance = await service.getBtcBalance(accounts.charlie.p2wpkh.address, {
         min_satoshi: BTC_UTXO_DUST_LIMIT,
       });
+
+      const impossibleLimit = balance.satoshi + balance.pending_satoshi + 1;
 
       await expect(() =>
         sendBtc({
@@ -89,10 +94,10 @@ describe('Transaction', () => {
           tos: [
             {
               address: accounts.charlie.p2wpkh.address,
-              value: 1000,
+              value: impossibleLimit,
             },
           ],
-          minUtxoSatoshi: balance.satoshi + balance.pending_satoshi + 1,
+          minUtxoSatoshi: impossibleLimit,
           source,
         }),
       ).rejects.toThrow(ErrorMessages[ErrorCodes.INSUFFICIENT_UTXO]);

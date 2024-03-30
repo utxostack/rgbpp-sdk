@@ -1,17 +1,15 @@
 import clone from 'lodash/cloneDeep';
 import { bitcoin } from '../bitcoin';
+import { addressToScriptPublicKeyHex, AddressType, getAddressType, isSupportedFromAddress } from '../address';
 import { DataSource } from '../query/source';
-import { Utxo } from '../types';
-import { AddressType } from '../address';
+import { NetworkType, RgbppBtcConfig } from '../preset/types';
 import { ErrorCodes, ErrorMessages, TxBuildError } from '../error';
-import { NetworkType, toPsbtNetwork } from '../network';
-import { addressToScriptPublicKeyHex, getAddressType, isSupportedFromAddress } from '../address';
-import { dataToOpReturnScriptPubkey } from './embed';
-import { BTC_UTXO_DUST_LIMIT, FEE_RATE } from '../constants';
-import { remove0x, toXOnly } from '../utils';
+import { networkTypeToConfig } from '../preset/config';
+import { dataToOpReturnScriptPubkey, isOpReturnScriptPubkey } from './embed';
+import { Utxo, utxoToInput } from './utxo';
 import { FeeEstimator } from './fee';
 
-interface TxInput {
+export interface TxInput {
   data: {
     hash: string;
     index: number;
@@ -22,8 +20,6 @@ interface TxInput {
 }
 
 export type TxOutput = TxAddressOutput | TxScriptOutput;
-export type InitOutput = TxAddressOutput | TxDataOutput | TxScriptOutput;
-
 export interface BaseOutput {
   value: number;
   fixed?: boolean;
@@ -33,11 +29,13 @@ export interface BaseOutput {
 export interface TxAddressOutput extends BaseOutput {
   address: string;
 }
-export interface TxDataOutput extends BaseOutput {
-  data: Buffer | string;
-}
 export interface TxScriptOutput extends BaseOutput {
   script: Buffer;
+}
+
+export type InitOutput = TxAddressOutput | TxDataOutput | TxScriptOutput;
+export interface TxDataOutput extends BaseOutput {
+  data: Buffer | string;
 }
 
 export class TxBuilder {
@@ -45,17 +43,17 @@ export class TxBuilder {
   outputs: TxOutput[] = [];
 
   source: DataSource;
+  config: RgbppBtcConfig;
   networkType: NetworkType;
   minUtxoSatoshi: number;
   feeRate?: number;
-  defaultFeeRate?: number;
 
   constructor(props: { source: DataSource; minUtxoSatoshi?: number; feeRate?: number }) {
     this.source = props.source;
     this.networkType = this.source.networkType;
-
+    this.config = networkTypeToConfig(this.networkType);
+    this.minUtxoSatoshi = props.minUtxoSatoshi ?? this.config.btcUtxoDustLimit;
     this.feeRate = props.feeRate;
-    this.minUtxoSatoshi = props.minUtxoSatoshi ?? BTC_UTXO_DUST_LIMIT;
   }
 
   hasInput(hash: string, index: number): boolean {
@@ -99,6 +97,15 @@ export class TxBuilder {
       throw new TxBuildError(ErrorCodes.UNSUPPORTED_OUTPUT);
     }
 
+    const minUtxoSatoshi = result.minUtxoSatoshi ?? this.minUtxoSatoshi;
+    const isOpReturnOutput = 'script' in result && isOpReturnScriptPubkey(result.script);
+    if (!isOpReturnOutput && result.value < minUtxoSatoshi) {
+      throw new TxBuildError(
+        ErrorCodes.DUST_OUTPUT,
+        `${ErrorMessages[ErrorCodes.DUST_OUTPUT]}: expected ${minUtxoSatoshi}, but defined ${result.value}`,
+      );
+    }
+
     this.outputs.push(result);
   }
 
@@ -108,15 +115,22 @@ export class TxBuilder {
     });
   }
 
-  async payFee(props: { address: string; publicKey?: string; changeAddress?: string; deductFromOutputs?: boolean }) {
-    const { address, publicKey, changeAddress, deductFromOutputs } = props;
+  async payFee(props: {
+    address: string;
+    publicKey?: string;
+    changeAddress?: string;
+    deductFromOutputs?: boolean;
+    feeRate?: number;
+  }) {
+    const { address, publicKey, feeRate, changeAddress, deductFromOutputs } = props;
     const originalInputs = clone(this.inputs);
     const originalOutputs = clone(this.outputs);
 
-    // Get default fee rate from mempool.space if feeRate is not provided
-    // The tx is expected be confirmed within half an hour
-    if (!this.feeRate) {
-      this.defaultFeeRate = await this.source.getAverageFeeRate();
+    // Use the average fee rate if feeRate is not provided
+    // The transaction is expected be confirmed within half an hour with the fee rate
+    let averageFeeRate: number | undefined;
+    if (!feeRate && !this.feeRate) {
+      averageFeeRate = await this.source.getAverageFeeRate();
     }
 
     let previousFee: number = 0;
@@ -143,7 +157,8 @@ export class TxBuilder {
       }
 
       const addressType = getAddressType(address);
-      const fee = await this.calculateFee(addressType);
+      const currentFeeRate = feeRate ?? averageFeeRate;
+      const fee = await this.calculateFee(addressType, currentFeeRate);
       if ([-1, 0, 1].includes(fee - previousFee)) {
         break;
       }
@@ -309,11 +324,12 @@ export class TxBuilder {
     }
   }
 
-  async calculateFee(addressType: AddressType): Promise<number> {
-    const feeRate = this.feeRate ?? this.defaultFeeRate;
-    if (!feeRate) {
+  async calculateFee(addressType: AddressType, feeRate?: number): Promise<number> {
+    if (!feeRate && !this.feeRate) {
       throw new TxBuildError(ErrorCodes.INVALID_FEE_RATE, `${ErrorMessages[ErrorCodes.INVALID_FEE_RATE]}: ${feeRate}`);
     }
+
+    const currentFeeRate = feeRate ?? this.feeRate!;
 
     const psbt = await this.createEstimatedPsbt(addressType);
     const tx = psbt.extractTransaction(true);
@@ -324,7 +340,7 @@ export class TxBuilder {
 
     const weight = weightWithoutWitness * 3 + weightWithWitness + inputs;
     const virtualSize = Math.ceil(weight / 4);
-    return Math.ceil(virtualSize * feeRate);
+    return Math.ceil(virtualSize * currentFeeRate);
   }
 
   async createEstimatedPsbt(addressType: AddressType): Promise<bitcoin.Psbt> {
@@ -372,7 +388,7 @@ export class TxBuilder {
   }
 
   toPsbt(): bitcoin.Psbt {
-    const network = toPsbtNetwork(this.networkType);
+    const network = this.config.network;
     const psbt = new bitcoin.Psbt({ network });
     this.inputs.forEach((input) => {
       psbt.data.addInput(input.data);
@@ -382,42 +398,4 @@ export class TxBuilder {
     });
     return psbt;
   }
-}
-
-export function utxoToInput(utxo: Utxo): TxInput {
-  if (utxo.addressType === AddressType.P2WPKH) {
-    const data = {
-      hash: utxo.txid,
-      index: utxo.vout,
-      witnessUtxo: {
-        value: utxo.value,
-        script: Buffer.from(remove0x(utxo.scriptPk), 'hex'),
-      },
-    };
-
-    return {
-      data,
-      utxo,
-    };
-  }
-  if (utxo.addressType === AddressType.P2TR) {
-    if (!utxo.pubkey) {
-      throw new TxBuildError(ErrorCodes.MISSING_PUBKEY);
-    }
-    const data = {
-      hash: utxo.txid,
-      index: utxo.vout,
-      witnessUtxo: {
-        value: utxo.value,
-        script: Buffer.from(remove0x(utxo.scriptPk), 'hex'),
-      },
-      tapInternalKey: toXOnly(Buffer.from(remove0x(utxo.pubkey), 'hex')),
-    };
-    return {
-      data,
-      utxo,
-    };
-  }
-
-  throw new TxBuildError(ErrorCodes.UNSUPPORTED_ADDRESS_TYPE);
 }

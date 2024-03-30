@@ -1,8 +1,9 @@
 import { BtcAssetsApi } from '@rgbpp-sdk/service';
-import { bitcoin, ECPair, DataSource, toNetworkType, toXOnly } from '../../src';
+import { bitcoin, ECPair, toXOnly, networkTypeToConfig, DataSource, NetworkType } from '../../src';
 
-export const network = bitcoin.networks.testnet;
-export const networkType = toNetworkType(network);
+export const networkType = NetworkType.TESTNET;
+export const config = networkTypeToConfig(networkType);
+export const network = config.network;
 
 export const service = BtcAssetsApi.fromToken(
   process.env.VITE_SERVICE_URL!,

@@ -36,7 +36,7 @@ const psbt = await sendBtc({
       value: 1000, // transfer satoshi amount
     },
   ],
-  feeRate: 1, // optional, default to 1 sat/vbyte
+  feeRate: 1, // optional, default to 1 on the testnet, and it is a floating number on the mainnet
   source,
 });
 
@@ -68,7 +68,7 @@ const psbt = await sendBtc({
       value: 1000, // transfer satoshi amount
     },
   ],
-  feeRate: 1, // optional, default to 1 sat/vbyte
+  feeRate: 1, // optional, default to 1 on the testnet, and it is a floating number on the mainnet
   source,
 });
 
@@ -106,7 +106,7 @@ const psbt = await sendBtc({
     },
   ],
   changeAddress: account.address, // optional, where to return the change
-  feeRate: 1, // optional, default to 1 sat/vbyte
+  feeRate: 1, // optional, default to 1 on the testnet, and it is a floating number on the mainnet
   source,
 });
 
@@ -155,8 +155,8 @@ const psbt = await sendUtxos({
   ],
   from: account.address, // provide fee to the transaction
   fromPubkey: account.publicKey, // optional, required if "from" is a P2TR address
-  changeAddress: account.address, // optional, where to send the change
-  feeRate: 1, // optional, default to 1 sat/vbyte
+  changeAddress: account.address, // optional, an address to return change, default to "from"
+  feeRate: 1, // optional, default to 1 on the testnet, and it is a floating number on the mainnet
   source,
 });
 
@@ -173,12 +173,14 @@ console.log('txid:', res.txid);
 ### Construct a isomorphic RGBPP transaction
 
 ```typescript
-import { sendRgbppUtxos, DataSource, Collector, NetworkType } from '@rgbpp-sdk/btc';
-import { RGBPP_UTXO_DUST_LIMIT, BTC_UTXO_DUST_LIMIT } from '@rgbpp-sdk/btc';
+import { sendRgbppUtxos, networkTypeToConfig, DataSource, Collector, NetworkType } from '@rgbpp-sdk/btc';
 import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
+const networkType = NetworkType.TESTNET;
+const config = networkTypeToConfig(networkType);
+
 const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
-const source = new DataSource(service, NetworkType.TESTNET);
+const source = new DataSource(service, networkType);
 
 const ckbVirtualTx: RawTransaction = {
   // ...
@@ -212,9 +214,9 @@ const psbt = await sendRgbppUtxos({
   from: accounts.address,
   fromPubkey: account.publicKey, // if "from" is a P2TR address, "fromPubkey" is required
   changeAddress: 'address_to_return_change', // optional, where should the change satoshi be returned to
-  minUtxoSatoshi: BTC_UTXO_DUST_LIMIT, // optional, default to 1000, officially should be 1,0000
-  rgbppMinUtxoSatoshi: RGBPP_UTXO_DUST_LIMIT, // optional, default to 546
-  feeRate: 1, // optional, default to 1 sat/vbyte
+  minUtxoSatoshi: config.btcUtxoDustLimit, // optional, default to 1000 on the testnet, 1,0000 on the mainnet
+  rgbppMinUtxoSatoshi: config.rgbppUtxoDustLimit, // optional, default to 546 on both testnet/mainnet
+  feeRate: 1, // optional, default to 1 on the testnet, and it is a floating number on the mainnet
 });
 ```
 

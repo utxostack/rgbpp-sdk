@@ -1,12 +1,13 @@
 import { expect } from 'vitest';
-import { bitcoin, FEE_RATE } from '../../src';
+import { bitcoin } from '../../src';
+import { config } from './env';
 
 /**
  * Estimate a network fee of a PSBT.
  */
 export function calculatePsbtFee(psbt: bitcoin.Psbt, feeRate?: number) {
   if (!feeRate) {
-    feeRate = FEE_RATE;
+    feeRate = config.feeRate;
   }
 
   const tx = psbt.extractTransaction(false);
