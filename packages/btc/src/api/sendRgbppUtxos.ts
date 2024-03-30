@@ -110,7 +110,7 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
       const toAddress = props.tos?.[i];
       const minUtxoSatoshi = props.rgbppMinUtxoSatoshi ?? config.rgbppUtxoDustLimit;
       outputs.push({
-        protected: true,
+        fixed: true,
         address: toAddress ?? props.from,
         value: minUtxoSatoshi,
         minUtxoSatoshi,

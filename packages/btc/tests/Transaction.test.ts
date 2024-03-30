@@ -228,7 +228,7 @@ describe('Transaction', () => {
       // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
-    it('Transfer fixed UTXO, sum(ins) > sum(outs)', async () => {
+    it('Transfer fixed UTXO, sum(ins) > sum(outs), need collection', async () => {
       const psbt = await sendUtxos({
         from: accounts.charlie.p2wpkh.address,
         inputs: [
@@ -266,7 +266,45 @@ describe('Transaction', () => {
       // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
-    it('Transfer fixed UTXO, and the fee is prepaid', async () => {
+    it('Transfer fixed UTXO, sum(ins) > sum(outs), but no collection', async () => {
+      const psbt = await sendUtxos({
+        from: accounts.charlie.p2wpkh.address,
+        inputs: [
+          {
+            txid: '4e1e9f8ff4bf245793c05bf2da58bff812c332a296d93c6935fbc980d906e567',
+            vout: 1,
+            value: 2500,
+            addressType: AddressType.P2WPKH,
+            address: accounts.charlie.p2wpkh.address,
+            scriptPk: accounts.charlie.p2wpkh.scriptPubkey.toString('hex'),
+          },
+        ],
+        outputs: [
+          {
+            address: accounts.charlie.p2wpkh.address,
+            value: 1000,
+            fixed: true,
+          },
+        ],
+        source,
+      });
+
+      // Sign & finalize inputs
+      psbt.signAllInputs(accounts.charlie.keyPair);
+      psbt.finalizeAllInputs();
+
+      expect(psbt.txInputs).toHaveLength(1);
+      expect(psbt.txOutputs).toHaveLength(2);
+
+      console.log('tx paid fee:', psbt.getFee());
+      expectPsbtFeeInRange(psbt);
+
+      // Broadcast transaction
+      // const tx = psbt.extractTransaction();
+      // const res = await service.sendBtcTransaction(tx.toHex());
+      // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
+    });
+    it('Transfer fixed UTXO, sum(ins) > sum(outs), the fee is prepaid', async () => {
       const psbt = await sendUtxos({
         from: accounts.charlie.p2wpkh.address,
         inputs: [
