@@ -354,6 +354,8 @@ interface BaseOutput {
 ```typescript
 interface DataSource {
   constructor(service: BtcAssetsApi, networkType: NetworkType): void;
+  getUtxo(hex: string, number: number): Promise<Utxo | undefined>;
+  getOutput(hex: string, number: number): Promise<Output | Utxo | undefined>;
   getUtxos(address: string, params?: BtcAssetsApiUtxoParams): Promise<Utxo[]>;
   collectSatoshi(props: {
     address: string;
@@ -386,16 +388,19 @@ interface FeesRecommended {
 
 ### Basic
 
-#### Utxo
+#### Utxo / Output
 
 ```typescript
-interface Utxo {
+interface Output {
   txid: string;
   vout: number;
   value: number;
-  address: string;
-  addressType: AddressType;
   scriptPk: string;
+}
+
+interface Utxo extends Output {
+  addressType: AddressType;
+  address: string;
   pubkey?: string;
 }
 ```

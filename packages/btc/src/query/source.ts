@@ -1,8 +1,9 @@
 import { FeesRecommended } from '@mempool/mempool.js/lib/interfaces/bitcoin/fees';
-import { BtcAssetsApi, BtcApiUtxoParams } from '@rgbpp-sdk/service';
-import { Utxo } from '../transaction/utxo';
+import { BtcApiUtxoParams, BtcAssetsApi } from '@rgbpp-sdk/service';
+import { Output, Utxo } from '../transaction/utxo';
 import { NetworkType } from '../preset/types';
-import { ErrorCodes, ErrorMessages, TxBuildError } from '../error';
+import { ErrorCodes, TxBuildError } from '../error';
+import { isOpReturnScriptPubkey } from '../transaction/embed';
 import { addressToScriptPublicKeyHex, getAddressType } from '../address';
 import { createMempool, MempoolInstance } from './mempool';
 import { remove0x } from '../utils';
@@ -18,10 +19,22 @@ export class DataSource {
     this.mempool = createMempool(networkType);
   }
 
+  // Query a UTXO from the service.
+  // Will throw error if the target output is unspendable
   async getUtxo(hash: string, index: number): Promise<Utxo | undefined> {
-    hash = remove0x(hash);
+    const output = await this.getOutput(hash, index);
+    if (output && !('address' in output)) {
+      throw TxBuildError.withComment(ErrorCodes.UNSPENDABLE_OUTPUT, `hash: ${hash}, index: ${index}`);
+    }
 
-    const tx = await this.service.getBtcTransaction(hash);
+    return output;
+  }
+
+  // Query an output from the service.
+  // Both unspent or unspendable output can be queried from the API.
+  async getOutput(hash: string, index: number): Promise<Output | Utxo | undefined> {
+    const txId = remove0x(hash);
+    const tx = await this.service.getBtcTransaction(txId);
     if (!tx) {
       return void 0;
     }
@@ -30,14 +43,24 @@ export class DataSource {
       return void 0;
     }
 
+    const scriptBuffer = Buffer.from(vout.scriptpubkey, 'hex');
+    if (isOpReturnScriptPubkey(scriptBuffer)) {
+      return {
+        txid: txId,
+        vout: index,
+        value: vout.value,
+        scriptPk: vout.scriptpubkey,
+      } as Output;
+    }
+
     return {
-      txid: hash,
+      txid: txId,
       vout: index,
       value: vout.value,
       scriptPk: vout.scriptpubkey,
       address: vout.scriptpubkey_address,
       addressType: getAddressType(vout.scriptpubkey_address),
-    };
+    } as Utxo;
   }
 
   async getUtxos(address: string, params?: BtcApiUtxoParams): Promise<Utxo[]> {
