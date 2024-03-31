@@ -31,10 +31,10 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
   feeRate: number;
   fee: number;
 }> {
-  const inputs: Utxo[] = [];
-  const outputs: InitOutput[] = [];
-  let lastTypeInputIndex = -1;
-  let lastTypeOutputIndex = -1;
+  const btcInputs: Utxo[] = [];
+  const btcOutputs: InitOutput[] = [];
+  let lastCkbTypeInputIndex = -1;
+  let lastCkbTypeOutputIndex = -1;
 
   const ckbVirtualTx = props.ckbVirtualTx;
   const config = networkTypeToConfig(props.source.networkType);
@@ -42,19 +42,19 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
 
   // Handle and check inputs
   for (let i = 0; i < ckbVirtualTx.inputs.length; i++) {
-    const input = ckbVirtualTx.inputs[i];
+    const ckbInput = ckbVirtualTx.inputs[i];
 
-    const liveCell = await props.ckbCollector.getLiveCell(input.previousOutput!);
-    const isRgbppLock = isRgbppLockCell(liveCell.output, isCkbMainnet);
+    const ckbLiveCell = await props.ckbCollector.getLiveCell(ckbInput.previousOutput!);
+    const isRgbppLock = isRgbppLockCell(ckbLiveCell.output, isCkbMainnet);
 
     // If input.type !== null, input.lock must be RgbppLock or RgbppTimeLock
-    if (liveCell.output.type) {
+    if (ckbLiveCell.output.type) {
       if (!isRgbppLock) {
         throw new TxBuildError(ErrorCodes.CKB_INVALID_CELL_LOCK);
       }
 
       // If input.type !== null，update lastTypeInput
-      lastTypeInputIndex = i;
+      lastCkbTypeInputIndex = i;
     }
 
     // If input.lock == RgbppLock, add to inputs if:
@@ -63,7 +63,7 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
     // 3. utxo.scriptPk == addressToScriptPk(props.from)
     // 4. utxo is not duplicated in the inputs
     if (isRgbppLock) {
-      const args = unpackRgbppLockArgs(liveCell.output.lock.args);
+      const args = unpackRgbppLockArgs(ckbLiveCell.output.lock.args);
       const utxo = await props.source.getUtxo(args.btcTxid, args.outIndex);
       if (!utxo) {
         throw new TxBuildError(ErrorCodes.CANNOT_FIND_UTXO);
@@ -72,12 +72,12 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
         throw new TxBuildError(ErrorCodes.REFERENCED_UNPROVABLE_UTXO);
       }
 
-      const foundInInputs = inputs.some((v) => v.txid === utxo.txid && v.vout === utxo.vout);
+      const foundInInputs = btcInputs.some((v) => v.txid === utxo.txid && v.vout === utxo.vout);
       if (foundInInputs) {
         continue;
       }
 
-      inputs.push({
+      btcInputs.push({
         ...utxo,
         pubkey: props.fromPubkey, // For P2TR addresses, a pubkey is required
       });
@@ -85,33 +85,33 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
   }
 
   // The inputs.length should be >= 1
-  if (inputs.length < 1) {
+  if (btcInputs.length < 1) {
     throw new TxBuildError(ErrorCodes.CKB_INVALID_INPUTS);
   }
 
   // Handle and check outputs
   for (let i = 0; i < ckbVirtualTx.outputs.length; i++) {
-    const output = ckbVirtualTx.outputs[i];
-    const isRgbppLock = isRgbppLockCell(output, isCkbMainnet);
-    const isRgbppTimeLock = isBtcTimeLockCell(output, isCkbMainnet);
+    const ckbOutput = ckbVirtualTx.outputs[i];
+    const isRgbppLock = isRgbppLockCell(ckbOutput, isCkbMainnet);
+    const isBtcTimeLock = isBtcTimeLockCell(ckbOutput, isCkbMainnet);
 
     // If output.type !== null, then the output.lock must be RgbppLock or RgbppTimeLock
-    if (output.type) {
-      if (!isRgbppLock && !isRgbppTimeLock) {
+    if (ckbOutput.type) {
+      if (!isRgbppLock && !isBtcTimeLock) {
         throw new TxBuildError(ErrorCodes.CKB_INVALID_CELL_LOCK);
       }
 
       // If output.type !== null，update lastTypeInput
-      lastTypeOutputIndex = i;
+      lastCkbTypeOutputIndex = i;
     }
 
     // If output.lock == RgbppLock, generate a corresponding output in outputs
     if (isRgbppLock) {
-      const toAddress = props.tos?.[i];
+      const toBtcAddress = props.tos?.[i];
       const minUtxoSatoshi = props.rgbppMinUtxoSatoshi ?? config.rgbppUtxoDustLimit;
-      outputs.push({
+      btcOutputs.push({
         fixed: true,
-        address: toAddress ?? props.from,
+        address: toBtcAddress ?? props.from,
         value: minUtxoSatoshi,
         minUtxoSatoshi,
       });
@@ -120,21 +120,21 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
 
   // By rules, the length of type outputs should be >= 1
   // The "lastTypeOutputIndex" is -1 by default so if (index < 0) it's invalid
-  if (lastTypeOutputIndex < 0) {
+  if (lastCkbTypeOutputIndex < 0) {
     throw new TxBuildError(ErrorCodes.CKB_INVALID_OUTPUTS);
   }
 
   // Verify the provided commitment
   const calculatedCommitment = calculateCommitment({
-    inputs: [...ckbVirtualTx.inputs].slice(0, lastTypeInputIndex + 1),
-    outputs: [...ckbVirtualTx.outputs].slice(0, lastTypeOutputIndex + 1),
-    outputsData: [...ckbVirtualTx.outputsData].slice(0, lastTypeOutputIndex + 1),
+    inputs: [...ckbVirtualTx.inputs].slice(0, lastCkbTypeInputIndex + 1),
+    outputs: [...ckbVirtualTx.outputs].slice(0, lastCkbTypeOutputIndex + 1),
+    outputsData: [...ckbVirtualTx.outputsData].slice(0, lastCkbTypeOutputIndex + 1),
   });
   if (props.commitment !== calculatedCommitment) {
     throw new TxBuildError(ErrorCodes.CKB_UNMATCHED_COMMITMENT);
   }
 
-  const mergedOutputs = (() => {
+  const mergedBtcOutputs = (() => {
     const merged: InitOutput[] = [];
 
     // Add commitment to the beginning of outputs
@@ -145,7 +145,7 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
     });
 
     // Add outputs
-    merged.push(...outputs);
+    merged.push(...btcOutputs);
 
     // Add paymaster if provided
     if (props.paymaster) {
@@ -159,8 +159,8 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
   })();
 
   return await createSendUtxosBuilder({
-    inputs,
-    outputs: mergedOutputs,
+    inputs: btcInputs,
+    outputs: mergedBtcOutputs,
     from: props.from,
     source: props.source,
     fromPubkey: props.fromPubkey,
