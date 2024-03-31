@@ -5,6 +5,7 @@ export enum ErrorCodes {
   CANNOT_FIND_UTXO,
   INSUFFICIENT_UTXO,
   REFERENCED_UNPROVABLE_UTXO,
+  UNSPENDABLE_OUTPUT,
   DUPLICATED_UTXO,
   DUST_OUTPUT,
   UNSUPPORTED_OUTPUT,
@@ -28,9 +29,10 @@ export const ErrorMessages = {
 
   [ErrorCodes.MISSING_PUBKEY]: 'Missing a pubkey that pairs with the address',
   [ErrorCodes.CANNOT_FIND_UTXO]: 'Cannot find the UTXO, it may not exist or is not live',
-  [ErrorCodes.INSUFFICIENT_UTXO]: 'Insufficient UTXO to cover the expected satoshi amount',
+  [ErrorCodes.INSUFFICIENT_UTXO]: 'Insufficient UTXO to construct the transaction',
   [ErrorCodes.REFERENCED_UNPROVABLE_UTXO]: 'Cannot reference a UTXO that does not belongs to "from"',
   [ErrorCodes.DUPLICATED_UTXO]: 'Cannot reference the same UTXO twice',
+  [ErrorCodes.UNSPENDABLE_OUTPUT]: 'Target output is not an UTXO',
   [ErrorCodes.DUST_OUTPUT]: 'Output defined value is below the dust limit',
   [ErrorCodes.UNSUPPORTED_OUTPUT]: 'Unsupported output format',
   [ErrorCodes.UNSUPPORTED_NETWORK_TYPE]: 'Unsupported network type',
@@ -54,5 +56,10 @@ export class TxBuildError extends Error {
     super(message);
     this.code = code;
     Object.setPrototypeOf(this, TxBuildError.prototype);
+  }
+
+  static withComment(code: ErrorCodes, comment?: string): TxBuildError {
+    const message: string | undefined = ErrorMessages[code];
+    return new TxBuildError(code, comment ? `${message}: ${comment}` : message);
   }
 }

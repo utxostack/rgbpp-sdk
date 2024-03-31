@@ -3,13 +3,16 @@ import { AddressType } from '../address';
 import { TxInput } from './build';
 import { remove0x, toXOnly } from '../utils';
 
-export interface Utxo {
+export interface Output {
   txid: string;
   vout: number;
   value: number;
-  address: string;
-  addressType: AddressType;
   scriptPk: string;
+}
+
+export interface Utxo extends Output {
+  addressType: AddressType;
+  address: string;
   pubkey?: string;
 }
 

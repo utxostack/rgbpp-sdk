@@ -62,10 +62,7 @@ export class TxBuilder {
 
   addInput(utxo: Utxo) {
     if (this.hasInput(utxo.txid, utxo.vout)) {
-      throw new TxBuildError(
-        ErrorCodes.DUPLICATED_UTXO,
-        `${ErrorMessages[ErrorCodes.DUPLICATED_UTXO]}: hash: ${utxo.txid}, index: ${utxo.vout}`,
-      );
+      throw TxBuildError.withComment(ErrorCodes.DUPLICATED_UTXO, `hash: ${utxo.txid}, index: ${utxo.vout}`);
     }
 
     utxo = clone(utxo);
@@ -100,10 +97,7 @@ export class TxBuilder {
     const minUtxoSatoshi = result.minUtxoSatoshi ?? this.minUtxoSatoshi;
     const isOpReturnOutput = 'script' in result && isOpReturnScriptPubkey(result.script);
     if (!isOpReturnOutput && result.value < minUtxoSatoshi) {
-      throw new TxBuildError(
-        ErrorCodes.DUST_OUTPUT,
-        `${ErrorMessages[ErrorCodes.DUST_OUTPUT]}: expected ${minUtxoSatoshi}, but defined ${result.value}`,
-      );
+      throw TxBuildError.withComment(ErrorCodes.DUST_OUTPUT, `expected ${minUtxoSatoshi}, but defined ${result.value}`);
     }
 
     this.outputs.push(result);
@@ -190,7 +184,7 @@ export class TxBuilder {
     deductFromOutputs?: boolean;
   }) {
     if (!isSupportedFromAddress(props.address)) {
-      throw new TxBuildError(ErrorCodes.UNSUPPORTED_ADDRESS_TYPE);
+      throw TxBuildError.withComment(ErrorCodes.UNSUPPORTED_ADDRESS_TYPE, props.address);
     }
 
     const injectCollected = props.injectCollected ?? false;
@@ -273,15 +267,24 @@ export class TxBuilder {
     }
 
     // If 0 < change amount < minUtxoSatoshi, collect one more time
-    if (changeAmount > 0 && changeAmount < this.minUtxoSatoshi) {
-      await _collect(this.minUtxoSatoshi - changeAmount);
+    const needForChange = changeAmount > 0 && changeAmount < this.minUtxoSatoshi;
+    const changeUtxoNeedAmount = needForChange ? this.minUtxoSatoshi - changeAmount : 0;
+    if (needForChange) {
+      await _collect(changeUtxoNeedAmount);
     }
 
-    // If not collected enough satoshi, revert to the original state and throw error
+    // If not collected enough satoshi, throw error
     const insufficientBalance = collected < targetAmount;
+    if (insufficientBalance) {
+      throw TxBuildError.withComment(ErrorCodes.INSUFFICIENT_UTXO, `expected: ${targetAmount}, actual: ${collected}`);
+    }
     const insufficientForChange = changeAmount > 0 && changeAmount < this.minUtxoSatoshi;
-    if (insufficientBalance || insufficientForChange) {
-      throw new TxBuildError(ErrorCodes.INSUFFICIENT_UTXO);
+    if (insufficientForChange) {
+      const shiftedExpectAmount = targetAmount + changeUtxoNeedAmount;
+      throw TxBuildError.withComment(
+        ErrorCodes.INSUFFICIENT_UTXO,
+        `expected: ${shiftedExpectAmount}, actual: ${collected}`,
+      );
     }
 
     // Return change
@@ -326,7 +329,7 @@ export class TxBuilder {
         deductFromOutputs: false,
       });
       if (collected < amount) {
-        throw new TxBuildError(ErrorCodes.INSUFFICIENT_UTXO);
+        throw TxBuildError.withComment(ErrorCodes.INSUFFICIENT_UTXO, `expected: ${amount}, actual: ${collected}`);
       }
     } else {
       this.addOutput({
@@ -338,7 +341,7 @@ export class TxBuilder {
 
   async calculateFee(addressType: AddressType, feeRate?: number): Promise<number> {
     if (!feeRate && !this.feeRate) {
-      throw new TxBuildError(ErrorCodes.INVALID_FEE_RATE, `${ErrorMessages[ErrorCodes.INVALID_FEE_RATE]}: ${feeRate}`);
+      throw TxBuildError.withComment(ErrorCodes.INVALID_FEE_RATE, `${feeRate ?? this.feeRate}`);
     }
 
     const currentFeeRate = feeRate ?? this.feeRate!;
