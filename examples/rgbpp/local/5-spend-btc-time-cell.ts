@@ -1,5 +1,5 @@
 import {
-  AddressPrefix,
+  AddressPrefix, privateKeyToAddress,
 } from '@nervosnetwork/ckb-sdk-utils';
 import {
   Collector,
@@ -23,7 +23,10 @@ const spendBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
   });
-  const address = collector.getCkb().utils.privateKeyToAddress(CKB_TEST_PRIVATE_KEY, { prefix: AddressPrefix.Testnet });
+  const isMainnet = false;
+  const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
+    prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
+  });
   console.log('ckb address: ', address);
 
   const btcTimeCells = await collector.getCells({

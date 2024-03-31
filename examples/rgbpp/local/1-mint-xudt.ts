@@ -1,4 +1,4 @@
-import { AddressPrefix } from '@nervosnetwork/ckb-sdk-utils';
+import { AddressPrefix, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
 import { blockchain } from '@ckb-lumos/base';
 import { buildMintTx, Collector } from 'ckb-omiga';
 import { getSecp256k1CellDep } from '@rgbpp-sdk/ckb';
@@ -13,7 +13,7 @@ const mintXudt = async () => {
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
   });
   const isMainnet = false
-  const address = collector.getCkb().utils.privateKeyToAddress(CKB_TEST_PRIVATE_KEY, { prefix: AddressPrefix.Testnet });
+  const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, { prefix: isMainnet? AddressPrefix.Mainnet: AddressPrefix.Testnet });
   // ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq0e4xk4rmg5jdkn8aams492a7jlg73ue0gc0ddfj
   console.log('ckb address: ', address);
 

@@ -9,7 +9,10 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTx
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
   });
-  const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, { prefix: AddressPrefix.Testnet });
+  const isMainnet = false;
+  const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
+      prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
+    });
   console.log('ckb address: ', address);
 
   const toRgbppLockArgs = buildRgbppLockArgs(outIndex, btcTxId);

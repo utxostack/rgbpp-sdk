@@ -32,7 +32,10 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
   });
-  const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, { prefix: AddressPrefix.Testnet });
+  const isMainnet = false;
+  const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
+    prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
+  });
   console.log('ckb address: ', address);
 
   const network = bitcoin.networks.testnet;
