@@ -46,7 +46,7 @@ const spendBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }
   let ckbRawTx: CKBComponents.RawTransaction = await buildBtcTimeCellsSpentTx({
     btcTimeCells,
     btcAssetsApi,
-    isMainnet: false,
+    isMainnet,
   });
 
   const signedTx = await signBtcTimeCellSpentTx({
@@ -54,7 +54,7 @@ const spendBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }
     collector,
     masterCkbAddress: address,
     ckbRawTx,
-    isMainnet: false,
+    isMainnet,
   });
 
   console.log(JSON.stringify(signedTx));

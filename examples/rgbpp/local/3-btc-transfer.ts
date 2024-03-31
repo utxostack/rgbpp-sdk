@@ -59,7 +59,7 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
     rgbppLockArgsList,
     xudtTypeBytes: serializeScript(xudtType),
     transferAmount,
-    isMainnet: false,
+    isMainnet,
   });
 
   const { commitment, ckbRawTx } = ckbVirtualTxResult;
@@ -97,7 +97,7 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
   // );
 
   // // Update CKB transaction with the real BTC txId
-  // const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet: false });
+  // const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet });
 
   // const rgbppApiSpvProof = await service.getRgbppSpvProof(btcTxId, 0);
 

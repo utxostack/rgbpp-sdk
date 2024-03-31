@@ -53,7 +53,7 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
     rgbppLockArgsList,
     xudtTypeBytes: serializeScript(xudtType),
     transferAmount,
-    isMainnet: false,
+    isMainnet,
     noMergeOutputCells: true
   });
 

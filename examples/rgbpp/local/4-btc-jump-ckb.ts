@@ -66,7 +66,7 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
     xudtTypeBytes: serializeScript(xudtType),
     transferAmount,
     toCkbAddress,
-    isMainnet: false,
+    isMainnet,
   });
 
   const { commitment, ckbRawTx } = ckbVirtualTxResult;
@@ -103,7 +103,7 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
   //   `{"version":"0x0","cellDeps":[{"outPoint":{"txHash":"0xf1de59e973b85791ec32debbba08dff80c63197e895eb95d67fc1e9f6b413e00","index":"0x0"},"depType":"code"},{"outPoint":{"txHash":"0xbf6fb538763efec2a70a6a3dcb7242787087e1030c4e7d86585bc63a9d337f5f","index":"0x0"},"depType":"code"},{"outPoint":{"txHash":"0xf1de59e973b85791ec32debbba08dff80c63197e895eb95d67fc1e9f6b413e00","index":"0x1"},"depType":"code"}],"headerDeps":[],"inputs":[{"previousOutput":{"txHash":"0x917c25c087a055b68b6d58b8f7c8925f81a86a11a4773983a185f852b1d1d7cb","index":"0x0"},"since":"0x0"}],"outputs":[{"lock":{"codeHash":"0x00cdf8fab0f8ac638758ebf5ea5e4052b1d71e8a77b9f43139718621f6849326","hashType":"type","args":"0x7f000000100000005b0000005f0000004b000000100000003000000031000000d23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac011600000000016c61f984f12d3c8a4f649e60acda5deda0b8837c060000000000000000000000000000000000000000000000000000000000000000000000"},"type":{"codeHash":"0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb","hashType":"type","args":"0x1ba116c119d1cfd98a53e9d1a615cf2af2bb87d95515c9d217d367054cfc696b"},"capacity":"0x5e9f51fda"}],"outputsData":["0x00205fa0120000000000000000000000"],"witnesses":["0xFF"]}`,
   // );
 
-  // const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet: false });
+  // const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet });
 
   // const rgbppApiSpvProof = await service.getRgbppSpvProof(btcTxId, 0);
 

@@ -62,7 +62,7 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
     xudtTypeBytes: serializeScript(xudtType),
     transferAmount,
     toCkbAddress,
-    isMainnet: false,
+    isMainnet,
   });
 
   const { commitment, ckbRawTx } = ckbVirtualTxResult;
