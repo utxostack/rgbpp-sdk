@@ -22,7 +22,10 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
   });
-  const ckbAddress = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, { prefix: AddressPrefix.Testnet });
+  const isMainnet = false;
+  const ckbAddress = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
+    prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
+  });
   console.log('ckb address: ', ckbAddress);
   // const fromLock = addressToScript(ckbAddress);
 
