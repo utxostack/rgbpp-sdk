@@ -105,7 +105,10 @@ export class DataSource {
     }
 
     if (collectedAmount < targetAmount) {
-      throw new TxBuildError(ErrorCodes.INSUFFICIENT_UTXO);
+      throw TxBuildError.withComment(
+        ErrorCodes.INSUFFICIENT_UTXO,
+        `expected: ${targetAmount}, actual: ${collectedAmount}`,
+      );
     }
 
     return {
@@ -121,10 +124,7 @@ export class DataSource {
     try {
       return await this.mempool.bitcoin.fees.getFeesRecommended();
     } catch (err: any) {
-      throw new TxBuildError(
-        ErrorCodes.MEMPOOL_API_RESPONSE_ERROR,
-        `${ErrorMessages[ErrorCodes.MEMPOOL_API_RESPONSE_ERROR]}: ${err.message ?? JSON.stringify(err)}`,
-      );
+      throw TxBuildError.withComment(ErrorCodes.MEMPOOL_API_RESPONSE_ERROR, err.message ?? JSON.stringify(err));
     }
   }
 

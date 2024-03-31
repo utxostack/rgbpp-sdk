@@ -28,7 +28,7 @@ export const ErrorMessages = {
 
   [ErrorCodes.MISSING_PUBKEY]: 'Missing a pubkey that pairs with the address',
   [ErrorCodes.CANNOT_FIND_UTXO]: 'Cannot find the UTXO, it may not exist or is not live',
-  [ErrorCodes.INSUFFICIENT_UTXO]: 'Insufficient UTXO to cover the expected satoshi amount',
+  [ErrorCodes.INSUFFICIENT_UTXO]: 'Insufficient UTXO to construct the transaction',
   [ErrorCodes.REFERENCED_UNPROVABLE_UTXO]: 'Cannot reference a UTXO that does not belongs to "from"',
   [ErrorCodes.DUPLICATED_UTXO]: 'Cannot reference the same UTXO twice',
   [ErrorCodes.DUST_OUTPUT]: 'Output defined value is below the dust limit',
@@ -54,5 +54,10 @@ export class TxBuildError extends Error {
     super(message);
     this.code = code;
     Object.setPrototypeOf(this, TxBuildError.prototype);
+  }
+
+  static withComment(code: ErrorCodes, comment?: string): TxBuildError {
+    const message: string | undefined = ErrorMessages[code];
+    return new TxBuildError(code, comment ? `${message}: ${comment}` : message);
   }
 }

@@ -66,10 +66,13 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
       const args = unpackRgbppLockArgs(liveCell.output.lock.args);
       const utxo = await props.source.getUtxo(args.btcTxid, args.outIndex);
       if (!utxo) {
-        throw new TxBuildError(ErrorCodes.CANNOT_FIND_UTXO);
+        throw TxBuildError.withComment(ErrorCodes.CANNOT_FIND_UTXO, `hash: ${args.btcTxid}, index: ${args.outIndex}`);
       }
       if (utxo.address !== props.from) {
-        throw new TxBuildError(ErrorCodes.REFERENCED_UNPROVABLE_UTXO);
+        throw TxBuildError.withComment(
+          ErrorCodes.REFERENCED_UNPROVABLE_UTXO,
+          `hash: ${args.btcTxid}, index: ${args.outIndex}`,
+        );
       }
 
       const foundInInputs = inputs.some((v) => v.txid === utxo.txid && v.vout === utxo.vout);
