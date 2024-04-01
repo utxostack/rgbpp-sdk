@@ -1,11 +1,11 @@
 import clone from 'lodash/cloneDeep';
 import { bitcoin } from '../bitcoin';
 import { DataSource } from '../query/source';
-import { addressToScriptPublicKeyHex, AddressType, getAddressType, isSupportedFromAddress } from '../address';
+import { ErrorCodes, TxBuildError } from '../error';
 import { NetworkType, RgbppBtcConfig } from '../preset/types';
-import { ErrorCodes, ErrorMessages, TxBuildError } from '../error';
-import { networkTypeToConfig } from '../preset/config';
+import { AddressType, addressToScriptPublicKeyHex, getAddressType, isSupportedFromAddress } from '../address';
 import { dataToOpReturnScriptPubkey, isOpReturnScriptPubkey } from './embed';
+import { networkTypeToConfig } from '../preset/config';
 import { Utxo, utxoToInput } from './utxo';
 import { FeeEstimator } from './fee';
 
@@ -137,18 +137,19 @@ export class TxBuilder {
     let currentFee: number = 0;
     let previousFee: number = 0;
     while (true) {
-      const { inputsNeeding, outputsNeeding } = this.summary();
-      if (outputsNeeding > 0) {
-        // If sum(inputs) > sum(outputs), return change while deducting fee
+      const { needCollect, needReturn } = this.summary();
+      const returnAmount = needReturn - previousFee;
+      if (returnAmount > 0) {
+        // If sum(inputs) - sum(outputs) > fee, return change while deducting fee
         // Note, should not deduct fee from outputs while also returning change at the same time
-        const returnAmount = outputsNeeding - previousFee;
         await this.injectChange({
           address: changeAddress ?? address,
           amount: returnAmount,
-          publicKey,
+          fromAddress: address,
+          fromPublicKey: publicKey,
         });
       } else {
-        const targetAmount = inputsNeeding + previousFee;
+        const targetAmount = needCollect + previousFee - needReturn;
         await this.injectSatoshi({
           address,
           publicKey,
@@ -291,9 +292,12 @@ export class TxBuilder {
     let changeIndex: number = -1;
     if (changeAmount > 0) {
       changeIndex = this.outputs.length;
-      this.addOutput({
-        address: props.changeAddress ?? props.address,
-        value: changeAmount,
+      const changeAddress = props.changeAddress ?? props.address;
+      await this.injectChange({
+        amount: changeAmount,
+        address: changeAddress,
+        fromAddress: props.address,
+        fromPublicKey: props.publicKey,
       });
     }
 
@@ -304,8 +308,8 @@ export class TxBuilder {
     };
   }
 
-  async injectChange(props: { amount: number; address: string; publicKey?: string }) {
-    const { address, publicKey, amount } = props;
+  async injectChange(props: { amount: number; address: string; fromAddress: string; fromPublicKey?: string }) {
+    const { address, fromAddress, fromPublicKey, amount } = props;
 
     for (let i = 0; i < this.outputs.length; i++) {
       const output = this.outputs[i];
@@ -322,9 +326,10 @@ export class TxBuilder {
 
     if (amount < this.minUtxoSatoshi) {
       const { collected } = await this.injectSatoshi({
-        address,
-        publicKey,
+        address: fromAddress,
+        publicKey: fromPublicKey,
         targetAmount: amount,
+        changeAddress: address,
         injectCollected: true,
         deductFromOutputs: false,
       });
@@ -381,11 +386,11 @@ export class TxBuilder {
 
     return {
       inputsTotal: sumOfInputs,
-      inputsRemaining: sumOfInputs - sumOfOutputs,
-      inputsNeeding: sumOfOutputs > sumOfInputs ? sumOfOutputs - sumOfInputs : 0,
       outputsTotal: sumOfOutputs,
+      inputsRemaining: sumOfInputs - sumOfOutputs,
       outputsRemaining: sumOfOutputs - sumOfInputs,
-      outputsNeeding: sumOfInputs > sumOfOutputs ? sumOfInputs - sumOfOutputs : 0,
+      needReturn: sumOfInputs > sumOfOutputs ? sumOfInputs - sumOfOutputs : 0,
+      needCollect: sumOfOutputs > sumOfInputs ? sumOfOutputs - sumOfInputs : 0,
     };
   }
 
