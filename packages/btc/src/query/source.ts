@@ -92,6 +92,7 @@ export class DataSource {
     address: string;
     targetAmount: number;
     minUtxoSatoshi?: number;
+    onlyConfirmedUtxos?: boolean;
     excludeUtxos?: {
       txid: string;
       vout: number;
@@ -101,8 +102,9 @@ export class DataSource {
     satoshi: number;
     exceedSatoshi: number;
   }> {
-    const { address, targetAmount, minUtxoSatoshi, excludeUtxos = [] } = props;
+    const { address, targetAmount, minUtxoSatoshi, onlyConfirmedUtxos, excludeUtxos = [] } = props;
     const utxos = await this.getUtxos(address, {
+      only_confirmed: onlyConfirmedUtxos,
       min_satoshi: minUtxoSatoshi,
     });
 
@@ -111,9 +113,6 @@ export class DataSource {
     for (const utxo of utxos) {
       if (collectedAmount >= targetAmount) {
         break;
-      }
-      if (minUtxoSatoshi !== void 0 && utxo.value < minUtxoSatoshi) {
-        continue;
       }
       if (excludeUtxos.length > 0) {
         const excluded = excludeUtxos.find((exclude) => {

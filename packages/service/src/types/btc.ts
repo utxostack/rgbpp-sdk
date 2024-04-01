@@ -60,6 +60,7 @@ export interface BtcApiBalance {
 }
 
 export interface BtcApiUtxoParams {
+  only_confirmed?: boolean;
   min_satoshi?: number;
 }
 export interface BtcApiUtxo {

@@ -110,6 +110,15 @@ describe(
 
         expect(filteredUtxos.length).toBe(0);
       });
+      it('Get UTXO[] with only_collected filter', async () => {
+        const confirmedUtxos = await service.getBtcUtxos(btcAddress, {
+          only_confirmed: true,
+        });
+        expect(Array.isArray(confirmedUtxos)).toBe(true);
+        for (const utxo of confirmedUtxos) {
+          expect(utxo.status.confirmed).toBe(true);
+        }
+      }, 0);
       it('Get transactions', async () => {
         const res = await service.getBtcTransactions(btcAddress);
         expect(Array.isArray(res)).toBe(true);

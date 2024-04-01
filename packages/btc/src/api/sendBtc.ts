@@ -6,10 +6,11 @@ export interface SendBtcProps {
   from: string;
   tos: InitOutput[];
   source: DataSource;
-  minUtxoSatoshi?: number;
-  changeAddress?: string;
-  fromPubkey?: string;
   feeRate?: number;
+  fromPubkey?: string;
+  changeAddress?: string;
+  minUtxoSatoshi?: number;
+  onlyConfirmedUtxos?: boolean;
 }
 
 export async function createSendBtcBuilder(props: SendBtcProps): Promise<{
@@ -19,8 +20,9 @@ export async function createSendBtcBuilder(props: SendBtcProps): Promise<{
 }> {
   const tx = new TxBuilder({
     source: props.source,
-    minUtxoSatoshi: props.minUtxoSatoshi,
     feeRate: props.feeRate,
+    minUtxoSatoshi: props.minUtxoSatoshi,
+    onlyConfirmedUtxos: props.onlyConfirmedUtxos,
   });
 
   props.tos.forEach((to) => {
