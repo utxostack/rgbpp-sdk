@@ -36,6 +36,7 @@ const psbt = await sendBtc({
       value: 1000, // transfer satoshi amount
     },
   ],
+  onlyConfirmedUtxos: false, // optional, default to false, only confirmed utxos are allowed in the transaction
   feeRate: 1, // optional, default to 1 on the testnet, and it is a floating number on the mainnet
   source,
 });
@@ -68,6 +69,7 @@ const psbt = await sendBtc({
       value: 1000, // transfer satoshi amount
     },
   ],
+  onlyConfirmedUtxos: false, // optional, default to false, only confirmed utxos are allowed in the transaction
   feeRate: 1, // optional, default to 1 on the testnet, and it is a floating number on the mainnet
   source,
 });
@@ -106,6 +108,7 @@ const psbt = await sendBtc({
     },
   ],
   changeAddress: account.address, // optional, where to return the change
+  onlyConfirmedUtxos: false, // optional, default to false, only confirmed utxos are allowed in the transaction
   feeRate: 1, // optional, default to 1 on the testnet, and it is a floating number on the mainnet
   source,
 });
@@ -156,6 +159,7 @@ const psbt = await sendUtxos({
   from: account.address, // provide fee to the transaction
   fromPubkey: account.publicKey, // optional, required if "from" is a P2TR address
   changeAddress: account.address, // optional, an address to return change, default to "from"
+  onlyConfirmedUtxos: false, // optional, default to false, only confirmed utxos are allowed in the transaction
   feeRate: 1, // optional, default to 1 on the testnet, and it is a floating number on the mainnet
   source,
 });
@@ -216,6 +220,7 @@ const psbt = await sendRgbppUtxos({
   changeAddress: 'address_to_return_change', // optional, where should the change satoshi be returned to
   minUtxoSatoshi: config.btcUtxoDustLimit, // optional, default to 1000 on the testnet, 1,0000 on the mainnet
   rgbppMinUtxoSatoshi: config.rgbppUtxoDustLimit, // optional, default to 546 on both testnet/mainnet
+  onlyConfirmedUtxos: false, // optional, default to false, only confirmed utxos are allowed in the transaction
   feeRate: 1, // optional, default to 1 on the testnet, and it is a floating number on the mainnet
 });
 ```
@@ -243,10 +248,11 @@ interface SendBtcProps {
   from: string;
   tos: InitOutput[];
   source: DataSource;
+  feeRate?: number;
   fromPubkey?: string;
   changeAddress?: string;
   minUtxoSatoshi?: number;
-  feeRate?: number;
+  onlyConfirmedUtxos?: boolean;
 }
 ```
 
@@ -270,10 +276,11 @@ interface SendUtxosProps {
   outputs: InitOutput[];
   source: DataSource;
   from: string;
+  feeRate?: number;
   fromPubkey?: string;
   changeAddress?: string;
   minUtxoSatoshi?: number;
-  feeRate?: number;
+  onlyConfirmedUtxos?: boolean;
 }
 ```
 
@@ -303,12 +310,13 @@ interface SendRgbppUtxosProps {
   rgbppTimeLockCodeHash: Hash;
   rgbppMinUtxoSatoshi?: number;
 
-  from: string;
   source: DataSource;
+  from: string;
+  feeRate?: number;
   fromPubkey?: string;
   changeAddress?: string;
   minUtxoSatoshi?: number;
-  feeRate?: number;
+  onlyConfirmedUtxos?: boolean;
 }
 ```
 
@@ -354,13 +362,14 @@ interface BaseOutput {
 ```typescript
 interface DataSource {
   constructor(service: BtcAssetsApi, networkType: NetworkType): void;
-  getUtxo(hex: string, number: number): Promise<Utxo | undefined>;
-  getOutput(hex: string, number: number): Promise<Output | Utxo | undefined>;
+  getUtxo(hex: string, number: number, requireConfirmed?: boolean): Promise<Utxo | undefined>;
+  getOutput(hex: string, number: number, requireConfirmed?: boolean): Promise<Output | Utxo | undefined>;
   getUtxos(address: string, params?: BtcAssetsApiUtxoParams): Promise<Utxo[]>;
   collectSatoshi(props: {
     address: string;
     targetAmount: number;
     minUtxoSatoshi?: number;
+    onlyConfirmedUtxos?: boolean;
     excludeUtxos?: {
       txid: string;
       vout: number;
