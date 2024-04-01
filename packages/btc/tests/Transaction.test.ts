@@ -190,6 +190,36 @@ describe('Transaction', () => {
       // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
+    it('Transfer fixed UTXO, sum(ins) = sum(outs) = 0', async () => {
+      const { builder, feeRate } = await createSendUtxosBuilder({
+        from: accounts.charlie.p2wpkh.address,
+        inputs: [],
+        outputs: [
+          {
+            data: Buffer.from('00'.repeat(32), 'hex'),
+            fixed: true,
+            value: 0,
+          },
+        ],
+        source,
+      });
+
+      // Sign & finalize inputs
+      const psbt = builder.toPsbt();
+      psbt.signAllInputs(accounts.charlie.keyPair);
+      psbt.finalizeAllInputs();
+
+      expect(psbt.txInputs.length).toBeGreaterThanOrEqual(1);
+      expect(psbt.txOutputs).toHaveLength(2);
+
+      console.log('tx paid fee:', psbt.getFee());
+      expectPsbtFeeInRange(psbt, feeRate);
+
+      // Broadcast transaction
+      // const tx = psbt.extractTransaction();
+      // const res = await service.sendBtcTransaction(tx.toHex());
+      // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
+    });
     it('Transfer fixed UTXO, sum(ins) < sum(outs)', async () => {
       const psbt = await sendUtxos({
         from: accounts.charlie.p2wpkh.address,

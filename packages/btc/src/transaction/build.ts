@@ -137,9 +137,10 @@ export class TxBuilder {
     let currentFee: number = 0;
     let previousFee: number = 0;
     while (true) {
-      const { needCollect, needReturn } = this.summary();
+      const { needCollect, needReturn, inputsTotal } = this.summary();
+      const safeToProcess = inputsTotal > 0 || previousFee > 0;
       const returnAmount = needReturn - previousFee;
-      if (returnAmount > 0) {
+      if (safeToProcess && returnAmount > 0) {
         // If sum(inputs) - sum(outputs) > fee, return change while deducting fee
         // Note, should not deduct fee from outputs while also returning change at the same time
         await this.injectChange({
@@ -149,7 +150,8 @@ export class TxBuilder {
           fromPublicKey: publicKey,
         });
       } else {
-        const targetAmount = needCollect + previousFee - needReturn;
+        const protectionAmount = !safeToProcess ? 1 : 0;
+        const targetAmount = needCollect - needReturn + previousFee + protectionAmount;
         await this.injectSatoshi({
           address,
           publicKey,
