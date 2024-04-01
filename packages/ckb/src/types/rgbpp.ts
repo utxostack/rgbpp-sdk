@@ -138,3 +138,23 @@ export interface BtcTimeCellStatusParams {
   // The BTC transaction id
   btcTxId: Hex;
 }
+
+export interface RgbppCkbJumpReceiver {
+  // The receiver rgbpp lock script args whose data structure is: out_index | bitcoin_tx_id
+  toRgbppLockArgs: Hex;
+  // The XUDT amount to be transferred
+  transferAmount: bigint;
+}
+
+export interface CkbBatchJumpBtcVirtualTxParams {
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // The serialized hex string of the XUDT type script
+  xudtTypeBytes: Hex;
+  // The from ckb address who will use his private key to sign the ckb tx
+  fromCkbAddress: Address;
+  // The rgbpp receiver list which include toRgbppLockArgs and transferAmount
+  rgbppReceivers: RgbppCkbJumpReceiver[];
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+  witnessLockPlaceholderSize?: number;
+}
