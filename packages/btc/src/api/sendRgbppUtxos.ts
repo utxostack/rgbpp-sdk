@@ -18,12 +18,13 @@ export interface SendRgbppUtxosProps {
   ckbCollector: Collector;
   rgbppMinUtxoSatoshi?: number;
 
-  from: string;
   source: DataSource;
+  from: string;
+  feeRate?: number;
   fromPubkey?: string;
   changeAddress?: string;
   minUtxoSatoshi?: number;
-  feeRate?: number;
+  onlyConfirmedUtxos?: boolean;
 }
 
 export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise<{
@@ -64,7 +65,7 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
     // 4. utxo is not duplicated in the inputs
     if (isRgbppLock) {
       const args = unpackRgbppLockArgs(ckbLiveCell.output.lock.args);
-      const utxo = await props.source.getUtxo(args.btcTxid, args.outIndex);
+      const utxo = await props.source.getUtxo(args.btcTxid, args.outIndex, props.onlyConfirmedUtxos);
       if (!utxo) {
         throw TxBuildError.withComment(ErrorCodes.CANNOT_FIND_UTXO, `hash: ${args.btcTxid}, index: ${args.outIndex}`);
       }
@@ -166,10 +167,11 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
     outputs: mergedBtcOutputs,
     from: props.from,
     source: props.source,
+    feeRate: props.feeRate,
     fromPubkey: props.fromPubkey,
     changeAddress: props.changeAddress,
     minUtxoSatoshi: props.minUtxoSatoshi,
-    feeRate: props.feeRate,
+    onlyConfirmedUtxos: props.onlyConfirmedUtxos,
   });
 }
 

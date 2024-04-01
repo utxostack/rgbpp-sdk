@@ -77,6 +77,18 @@ export class TxBuilder {
     });
   }
 
+  async validateInputs() {
+    for (const input of this.inputs) {
+      const transactionConfirmed = await this.source.isTransactionConfirmed(input.data.hash);
+      if (!transactionConfirmed) {
+        throw TxBuildError.withComment(
+          ErrorCodes.UNCONFIRMED_UTXO,
+          `hash: ${input.data.hash}, index: ${input.data.index}`,
+        );
+      }
+    }
+  }
+
   addOutput(output: InitOutput) {
     let result: TxOutput | undefined;
 

@@ -3,6 +3,7 @@ export enum ErrorCodes {
 
   MISSING_PUBKEY = 20,
   CANNOT_FIND_UTXO,
+  UNCONFIRMED_UTXO,
   INSUFFICIENT_UTXO,
   REFERENCED_UNPROVABLE_UTXO,
   UNSPENDABLE_OUTPUT,
@@ -29,6 +30,7 @@ export const ErrorMessages = {
 
   [ErrorCodes.MISSING_PUBKEY]: 'Missing a pubkey that pairs with the address',
   [ErrorCodes.CANNOT_FIND_UTXO]: 'Cannot find the UTXO, it may not exist or is not live',
+  [ErrorCodes.UNCONFIRMED_UTXO]: 'Unconfirmed UTXO',
   [ErrorCodes.INSUFFICIENT_UTXO]: 'Insufficient UTXO to construct the transaction',
   [ErrorCodes.REFERENCED_UNPROVABLE_UTXO]: 'Cannot reference a UTXO that does not belongs to "from"',
   [ErrorCodes.DUPLICATED_UTXO]: 'Cannot reference the same UTXO twice',

@@ -30,6 +30,10 @@ export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
   tx.addInputs(props.inputs);
   tx.addOutputs(props.outputs);
 
+  if (props.onlyConfirmedUtxos) {
+    await tx.validateInputs();
+  }
+
   const paid = await tx.payFee({
     address: props.from,
     publicKey: props.fromPubkey,
