@@ -296,7 +296,7 @@ describe('Transaction', () => {
       // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
-    it('Transfer fixed UTXO, sum(ins) > sum(outs), change > fee, change > fee + minUtxoSatoshi', async () => {
+    it('Transfer fixed UTXO, sum(ins) > sum(outs), change > fee + minUtxoSatoshi', async () => {
       const psbt = await sendUtxos({
         from: accounts.charlie.p2wpkh.address,
         inputs: [
@@ -334,7 +334,7 @@ describe('Transaction', () => {
       // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
-    it('Transfer fixed UTXO, sum(ins) > sum(outs), change > fee, change = fee + minUtxoSatoshi', async () => {
+    it('Transfer fixed UTXO, sum(ins) > sum(outs), change = fee + minUtxoSatoshi', async () => {
       const psbt = await sendUtxos({
         from: accounts.charlie.p2wpkh.address,
         inputs: [

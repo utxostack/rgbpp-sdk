@@ -150,7 +150,7 @@ export class TxBuilder {
           fromPublicKey: publicKey,
         });
       } else {
-        const protectionAmount = !safeToProcess ? 1 : 0;
+        const protectionAmount = safeToProcess ? 0 : 1;
         const targetAmount = needCollect - needReturn + previousFee + protectionAmount;
         await this.injectSatoshi({
           address,
@@ -383,16 +383,19 @@ export class TxBuilder {
   }
 
   summary() {
-    const sumOfInputs = this.inputs.reduce((acc, input) => acc + input.utxo.value, 0);
-    const sumOfOutputs = this.outputs.reduce((acc, output) => acc + output.value, 0);
+    const inputsTotal = this.inputs.reduce((acc, input) => acc + input.utxo.value, 0);
+    const outputsTotal = this.outputs.reduce((acc, output) => acc + output.value, 0);
+
+    const inputsRemaining = inputsTotal - outputsTotal;
+    const outputsRemaining = outputsTotal - inputsTotal;
 
     return {
-      inputsTotal: sumOfInputs,
-      outputsTotal: sumOfOutputs,
-      inputsRemaining: sumOfInputs - sumOfOutputs,
-      outputsRemaining: sumOfOutputs - sumOfInputs,
-      needReturn: sumOfInputs > sumOfOutputs ? sumOfInputs - sumOfOutputs : 0,
-      needCollect: sumOfOutputs > sumOfInputs ? sumOfOutputs - sumOfInputs : 0,
+      inputsTotal,
+      outputsTotal,
+      inputsRemaining,
+      outputsRemaining,
+      needReturn: inputsRemaining > 0 ? inputsRemaining : 0,
+      needCollect: outputsRemaining > 0 ? outputsRemaining : 0,
     };
   }
 
