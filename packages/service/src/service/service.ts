@@ -17,6 +17,7 @@ import {
 import {
   RgbppApis,
   RgbppApiSpvProof,
+  RgbppApiPaymasterInfo,
   RgbppApiTransactionState,
   RgbppApiSendCkbTransactionPayload,
   RgbppApiCkbTransactionHash,
@@ -87,6 +88,10 @@ export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis
   /**
    * RGBPP APIs, under the /rgbpp/v1 prefix.
    */
+
+  getRgbppPaymasterInfo() {
+    return this.request<RgbppApiPaymasterInfo>('/rgbpp/v1/paymaster/info');
+  }
 
   getRgbppTransactionHash(btcTxId: string) {
     return this.request<RgbppApiCkbTransactionHash>(`/rgbpp/v1/transaction/${btcTxId}`);

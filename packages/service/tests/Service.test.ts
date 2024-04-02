@@ -1,7 +1,7 @@
 import { Cell } from '@ckb-lumos/lumos';
 import { blockchain, bytes } from '@ckb-lumos/lumos/codec';
 import { describe, expect, it } from 'vitest';
-import { BtcAssetsApi, ErrorCodes, ErrorMessages } from '../src';
+import { BtcAssetsApiError, BtcAssetsApi, ErrorCodes, ErrorMessages } from '../src';
 
 describe(
   'BtcServiceApi',
@@ -153,6 +153,17 @@ describe(
 
       const emptyBtcTxId = '0000000000000000000000000000000000000000000000000000000000000001';
 
+      it('Get paymaster info', async () => {
+        try {
+          const res = await service.getRgbppPaymasterInfo();
+          expect(res).toBeDefined();
+          expect(res.btc_address).toBeTypeOf('string');
+          expect(res.fee).toBeTypeOf('number');
+        } catch (e) {
+          expect(e).toBeInstanceOf(BtcAssetsApiError);
+          expect(e.code).toBe(ErrorCodes.ASSETS_API_RESOURCE_NOT_FOUND);
+        }
+      });
       it('Get the hash of RGBPP CKB_TX', async () => {
         const res = await service.getRgbppTransactionHash(rgbppBtcTxId);
         expect(res).toBeDefined();

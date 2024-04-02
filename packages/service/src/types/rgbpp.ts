@@ -1,6 +1,7 @@
 import { Cell } from '@ckb-lumos/lumos';
 
 export interface RgbppApis {
+  getRgbppPaymasterInfo(): Promise<RgbppApiPaymasterInfo>;
   getRgbppTransactionHash(btcTxId: string): Promise<RgbppApiCkbTransactionHash>;
   getRgbppTransactionState(btcTxId: string): Promise<RgbppApiTransactionState>;
   getRgbppAssetsByBtcTxId(btcTxId: string): Promise<Cell[]>;
@@ -11,6 +12,11 @@ export interface RgbppApis {
 }
 
 export type RgbppTransactionState = 'completed' | 'failed' | 'delayed' | 'active' | 'waiting';
+
+export interface RgbppApiPaymasterInfo {
+  btc_address: string;
+  fee: number;
+}
 
 export interface RgbppApiCkbTransactionHash {
   txhash: string;
