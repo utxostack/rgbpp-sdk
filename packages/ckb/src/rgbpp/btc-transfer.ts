@@ -28,6 +28,8 @@ import { getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
  * @param transferAmount The XUDT amount to be transferred, if the noMergeOutputCells is true, the transferAmount will be ignored
  * @param isMainnet
  * @param noMergeOutputCells The noMergeOutputCells indicates whether the CKB outputs need to be merged. By default, the outputs will be merged.
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  */
 export const genBtcTransferCkbVirtualTx = async ({
   collector,
@@ -36,6 +38,8 @@ export const genBtcTransferCkbVirtualTx = async ({
   transferAmount,
   isMainnet,
   noMergeOutputCells,
+  witnessLockPlaceholderSize,
+  ckbFeeRate,
 }: BtcTransferVirtualTxParams): Promise<BtcTransferVirtualTxResult> => {
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
 
@@ -134,8 +138,8 @@ export const genBtcTransferCkbVirtualTx = async ({
   };
 
   if (!needPaymasterCell) {
-    const txSize = getTransactionSize(ckbRawTx) + RGBPP_TX_WITNESS_MAX_SIZE;
-    const estimatedTxFee = calculateTransactionFee(txSize);
+    const txSize = getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? RGBPP_TX_WITNESS_MAX_SIZE);
+    const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
 
     changeCapacity -= estimatedTxFee;
     ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));

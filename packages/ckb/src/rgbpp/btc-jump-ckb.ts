@@ -34,6 +34,8 @@ import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-util
  * @param xudtTypeBytes The serialized hex string of the XUDT type script
  * @param rgbppLockArgsList The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  * @param isMainnet
  */
 export const genBtcJumpCkbVirtualTx = async ({
@@ -42,6 +44,8 @@ export const genBtcJumpCkbVirtualTx = async ({
   rgbppLockArgsList,
   transferAmount,
   toCkbAddress,
+  witnessLockPlaceholderSize,
+  ckbFeeRate,
 }: BtcJumpCkbVirtualTxParams): Promise<BtcJumpCkbVirtualTxResult> => {
   const isMainnet = toCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
@@ -123,8 +127,8 @@ export const genBtcJumpCkbVirtualTx = async ({
   };
 
   if (!needPaymasterCell) {
-    const txSize = getTransactionSize(ckbRawTx) + RGBPP_TX_WITNESS_MAX_SIZE;
-    const estimatedTxFee = calculateTransactionFee(txSize);
+    const txSize = getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? RGBPP_TX_WITNESS_MAX_SIZE);
+    const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
 
     changeCapacity -= estimatedTxFee;
     ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
