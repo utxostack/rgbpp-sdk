@@ -627,6 +627,32 @@ describe('Transaction', () => {
       // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
+
+    it('Try transfer non-existence UTXO', async () => {
+      await expect(() =>
+        sendUtxos({
+          from: accounts.charlie.p2wpkh.address,
+          inputs: [
+            {
+              txid: '00'.repeat(32),
+              vout: 0,
+              value: 1000,
+              addressType: AddressType.P2WPKH,
+              address: accounts.charlie.p2wpkh.address,
+              scriptPk: accounts.charlie.p2wpkh.scriptPubkey.toString('hex'),
+            },
+          ],
+          outputs: [
+            {
+              address: accounts.charlie.p2wpkh.address,
+              value: 1000,
+            },
+          ],
+          onlyConfirmedUtxos: true,
+          source,
+        }),
+      ).rejects.toThrow();
+    });
   });
 
   describe.todo('sendRgbppUtxos()', () => {

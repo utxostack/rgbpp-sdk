@@ -45,13 +45,15 @@ export class TxBuilder {
   source: DataSource;
   config: RgbppBtcConfig;
   networkType: NetworkType;
+  onlyConfirmedUtxos: boolean;
   minUtxoSatoshi: number;
   feeRate?: number;
 
-  constructor(props: { source: DataSource; minUtxoSatoshi?: number; feeRate?: number }) {
+  constructor(props: { source: DataSource; onlyConfirmedUtxos?: boolean; minUtxoSatoshi?: number; feeRate?: number }) {
     this.source = props.source;
     this.networkType = this.source.networkType;
     this.config = networkTypeToConfig(this.networkType);
+    this.onlyConfirmedUtxos = props.onlyConfirmedUtxos ?? false;
     this.minUtxoSatoshi = props.minUtxoSatoshi ?? this.config.btcUtxoDustLimit;
     this.feeRate = props.feeRate;
   }
@@ -73,6 +75,18 @@ export class TxBuilder {
     utxos.forEach((utxo) => {
       this.addInput(utxo);
     });
+  }
+
+  async validateInputs() {
+    for (const input of this.inputs) {
+      const transactionConfirmed = await this.source.isTransactionConfirmed(input.data.hash);
+      if (!transactionConfirmed) {
+        throw TxBuildError.withComment(
+          ErrorCodes.UNCONFIRMED_UTXO,
+          `hash: ${input.data.hash}, index: ${input.data.index}`,
+        );
+      }
+    }
   }
 
   addOutput(output: InitOutput) {
@@ -203,6 +217,7 @@ export class TxBuilder {
         address: props.address,
         targetAmount: _targetAmount,
         minUtxoSatoshi: this.minUtxoSatoshi,
+        onlyConfirmedUtxos: this.onlyConfirmedUtxos,
         excludeUtxos: this.inputs.map((row) => row.utxo),
       });
       utxos.forEach((utxo) => {

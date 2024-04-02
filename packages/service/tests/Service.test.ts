@@ -70,7 +70,7 @@ describe(
         expect(res.pending_satoshi).toBeTypeOf('number');
         expect(res.dust_satoshi).toBeTypeOf('number');
         expect(res.utxo_count).toBeTypeOf('number');
-      }, 0);
+      });
       it('Get balance with min_satoshi filter', async () => {
         const originalBalance = await service.getBtcBalance(btcAddress);
         const filteredBalance = await service.getBtcBalance(btcAddress, {
@@ -79,7 +79,7 @@ describe(
 
         expect(filteredBalance.satoshi).toEqual(0);
         expect(filteredBalance.dust_satoshi).toEqual(originalBalance.satoshi + originalBalance.dust_satoshi);
-      }, 0);
+      });
       it('Get UTXO[]', async () => {
         const res = await service.getBtcUtxos(btcAddress);
         expect(Array.isArray(res)).toBe(true);
@@ -99,7 +99,7 @@ describe(
             expect(utxo.status.block_time).toBeTypeOf('number');
           }
         });
-      }, 0);
+      });
       it('Get UTXO[] with min_satoshi filter', async () => {
         const originalUtxos = await service.getBtcUtxos(btcAddress);
 
@@ -109,6 +109,15 @@ describe(
         });
 
         expect(filteredUtxos.length).toBe(0);
+      });
+      it('Get UTXO[] with only_collected filter', async () => {
+        const confirmedUtxos = await service.getBtcUtxos(btcAddress, {
+          only_confirmed: true,
+        });
+        expect(Array.isArray(confirmedUtxos)).toBe(true);
+        for (const utxo of confirmedUtxos) {
+          expect(utxo.status.confirmed).toBe(true);
+        }
       });
       it('Get transactions', async () => {
         const res = await service.getBtcTransactions(btcAddress);
@@ -123,7 +132,7 @@ describe(
             expect(transaction.status.block_time).toBeTypeOf('number');
           }
         });
-      }, 0);
+      });
       it('Get transaction', async () => {
         const res = await service.getBtcTransaction('102d5a002e72f0781944eef636117377da6d3601061e47e03025e7cd29a91579');
         expect(res.txid).toBe('102d5a002e72f0781944eef636117377da6d3601061e47e03025e7cd29a91579');

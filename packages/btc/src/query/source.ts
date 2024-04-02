@@ -20,9 +20,10 @@ export class DataSource {
   }
 
   // Query a UTXO from the service.
-  // Will throw error if the target output is unspendable
-  async getUtxo(hash: string, index: number): Promise<Utxo | undefined> {
-    const output = await this.getOutput(hash, index);
+  // Will throw error if the target output is unspendable.
+  // When set "confirmed = true", will throw error if the output is unconfirmed.
+  async getUtxo(hash: string, index: number, requireConfirmed?: boolean): Promise<Utxo | undefined> {
+    const output = await this.getOutput(hash, index, requireConfirmed);
     if (output && !('address' in output)) {
       throw TxBuildError.withComment(ErrorCodes.UNSPENDABLE_OUTPUT, `hash: ${hash}, index: ${index}`);
     }
@@ -32,11 +33,15 @@ export class DataSource {
 
   // Query an output from the service.
   // Both unspent or unspendable output can be queried from the API.
-  async getOutput(hash: string, index: number): Promise<Output | Utxo | undefined> {
+  // When set "confirmed = true", will throw error if the output is unconfirmed.
+  async getOutput(hash: string, index: number, requireConfirmed?: boolean): Promise<Output | Utxo | undefined> {
     const txId = remove0x(hash);
     const tx = await this.service.getBtcTransaction(txId);
     if (!tx) {
       return void 0;
+    }
+    if (requireConfirmed && !tx.status.confirmed) {
+      throw TxBuildError.withComment(ErrorCodes.UNCONFIRMED_UTXO, `hash: ${hash}, index: ${index}`);
     }
     const vout = tx.vout[index];
     if (!vout) {
@@ -61,6 +66,11 @@ export class DataSource {
       address: vout.scriptpubkey_address,
       addressType: getAddressType(vout.scriptpubkey_address),
     } as Utxo;
+  }
+
+  async isTransactionConfirmed(hash: string): Promise<boolean> {
+    const tx = await this.service.getBtcTransaction(remove0x(hash));
+    return tx.status.confirmed;
   }
 
   async getUtxos(address: string, params?: BtcApiUtxoParams): Promise<Utxo[]> {
@@ -92,6 +102,7 @@ export class DataSource {
     address: string;
     targetAmount: number;
     minUtxoSatoshi?: number;
+    onlyConfirmedUtxos?: boolean;
     excludeUtxos?: {
       txid: string;
       vout: number;
@@ -101,8 +112,9 @@ export class DataSource {
     satoshi: number;
     exceedSatoshi: number;
   }> {
-    const { address, targetAmount, minUtxoSatoshi, excludeUtxos = [] } = props;
+    const { address, targetAmount, minUtxoSatoshi, onlyConfirmedUtxos, excludeUtxos = [] } = props;
     const utxos = await this.getUtxos(address, {
+      only_confirmed: onlyConfirmedUtxos,
       min_satoshi: minUtxoSatoshi,
     });
 
@@ -111,9 +123,6 @@ export class DataSource {
     for (const utxo of utxos) {
       if (collectedAmount >= targetAmount) {
         break;
-      }
-      if (minUtxoSatoshi !== void 0 && utxo.value < minUtxoSatoshi) {
-        continue;
       }
       if (excludeUtxos.length > 0) {
         const excluded = excludeUtxos.find((exclude) => {
