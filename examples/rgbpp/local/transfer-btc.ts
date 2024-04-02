@@ -31,7 +31,6 @@ const transferBtc = async () => {
         value: 100000, // transfer satoshi amount
       },
     ],
-    feeRate: 1, // optional, default to 1 sat/vbyte
     source,
   });
 
