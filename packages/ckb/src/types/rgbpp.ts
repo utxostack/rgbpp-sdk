@@ -28,6 +28,8 @@ export interface BtcTransferVirtualTxParams {
   isMainnet: boolean;
   // The noMergeOutputCells indicates whether the CKB outputs need to be merged. By default, the outputs will be merged.
   noMergeOutputCells?: boolean;
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+  witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
 }

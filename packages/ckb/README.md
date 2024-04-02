@@ -47,6 +47,7 @@ export interface BtcTransferVirtualTxResult {
  * @param rgbppLockArgsList The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred, if the noMergeOutputCells is true, the transferAmount will be ignored
  * @param isMainnet
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
  * @param noMergeOutputCells The noMergeOutputCells indicates whether the CKB outputs need to be merged. By default, the outputs will be merged.
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  */
@@ -56,8 +57,9 @@ export const genBtcTransferCkbVirtualTx = async ({
   rgbppLockArgsList,
   transferAmount,
   isMainnet,
+  witnessLockPlaceholderSize,
   noMergeOutputCells,
-  ckbFeeRate
+  ckbFeeRate,
 }: BtcTransferVirtualTxParams): Promise<BtcTransferVirtualTxResult>
 ```
 
@@ -82,6 +84,7 @@ interface BtcJumpCkbVirtualTxResult {
  * @param xudtTypeBytes The serialized hex string of the XUDT type script
  * @param rgbppLockArgsList The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  * @param isMainnet
  */
@@ -91,7 +94,8 @@ export const genBtcJumpCkbVirtualTx = async ({
   rgbppLockArgsList,
   transferAmount,
   toCkbAddress,
-  ckbFeeRate
+  witnessLockPlaceholderSize,
+  ckbFeeRate,
 }: BtcJumpCkbVirtualTxParams): Promise<BtcJumpCkbVirtualTxResult>
 ```
 
@@ -118,6 +122,6 @@ export const genCkbJumpBtcVirtualTx = async ({
   toRgbppLockArgs,
   transferAmount,
   witnessLockPlaceholderSize,
-  ckbFeeRate
+  ckbFeeRate,
 }: CkbJumpBtcVirtualTxParams): Promise<CKBComponents.RawTransaction>
 ```
