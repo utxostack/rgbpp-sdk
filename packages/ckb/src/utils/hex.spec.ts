@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { leToU128, reverseHex, u128ToLe, u32ToLe, u32ToLeHex, u64ToLe } from './hex';
+import { leToU128, reverseHex, u128ToLe, u32ToLe, u32ToLeHex, u64ToLe, u8ToHex, utf8ToHex } from './hex';
 import { bytesToHex } from '@nervosnetwork/ckb-sdk-utils';
 
 describe('number to little endian', () => {
@@ -32,6 +32,16 @@ describe('number to little endian', () => {
   it('bytesToHex', () => {
     const expected = bytesToHex(new Uint8Array([0x12, 0x34, 0x56]));
     expect('0x123456').toBe(expected);
+  });
+
+  it('u8ToHex', () => {
+    const actual = u8ToHex(8);
+    expect(actual).toBe('08');
+  });
+
+  it('u8ToHex', () => {
+    const actual = utf8ToHex('RGBPP Test Token');
+    expect(actual).toBe('0x5247425050205465737420546f6b656e');
   });
 
   it('reverseHex', () => {
