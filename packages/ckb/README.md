@@ -48,6 +48,7 @@ export interface BtcTransferVirtualTxResult {
  * @param transferAmount The XUDT amount to be transferred, if the noMergeOutputCells is true, the transferAmount will be ignored
  * @param isMainnet
  * @param noMergeOutputCells The noMergeOutputCells indicates whether the CKB outputs need to be merged. By default, the outputs will be merged.
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  */
 export const genBtcTransferCkbVirtualTx = async ({
   collector,
@@ -56,6 +57,7 @@ export const genBtcTransferCkbVirtualTx = async ({
   transferAmount,
   isMainnet,
   noMergeOutputCells,
+  ckbFeeRate
 }: BtcTransferVirtualTxParams): Promise<BtcTransferVirtualTxResult>
 ```
 
@@ -80,6 +82,7 @@ interface BtcJumpCkbVirtualTxResult {
  * @param xudtTypeBytes The serialized hex string of the XUDT type script
  * @param rgbppLockArgsList The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  * @param isMainnet
  */
 export const genBtcJumpCkbVirtualTx = async ({
@@ -88,6 +91,7 @@ export const genBtcJumpCkbVirtualTx = async ({
   rgbppLockArgsList,
   transferAmount,
   toCkbAddress,
+  ckbFeeRate
 }: BtcJumpCkbVirtualTxParams): Promise<BtcJumpCkbVirtualTxResult>
 ```
 
@@ -104,6 +108,7 @@ The method `genCkbJumpBtcVirtualTx` can generate a CKB transaction for rgbpp ass
  * @param toRgbppLockArgs The receiver rgbpp lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred
  * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  * @param isMainnet
  */
 export const genCkbJumpBtcVirtualTx = async ({
@@ -113,5 +118,6 @@ export const genCkbJumpBtcVirtualTx = async ({
   toRgbppLockArgs,
   transferAmount,
   witnessLockPlaceholderSize,
+  ckbFeeRate
 }: CkbJumpBtcVirtualTxParams): Promise<CKBComponents.RawTransaction>
 ```
