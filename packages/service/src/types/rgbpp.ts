@@ -9,6 +9,7 @@ export interface RgbppApis {
   getRgbppAssetsByBtcAddress(btcAddress: string, params?: RgbppApiAssetsByAddressParams): Promise<Cell[]>;
   getRgbppSpvProof(btcTxId: string, confirmations: number): Promise<RgbppApiSpvProof>;
   sendRgbppCkbTransaction(payload: RgbppApiSendCkbTransactionPayload): Promise<RgbppApiTransactionState>;
+  retryRgbppCkbTransaction(payload: RgbppApiRetryCkbTransactionPayload): Promise<RgbppApiTransactionRetry>;
 }
 
 export type RgbppTransactionState = 'completed' | 'failed' | 'delayed' | 'active' | 'waiting';
@@ -47,4 +48,13 @@ export interface RgbppApiSendCkbTransactionPayload {
     sumInputsCapacity: string;
     commitment: string;
   };
+}
+
+export interface RgbppApiRetryCkbTransactionPayload {
+  btc_txid: string;
+}
+
+export interface RgbppApiTransactionRetry {
+  success: boolean;
+  state: RgbppTransactionState;
 }
