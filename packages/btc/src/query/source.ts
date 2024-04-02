@@ -5,7 +5,7 @@ import { NetworkType } from '../preset/types';
 import { ErrorCodes, TxBuildError } from '../error';
 import { isOpReturnScriptPubkey } from '../transaction/embed';
 import { addressToScriptPublicKeyHex, getAddressType } from '../address';
-import { createMempool, MempoolInstance } from './mempool';
+import { createMempool, isMempoolRecommendedFeeType, MempoolInstance, RecommendedFeeRate } from './mempool';
 import { remove0x } from '../utils';
 
 export class DataSource {
@@ -150,7 +150,7 @@ export class DataSource {
     };
   }
 
-  // Get recommended fee rates from mempool.space.
+  // Get recommended fee rates from the mempool.space APIs.
   // From fastest to slowest: fastestFee > halfHourFee > economyFee > hourFee > minimumFee
   async getRecommendedFeeRates(): Promise<FeesRecommended> {
     try {
@@ -160,9 +160,14 @@ export class DataSource {
     }
   }
 
-  // Get the recommended average fee rate.
-  async getAverageFeeRate(): Promise<number> {
+  // Get a recommended fee rate from the mempool.space APIs.
+  // If "feeRate" is not specified, return "fastestFee" from the recommended fee rates.
+  async getRecommendedFeeRate(feeType?: RecommendedFeeRate): Promise<number> {
+    if (feeType && !isMempoolRecommendedFeeType(feeType)) {
+      throw TxBuildError.withComment(ErrorCodes.MEMPOOL_API_INVALID_FEE_TYPE, feeType);
+    }
+
     const fees = await this.getRecommendedFeeRates();
-    return fees.halfHourFee;
+    return feeType ? fees[feeType] : fees.halfHourFee;
   }
 }

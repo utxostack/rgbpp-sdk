@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { source } from './shared/env';
-import { ErrorCodes } from '../src';
+import { ErrorCodes, RecommendedFeeRate } from '../src';
 
 describe('DataSource', () => {
   it('Get recommended fee rates', async () => {
@@ -15,13 +15,18 @@ describe('DataSource', () => {
     expect(fees.fastestFee).toBeGreaterThanOrEqual(fees.halfHourFee);
     expect(fees.halfHourFee).toBeGreaterThanOrEqual(fees.hourFee);
     expect(fees.hourFee).toBeGreaterThanOrEqual(fees.minimumFee);
-  });
-  it('Get average fee rate', async () => {
-    const [feeRates, averageFeeRate] = await Promise.all([source.getRecommendedFeeRates(), source.getAverageFeeRate()]);
 
-    expect(averageFeeRate).toBeTypeOf('number');
-    expect(feeRates.halfHourFee).toBeTypeOf('number');
-    expect(averageFeeRate).toEqual(feeRates.halfHourFee);
+    expect(fees[RecommendedFeeRate.FASTEST]).toBeTypeOf('number');
+    expect(fees[RecommendedFeeRate.AVERAGE]).toBeTypeOf('number');
+    expect(fees[RecommendedFeeRate.SLOW]).toBeTypeOf('number');
+    expect(fees[RecommendedFeeRate.MINIMUM]).toBeTypeOf('number');
+  });
+  it('Get default recommended fee rate', async () => {
+    const [feeRates, feeRate] = await Promise.all([source.getRecommendedFeeRates(), source.getRecommendedFeeRate()]);
+
+    expect(feeRate).toBeTypeOf('number');
+    expect(feeRates.fastestFee).toBeTypeOf('number');
+    expect(feeRate).toEqual(feeRates.fastestFee);
   });
   it('Get OP_RETURN output via getOutput()', async () => {
     const output = await source.getOutput('70b250e2a3cc7a33b47f7a4e94e41e1ee2501ce73b393d824db1dd4c872c5348', 0);

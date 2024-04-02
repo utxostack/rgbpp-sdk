@@ -8,6 +8,7 @@ export * from './bitcoin';
 export * from './address';
 
 export * from './query/source';
+export * from './query/mempool';
 
 export * from './transaction/build';
 export * from './transaction/embed';

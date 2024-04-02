@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { expectPsbtFeeInRange } from './shared/utils';
 import { accounts, config, network, service, source } from './shared/env';
 import { bitcoin, ErrorMessages, ErrorCodes, AddressType, createSendUtxosBuilder } from '../src';
-import { createSendBtcBuilder, sendBtc, sendUtxos, tweakSigner } from '../src';
+import { RecommendedFeeRate, createSendBtcBuilder, sendBtc, sendUtxos, tweakSigner } from '../src';
 
 const BTC_UTXO_DUST_LIMIT = config.btcUtxoDustLimit;
 const RGBPP_UTXO_DUST_LIMIT = config.rgbppUtxoDustLimit;
@@ -67,7 +67,7 @@ describe('Transaction', () => {
       // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
-    it('Transfer with defined value < minUtxoSatoshi', async () => {
+    it('Try transfer with output value < minUtxoSatoshi', async () => {
       await expect(() =>
         sendBtc({
           from: accounts.charlie.p2wpkh.address,
@@ -81,7 +81,7 @@ describe('Transaction', () => {
         }),
       ).rejects.toThrow();
     });
-    it('Transfer with an impossible "minUtxoSatoshi" filter', async () => {
+    it('Try transfer with balance < minUtxoSatoshi', async () => {
       const balance = await service.getBtcBalance(accounts.charlie.p2wpkh.address, {
         min_satoshi: BTC_UTXO_DUST_LIMIT,
       });
@@ -147,6 +147,27 @@ describe('Transaction', () => {
       // const tx = psbt.extractTransaction();
       // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
+    });
+    it('Transfer with RecommendedFeeRate', async () => {
+      const { builder, feeRate } = await createSendBtcBuilder({
+        from: accounts.charlie.p2wpkh.address,
+        tos: [
+          {
+            address: accounts.charlie.p2wpkh.address,
+            value: 1000,
+          },
+        ],
+        feeRate: RecommendedFeeRate.FASTEST,
+        source,
+      });
+
+      // Sign & finalize inputs
+      const psbt = builder.toPsbt();
+      psbt.signAllInputs(accounts.charlie.keyPair);
+      psbt.finalizeAllInputs();
+
+      console.log('tx paid fee:', psbt.getFee());
+      expectPsbtFeeInRange(psbt, feeRate);
     });
   });
 

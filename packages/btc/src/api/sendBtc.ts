@@ -1,12 +1,12 @@
 import { bitcoin } from '../bitcoin';
 import { DataSource } from '../query/source';
-import { InitOutput, TxBuilder } from '../transaction/build';
+import { FeeRateOption, InitOutput, TxBuilder } from '../transaction/build';
 
 export interface SendBtcProps {
   from: string;
   tos: InitOutput[];
   source: DataSource;
-  feeRate?: number;
+  feeRate?: FeeRateOption;
   fromPubkey?: string;
   changeAddress?: string;
   minUtxoSatoshi?: number;

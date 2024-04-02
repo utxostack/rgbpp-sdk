@@ -4,7 +4,7 @@ import { Utxo } from '../transaction/utxo';
 import { DataSource } from '../query/source';
 import { NetworkType } from '../preset/types';
 import { ErrorCodes, TxBuildError } from '../error';
-import { InitOutput, TxAddressOutput, TxBuilder } from '../transaction/build';
+import { FeeRateOption, InitOutput, TxAddressOutput, TxBuilder } from '../transaction/build';
 import { networkTypeToConfig } from '../preset/config';
 import { unpackRgbppLockArgs } from '../ckb/molecule';
 import { createSendUtxosBuilder } from './sendUtxos';
@@ -20,7 +20,7 @@ export interface SendRgbppUtxosProps {
 
   source: DataSource;
   from: string;
-  feeRate?: number;
+  feeRate?: FeeRateOption;
   fromPubkey?: string;
   changeAddress?: string;
   minUtxoSatoshi?: number;

@@ -1,5 +1,6 @@
 import Mempool from '@mempool/mempool.js';
 import { NetworkType } from '../preset/types';
+import { FeesRecommended } from '@mempool/mempool.js/lib/interfaces/bitcoin/fees';
 
 export type MempoolInstance = ReturnType<typeof Mempool>;
 
@@ -38,4 +39,20 @@ export function networkTypeToMempoolConfig(network: NetworkType) {
 export function createMempool(network: NetworkType) {
   const config = networkTypeToMempoolConfig(network);
   return Mempool(config);
+}
+
+export enum RecommendedFeeRate {
+  FASTEST = 'fastestFee',
+  AVERAGE = 'halfHourFee',
+  SLOW = 'hourFee',
+  MINIMUM = 'minimumFee',
+}
+
+/**
+ * Check if target string is a recommended fee type.
+ * Acceptable fee types: "fastestFee", "halfHourFee", "hourFee", "minimumFee"
+ */
+export function isMempoolRecommendedFeeType(feeType: unknown): feeType is keyof FeesRecommended {
+  const values: string[] = Object.values(RecommendedFeeRate);
+  return typeof feeType === 'string' && values.includes(feeType);
 }

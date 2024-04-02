@@ -1,14 +1,14 @@
 import { bitcoin } from '../bitcoin';
 import { Utxo } from '../transaction/utxo';
 import { DataSource } from '../query/source';
-import { TxBuilder, InitOutput } from '../transaction/build';
+import { TxBuilder, InitOutput, FeeRateOption } from '../transaction/build';
 
 export interface SendUtxosProps {
   inputs: Utxo[];
   outputs: InitOutput[];
   source: DataSource;
   from: string;
-  feeRate?: number;
+  feeRate?: FeeRateOption;
   fromPubkey?: string;
   changeAddress?: string;
   minUtxoSatoshi?: number;

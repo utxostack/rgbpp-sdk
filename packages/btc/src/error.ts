@@ -23,6 +23,7 @@ export enum ErrorCodes {
   CKB_RGBPP_LOCK_UNPACK_ERROR,
 
   MEMPOOL_API_RESPONSE_ERROR = 60,
+  MEMPOOL_API_INVALID_FEE_TYPE,
 }
 
 export const ErrorMessages = {
@@ -50,6 +51,7 @@ export const ErrorMessages = {
   [ErrorCodes.CKB_RGBPP_LOCK_UNPACK_ERROR]: 'Failed to unpack RgbppLockArgs from the CKB cell lock',
 
   [ErrorCodes.MEMPOOL_API_RESPONSE_ERROR]: 'Mempool.space API returned an error',
+  [ErrorCodes.MEMPOOL_API_INVALID_FEE_TYPE]: 'Invalid feeType specified to the Mempool.space API',
 };
 
 export class TxBuildError extends Error {

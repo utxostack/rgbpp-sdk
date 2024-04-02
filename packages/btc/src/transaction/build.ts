@@ -3,6 +3,7 @@ import { bitcoin } from '../bitcoin';
 import { DataSource } from '../query/source';
 import { ErrorCodes, TxBuildError } from '../error';
 import { NetworkType, RgbppBtcConfig } from '../preset/types';
+import { isMempoolRecommendedFeeType, RecommendedFeeRate } from '../query/mempool';
 import { AddressType, addressToScriptPublicKeyHex, getAddressType, isSupportedFromAddress } from '../address';
 import { dataToOpReturnScriptPubkey, isOpReturnScriptPubkey } from './embed';
 import { networkTypeToConfig } from '../preset/config';
@@ -38,6 +39,8 @@ export interface TxDataOutput extends BaseOutput {
   data: Buffer | string;
 }
 
+export type FeeRateOption = number | RecommendedFeeRate;
+
 export class TxBuilder {
   inputs: TxInput[] = [];
   outputs: TxOutput[] = [];
@@ -47,9 +50,14 @@ export class TxBuilder {
   networkType: NetworkType;
   onlyConfirmedUtxos: boolean;
   minUtxoSatoshi: number;
-  feeRate?: number;
+  feeRate?: FeeRateOption;
 
-  constructor(props: { source: DataSource; onlyConfirmedUtxos?: boolean; minUtxoSatoshi?: number; feeRate?: number }) {
+  constructor(props: {
+    source: DataSource;
+    onlyConfirmedUtxos?: boolean;
+    minUtxoSatoshi?: number;
+    feeRate?: FeeRateOption;
+  }) {
     this.source = props.source;
     this.networkType = this.source.networkType;
     this.config = networkTypeToConfig(this.networkType);
@@ -128,7 +136,7 @@ export class TxBuilder {
     publicKey?: string;
     changeAddress?: string;
     deductFromOutputs?: boolean;
-    feeRate?: number;
+    feeRate?: FeeRateOption;
   }): Promise<{
     fee: number;
     feeRate: number;
@@ -137,16 +145,8 @@ export class TxBuilder {
     const originalInputs = clone(this.inputs);
     const originalOutputs = clone(this.outputs);
 
-    // Fetch the latest average fee rate if feeRate param is not provided
-    // The transaction is expected be confirmed within half an hour with the fee rate
-    let averageFeeRate: number | undefined;
-    if (!feeRate && !this.feeRate) {
-      averageFeeRate = await this.source.getAverageFeeRate();
-    }
-
-    // Use the feeRate param if it is specified,
-    // otherwise use the average fee rate from the DataSource
-    const currentFeeRate = feeRate ?? this.feeRate ?? averageFeeRate!;
+    // Use the provided fee rate or get recommended fee rate from the mempool.space API
+    const currentFeeRate = await this.getFeeRate(feeRate);
 
     let currentFee: number = 0;
     let previousFee: number = 0;
@@ -325,6 +325,29 @@ export class TxBuilder {
     };
   }
 
+  async getFeeRate(feeRate?: FeeRateOption): Promise<number> {
+    const _tryGetFeeRate = async (feeRate?: FeeRateOption): Promise<number | undefined> => {
+      if (typeof feeRate === 'number' && feeRate > 0) {
+        return feeRate;
+      }
+      if (isMempoolRecommendedFeeType(feeRate)) {
+        return await this.source.getRecommendedFeeRate(feeRate);
+      }
+      return void 0;
+    };
+
+    const paramFeeRate = await _tryGetFeeRate(feeRate);
+    if (paramFeeRate) {
+      return paramFeeRate;
+    }
+    const innerFeeRate = await _tryGetFeeRate(this.feeRate);
+    if (innerFeeRate) {
+      return innerFeeRate;
+    }
+
+    return await this.source.getRecommendedFeeRate();
+  }
+
   async injectChange(props: { amount: number; address: string; fromAddress: string; fromPublicKey?: string }) {
     const { address, fromAddress, fromPublicKey, amount } = props;
 
@@ -361,12 +384,8 @@ export class TxBuilder {
     }
   }
 
-  async calculateFee(addressType: AddressType, feeRate?: number): Promise<number> {
-    if (!feeRate && !this.feeRate) {
-      throw TxBuildError.withComment(ErrorCodes.INVALID_FEE_RATE, `${feeRate ?? this.feeRate}`);
-    }
-
-    const currentFeeRate = feeRate ?? this.feeRate!;
+  async calculateFee(addressType: AddressType, feeRate?: FeeRateOption): Promise<number> {
+    const currentFeeRate = await this.getFeeRate(feeRate);
 
     const psbt = await this.createEstimatedPsbt(addressType);
     const tx = psbt.extractTransaction(true);
