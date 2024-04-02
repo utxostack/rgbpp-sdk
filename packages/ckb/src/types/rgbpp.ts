@@ -34,6 +34,25 @@ export interface BtcTransferVirtualTxParams {
   ckbFeeRate?: bigint;
 }
 
+export interface RgbppBtcAddressReceiver {
+  // The BTC address
+  toBtcAddress: string;
+  // The XUDT amount to be transferred
+  transferAmount: bigint;
+}
+
+export interface BtcBatchTransferVirtualTxParams {
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // The serialized hex string of the XUDT type script
+  xudtTypeBytes: Hex;
+  // The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
+  rgbppLockArgsList: Hex[];
+  // The rgbpp receiver list which include toRgbppLockArgs and transferAmount
+  rgbppReceivers: RgbppBtcAddressReceiver[];
+  isMainnet: boolean;
+}
+
 export interface RgbppCkbVirtualTx {
   // The rgbpp inputs whose lock scripts must be rgbpp lock and type scripts must be XUDT type
   inputs: CKBComponents.CellInput[];
@@ -151,7 +170,7 @@ export interface BtcTimeCellStatusParams {
   btcTxId: Hex;
 }
 
-export interface RgbppCkbJumpReceiver {
+export interface RgbppLockArgsReceiver {
   // The receiver rgbpp lock script args whose data structure is: out_index | bitcoin_tx_id
   toRgbppLockArgs: Hex;
   // The XUDT amount to be transferred
@@ -166,7 +185,7 @@ export interface CkbBatchJumpBtcVirtualTxParams {
   // The from ckb address who will use his private key to sign the ckb tx
   fromCkbAddress: Address;
   // The rgbpp receiver list which include toRgbppLockArgs and transferAmount
-  rgbppReceivers: RgbppCkbJumpReceiver[];
+  rgbppReceivers: RgbppLockArgsReceiver[];
   // The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
@@ -183,4 +202,20 @@ export interface RgbppTokenInfo {
   name: string;
   // The symbol of the RGBPP token, and maximum number of characters is 255
   symbol: string;
+}
+
+export interface RgbppLaunchCkbVirtualTxParams {
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // The owner RGBPP lock args whose data structure is: out_index | bitcoin_tx_id
+  ownerRgbppLockArgs: Address;
+  // The total amount of RGBPP assets issued
+  launchAmount: bigint;
+  // The RGBPP token info https://github.com/ckb-cell/unique-cell?tab=readme-ov-file#xudt-information
+  rgbppTokenInfo: RgbppTokenInfo;
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+  witnessLockPlaceholderSize?: number;
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
+  isMainnet: boolean;
 }

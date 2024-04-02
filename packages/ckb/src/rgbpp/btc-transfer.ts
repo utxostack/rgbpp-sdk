@@ -1,4 +1,9 @@
-import { BtcTransferVirtualTxParams, BtcTransferVirtualTxResult, RgbppCkbVirtualTx } from '../types/rgbpp';
+import {
+  BtcBatchTransferVirtualTxParams,
+  BtcTransferVirtualTxParams,
+  BtcTransferVirtualTxResult,
+  RgbppCkbVirtualTx,
+} from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
 import { NoRgbppLiveCellError, TypeAssetNotSupportedError } from '../error';
 import {
@@ -160,6 +165,103 @@ export const genBtcTransferCkbVirtualTx = async ({
     ckbRawTx,
     commitment,
     needPaymasterCell,
+    sumInputsCapacity: append0x(sumInputsCapacity.toString(16)),
+  };
+};
+
+/**
+ * Generate the virtual ckb transaction for the btc batch transfer tx
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param xudtTypeBytes The serialized hex string of the XUDT type script
+ * @param rgbppLockArgsList The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
+ * @param rgbppReceivers The rgbpp receiver list which include toBtcAddress and transferAmount
+ * @param isMainnet
+ */
+export const genBtcBatchTransferCkbVirtualTx = async ({
+  collector,
+  xudtTypeBytes,
+  rgbppLockArgsList,
+  rgbppReceivers,
+  isMainnet,
+}: BtcBatchTransferVirtualTxParams): Promise<BtcTransferVirtualTxResult> => {
+  const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
+
+  if (!isTypeAssetSupported(xudtType, isMainnet)) {
+    throw new TypeAssetNotSupportedError('The type script asset is not supported now');
+  }
+
+  const rgbppLocks = rgbppLockArgsList.map((args) => genRgbppLockScript(args, isMainnet));
+  let rgbppCells: IndexerCell[] = [];
+  for await (const rgbppLock of rgbppLocks) {
+    const cells = await collector.getCells({ lock: rgbppLock, type: xudtType });
+    if (!cells || cells.length === 0) {
+      throw new NoRgbppLiveCellError('No rgbpp cells found with the xudt type script and the rgbpp lock args');
+    }
+    rgbppCells = [...rgbppCells, ...cells];
+  }
+  rgbppCells = rgbppCells.sort(compareInputs);
+
+  const sumTransferAmount = rgbppReceivers
+    .map((receiver) => receiver.transferAmount)
+    .reduce((prev, current) => prev + current, BigInt(0));
+
+  const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
+  const outputs: CKBComponents.CellOutput[] = rgbppReceivers.map((_, index) => ({
+    // The Vouts[0] for OP_RETURN and Vouts[1], Vouts[2], ... for RGBPP assets
+    lock: genRgbppLockScript(buildPreLockArgs(index + 1), isMainnet),
+    type: xudtType,
+    capacity: append0x(rpbppCellCapacity.toString(16)),
+  }));
+  const outputsData = rgbppReceivers.map((receiver) => append0x(u128ToLe(receiver.transferAmount)));
+
+  const { inputs, sumInputsCapacity, sumAmount } = collector.collectUdtInputs({
+    liveCells: rgbppCells,
+    needAmount: sumTransferAmount,
+    isMax: true,
+  });
+
+  let changeCapacity = sumInputsCapacity - rpbppCellCapacity * BigInt(rgbppReceivers.length);
+  const lastUtxoIndex = rgbppReceivers.length + 1;
+  outputs.push({
+    // The Vouts[0] for OP_RETURN and Vouts[1], Vouts[2], ... for RGBPP assets
+    lock: genRgbppLockScript(buildPreLockArgs(lastUtxoIndex), isMainnet),
+    type: xudtType,
+    capacity: append0x(changeCapacity.toString(16)),
+  });
+
+  if (sumAmount > sumTransferAmount) {
+    outputsData.push(append0x(u128ToLe(sumAmount - sumTransferAmount)));
+  } else {
+    outputsData.push('0x');
+  }
+
+  const cellDeps = [getRgbppLockDep(isMainnet), getXudtDep(isMainnet), getRgbppLockConfigDep(isMainnet)];
+  const witnesses: Hex[] = inputs.map((_, index) => (index === 0 ? RGBPP_WITNESS_PLACEHOLDER : '0x'));
+
+  const ckbRawTx: CKBComponents.RawTransaction = {
+    version: '0x0',
+    cellDeps,
+    headerDeps: [],
+    inputs,
+    outputs,
+    outputsData,
+    witnesses,
+  };
+
+  const txSize = getTransactionSize(ckbRawTx) + RGBPP_TX_WITNESS_MAX_SIZE;
+  const estimatedTxFee = calculateTransactionFee(txSize);
+  changeCapacity -= estimatedTxFee;
+  ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
+
+  const virtualTx: RgbppCkbVirtualTx = {
+    ...ckbRawTx,
+  };
+  const commitment = calculateCommitment(virtualTx);
+
+  return {
+    ckbRawTx,
+    commitment,
+    needPaymasterCell: false,
     sumInputsCapacity: append0x(sumInputsCapacity.toString(16)),
   };
 };
