@@ -28,6 +28,8 @@ export interface BtcTransferVirtualTxParams {
   isMainnet: boolean;
   // The noMergeOutputCells indicates whether the CKB outputs need to be merged. By default, the outputs will be merged.
   noMergeOutputCells?: boolean;
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
 }
 
 export interface RgbppCkbVirtualTx {
@@ -71,6 +73,8 @@ export interface AppendPaymasterCellAndSignTxParams {
   // The paymaster cell to be inserted into CKB transaction to pay an extra output cell
   paymasterCell: IndexerCell;
   isMainnet: boolean;
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
 }
 
 export interface SendCkbTxParams {
@@ -105,6 +109,8 @@ export interface SignBtcTimeCellsTxParams {
   // The master CKB address to pay the time cells spent tx fee
   masterCkbAddress: Address;
   isMainnet: boolean;
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
 }
 
 export interface CkbJumpBtcVirtualTxParams {
@@ -120,6 +126,8 @@ export interface CkbJumpBtcVirtualTxParams {
   transferAmount: bigint;
   // The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
   witnessLockPlaceholderSize?: number;
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
 }
 
 export interface UpdateCkbTxWithRealBtcTxIdParams {
@@ -157,4 +165,6 @@ export interface CkbBatchJumpBtcVirtualTxParams {
   rgbppReceivers: RgbppCkbJumpReceiver[];
   // The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
   witnessLockPlaceholderSize?: number;
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
 }

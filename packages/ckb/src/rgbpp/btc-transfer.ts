@@ -28,6 +28,7 @@ import { getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
  * @param transferAmount The XUDT amount to be transferred, if the noMergeOutputCells is true, the transferAmount will be ignored
  * @param isMainnet
  * @param noMergeOutputCells The noMergeOutputCells indicates whether the CKB outputs need to be merged. By default, the outputs will be merged.
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  */
 export const genBtcTransferCkbVirtualTx = async ({
   collector,
@@ -36,6 +37,7 @@ export const genBtcTransferCkbVirtualTx = async ({
   transferAmount,
   isMainnet,
   noMergeOutputCells,
+  ckbFeeRate,
 }: BtcTransferVirtualTxParams): Promise<BtcTransferVirtualTxResult> => {
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
 
@@ -135,7 +137,7 @@ export const genBtcTransferCkbVirtualTx = async ({
 
   if (!needPaymasterCell) {
     const txSize = getTransactionSize(ckbRawTx) + RGBPP_TX_WITNESS_MAX_SIZE;
-    const estimatedTxFee = calculateTransactionFee(txSize);
+    const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
 
     changeCapacity -= estimatedTxFee;
     ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));

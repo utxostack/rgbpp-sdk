@@ -21,6 +21,7 @@ import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-util
  * @param toRgbppLockArgs The receiver rgbpp lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred
  * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  * @param isMainnet
  */
 export const genCkbJumpBtcVirtualTx = async ({
@@ -30,6 +31,7 @@ export const genCkbJumpBtcVirtualTx = async ({
   toRgbppLockArgs,
   transferAmount,
   witnessLockPlaceholderSize,
+  ckbFeeRate,
 }: CkbJumpBtcVirtualTxParams): Promise<CKBComponents.RawTransaction> => {
   const isMainnet = fromCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
@@ -107,7 +109,7 @@ export const genCkbJumpBtcVirtualTx = async ({
 
   if (txFee === MAX_FEE) {
     const txSize = getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? RGBPP_TX_WITNESS_MAX_SIZE);
-    const estimatedTxFee = calculateTransactionFee(txSize);
+    const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
     const estimatedChangeCapacity = changeCapacity + (MAX_FEE - estimatedTxFee);
     ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(estimatedChangeCapacity.toString(16));
   }
@@ -122,6 +124,7 @@ export const genCkbJumpBtcVirtualTx = async ({
  * @param fromCkbAddress The from ckb address who will use his private key to sign the ckb tx
  * @param rgbppReceivers The rgbpp receiver list which include toRgbppLockArgs and transferAmount
  * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  * @param isMainnet
  */
 export const genCkbBatchJumpBtcVirtualTx = async ({
@@ -130,6 +133,7 @@ export const genCkbBatchJumpBtcVirtualTx = async ({
   fromCkbAddress,
   rgbppReceivers,
   witnessLockPlaceholderSize,
+  ckbFeeRate,
 }: CkbBatchJumpBtcVirtualTxParams): Promise<CKBComponents.RawTransaction> => {
   const isMainnet = fromCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
@@ -209,7 +213,7 @@ export const genCkbBatchJumpBtcVirtualTx = async ({
 
   if (txFee === MAX_FEE) {
     const txSize = getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? RGBPP_TX_WITNESS_MAX_SIZE);
-    const estimatedTxFee = calculateTransactionFee(txSize);
+    const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
     const estimatedChangeCapacity = changeCapacity + (MAX_FEE - estimatedTxFee);
     ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(estimatedChangeCapacity.toString(16));
   }

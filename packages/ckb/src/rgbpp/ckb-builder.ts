@@ -79,6 +79,7 @@ export const appendCkbTxWitnesses = async ({
  * @param ckbRawTx CKB raw transaction
  * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
  * @param paymasterCell The paymaster cell whose type is IndexerCell is used to pay the extra output cell
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  */
 export const appendPaymasterCellAndSignCkbTx = async ({
   secp256k1PrivateKey,
@@ -86,6 +87,7 @@ export const appendPaymasterCellAndSignCkbTx = async ({
   sumInputsCapacity,
   paymasterCell,
   isMainnet,
+  ckbFeeRate,
 }: AppendPaymasterCellAndSignTxParams): Promise<CKBComponents.RawTransaction> => {
   let rawTx = ckbRawTx as CKBComponents.RawTransactionToSign;
   const paymasterInput = { previousOutput: paymasterCell.outPoint, since: '0x0' };
@@ -109,7 +111,7 @@ export const appendPaymasterCellAndSignCkbTx = async ({
   rawTx.outputsData = [...rawTx.outputsData, '0x'];
 
   const txSize = getTransactionSize(rawTx) + SECP256K1_WITNESS_LOCK_SIZE;
-  const estimatedTxFee = calculateTransactionFee(txSize);
+  const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
   changeCapacity -= estimatedTxFee;
   rawTx.outputs[rawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
 

@@ -114,6 +114,7 @@ export const buildBtcTimeCellsSpentTx = async ({
  * @param ckbRawTx The CKB raw transaction to be signed
  * @param collector The collector that collects CKB live cells and transactions
  * @param masterCkbAddress The master CKB address
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  * @param isMainnet
  */
 export const signBtcTimeCellSpentTx = async ({
@@ -122,6 +123,7 @@ export const signBtcTimeCellSpentTx = async ({
   collector,
   masterCkbAddress,
   isMainnet,
+  ckbFeeRate,
 }: SignBtcTimeCellsTxParams): Promise<CKBComponents.RawTransaction> => {
   const masterLock = addressToScript(masterCkbAddress);
   const emptyCells = await collector.getCells({
@@ -146,7 +148,7 @@ export const signBtcTimeCellSpentTx = async ({
   };
 
   const txSize = getTransactionSize(rawTx) + SECP256K1_WITNESS_LOCK_SIZE;
-  const estimatedTxFee = calculateTransactionFee(txSize);
+  const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
 
   const changeCapacity = BigInt(emptyCells[0].output.capacity) - estimatedTxFee;
   rawTx.outputs[0].capacity = append0x(changeCapacity.toString(16));
