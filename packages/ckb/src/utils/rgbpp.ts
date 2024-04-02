@@ -1,6 +1,6 @@
 import { sha256 } from 'js-sha256';
 import { Hex, IndexerCell, RgbppCkbVirtualTx, RgbppTokenInfo, SpvClientCellTxProof } from '../types';
-import { append0x, remove0x, reverseHex, u32ToLe, u32ToLeHex, u8ToHex, utf8ToHex } from './hex';
+import { append0x, remove0x, reverseHex, u32ToLe, u8ToHex, utf8ToHex } from './hex';
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
   RGBPP_TX_ID_PLACEHOLDER,
