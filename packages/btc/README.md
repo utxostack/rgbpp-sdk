@@ -22,7 +22,7 @@ $ pnpm add @rgbpp-sdk/btc
 ### Transfer BTC from a `P2WPKH` address
 
 ```typescript
-import { sendBtc, DataSource, NetworkType } from '@rgbpp-sdk/btc';
+import { sendBtc, DataSource, NetworkType, RecommendedFeeRate } from '@rgbpp-sdk/btc';
 import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
 const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
@@ -37,7 +37,7 @@ const psbt = await sendBtc({
     },
   ],
   onlyConfirmedUtxos: false, // optional, default to false, only confirmed utxos are allowed in the transaction
-  feeRate: 1, // optional, default to 1 on the testnet, and it is a floating number on the mainnet
+  feeRate: RecommendedFeeRate.FASTEST, // optional, will fetch from mempool.space API if not provided
   source,
 });
 
@@ -54,7 +54,7 @@ console.log('txid:', res.txid);
 ### Transfer BTC from a `P2TR` address
 
 ```typescript
-import { sendBtc, DataSource, NetworkType } from '@rgbpp-sdk/btc';
+import { sendBtc, DataSource, NetworkType, RecommendedFeeRate } from '@rgbpp-sdk/btc';
 import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
 const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
@@ -70,7 +70,7 @@ const psbt = await sendBtc({
     },
   ],
   onlyConfirmedUtxos: false, // optional, default to false, only confirmed utxos are allowed in the transaction
-  feeRate: 1, // optional, default to 1 on the testnet, and it is a floating number on the mainnet
+  feeRate: RecommendedFeeRate.FASTEST, // optional, will fetch from mempool.space API if not provided
   source,
 });
 
@@ -92,7 +92,7 @@ console.log('txid:', res.txid);
 ### Create an `OP_RETURN` output
 
 ```typescript
-import { sendBtc, DataSource, NetworkType } from '@rgbpp-sdk/btc';
+import { sendBtc, DataSource, NetworkType, RecommendedFeeRate } from '@rgbpp-sdk/btc';
 import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
 const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
@@ -109,7 +109,7 @@ const psbt = await sendBtc({
   ],
   changeAddress: account.address, // optional, where to return the change
   onlyConfirmedUtxos: false, // optional, default to false, only confirmed utxos are allowed in the transaction
-  feeRate: 1, // optional, default to 1 on the testnet, and it is a floating number on the mainnet
+  feeRate: RecommendedFeeRate.FASTEST, // optional, will fetch from mempool.space API if not provided
   source,
 });
 
@@ -126,7 +126,7 @@ console.log('txid:', res.txid);
 ### Transfer with predefined inputs/outputs
 
 ```typescript
-import { sendUtxos, DataSource, NetworkType } from '@rgbpp-sdk/btc';
+import { sendUtxos, DataSource, NetworkType, RecommendedFeeRate } from '@rgbpp-sdk/btc';
 import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
 const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
@@ -160,7 +160,7 @@ const psbt = await sendUtxos({
   fromPubkey: account.publicKey, // optional, required if "from" is a P2TR address
   changeAddress: account.address, // optional, an address to return change, default to "from"
   onlyConfirmedUtxos: false, // optional, default to false, only confirmed utxos are allowed in the transaction
-  feeRate: 1, // optional, default to 1 on the testnet, and it is a floating number on the mainnet
+  feeRate: RecommendedFeeRate.FASTEST, // optional, will fetch from mempool.space API if not provided
   source,
 });
 
@@ -177,7 +177,14 @@ console.log('txid:', res.txid);
 ### Construct a isomorphic RGBPP transaction
 
 ```typescript
-import { sendRgbppUtxos, networkTypeToConfig, DataSource, Collector, NetworkType } from '@rgbpp-sdk/btc';
+import {
+  sendRgbppUtxos,
+  networkTypeToConfig,
+  DataSource,
+  Collector,
+  NetworkType,
+  RecommendedFeeRate,
+} from '@rgbpp-sdk/btc';
 import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
 const networkType = NetworkType.TESTNET;
@@ -221,7 +228,7 @@ const psbt = await sendRgbppUtxos({
   minUtxoSatoshi: config.btcUtxoDustLimit, // optional, default to 1000 on the testnet, 1,0000 on the mainnet
   rgbppMinUtxoSatoshi: config.rgbppUtxoDustLimit, // optional, default to 546 on both testnet/mainnet
   onlyConfirmedUtxos: false, // optional, default to false, only confirmed utxos are allowed in the transaction
-  feeRate: 1, // optional, default to 1 on the testnet, and it is a floating number on the mainnet
+  feeRate: RecommendedFeeRate.FASTEST, // optional, will fetch from mempool.space API if not provided
 });
 ```
 
@@ -248,7 +255,7 @@ interface SendBtcProps {
   from: string;
   tos: InitOutput[];
   source: DataSource;
-  feeRate?: number;
+  feeRate?: FeeRateOption;
   fromPubkey?: string;
   changeAddress?: string;
   minUtxoSatoshi?: number;
@@ -276,7 +283,7 @@ interface SendUtxosProps {
   outputs: InitOutput[];
   source: DataSource;
   from: string;
-  feeRate?: number;
+  feeRate?: FeeRateOption;
   fromPubkey?: string;
   changeAddress?: string;
   minUtxoSatoshi?: number;
@@ -312,7 +319,7 @@ interface SendRgbppUtxosProps {
 
   source: DataSource;
   from: string;
-  feeRate?: number;
+  feeRate?: FeeRateOption;
   fromPubkey?: string;
   changeAddress?: string;
   minUtxoSatoshi?: number;
@@ -357,6 +364,12 @@ interface BaseOutput {
 }
 ```
 
+#### FeeRateOption
+
+```typescript
+type FeeRateOption = number | RecommendedFeeRate;
+```
+
 #### DataSource
 
 ```typescript
@@ -380,7 +393,7 @@ interface DataSource {
     exceedSatoshi: number;
   }>;
   getRecommendedFeeRates(): Promise<FeesRecommended>;
-  getAverageFeeRate(): Promise<number>;
+  getRecommendedFeeRate(feeRate?: RecommendedFeeRate): Promise<number>;
 }
 ```
 
@@ -392,6 +405,17 @@ interface FeesRecommended {
   halfHourFee: number;
   hourFee: number;
   minimumFee: number;
+}
+```
+
+#### RecommendedFeeRate
+
+```typescript
+enum RecommendedFeeRate {
+  FASTEST = 'fastestFee',
+  AVERAGE = 'halfHourFee',
+  SLOW = 'hourFee',
+  MINIMUM = 'minimumFee',
 }
 ```
 
