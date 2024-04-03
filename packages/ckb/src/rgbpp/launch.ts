@@ -3,7 +3,7 @@ import { NoLiveCellError } from '../error';
 import {
   append0x,
   calculateRgbppCellCapacity,
-  calculateTokenInfoCellCapacity,
+  calculateRgbppTokenInfoCellCapacity,
   calculateTransactionFee,
   generateUniqueTypeArgs,
 } from '../utils';
@@ -46,7 +46,7 @@ export const genRgbppLaunchCkbVirtualTx = async ({
     throw new NoLiveCellError('The owner address has no empty cells');
   }
   const rgbppCellCapacity = calculateRgbppCellCapacity();
-  const infoCellCapacity = calculateTokenInfoCellCapacity(ownerLock, rgbppTokenInfo);
+  const infoCellCapacity = calculateRgbppTokenInfoCellCapacity(rgbppTokenInfo, isMainnet);
 
   let txFee = MAX_FEE;
   const { inputs, sumInputsCapacity } = collector.collectInputs(

@@ -7,6 +7,7 @@ import {
   buildRgbppLockArgs,
   calculateCommitment,
   estimateWitnessSize,
+  calculateRgbppTokenInfoSize,
   encodeRgbppTokenInfo,
   genBtcTimeLockArgs,
   genBtcTimeLockScript,
@@ -224,4 +225,9 @@ describe('rgbpp tests', () => {
     const actual = encodeRgbppTokenInfo({ decimal: 8, name: 'RGBPP Test Token', symbol: 'RTT' });
     expect(actual).toBe('0x08105247425050205465737420546f6b656e03525454');
   });
-})
+
+  it('calculateRgbppTokenInfoSize', () => {
+    const actual = calculateRgbppTokenInfoSize({ decimal: 8, name: 'RGBPP Test Token', symbol: 'RTT' });
+    expect(actual).toBe(BigInt(22));
+  });
+});

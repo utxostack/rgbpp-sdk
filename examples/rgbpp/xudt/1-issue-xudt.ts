@@ -31,7 +31,7 @@ const issueXudt = async ({ xudtTotalAmount }: { xudtTotalAmount: bigint }) => {
   }
 
   const xudtCapacity = calculateUdtCellCapacity(issueLock);
-  const xudtInfoCapacity = calculateTokenInfoCellCapacity(XUDT_TOKEN_INFO, issueLock);
+  const xudtInfoCapacity = calculateXudtTokenInfoCellCapacity(XUDT_TOKEN_INFO, issueLock);
 
   let txFee = MAX_FEE;
   const { inputs, sumInputsCapacity } = collector.collectInputs(
