@@ -1,4 +1,9 @@
-import { BtcTransferVirtualTxResult, RgbppCkbVirtualTx, RgbppLaunchCkbVirtualTxParams } from '../types/rgbpp';
+import {
+  BtcTransferVirtualTxResult,
+  RgbppCkbVirtualTx,
+  RgbppLaunchCkbVirtualTxParams,
+  RgbppLaunchVirtualTxResult,
+} from '../types/rgbpp';
 import { NoLiveCellError } from '../error';
 import {
   append0x,
@@ -6,8 +11,15 @@ import {
   calculateRgbppTokenInfoCellCapacity,
   calculateTransactionFee,
   generateUniqueTypeArgs,
+  u128ToLe,
 } from '../utils';
-import { buildPreLockArgs, calculateCommitment, encodeRgbppTokenInfo, genRgbppLockScript } from '../utils/rgbpp';
+import {
+  buildPreLockArgs,
+  calculateCommitment,
+  encodeRgbppTokenInfo,
+  genBtcTimeLockScript,
+  genRgbppLockScript,
+} from '../utils/rgbpp';
 import { Hex } from '../types';
 import {
   MAX_FEE,
@@ -18,6 +30,8 @@ import {
   getXudtTypeScript,
   getUniqueTypeScript,
   getUniqueTypeDep,
+  UNLOCKABLE_LOCK_SCRIPT,
+  getRgbppLockConfigDep,
 } from '../constants';
 import { getTransactionSize, scriptToHash } from '@nervosnetwork/ckb-sdk-utils';
 
@@ -39,23 +53,18 @@ export const genRgbppLaunchCkbVirtualTx = async ({
   witnessLockPlaceholderSize,
   ckbFeeRate,
   isMainnet,
-}: RgbppLaunchCkbVirtualTxParams): Promise<BtcTransferVirtualTxResult> => {
+}: RgbppLaunchCkbVirtualTxParams): Promise<RgbppLaunchVirtualTxResult> => {
   const ownerLock = genRgbppLockScript(ownerRgbppLockArgs, isMainnet);
   const emptyCells = await collector.getCells({ lock: ownerLock });
   if (!emptyCells || emptyCells.length === 0) {
     throw new NoLiveCellError('The owner address has no empty cells');
   }
-  const rgbppCellCapacity = calculateRgbppCellCapacity();
   const infoCellCapacity = calculateRgbppTokenInfoCellCapacity(rgbppTokenInfo, isMainnet);
 
   let txFee = MAX_FEE;
-  const { inputs, sumInputsCapacity } = collector.collectInputs(
-    emptyCells,
-    rgbppCellCapacity + infoCellCapacity,
-    txFee,
-  );
+  const { inputs, sumInputsCapacity } = collector.collectInputs(emptyCells, infoCellCapacity, txFee, { isMax: true });
 
-  let changeCapacity = sumInputsCapacity - rgbppCellCapacity - infoCellCapacity;
+  let rgbppCellCapacity = sumInputsCapacity - infoCellCapacity;
   const outputs: CKBComponents.CellOutput[] = [
     {
       lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
@@ -66,21 +75,22 @@ export const genRgbppLaunchCkbVirtualTx = async ({
       capacity: append0x(rgbppCellCapacity.toString(16)),
     },
     {
-      lock: ownerLock,
+      lock: genBtcTimeLockScript(UNLOCKABLE_LOCK_SCRIPT, isMainnet),
       type: {
         ...getUniqueTypeScript(isMainnet),
-        args: generateUniqueTypeArgs(inputs[0], 0),
+        args: generateUniqueTypeArgs(inputs[0], 1),
       },
       capacity: append0x(infoCellCapacity.toString(16)),
     },
-    {
-      lock: ownerLock,
-      capacity: append0x(changeCapacity.toString(16)),
-    },
   ];
 
-  const outputsData = [append0x(launchAmount.toString(16)), encodeRgbppTokenInfo(rgbppTokenInfo), '0x'];
-  const cellDeps = [getRgbppLockDep(isMainnet), getXudtDep(isMainnet), getUniqueTypeDep(isMainnet)];
+  const outputsData = [append0x(u128ToLe(launchAmount)), encodeRgbppTokenInfo(rgbppTokenInfo)];
+  const cellDeps = [
+    getRgbppLockDep(isMainnet),
+    getRgbppLockConfigDep(isMainnet),
+    getXudtDep(isMainnet),
+    getUniqueTypeDep(isMainnet),
+  ];
 
   const witnesses: Hex[] = inputs.map((_, index) => (index === 0 ? RGBPP_WITNESS_PLACEHOLDER : '0x'));
 
@@ -96,18 +106,18 @@ export const genRgbppLaunchCkbVirtualTx = async ({
 
   const txSize = getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? RGBPP_TX_WITNESS_MAX_SIZE);
   const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
-  changeCapacity -= estimatedTxFee;
-  ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
+  rgbppCellCapacity -= estimatedTxFee;
+  ckbRawTx.outputs[0].capacity = append0x(rgbppCellCapacity.toString(16));
 
   const virtualTx: RgbppCkbVirtualTx = {
     ...ckbRawTx,
+    outputs: ckbRawTx.outputs,
   };
+
   const commitment = calculateCommitment(virtualTx);
 
   return {
     ckbRawTx,
     commitment,
-    needPaymasterCell: false,
-    sumInputsCapacity: append0x(sumInputsCapacity.toString(16)),
   };
 };

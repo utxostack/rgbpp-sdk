@@ -161,15 +161,18 @@ export const updateCkbTxWithRealBtcTxId = ({
   btcTxId,
   isMainnet,
 }: UpdateCkbTxWithRealBtcTxIdParams): CKBComponents.RawTransaction => {
-  const outputs = ckbRawTx.outputs
-    .filter((output) => isRgbppLockOrBtcTimeLock(output.lock, isMainnet))
-    .map((output) => ({
-      ...output,
-      lock: {
-        ...output.lock,
-        args: replaceLockArgsWithRealBtcTxId(output.lock.args, btcTxId),
-      },
-    }));
+  const outputs = ckbRawTx.outputs.map((output) => {
+    if (isRgbppLockOrBtcTimeLock(output.lock, isMainnet)) {
+      return {
+        ...output,
+        lock: {
+          ...output.lock,
+          args: replaceLockArgsWithRealBtcTxId(output.lock.args, btcTxId),
+        },
+      };
+    }
+    return output;
+  });
   const newRawTx: CKBComponents.RawTransaction = {
     ...ckbRawTx,
     outputs,

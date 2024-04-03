@@ -1,11 +1,18 @@
 import {
+  AppendIssuerCellToBtcBatchTransfer,
   BtcBatchTransferVirtualTxParams,
+  BtcBatchTransferVirtualTxResult,
   BtcTransferVirtualTxParams,
   BtcTransferVirtualTxResult,
   RgbppCkbVirtualTx,
 } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
-import { NoRgbppLiveCellError, TypeAssetNotSupportedError } from '../error';
+import {
+  InputsCapacityNotEnoughError,
+  NoLiveCellError,
+  NoRgbppLiveCellError,
+  TypeAssetNotSupportedError,
+} from '../error';
 import {
   append0x,
   calculateRgbppCellCapacity,
@@ -22,13 +29,25 @@ import {
 } from '../utils/rgbpp';
 import { Hex, IndexerCell } from '../types';
 import {
+  MAX_FEE,
+  MIN_CAPACITY,
+  RGBPP_TX_WITNESS_MAX_SIZE,
   RGBPP_WITNESS_PLACEHOLDER,
+  SECP256K1_WITNESS_LOCK_SIZE,
   getRgbppLockConfigDep,
   getRgbppLockDep,
+  getRgbppLockScript,
   getSecp256k1CellDep,
   getXudtDep,
 } from '../constants';
-import { getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
+import {
+  addressToScript,
+  getTransactionSize,
+  rawTransactionToHash,
+  scriptToHash,
+  serializeWitnessArgs,
+} from '@nervosnetwork/ckb-sdk-utils';
+import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 
 /**
  * Generate the virtual ckb transaction for the btc transfer tx
@@ -183,7 +202,7 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
   rgbppLockArgsList,
   rgbppReceivers,
   isMainnet,
-}: BtcBatchTransferVirtualTxParams): Promise<BtcTransferVirtualTxResult> => {
+}: BtcBatchTransferVirtualTxParams): Promise<BtcBatchTransferVirtualTxResult> => {
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
 
   if (!isTypeAssetSupported(xudtType, isMainnet)) {
@@ -220,22 +239,25 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
     isMax: true,
   });
 
-  let changeCapacity = sumInputsCapacity - rpbppCellCapacity * BigInt(rgbppReceivers.length);
-  const lastUtxoIndex = rgbppReceivers.length + 1;
-  outputs.push({
-    // The Vouts[0] for OP_RETURN and Vouts[1], Vouts[2], ... for RGBPP assets
-    lock: genRgbppLockScript(buildPreLockArgs(lastUtxoIndex), isMainnet),
-    type: xudtType,
-    capacity: append0x(changeCapacity.toString(16)),
-  });
-
+  let rgbppChangeOutIndex = -1;
   if (sumAmount > sumTransferAmount) {
+    const lastUtxoIndex = rgbppReceivers.length + 1;
+    rgbppChangeOutIndex = lastUtxoIndex;
+    outputs.push({
+      // The Vouts[0] for OP_RETURN and Vouts[1], Vouts[2], ... for RGBPP assets
+      lock: genRgbppLockScript(buildPreLockArgs(lastUtxoIndex), isMainnet),
+      type: xudtType,
+      capacity: append0x(rpbppCellCapacity.toString(16)),
+    });
     outputsData.push(append0x(u128ToLe(sumAmount - sumTransferAmount)));
-  } else {
-    outputsData.push('0x');
   }
 
-  const cellDeps = [getRgbppLockDep(isMainnet), getXudtDep(isMainnet), getRgbppLockConfigDep(isMainnet)];
+  const cellDeps = [
+    getRgbppLockDep(isMainnet),
+    getXudtDep(isMainnet),
+    getRgbppLockConfigDep(isMainnet),
+    getSecp256k1CellDep(isMainnet),
+  ];
   const witnesses: Hex[] = inputs.map((_, index) => (index === 0 ? RGBPP_WITNESS_PLACEHOLDER : '0x'));
 
   const ckbRawTx: CKBComponents.RawTransaction = {
@@ -248,11 +270,6 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
     witnesses,
   };
 
-  const txSize = getTransactionSize(ckbRawTx) + RGBPP_TX_WITNESS_MAX_SIZE;
-  const estimatedTxFee = calculateTransactionFee(txSize);
-  changeCapacity -= estimatedTxFee;
-  ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
-
   const virtualTx: RgbppCkbVirtualTx = {
     ...ckbRawTx,
   };
@@ -261,7 +278,93 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
   return {
     ckbRawTx,
     commitment,
+    rgbppChangeOutIndex,
     needPaymasterCell: false,
     sumInputsCapacity: append0x(sumInputsCapacity.toString(16)),
   };
+};
+
+/**
+ * Append paymaster cell to the ckb transaction inputs and sign the transaction with paymaster cell's secp256k1 private key
+ * @param secp256k1PrivateKey The Secp256k1 private key of the paymaster cells maintainer
+ * @param issuerAddress The issuer ckb address
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param ckbRawTx CKB raw transaction
+ * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ */
+export const appendIssuerCellToBtcBatchTransfer = async ({
+  secp256k1PrivateKey,
+  issuerAddress,
+  collector,
+  ckbRawTx,
+  sumInputsCapacity,
+  isMainnet,
+  ckbFeeRate,
+}: AppendIssuerCellToBtcBatchTransfer): Promise<CKBComponents.RawTransaction> => {
+  let rawTx = ckbRawTx as CKBComponents.RawTransactionToSign;
+
+  const rgbppInputsLength = rawTx.inputs.length;
+
+  const sumOutputsCapacity: bigint = rawTx.outputs
+    .map((output) => BigInt(output.capacity))
+    .reduce((prev, current) => prev + current, BigInt(0));
+
+  const issuerLock = addressToScript(issuerAddress);
+  const emptyCells = await collector.getCells({ lock: issuerLock });
+  if (!emptyCells || emptyCells.length === 0) {
+    throw new NoLiveCellError('The issuer address has no empty cells');
+  }
+
+  let actualInputsCapacity = BigInt(sumInputsCapacity);
+  let txFee = MAX_FEE;
+  if (actualInputsCapacity <= sumOutputsCapacity) {
+    const needCapacity = sumOutputsCapacity - actualInputsCapacity + MIN_CAPACITY;
+    const { inputs, sumInputsCapacity: sumEmptyCapacity } = collector.collectInputs(emptyCells, needCapacity, txFee);
+    rawTx.inputs = [...rawTx.inputs, ...inputs];
+    actualInputsCapacity += sumEmptyCapacity;
+  }
+
+  let changeCapacity = actualInputsCapacity - sumOutputsCapacity;
+  const changeOutput = {
+    lock: issuerLock,
+    capacity: append0x(changeCapacity.toString(16)),
+  };
+  rawTx.outputs = [...rawTx.outputs, changeOutput];
+  rawTx.outputsData = [...rawTx.outputsData, '0x'];
+
+  const txSize = getTransactionSize(rawTx) + SECP256K1_WITNESS_LOCK_SIZE;
+  const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
+  changeCapacity -= estimatedTxFee;
+  rawTx.outputs[rawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
+
+  let keyMap = new Map<string, string>();
+  keyMap.set(scriptToHash(issuerLock), secp256k1PrivateKey);
+  keyMap.set(scriptToHash(getRgbppLockScript(isMainnet)), '');
+
+  const issuerCellIndex = rgbppInputsLength;
+  const cells = rawTx.inputs.map((input, index) => ({
+    outPoint: input.previousOutput,
+    lock: index >= issuerCellIndex ? issuerLock : getRgbppLockScript(isMainnet),
+  }));
+
+  const emptyWitness = { lock: '', inputType: '', outputType: '' };
+  const issuerWitnesses = rawTx.inputs.slice(rgbppInputsLength).map((_, index) => (index === 0 ? emptyWitness : '0x'));
+  rawTx.witnesses = [...rawTx.witnesses, ...issuerWitnesses];
+
+  const transactionHash = rawTransactionToHash(rawTx);
+  const signedWitnesses = signWitnesses(keyMap)({
+    transactionHash,
+    witnesses: rawTx.witnesses,
+    inputCells: cells,
+    skipMissingKeys: true,
+  });
+
+  const signedTx = {
+    ...rawTx,
+    witnesses: signedWitnesses.map((witness) =>
+      typeof witness !== 'string' ? serializeWitnessArgs(witness) : witness,
+    ),
+  };
+  return signedTx;
 };
