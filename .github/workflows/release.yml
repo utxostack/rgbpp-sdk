@@ -4,6 +4,9 @@ name: Release
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+    - main
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -12,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -48,6 +52,8 @@ jobs:
         uses: changesets/action@v1
         with:
           publish: pnpm run release:packages
+          title: "bump: assumable rgbpp-sdk version"
+          commit: "bump: assumable rgbpp-sdk version"
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
