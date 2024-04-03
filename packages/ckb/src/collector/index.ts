@@ -5,6 +5,7 @@ import { CollectResult, CollectUdtResult, IndexerCell } from '../types/collector
 import { MIN_CAPACITY } from '../constants';
 import { CapacityNotEnoughError, IndexerError, UdtAmountNotEnoughError } from '../error';
 import { leToU128 } from '../utils';
+import { Hex } from '../types';
 
 const parseScript = (script: CKBComponents.Script) => ({
   code_hash: script.codeHash,
@@ -29,10 +30,12 @@ export class Collector {
     lock,
     type,
     isDataEmpty = true,
+    outputCapacityRange,
   }: {
     lock?: CKBComponents.Script;
     type?: CKBComponents.Script;
     isDataEmpty?: boolean;
+    outputCapacityRange?: Hex[];
   }): Promise<IndexerCell[] | undefined> {
     let param: any = {
       script_search_mode: 'exact',
@@ -45,6 +48,7 @@ export class Collector {
         filter: {
           script: type ? parseScript(type) : null,
           output_data_len_range: isDataEmpty && !type ? ['0x0', '0x1'] : null,
+          output_capacity_range: outputCapacityRange,
         },
       };
     } else if (type) {

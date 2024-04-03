@@ -111,6 +111,8 @@ export interface SignBtcTimeCellsTxParams {
   // The master CKB address to pay the time cells spent tx fee
   masterCkbAddress: Address;
   isMainnet: boolean;
+  // [u64; 2], filter cells by output capacity range, [inclusive, exclusive]
+  outputCapacityRange?: Hex[];
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
 }
