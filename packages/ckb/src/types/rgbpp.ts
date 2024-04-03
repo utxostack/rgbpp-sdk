@@ -75,6 +75,17 @@ export interface BaseCkbVirtualTxResult {
 
 export interface BtcTransferVirtualTxResult extends BaseCkbVirtualTxResult {}
 
+export interface BtcBatchTransferVirtualTxResult extends BaseCkbVirtualTxResult {
+  rgbppChangeOutIndex: number;
+}
+
+export interface RgbppLaunchVirtualTxResult {
+  // CKB raw transaction
+  ckbRawTx: CKBComponents.RawTransaction;
+  // The rgbpp commitment to be inserted into BTC op_return
+  commitment: Hex;
+}
+
 export interface AppendWitnessesParams {
   // CKB raw transaction
   ckbRawTx: CKBComponents.RawTransaction;
@@ -188,6 +199,22 @@ export interface CkbBatchJumpBtcVirtualTxParams {
   rgbppReceivers: RgbppLockArgsReceiver[];
   // The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
   witnessLockPlaceholderSize?: number;
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
+}
+
+export interface AppendIssuerCellToBtcBatchTransfer {
+  // The Secp256k1 private key of the issuer cells maintainer
+  secp256k1PrivateKey: Hex;
+  // The issuer ckb address
+  issuerAddress: Address;
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // CKB raw transaction
+  ckbRawTx: CKBComponents.RawTransaction;
+  // The sum capacity of the ckb inputs
+  sumInputsCapacity: Hex;
+  isMainnet: boolean;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
 }

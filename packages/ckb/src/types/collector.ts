@@ -22,3 +22,9 @@ export interface CollectResult {
 export interface CollectUdtResult extends CollectResult {
   sumAmount: bigint;
 }
+
+export interface CollectConfig {
+  isMax?: boolean;
+  minCapacity?: bigint;
+  errMsg?: string;
+}
