@@ -17,10 +17,13 @@ import {
 import {
   RgbppApis,
   RgbppApiSpvProof,
+  RgbppApiPaymasterInfo,
   RgbppApiTransactionState,
   RgbppApiSendCkbTransactionPayload,
   RgbppApiCkbTransactionHash,
   RgbppApiAssetsByAddressParams,
+  RgbppApiRetryCkbTransactionPayload,
+  RgbppApiTransactionRetry,
 } from '../types';
 
 export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis {
@@ -88,6 +91,10 @@ export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis
    * RGBPP APIs, under the /rgbpp/v1 prefix.
    */
 
+  getRgbppPaymasterInfo() {
+    return this.request<RgbppApiPaymasterInfo>('/rgbpp/v1/paymaster/info');
+  }
+
   getRgbppTransactionHash(btcTxId: string) {
     return this.request<RgbppApiCkbTransactionHash>(`/rgbpp/v1/transaction/${btcTxId}`);
   }
@@ -119,8 +126,14 @@ export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis
     });
   }
 
-  sendRgbppCkbTransaction(payload: RgbppApiSendCkbTransactionPayload): Promise<RgbppApiTransactionState> {
+  sendRgbppCkbTransaction(payload: RgbppApiSendCkbTransactionPayload) {
     return this.post<RgbppApiTransactionState>('/rgbpp/v1/transaction/ckb-tx', {
+      body: JSON.stringify(payload),
+    });
+  }
+
+  retryRgbppCkbTransaction(payload: RgbppApiRetryCkbTransactionPayload) {
+    return this.post<RgbppApiTransactionRetry>('/rgbpp/v1/transaction/retry', {
       body: JSON.stringify(payload),
     });
   }

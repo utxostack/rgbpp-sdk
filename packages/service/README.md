@@ -182,6 +182,7 @@ interface BtcApiBalance {
 }
 
 interface BtcApiUtxoParams {
+  only_confirmed?: boolean;
   min_satoshi?: number;
 }
 
@@ -244,16 +245,23 @@ interface BtcApiTransaction {
 
 ```typescript
 interface RgbppApis {
-  getRgbppTransactionHash(btcTxId: string): Promise<RgbppApiCkbTransactionHash | undefined>;
-  getRgbppTransactionState(btcTxId: string): Promise<RgbppApiTransactionState | undefined>;
+  getRgbppPaymasterInfo(): Promise<RgbppApiPaymasterInfo>;
+  getRgbppTransactionHash(btcTxId: string): Promise<RgbppApiCkbTransactionHash>;
+  getRgbppTransactionState(btcTxId: string): Promise<RgbppApiTransactionState>;
   getRgbppAssetsByBtcTxId(btcTxId: string): Promise<Cell[]>;
   getRgbppAssetsByBtcUtxo(btcTxId: string, vout: number): Promise<Cell[]>;
   getRgbppAssetsByBtcAddress(btcAddress: string, params?: RgbppApiAssetsByAddressParams): Promise<Cell[]>;
-  getRgbppSpvProof(btcTxId: string, confirmations: number): Promise<RgbppApiSpvProof | undefined>;
+  getRgbppSpvProof(btcTxId: string, confirmations: number): Promise<RgbppApiSpvProof>;
   sendRgbppCkbTransaction(payload: RgbppApiSendCkbTransactionPayload): Promise<RgbppApiTransactionState>;
+  retryRgbppCkbTransaction(payload: RgbppApiRetryCkbTransactionPayload): Promise<RgbppApiTransactionRetry>;
 }
 
 type RgbppTransactionState = 'completed' | 'failed' | 'delayed' | 'active' | 'waiting';
+
+interface RgbppApiPaymasterInfo {
+  btc_address: string;
+  fee: number;
+}
 
 interface RgbppApiCkbTransactionHash {
   txhash: string;
@@ -283,5 +291,14 @@ interface RgbppApiSendCkbTransactionPayload {
     sumInputsCapacity: string;
     commitment: string;
   };
+}
+
+interface RgbppApiRetryCkbTransactionPayload {
+  btc_txid: string;
+}
+
+interface RgbppApiTransactionRetry {
+  success: boolean;
+  state: RgbppTransactionState;
 }
 ```
