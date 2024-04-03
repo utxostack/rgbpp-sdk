@@ -2,7 +2,13 @@
 
 ## About
 
-The `@rgbpp-sdk/service` package provides a wrapped class to interact with the BtcAssetsApi service. You can interact with the BtcAssetsApi service to query BTC blockchain information, balance, UTXOs, RGBPP cells, BTC/RGBPP transactions, and send BTC/RGBPP transactions.
+The `@rgbpp-sdk/service` package provides a wrapped class to interact with `Bitcoin/RGB++ Assets Service` (BtcAssetsApi). It offers various features for interacting with Bitcoin and RGB++ assets:
+
+- **Retrieve Blockchain Information** including Bitcoin chain info, blocks, headers, transactions, addresses, and RGB++ assets
+- **Handle transactions** by posting to `/bitcoin/v1/transaction` or `/rgbpp/v1/transaction/ckb-tx`
+- **Generate Bitcoin transaction Proof** via `/rgbpp/v1/btc-spv/proof` through [Bitcoin SPV Service on CKB](https://github.com/ckb-cell/ckb-bitcoin-spv-service)
+- Simplify RGB++ assets workflows with **RGB++ CKB transaction Queue** and cron jobs
+- More detailed API documentation can be found on [Testnet](https://btc-assets-api.testnet.mibao.pro/docs) and [Mainnet](https://api.rgbpp.io/docs)
 
 ## Installation
 
