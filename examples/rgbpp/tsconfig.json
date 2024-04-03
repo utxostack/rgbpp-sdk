@@ -1,11 +1,4 @@
 {
-  "ts-node": {
-    // these options are overrides used only by ts-node
-    // same as the --compilerOptions flag and the TS_NODE_COMPILER_OPTIONS environment variable
-    "compilerOptions": {
-      "module": "CommonJS"
-    }
-  },
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "target": "ES2015",
@@ -27,6 +20,6 @@
     "skipLibCheck": true,
     "strict": true,
   },
-  "include": ["local/**.ts", "queue/**/*.ts"],
+  "include": ["local/**.ts", "queue/**/*.ts", "local/launch/0-rgbpp-token-info.ts", "local/launch/1-prepare-launch.ts", "local/launch/2-launch-rgbpp.ts", "local/launch/3-distribute-rgbpp.ts"],
   "exclude": ["node_modules"]
 }
