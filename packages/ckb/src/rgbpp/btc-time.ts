@@ -114,6 +114,7 @@ export const buildBtcTimeCellsSpentTx = async ({
  * @param ckbRawTx The CKB raw transaction to be signed
  * @param collector The collector that collects CKB live cells and transactions
  * @param masterCkbAddress The master CKB address
+ * @param outputCapacityRange [u64; 2], filter cells by output capacity range, [inclusive, exclusive]
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  * @param isMainnet
  */
@@ -123,11 +124,13 @@ export const signBtcTimeCellSpentTx = async ({
   collector,
   masterCkbAddress,
   isMainnet,
+  outputCapacityRange,
   ckbFeeRate,
 }: SignBtcTimeCellsTxParams): Promise<CKBComponents.RawTransaction> => {
   const masterLock = addressToScript(masterCkbAddress);
   const emptyCells = await collector.getCells({
     lock: masterLock,
+    outputCapacityRange,
   });
   if (!emptyCells || emptyCells.length === 0) {
     throw new Error('No empty cell found');
