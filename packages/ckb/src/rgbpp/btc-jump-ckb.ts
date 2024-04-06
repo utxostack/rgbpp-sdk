@@ -7,19 +7,18 @@ import {
   calculateTransactionFee,
   isLockArgsSizeExceeded,
   isTypeAssetSupported,
-  remove0x,
   u128ToLe,
 } from '../utils';
 import {
   buildPreLockArgs,
   calculateCommitment,
   compareInputs,
+  estimateWitnessSize,
   genBtcTimeLockScript,
   genRgbppLockScript,
 } from '../utils/rgbpp';
 import { Hex, IndexerCell } from '../types';
 import {
-  RGBPP_TX_WITNESS_MAX_SIZE,
   RGBPP_WITNESS_PLACEHOLDER,
   getRgbppLockConfigDep,
   getRgbppLockDep,
@@ -127,7 +126,8 @@ export const genBtcJumpCkbVirtualTx = async ({
   };
 
   if (!needPaymasterCell) {
-    const txSize = getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? RGBPP_TX_WITNESS_MAX_SIZE);
+    const txSize =
+      getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? estimateWitnessSize(rgbppLockArgsList));
     const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
 
     changeCapacity -= estimatedTxFee;

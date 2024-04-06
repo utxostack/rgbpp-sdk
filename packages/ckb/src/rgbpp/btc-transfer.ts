@@ -8,10 +8,15 @@ import {
   isTypeAssetSupported,
   u128ToLe,
 } from '../utils';
-import { buildPreLockArgs, calculateCommitment, compareInputs, genRgbppLockScript } from '../utils/rgbpp';
+import {
+  buildPreLockArgs,
+  calculateCommitment,
+  compareInputs,
+  estimateWitnessSize,
+  genRgbppLockScript,
+} from '../utils/rgbpp';
 import { Hex, IndexerCell } from '../types';
 import {
-  RGBPP_TX_WITNESS_MAX_SIZE,
   RGBPP_WITNESS_PLACEHOLDER,
   getRgbppLockConfigDep,
   getRgbppLockDep,
@@ -138,7 +143,8 @@ export const genBtcTransferCkbVirtualTx = async ({
   };
 
   if (!needPaymasterCell) {
-    const txSize = getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? RGBPP_TX_WITNESS_MAX_SIZE);
+    const txSize =
+      getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? estimateWitnessSize(rgbppLockArgsList));
     const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
 
     changeCapacity -= estimatedTxFee;

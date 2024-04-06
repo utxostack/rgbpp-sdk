@@ -6,6 +6,7 @@ import {
   buildPreLockArgs,
   buildRgbppLockArgs,
   calculateCommitment,
+  estimateWitnessSize,
   genBtcTimeLockArgs,
   genBtcTimeLockScript,
   lockScriptFromBtcTimeLockArgs,
@@ -171,5 +172,15 @@ describe('rgbpp tests', () => {
     expect('0x047b6894a0b7a4d7a73b1503d1ae35c51fc5fa6306776dcf22b1fb3daaa32a29').toBe(expected.spvClient.txHash);
     expect('0xa').toBe(expected.spvClient.index);
     expect('0x2f061a27abcab1d1d146514ffada6a83c0d974fe0813835ad8be2a39a6b1a6ee').toBe(expected.proof);
+  });
+
+  it('estimatedWitnessSize', () => {
+    const actual = estimateWitnessSize([
+      '0x000000002f061a27abcab1d1d146514ffada6a83c0d974fe0813835ad8be2a39a6b1a6ee',
+      '0x010000002f061a27abcab1d1d146514ffada6a83c0d974fe0813835ad8be2a39a6b1a6ee',
+      '0x01000000047b6894a0b7a4d7a73b1503d1ae35c51fc5fa6306776dcf22b1fb3daaa32a29',
+      '0x010000002f061a27abcab1d1d146514ffada6a83c0d974fe0813835ad8be2a39a6b1a6ee',
+    ]);
+    expect(actual).toBe(9000);
   });
 });
