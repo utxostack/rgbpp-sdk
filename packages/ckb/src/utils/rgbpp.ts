@@ -173,7 +173,7 @@ export const buildSpvClientCellDep = (spvClient: CKBComponents.OutPoint) => {
  * Estimate the size of the witness based on the number of groups of lock args
  * @param rgbppLockArgsList The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
  */
-export const estimatedWitnessSize = (rgbppLockArgsList: Hex[]): number => {
+export const estimateWitnessSize = (rgbppLockArgsList: Hex[]): number => {
   const rgbppLockArgsSet = new Set(rgbppLockArgsList);
   const inputsGroupSize = rgbppLockArgsSet.size;
   return RGBPP_TX_WITNESS_MAX_SIZE * inputsGroupSize;
