@@ -2,7 +2,6 @@ import { AddressPrefix, privateKeyToAddress, serializeScript } from '@nervosnetw
 import { Collector, RgbppBtcAddressReceiver, appendCkbTxWitnesses, appendIssuerCellToBtcBatchTransfer, buildRgbppLockArgs, genBtcBatchTransferCkbVirtualTx, getXudtTypeScript, sendCkbTx, updateCkbTxWithRealBtcTxId } from '@rgbpp-sdk/ckb';
 import { sendRgbppUtxos, DataSource, ECPair, bitcoin, NetworkType, transactionToHex } from '@rgbpp-sdk/btc';
 import { BtcAssetsApi, BtcAssetsApiError } from '@rgbpp-sdk/service';
-import { readBtcAddresses } from '../address/read-btc-addresses'
 import { RGBPP_TOKEN_INFO } from './0-rgbpp-token-info';
 
 // CKB SECP256K1 private key
@@ -18,7 +17,7 @@ interface Params {
   rgbppLockArgsList: string[];
   receivers: RgbppBtcAddressReceiver[];
 }
-const distributeRgbppOnBtc = async ({ rgbppLockArgsList, receivers }: Params) => {
+const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers }: Params) => {
   const collector = new Collector({
     ckbNodeUrl: 'https://mainnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://mainnet.ckb.dev/indexer',
@@ -68,7 +67,6 @@ const distributeRgbppOnBtc = async ({ rgbppLockArgsList, receivers }: Params) =>
     ckbCollector: collector,
     from: btcAddress!,
     source,
-    feeRate: 40
   });
   psbt.signAllInputs(keyPair);
   psbt.finalizeAllInputs();
@@ -112,30 +110,15 @@ const distributeRgbppOnBtc = async ({ rgbppLockArgsList, receivers }: Params) =>
 };
 
 
-const readReceivers = async () => {
-  const btcAddresses: string[] = await readBtcAddresses();
-
-  // console.log(btcAddresses[0])
-  // console.log(btcAddresses.length)
-  // const btcAddresses: string[] = ['bc1p0ey32x7dwhlx569rh0l5qaxetsfnpvezanrezahelr0t02ytyegssdel0h'];
-  const receivers: RgbppBtcAddressReceiver[] = btcAddresses.map(address => ({
-      toBtcAddress: address,
+// Use your real BTC UTXO information on the BTC Testnet
+// rgbppLockArgs: outIndexU32 + btcTxId
+distributeRgbppAssetOnBtc({
+  rgbppLockArgsList: [buildRgbppLockArgs(251, '92966139a07e1cce77293df58c360c0a64a83dd651a9a831d37bcf34fa6d882b')],
+  receivers: [
+    {
+      toBtcAddress: 'bc1p0ey32x7dwhlx569rh0l5qaxetsfnpvezanrezahelr0t02ytyegssdel0h',
       transferAmount: BigInt(1000) * BigInt(10 ** RGBPP_TOKEN_INFO.decimal),
-  }))
-  return receivers
-}
+    },
+  ],
+});
 
-
-const runDistributeJob = async () => {
-  const receivers = await readReceivers();
-
-  // Use your real BTC UTXO information on the BTC Testnet
-  // rgbppLockArgs: outIndexU32 + btcTxId
-
-  distributeRgbppOnBtc({
-    rgbppLockArgsList: [buildRgbppLockArgs(251, '92966139a07e1cce77293df58c360c0a64a83dd651a9a831d37bcf34fa6d882b')],
-    receivers,
-  });
-};
-
-runDistributeJob()

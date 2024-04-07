@@ -55,7 +55,6 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
     ckbCollector: collector,
     from: btcAddress!,
     source,
-    feeRate: 22
   });
   psbt.signAllInputs(keyPair);
   psbt.finalizeAllInputs();

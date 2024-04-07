@@ -1,9 +1,4 @@
-import {
-  BtcTransferVirtualTxResult,
-  RgbppCkbVirtualTx,
-  RgbppLaunchCkbVirtualTxParams,
-  RgbppLaunchVirtualTxResult,
-} from '../types/rgbpp';
+import { RgbppCkbVirtualTx, RgbppLaunchCkbVirtualTxParams, RgbppLaunchVirtualTxResult } from '../types/rgbpp';
 import { NoLiveCellError } from '../error';
 import {
   append0x,
