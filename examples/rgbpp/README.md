@@ -25,17 +25,25 @@ But when you're searching for this transaction in [Bitcoin Core](https://bitcoin
 018025fb6989eed484774170eefa2bef1074b0c24537f992a64dbc138277bc4a
 ```
 
-## Examples with Queue service(Recommended)
+## xUDT Examples
 
-### Mint XUDT
-As a simple example, Omiga protocol is reused for a quick demonstration of XUDT asset insurance.
-Developers have the option to utilize an existing XUDT (User-Defined Token) on CKB.
+### Issue xUDT
 
 ```shell
-npx ts-node examples/rgbpp/queue/1-mint-xudt.ts 
+npx ts-node examples/rgbpp/xudt/1-issue-xudt.ts 
 ```
 
-### Jump XUDT from CKB to BTC
+### Mint/Transfer xUDT
+
+You can use this command to mint or transfer xUDT assets
+
+```shell
+npx ts-node examples/rgbpp/xudt/2-transfer-xudt.ts 
+```
+
+## Examples with Queue service(Recommended)
+
+### Jump xUDT from CKB to BTC
 
 ```shell
 npx ts-node examples/rgbpp/queue/2-ckb-jump-btc.ts 
@@ -57,17 +65,10 @@ npx ts-node examples/rgbpp/queue/4-btc-jump-ckb.ts
 
 A cron job in RGB++ Queue service will construct a transaction unlocking the mature BTC time cells to the their `target_ckb_address`.
 
+
 ## Local Examples
 
-### Mint XUDT
-As a simple example, Omiga protocol is reused for a quick demonstration of XUDT asset insurance.
-Developers have the option to utilize an existing XUDT (User-Defined Token) on CKB.
-
-```shell
-npx ts-node examples/rgbpp/local/1-mint-xudt.ts 
-```
-
-### Jump XUDT from CKB to BTC
+### Jump xUDT from CKB to BTC
 
 ```shell
 npx ts-node examples/rgbpp/local/2-ckb-jump-btc.ts 
