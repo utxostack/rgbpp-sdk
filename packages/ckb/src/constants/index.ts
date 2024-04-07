@@ -62,6 +62,20 @@ const TestnetInfo = {
     },
     depType: 'code',
   } as CKBComponents.CellDep,
+
+  UniqueTypeScript: {
+    codeHash: '0x8e341bcfec6393dcd41e635733ff2dca00a6af546949f70c57a706c0f344df8b',
+    hashType: 'type',
+    args: '',
+  } as CKBComponents.Script,
+
+  UniqueTypeDep: {
+    outPoint: {
+      txHash: '0xff91b063c78ed06f10a1ed436122bd7d671f9a72ef5f5fa28d05252c17cf4cef',
+      index: '0x0',
+    },
+    depType: 'code',
+  } as CKBComponents.CellDep,
 };
 
 const MainnetInfo = {
@@ -118,6 +132,20 @@ const MainnetInfo = {
     },
     depType: 'code',
   } as CKBComponents.CellDep,
+
+  UniqueTypeScript: {
+    codeHash: '0x2c8c11c985da60b0a330c61a85507416d6382c130ba67f0c47ab071e00aec628',
+    hashType: 'data1',
+    args: '',
+  } as CKBComponents.Script,
+
+  UniqueTypeDep: {
+    outPoint: {
+      txHash: '0x67524c01c0cb5492e499c7c7e406f2f9d823e162d6b0cf432eacde0c9808c2ad',
+      index: '0x0',
+    },
+    depType: 'code',
+  } as CKBComponents.CellDep,
 };
 
 export const getSecp256k1CellDep = (isMainnet: boolean) =>
@@ -142,3 +170,8 @@ export const getBtcTimeLockDep = (isMainnet: boolean) =>
 
 export const getBtcTimeLockConfigDep = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.BtcTimeLockConfigDep : TestnetInfo.BtcTimeLockConfigDep;
+
+export const getUniqueTypeScript = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.UniqueTypeScript : TestnetInfo.UniqueTypeScript;
+export const getUniqueTypeDep = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.UniqueTypeDep : TestnetInfo.UniqueTypeDep;
