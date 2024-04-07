@@ -15,7 +15,7 @@ import {
   ECPair,
   transactionToHex,
 } from '@rgbpp-sdk/btc';
-import { BtcAssetsApi } from '@rgbpp-sdk/service'
+import { BtcAssetsApi, BtcAssetsApiError } from '@rgbpp-sdk/service'
 
 // CKB SECP256K1 private key
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
@@ -92,32 +92,29 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
   console.log('BTC TxId: ', btcTxId);
   console.log('ckbRawTx', JSON.stringify(ckbRawTx));
 
-  /*****************************************************************************************************************/
-  // Warning: Please wait for the btc transaction to be confirmed, and use the above printed data to assign values to the following three variables
-  // and delete the following annotations
+  // Wait for BTC tx and proof to be ready, and then send isomorphic CKB transactions
+  const interval = setInterval(async () => {
+    try {
+      console.log('Waiting for BTC tx and proof to be ready');
+      const rgbppApiSpvProof = await service.getRgbppSpvProof(btcTxId, 0);
+      clearInterval(interval);
+      // Update CKB transaction with the real BTC txId
+      const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet });
+      const ckbTx = await appendCkbTxWitnesses({
+        ckbRawTx: newCkbRawTx,
+        btcTxBytes,
+        rgbppApiSpvProof,
+      });
 
-  // const btcTxId = 'ede749ecee5e607e761e4fffb6d754799498056872456a7d33abe426d7b9951c';
-  // const btcTxBytes =
-  //   '020000000115a7fbbda80c32da1add29538da1627411c740bbbc907a273add56914122e6240100000000ffffffff020000000000000000226a207f1b052bca06997651c36fae885dd7e4cb25606ccaa970703952995f427bc43284310f000000000016001462fc12a35b779f0cf7edcb9690be19b0386e0f9a00000000';
-  // const ckbRawTx = JSON.parse(
-  //   `{"version":"0x0","cellDeps":[{"outPoint":{"txHash":"0xf1de59e973b85791ec32debbba08dff80c63197e895eb95d67fc1e9f6b413e00","index":"0x0"},"depType":"code"},{"outPoint":{"txHash":"0xbf6fb538763efec2a70a6a3dcb7242787087e1030c4e7d86585bc63a9d337f5f","index":"0x0"},"depType":"code"},{"outPoint":{"txHash":"0xf1de59e973b85791ec32debbba08dff80c63197e895eb95d67fc1e9f6b413e00","index":"0x1"},"depType":"code"}],"headerDeps":[],"inputs":[{"previousOutput":{"txHash":"0x917c25c087a055b68b6d58b8f7c8925f81a86a11a4773983a185f852b1d1d7cb","index":"0x0"},"since":"0x0"}],"outputs":[{"lock":{"codeHash":"0x00cdf8fab0f8ac638758ebf5ea5e4052b1d71e8a77b9f43139718621f6849326","hashType":"type","args":"0x7f000000100000005b0000005f0000004b000000100000003000000031000000d23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac011600000000016c61f984f12d3c8a4f649e60acda5deda0b8837c060000000000000000000000000000000000000000000000000000000000000000000000"},"type":{"codeHash":"0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb","hashType":"type","args":"0x1ba116c119d1cfd98a53e9d1a615cf2af2bb87d95515c9d217d367054cfc696b"},"capacity":"0x5e9f51fda"}],"outputsData":["0x00205fa0120000000000000000000000"],"witnesses":["0xFF"]}`,
-  // );
-
-  // const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet });
-
-  // const rgbppApiSpvProof = await service.getRgbppSpvProof(btcTxId, 0);
-
-  // const ckbTx = await appendCkbTxWitnesses({
-  //   ckbRawTx: newCkbRawTx,
-  //   btcTxBytes,
-  //   rgbppApiSpvProof,
-  // });
-
-  // console.log('BTC time lock args: ', newCkbRawTx.outputs[0].lock.args);
-
-  // const txHash = await sendCkbTx({ collector, signedTx: ckbTx });
-  // console.info(`Rgbpp asset has been jumped from BTC to CKB and tx hash is ${txHash}`);
-};
+      const txHash = await sendCkbTx({ collector, signedTx: ckbTx });
+      console.info(`RGB++ Asset has been leaped from BTC to CKB and the CKB tx hash is ${txHash}`);
+    } catch (error) {
+      if (!(error instanceof BtcAssetsApiError)) {
+        console.error(error);
+      }
+    }
+  }, 30 * 1000);
+}
 
 // rgbppLockArgs: outIndexU32 + btcTxId
 jumpFromBtcToCkb({
