@@ -172,3 +172,9 @@ export interface CkbBatchJumpBtcVirtualTxParams {
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
 }
+
+export interface RgbppTokenInfo {
+  decimal: number;
+  name: string;
+  symbol: string;
+}
