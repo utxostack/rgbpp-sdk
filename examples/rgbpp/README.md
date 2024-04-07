@@ -46,19 +46,19 @@ npx ts-node examples/rgbpp/xudt/2-transfer-xudt.ts
 ### Jump xUDT from CKB to BTC
 
 ```shell
-npx ts-node examples/rgbpp/queue/2-ckb-jump-btc.ts 
+npx ts-node examples/rgbpp/queue/1-ckb-jump-btc.ts 
 ```
 
 ### Transfer RGB++ asset on BTC
 
 ```shell
-npx ts-node examples/rgbpp/queue/3-btc-transfer.ts 
+npx ts-node examples/rgbpp/queue/2-btc-transfer.ts 
 ```
 
 ### Jump RGB++ asset from BTC to CKB
 
 ```shell
-npx ts-node examples/rgbpp/queue/4-btc-jump-ckb.ts 
+npx ts-node examples/rgbpp/queue/3-btc-jump-ckb.ts 
 ```
 
 ### Unlock BTC time cells on CKB
@@ -71,19 +71,19 @@ A cron job in RGB++ Queue service will construct a transaction unlocking the mat
 ### Jump xUDT from CKB to BTC
 
 ```shell
-npx ts-node examples/rgbpp/local/2-ckb-jump-btc.ts 
+npx ts-node examples/rgbpp/local/1-ckb-jump-btc.ts 
 ```
 
 ### Transfer RGB++ asset on BTC
 
 ```shell
-npx ts-node examples/rgbpp/local/3-btc-transfer.ts 
+npx ts-node examples/rgbpp/local/2-btc-transfer.ts 
 ```
 
 ### Jump RGB++ asset from BTC to CKB
 
 ```shell
-npx ts-node examples/rgbpp/local/4-btc-jump-ckb.ts 
+npx ts-node examples/rgbpp/local/3-btc-jump-ckb.ts 
 ```
 
 ### Unlock BTC time cells on CKB
@@ -91,5 +91,5 @@ npx ts-node examples/rgbpp/local/4-btc-jump-ckb.ts
 **Warning: Wait at least 6 BTC confirmation blocks to unlock the BTC time cells after 4-btc-jump-ckb.ts**
 
 ```shell
-npx ts-node examples/rgbpp/local/5-spend-btc-time-cell.ts 
+npx ts-node examples/rgbpp/local/4-spend-btc-time-cell.ts 
 ```
