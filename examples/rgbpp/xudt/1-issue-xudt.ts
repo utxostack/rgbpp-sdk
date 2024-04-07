@@ -1,6 +1,6 @@
 import { AddressPrefix, addressToScript, getTransactionSize, privateKeyToAddress, scriptToHash } from '@nervosnetwork/ckb-sdk-utils';
 import { getSecp256k1CellDep,Collector, NoLiveCellError, calculateUdtCellCapacity, MAX_FEE, MIN_CAPACITY, getXudtTypeScript, append0x, getUniqueTypeScript, u128ToLe, encodeRgbppTokenInfo, getXudtDep, getUniqueTypeDep, SECP256K1_WITNESS_LOCK_SIZE, calculateTransactionFee, generateUniqueTypeArgs } from '@rgbpp-sdk/ckb';
-import { calculateTokenInfoCellCapacity } from '@rgbpp-sdk/ckb/src/utils';
+import { calculateXudtTokenInfoCellCapacity } from '@rgbpp-sdk/ckb/src/utils';
 import { XUDT_TOKEN_INFO } from './0-token-info';
 
 // CKB SECP256K1 private key
@@ -38,7 +38,7 @@ const issueXudt = async ({ xudtTotalAmount }: { xudtTotalAmount: bigint }) => {
     emptyCells,
     xudtCapacity + xudtInfoCapacity,
     txFee,
-    MIN_CAPACITY,
+    {minCapacity: MIN_CAPACITY},
   );
 
   const xudtType: CKBComponents.Script = {

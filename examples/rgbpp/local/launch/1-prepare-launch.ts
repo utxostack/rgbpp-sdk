@@ -1,5 +1,5 @@
 import { AddressPrefix, addressToScript, getTransactionSize, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
-import { Collector, MAX_FEE, NoLiveCellError, RgbppTokenInfo, SECP256K1_WITNESS_LOCK_SIZE, append0x, buildRgbppLockArgs, calculateRgbppCellCapacity, calculateTokenInfoCellCapacity, calculateTransactionFee, genRgbppLockScript, getSecp256k1CellDep } from '@rgbpp-sdk/ckb';
+import { Collector, MAX_FEE, NoLiveCellError, RgbppTokenInfo, SECP256K1_WITNESS_LOCK_SIZE, append0x, buildRgbppLockArgs, calculateRgbppCellCapacity, calculateRgbppTokenInfoCellCapacity, calculateTransactionFee, genRgbppLockScript, getSecp256k1CellDep } from '@rgbpp-sdk/ckb';
 import { RGBPP_TOKEN_INFO } from './0-rgbpp-token-info';
 
 // CKB SECP256K1 private key
@@ -26,7 +26,8 @@ const prepareLaunchCell = async ({
   console.log('ckb address: ', address);
 
   // The capacity required to launch cells is determined by the token info cell capacity, and transaction fee.
-  const launchCellCapacity = calculateRgbppCellCapacity() + calculateTokenInfoCellCapacity(rgbppTokenInfo, isMainnet);
+  const launchCellCapacity =
+    calculateRgbppCellCapacity() + calculateRgbppTokenInfoCellCapacity(rgbppTokenInfo, isMainnet);
 
   const emptyCells = await collector.getCells({
     lock: masterLock,
