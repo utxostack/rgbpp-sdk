@@ -172,3 +172,15 @@ export interface CkbBatchJumpBtcVirtualTxParams {
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
 }
+
+/**
+ * @see {@link https://github.com/ckb-cell/unique-cell?tab=readme-ov-file#xudt-information} for the definition of xUDT information
+ */
+export interface RgbppTokenInfo {
+  // The number of decimals the RGBPP token uses
+  decimal: number;
+  // The name of the RGBPP token, and maximum number of characters is 255
+  name: string;
+  // The symbol of the RGBPP token, and maximum number of characters is 255
+  symbol: string;
+}

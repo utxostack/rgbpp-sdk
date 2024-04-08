@@ -1,6 +1,6 @@
 import { sha256 } from 'js-sha256';
-import { Hex, IndexerCell, RgbppCkbVirtualTx, SpvClientCellTxProof } from '../types';
-import { append0x, remove0x, reverseHex, u32ToLe, u32ToLeHex, utf8ToHex } from './hex';
+import { Hex, IndexerCell, RgbppCkbVirtualTx, RgbppTokenInfo, SpvClientCellTxProof } from '../types';
+import { append0x, remove0x, reverseHex, u32ToLe, u32ToLeHex, u8ToHex, utf8ToHex } from './hex';
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
   RGBPP_TX_ID_PLACEHOLDER,
@@ -188,4 +188,23 @@ export const estimateWitnessSize = (rgbppLockArgsList: Hex[]): number => {
   const rgbppLockArgsSet = new Set(rgbppLockArgsList);
   const inputsGroupSize = rgbppLockArgsSet.size;
   return RGBPP_TX_WITNESS_MAX_SIZE * inputsGroupSize;
+};
+
+/**
+ * Encode RGBPP token information into hex format
+ * @param tokenInfo RGBPP token information
+ * @returns hex string for cell data
+ */
+export const encodeRgbppTokenInfo = (tokenInfo: RgbppTokenInfo) => {
+  const decimal = u8ToHex(tokenInfo.decimal);
+  const name = remove0x(utf8ToHex(tokenInfo.name));
+  const nameSize = u8ToHex(name.length / 2);
+  const symbol = remove0x(utf8ToHex(tokenInfo.symbol));
+  const symbolSize = u8ToHex(symbol.length / 2);
+  return `0x${decimal}${nameSize}${name}${symbolSize}${symbol}`;
+};
+
+export const calculateRgbppTokenInfoSize = (tokenInfo: RgbppTokenInfo): bigint => {
+  const encodedTokenInfo = encodeRgbppTokenInfo(tokenInfo);
+  return BigInt(remove0x(encodedTokenInfo).length / 2);
 };
