@@ -173,6 +173,9 @@ export interface CkbBatchJumpBtcVirtualTxParams {
   ckbFeeRate?: bigint;
 }
 
+/**
+ * @see {@link https://github.com/ckb-cell/unique-cell?tab=readme-ov-file#xudt-information} for the definition of xUDT information
+ */
 export interface RgbppTokenInfo {
   decimal: number;
   name: string;
