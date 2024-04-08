@@ -21,6 +21,7 @@ import { blockchain } from '@ckb-lumos/base';
 import { bytes } from '@ckb-lumos/codec';
 import { RgbppApiSpvProof } from '@rgbpp-sdk/service';
 import { toCamelcase } from './case-parser';
+import { InputsOrOutputsLenError } from '../error';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
   return {
@@ -50,20 +51,30 @@ export const genBtcTimeLockScript = (toLock: CKBComponents.Script, isMainnet: bo
   } as CKBComponents.Script;
 };
 
+// The maximum length of inputs and outputs is 255, and the field type representing the length in the RGB++ protocol is Uint8
+const MAX_INPUTS_LEN = 255;
 // refer to https://github.com/ckb-cell/rgbpp/blob/0c090b039e8d026aad4336395b908af283a70ebf/contracts/rgbpp-lock/src/main.rs#L173-L211
 export const calculateCommitment = (rgbppVirtualTx: RgbppCkbVirtualTx | CKBComponents.RawTransaction): Hex => {
   var hash = sha256.create();
   hash.update(hexToBytes(utf8ToHex('RGB++')));
   const version = [0, 0];
   hash.update(version);
-  hash.update([rgbppVirtualTx.inputs.length, rgbppVirtualTx.outputs.length]);
 
-  for (const input of rgbppVirtualTx.inputs) {
+  const { inputs, outputs, outputsData } = rgbppVirtualTx;
+
+  if (inputs.length > MAX_INPUTS_LEN || outputs.length > MAX_INPUTS_LEN) {
+    throw new InputsOrOutputsLenError(
+      'The inputs or outputs length of RGB++ CKB virtual tx cannot be greater than 255',
+    );
+  }
+  hash.update([inputs.length, outputs.length]);
+
+  for (const input of inputs) {
     hash.update(hexToBytes(serializeOutPoint(input.previousOutput)));
   }
-  for (let index = 0; index < rgbppVirtualTx.outputs.length; index++) {
-    const output = rgbppVirtualTx.outputs[index];
-    const outputData = rgbppVirtualTx.outputsData[index];
+  for (let index = 0; index < outputs.length; index++) {
+    const output = outputs[index];
+    const outputData = outputsData[index];
     hash.update(hexToBytes(serializeOutput(output)));
 
     const outputDataLen = u32ToLe(remove0x(outputData).length / 2);

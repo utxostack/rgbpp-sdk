@@ -66,6 +66,38 @@ describe('rgbpp tests', () => {
     };
     const commitment = calculateCommitment(rgbppVirtualTx);
     expect('7cdecc8cc293d491a0cbf44e92feabfc29e79408c1d2f7547b334c42efe13131').toBe(commitment);
+
+    const invalidRgbppVirtualTx: RgbppCkbVirtualTx = {
+      inputs: new Array(300).fill({
+        previousOutput: {
+          txHash: '0x047b6894a0b7a4d7a73b1503d1ae35c51fc5fa6306776dcf22b1fb3daaa32a29',
+          index: '0x0',
+        },
+        since: '0x0',
+      }),
+      outputs: [
+        {
+          lock: {
+            codeHash: '0xd5a4e241104041f6f12f11bddcf30bd7b2f818722f78353fde019f5081cd6b49',
+            hashType: 'type',
+            args: '0x010000000000000000000000000000000000000000000000000000000000000000000000',
+          },
+          capacity: '0x0000000000000000',
+          type: {
+            codeHash: '0xc4957f239eb3db9f5c5fb949e9dd99adbb8068b8ac7fe7ae49495486d5e5d235',
+            hashType: 'type',
+            args: '0x43094caf2f2bcdf6f5ab02c2de744936897278d558a2b6924db98a4f27d629e2',
+          },
+        },
+      ],
+      outputsData: ['0xbc020000000000000000000000000000'],
+    };
+    try {
+      calculateCommitment(invalidRgbppVirtualTx);
+    } catch (error) {
+      expect(108).toBe(error.code);
+      expect('The inputs or outputs length of RGB++ CKB virtual tx cannot be greater than 255').toBe(error.message);
+    }
   });
 
   it('genBtcTimeLockArgs', () => {
