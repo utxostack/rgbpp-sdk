@@ -62,7 +62,7 @@ export const calculateCommitment = (rgbppVirtualTx: RgbppCkbVirtualTx | CKBCompo
 
   const { inputs, outputs, outputsData } = rgbppVirtualTx;
 
-  if (inputs.length > MAX_INPUTS_LEN || outputs.length > MAX_INPUTS_LEN) {
+  if (inputs.length > MAX_RGBPP_CELL_NUM || outputs.length > MAX_RGBPP_CELL_NUM) {
     throw new InputsOrOutputsLenError(
       'The inputs or outputs length of RGB++ CKB virtual tx cannot be greater than 255',
     );
