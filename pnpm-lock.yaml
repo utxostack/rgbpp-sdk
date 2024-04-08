@@ -241,7 +241,13 @@ importers:
       '@nervosnetwork/ckb-types':
         specifier: ^0.109.1
         version: 0.109.1
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
     devDependencies:
+      '@types/lodash':
+        specifier: ^4.17.0
+        version: 4.17.0
       vitest:
         specifier: ^1.4.0
         version: 1.4.0(@types/node@20.12.2)

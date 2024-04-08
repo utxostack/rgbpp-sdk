@@ -1,6 +1,7 @@
 import { isDomain } from '../utils';
 import { BtcAssetsApiError, ErrorCodes } from '../error';
 import { BaseApis, BaseApiRequestOptions, BtcAssetsApiToken } from '../types';
+import { pickBy } from 'lodash';
 
 export class BtcAssetsApiBase implements BaseApis {
   public url: string;
@@ -31,7 +32,7 @@ export class BtcAssetsApiBase implements BaseApis {
       await this.init();
     }
 
-    const packedParams = params ? '?' + new URLSearchParams(params).toString() : '';
+    const packedParams = params ? '?' + new URLSearchParams(pickBy(params, (val) => val !== undefined)).toString() : '';
     const withOriginHeaders = this.origin ? { origin: this.origin } : void 0;
     const withAuthHeaders = requireToken && this.token ? { Authorization: `Bearer ${this.token}` } : void 0;
     const res = await fetch(`${this.url}${route}${packedParams}`, {
