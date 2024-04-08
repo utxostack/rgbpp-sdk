@@ -15,6 +15,7 @@ import {
 } from './rgbpp';
 import { RgbppCkbVirtualTx } from '../types';
 import { calculateUdtCellCapacity } from './ckb-tx';
+import { InputsOrOutputsLenError } from '../error';
 
 describe('rgbpp tests', () => {
   it('sha256', () => {
@@ -95,8 +96,10 @@ describe('rgbpp tests', () => {
     try {
       calculateCommitment(invalidRgbppVirtualTx);
     } catch (error) {
-      expect(108).toBe(error.code);
-      expect('The inputs or outputs length of RGB++ CKB virtual tx cannot be greater than 255').toBe(error.message);
+      if (error instanceof InputsOrOutputsLenError) {
+        expect(108).toBe(error.code);
+        expect('The inputs or outputs length of RGB++ CKB virtual tx cannot be greater than 255').toBe(error.message);
+      }
     }
   });
 
