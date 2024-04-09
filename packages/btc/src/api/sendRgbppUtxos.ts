@@ -1,4 +1,4 @@
-import { Collector, isRgbppLockCell, calculateCommitment } from '@rgbpp-sdk/ckb';
+import { Collector, isRgbppLockCell, isBtcTimeLockCell, calculateCommitment } from '@rgbpp-sdk/ckb';
 import { bitcoin } from '../bitcoin';
 import { Utxo } from '../transaction/utxo';
 import { DataSource } from '../query/source';
@@ -34,6 +34,7 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
 }> {
   const btcInputs: Utxo[] = [];
   const btcOutputs: InitOutput[] = [];
+  let lastCkbTypeOutputIndex = -1;
 
   const ckbVirtualTx = props.ckbVirtualTx;
   const config = networkTypeToConfig(props.source.networkType);
@@ -85,6 +86,17 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
   for (let i = 0; i < ckbVirtualTx.outputs.length; i++) {
     const ckbOutput = ckbVirtualTx.outputs[i];
     const isRgbppLock = isRgbppLockCell(ckbOutput, isCkbMainnet);
+    const isBtcTimeLock = isBtcTimeLockCell(ckbOutput, isCkbMainnet);
+
+    // If output.type !== null, then the output.lock must be RgbppLock or RgbppTimeLock
+    if (ckbOutput.type) {
+      if (!isRgbppLock && !isBtcTimeLock) {
+        throw new TxBuildError(ErrorCodes.CKB_INVALID_CELL_LOCK);
+      }
+
+      // If output.type !== null，update lastTypeInput
+      lastCkbTypeOutputIndex = i;
+    }
 
     // If output.lock == RgbppLock, generate a corresponding output in outputs
     if (isRgbppLock) {
@@ -99,9 +111,17 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
     }
   }
 
+  // By rules, the length of type outputs should be >= 1
+  // The "lastTypeOutputIndex" is -1 by default so if (index < 0) it's invalid
+  if (lastCkbTypeOutputIndex < 0) {
+    throw new TxBuildError(ErrorCodes.CKB_INVALID_OUTPUTS);
+  }
+
   // Verify the provided commitment
   const calculatedCommitment = calculateCommitment({
     ...ckbVirtualTx,
+    outputs: ckbVirtualTx.outputs.slice(0, lastCkbTypeOutputIndex + 1),
+    outputsData: ckbVirtualTx.outputsData.slice(0, lastCkbTypeOutputIndex + 1),
   });
   if (props.commitment !== calculatedCommitment) {
     throw new TxBuildError(ErrorCodes.CKB_UNMATCHED_COMMITMENT);
