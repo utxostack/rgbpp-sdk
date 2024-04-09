@@ -196,8 +196,8 @@ importers:
         specifier: ^0.21.1
         version: 0.21.1
       '@ckb-lumos/codec':
-        specifier: ^0.21.1
-        version: 0.21.1
+        specifier: 0.22.0-next.5
+        version: 0.22.0-next.5
       '@ckb-lumos/helpers':
         specifier: ^0.21.1
         version: 0.21.1
