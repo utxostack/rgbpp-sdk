@@ -15,10 +15,10 @@ const prepareLaunchCell = async ({
   rgbppTokenInfo: RgbppTokenInfo;
 }) => {
   const collector = new Collector({
-    ckbNodeUrl: 'https://mainnet.ckb.dev/rpc',
-    ckbIndexerUrl: 'https://mainnet.ckb.dev/indexer',
+    ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
+    ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
   });
-  const isMainnet = true;
+  const isMainnet = false;
   const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
     prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
   });

@@ -38,7 +38,7 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
   });
   console.log('ckb address: ', address);
 
-  const network = bitcoin.networks.testnet;
+  const network = isMainnet ? bitcoin.networks.bitcoin : bitcoin.networks.testnet;
   const keyPair = ECPair.fromPrivateKey(Buffer.from(BTC_TEST_PRIVATE_KEY, 'hex'), { network });
   const { address: btcAddress } = bitcoin.payments.p2wpkh({
     pubkey: keyPair.publicKey,
@@ -46,7 +46,7 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
   });
   console.log('btc address: ', btcAddress);
 
-  const networkType = NetworkType.TESTNET;
+  const networkType = isMainnet ? NetworkType.MAINNET : NetworkType.TESTNET;
   const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, 'https://btc-test.app');
   const source = new DataSource(service, networkType);
 

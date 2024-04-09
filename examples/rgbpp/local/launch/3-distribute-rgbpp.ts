@@ -9,7 +9,7 @@ const CKB_TEST_PRIVATE_KEY = '0x000000000000000000000000000000000000000000000000
 // BTC SECP256K1 private key
 const BTC_TEST_PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000001';
 // API docs: https://btc-assets-api.testnet.mibao.pro/docs
-const BTC_ASSETS_API_URL = 'https://api.rgbpp.io';
+const BTC_ASSETS_API_URL = 'https://btc-assets-api.testnet.mibao.pro';
 // https://btc-assets-api.testnet.mibao.pro/docs/static/index.html#/Token/post_token_generate
 const BTC_ASSETS_TOKEN = '';
 
@@ -19,17 +19,17 @@ interface Params {
 }
 const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers }: Params) => {
   const collector = new Collector({
-    ckbNodeUrl: 'https://mainnet.ckb.dev/rpc',
-    ckbIndexerUrl: 'https://mainnet.ckb.dev/indexer',
+    ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
+    ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
   });
-  const isMainnet = true;
+  const isMainnet = false;
   const ckbAddress = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
     prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
   });
   console.log('ckb address: ', ckbAddress);
   // const fromLock = addressToScript(ckbAddress);
 
-  const network = bitcoin.networks.bitcoin;
+  const network = isMainnet ? bitcoin.networks.bitcoin : bitcoin.networks.testnet;
   const keyPair = ECPair.fromPrivateKey(Buffer.from(BTC_TEST_PRIVATE_KEY, 'hex'), { network });
   const { address: btcAddress } = bitcoin.payments.p2wpkh({
     pubkey: keyPair.publicKey,
@@ -38,8 +38,8 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers }: Param
 
   console.log('btc address: ', btcAddress);
 
-  const networkType = NetworkType.MAINNET;
-  const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, 'https://api.rgbpp.io');
+  const networkType = isMainnet ? NetworkType.MAINNET : NetworkType.TESTNET;
+  const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, 'https://btc-test.app');
   const source = new DataSource(service, networkType);
 
   const xudtType: CKBComponents.Script = {
