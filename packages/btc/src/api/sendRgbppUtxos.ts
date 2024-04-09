@@ -119,7 +119,7 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
 
   // Verify the provided commitment
   const calculatedCommitment = calculateCommitment({
-    ...ckbVirtualTx,
+    inputs: ckbVirtualTx.inputs,
     outputs: ckbVirtualTx.outputs.slice(0, lastCkbTypeOutputIndex + 1),
     outputsData: ckbVirtualTx.outputsData.slice(0, lastCkbTypeOutputIndex + 1),
   });

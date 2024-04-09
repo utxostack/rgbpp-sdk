@@ -239,8 +239,10 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
     isMax: true,
   });
 
+  // Rgbpp change cell index, if it is -1, it means there is no change rgbpp cell
   let rgbppChangeOutIndex = -1;
   if (sumAmount > sumTransferAmount) {
+    // Rgbpp change cell is placed at the last position by default
     const lastUtxoIndex = rgbppReceivers.length + 1;
     rgbppChangeOutIndex = lastUtxoIndex;
     outputs.push({

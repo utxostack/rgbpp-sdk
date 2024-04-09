@@ -55,15 +55,17 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers }: Param
     isMainnet,
   });
 
-  const { commitment, ckbRawTx, sumInputsCapacity,rgbppChangeOutIndex } = ckbVirtualTxResult;
+  const { commitment, ckbRawTx, sumInputsCapacity, rgbppChangeOutIndex } = ckbVirtualTxResult;
 
-  console.log('RGB++ asset change out index: ', rgbppChangeOutIndex)
+  // The first output utxo is OP_RETURN
+  // Rgbpp change utxo position depends on the number of distributions, if 50 addresses are distributed, then the change utxo position is 51
+  console.log('RGB++ asset change utxo out index: ', rgbppChangeOutIndex);
 
   // Send BTC tx
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
-    tos: receivers.map(receiver => receiver.toBtcAddress),
+    tos: receivers.map((receiver) => receiver.toBtcAddress),
     ckbCollector: collector,
     from: btcAddress!,
     source,
@@ -96,7 +98,7 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers }: Param
         ckbRawTx: ckbTx,
         collector,
         sumInputsCapacity,
-        isMainnet
+        isMainnet,
       });
 
       const txHash = await sendCkbTx({ collector, signedTx });
@@ -104,7 +106,7 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers }: Param
     } catch (error) {
       if (!(error instanceof BtcAssetsApiError)) {
         console.error(error);
-      } 
+      }
     }
   }, 20 * 1000);
 };
@@ -113,7 +115,8 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers }: Param
 // Use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 distributeRgbppAssetOnBtc({
-  rgbppLockArgsList: [buildRgbppLockArgs(251, '92966139a07e1cce77293df58c360c0a64a83dd651a9a831d37bcf34fa6d882b')],
+  // Warning: If rgbpp assets are distributed continuously, then the position of the current rgbpp asset utxo depends on the position of the previous change utxo distributed
+  rgbppLockArgsList: [buildRgbppLockArgs(51, '92966139a07e1cce77293df58c360c0a64a83dd651a9a831d37bcf34fa6d882b')],
   receivers: [
     {
       toBtcAddress: 'bc1p0ey32x7dwhlx569rh0l5qaxetsfnpvezanrezahelr0t02ytyegssdel0h',
