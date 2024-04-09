@@ -20,6 +20,6 @@
     "skipLibCheck": true,
     "strict": true,
   },
-  "include": ["local/**.ts", "queue/**/*.ts", "local/launch/0-rgbpp-token-info.ts", "local/launch/1-prepare-launch.ts", "local/launch/2-launch-rgbpp.ts", "local/launch/3-distribute-rgbpp.ts"],
+  "include": ["local/**/*.ts", "queue/**/*.ts"],
   "exclude": ["node_modules"]
 }
