@@ -11,7 +11,7 @@ import {
   genRgbppLockScript,
   getSecp256k1CellDep,
 } from '@rgbpp-sdk/ckb';
-import { CLUSTER_DATA } from './spore-info';
+import { CLUSTER_DATA } from './0-spore-info';
 
 // CKB SECP256K1 private key
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';

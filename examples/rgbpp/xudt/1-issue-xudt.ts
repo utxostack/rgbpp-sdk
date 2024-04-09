@@ -38,7 +38,7 @@ const issueXudt = async ({ xudtTotalAmount }: { xudtTotalAmount: bigint }) => {
     emptyCells,
     xudtCapacity + xudtInfoCapacity,
     txFee,
-    {minCapacity: MIN_CAPACITY},
+    { minCapacity: MIN_CAPACITY },
   );
 
   const xudtType: CKBComponents.Script = {

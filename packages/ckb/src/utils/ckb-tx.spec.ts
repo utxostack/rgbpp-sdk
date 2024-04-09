@@ -80,6 +80,6 @@ describe('ckb tx utils', () => {
       description: 'Description of the cluster',
     };
     const capacity = calculateRgbppClusterCellCapacity(clusterData);
-    expect(capacity).toBe(BigInt(211_0000_0000));
+    expect(capacity).toBe(BigInt(212_0000_0000));
   });
 });

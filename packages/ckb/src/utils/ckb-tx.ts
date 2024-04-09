@@ -86,9 +86,10 @@ export const generateUniqueTypeArgs = (firstInput: CKBComponents.CellInput, firs
 };
 
 // https://docs.spore.pro/recipes/Create/create-private-cluster
+// Minimum occupied capacity and 1 ckb for transaction fee
 export const calculateRgbppClusterCellCapacity = (clusterData: RawClusterData): bigint => {
   const clusterDataSize = packRawClusterData(clusterData).length;
   const clusterTypeSize = 32 + 1 + 32;
   const cellSize = RGBPP_LOCK_SIZE + clusterTypeSize + 8 + clusterDataSize;
-  return BigInt(cellSize) * CKB_UNIT;
+  return BigInt(cellSize + 1) * CKB_UNIT;
 };
