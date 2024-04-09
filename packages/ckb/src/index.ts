@@ -7,3 +7,4 @@ export * from './types';
 export * from './rgbpp';
 export * from './utils';
 export * from './constants';
+export * from './spore';
