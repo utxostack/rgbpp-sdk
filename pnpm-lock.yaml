@@ -193,14 +193,14 @@ importers:
   packages/ckb:
     dependencies:
       '@ckb-lumos/base':
-        specifier: 0.22.0
-        version: 0.22.0
+        specifier: ^0.21.1
+        version: 0.21.1
       '@ckb-lumos/codec':
-        specifier: 0.22.0
-        version: 0.22.0
+        specifier: ^0.21.1
+        version: 0.21.1
       '@ckb-lumos/helpers':
-        specifier: 0.22.0
-        version: 0.22.0
+        specifier: ^0.21.1
+        version: 0.21.1
       '@nervosnetwork/ckb-sdk-core':
         specifier: ^0.109.1
         version: 0.109.1
@@ -214,8 +214,8 @@ importers:
         specifier: workspace:^
         version: link:../service
       '@spore-sdk/core':
-        specifier: 0.2.0-beta.4
-        version: 0.2.0-beta.4(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
+        specifier: 0.2.0-beta.3
+        version: 0.2.0-beta.3
       axios:
         specifier: ^1.6.8
         version: 1.6.8
@@ -227,8 +227,8 @@ importers:
         version: 0.11.0
     devDependencies:
       '@ckb-lumos/molecule':
-        specifier: 0.22.0
-        version: 0.22.0
+        specifier: 0.22.0-next.5
+        version: 0.22.0-next.5
       '@types/lodash':
         specifier: ^4.17.0
         version: 4.17.0
@@ -715,20 +715,6 @@ packages:
       lodash.isequal: 4.5.0
     dev: false
 
-  /@ckb-lumos/base@0.22.0:
-    resolution: {integrity: sha512-kx5eFlP2jwXBY1aJB0JPml33KvOwuavdDtJDHnqIMmuraHH2nzCGA1G1YcjTyIcEB5zRGlUoZbfBp6UAFJN1xA==}
-    engines: {node: '>=12.0.0'}
-    dependencies:
-      '@ckb-lumos/bi': 0.22.0
-      '@ckb-lumos/codec': 0.22.0
-      '@ckb-lumos/toolkit': 0.22.0
-      '@types/blake2b': 2.1.3
-      '@types/lodash.isequal': 4.5.8
-      blake2b: 2.1.4
-      js-xxhash: 1.0.4
-      lodash.isequal: 4.5.0
-    dev: false
-
   /@ckb-lumos/base@0.22.0-next.5:
     resolution: {integrity: sha512-2I4f/zJm3Bdz/5soXo35vDh98Vffp2clO8n1ZeZRsUtBZUtvAGNbggC4J8/0a/yFw3cStaOJ1Tztla5E0hP+xA==}
     engines: {node: '>=12.0.0'}
@@ -750,18 +736,11 @@ packages:
       jsbi: 4.3.0
     dev: false
 
-  /@ckb-lumos/bi@0.22.0:
-    resolution: {integrity: sha512-dW1sa6WS4J2bU6bOjNPDuYf4aCjftExGVAo1BW5BVF3zGrxtXImP7gf5NuyBLrHXH1KIijkaxmwrrDyEnmugQA==}
-    engines: {node: '>=12.0.0'}
-    dependencies:
-      jsbi: 4.3.0
-
   /@ckb-lumos/bi@0.22.0-next.5:
     resolution: {integrity: sha512-hfh9PQDLJeZedlJ6qBVxx2MR9ndU0XyIl53vh1I+S4SGmvl/z2PGEY06vN34nkjmZ/1c87/KW+sL2Cpii0IxGg==}
     engines: {node: '>=12.0.0'}
     dependencies:
       jsbi: 4.3.0
-    dev: false
 
   /@ckb-lumos/ckb-indexer@0.22.0-next.5:
     resolution: {integrity: sha512-1UZ0whrn9k18wrvIIvsdAYRCGInNA4qcrMcxsqSV7ADQnPsw8c+ARkIyzQrqaM2bzvPa3O+aVXnZ7g2oTrhtFA==}
@@ -785,18 +764,11 @@ packages:
       '@ckb-lumos/bi': 0.21.1
     dev: false
 
-  /@ckb-lumos/codec@0.22.0:
-    resolution: {integrity: sha512-u8UxQmUFWmjXbo0tlzWcF5yq1bMCJdzCdJ/FaBDOeaWRlBRxZBHnXjBPxL0KETCBLgehhzylnrVPiCbWUf93WA==}
-    engines: {node: '>=12.0.0'}
-    dependencies:
-      '@ckb-lumos/bi': 0.22.0
-
   /@ckb-lumos/codec@0.22.0-next.5:
     resolution: {integrity: sha512-AVvREoEc0zSbGSdFZOph1WL9QtUKUjQ2PABpApROMTqDCryG9/FpBrInjm2y50USZlwcEE3+ocEqFqJjfuTXKQ==}
     engines: {node: '>=12.0.0'}
     dependencies:
       '@ckb-lumos/bi': 0.22.0-next.5
-    dev: false
 
   /@ckb-lumos/common-scripts@0.22.0-next.5:
     resolution: {integrity: sha512-DXGwyc0pmrq0fj+NflDBeBgJSL2bNAVHpULpbUncDUPIBJf9IFyMDSZUgzX6hYjTX0WA07e5CEFo5wwHb24Dmw==}
@@ -816,18 +788,15 @@ packages:
       - encoding
     dev: false
 
-  /@ckb-lumos/config-manager@0.22.0:
-    resolution: {integrity: sha512-bRLB04ERhj0YwwtX2sFr2JDCeIisrMYpGGvVUCkojkLRQSo8fUqM+K6LPgjFWWHrbl5SWzJkB9zuGemlZWabMA==}
+  /@ckb-lumos/config-manager@0.21.1:
+    resolution: {integrity: sha512-BmrNqYyaksdCKHWagyC8+R8GUxhIO+sOM5S925jlkpjju2sUbH0Id2/zmdb7I9KxdKnbx3WsR+hqy7/bYqw1lA==}
     engines: {node: '>=12.0.0'}
     dependencies:
-      '@ckb-lumos/base': 0.22.0
-      '@ckb-lumos/bi': 0.22.0
-      '@ckb-lumos/codec': 0.22.0
-      '@ckb-lumos/rpc': 0.22.0
+      '@ckb-lumos/base': 0.21.1
+      '@ckb-lumos/bi': 0.21.1
+      '@ckb-lumos/codec': 0.21.1
       '@types/deep-freeze-strict': 1.1.2
       deep-freeze-strict: 1.1.1
-    transitivePeerDependencies:
-      - encoding
     dev: false
 
   /@ckb-lumos/config-manager@0.22.0-next.5:
@@ -857,19 +826,17 @@ packages:
       uuid: 8.3.2
     dev: false
 
-  /@ckb-lumos/helpers@0.22.0:
-    resolution: {integrity: sha512-2x7EqqZupJGt0xhkSShRiwe46hqOcZI+uYg6XZyKNMBFCCneX5d0D3uXTOuoRYnR4FVYNjdSs2gwvyDzKRNIsg==}
+  /@ckb-lumos/helpers@0.21.1:
+    resolution: {integrity: sha512-jFN6DtWzwVNEY4kmnzczRaQqtyRJQwzAEuHRUQ0LqTiIGM+SlfgjH/l/InAG4cIhDOurMudnUJ4ex68wmbkhVw==}
     engines: {node: '>=12.0.0'}
     dependencies:
-      '@ckb-lumos/base': 0.22.0
-      '@ckb-lumos/bi': 0.22.0
-      '@ckb-lumos/codec': 0.22.0
-      '@ckb-lumos/config-manager': 0.22.0
-      '@ckb-lumos/toolkit': 0.22.0
+      '@ckb-lumos/base': 0.21.1
+      '@ckb-lumos/bi': 0.21.1
+      '@ckb-lumos/codec': 0.21.1
+      '@ckb-lumos/config-manager': 0.21.1
+      '@ckb-lumos/toolkit': 0.21.1
       bech32: 2.0.0
       immutable: 4.3.5
-    transitivePeerDependencies:
-      - encoding
     dev: false
 
   /@ckb-lumos/helpers@0.22.0-next.5:
@@ -920,13 +887,13 @@ packages:
       - encoding
     dev: false
 
-  /@ckb-lumos/molecule@0.22.0:
-    resolution: {integrity: sha512-XK9AUuxtU7CIMBAAHNL3rHrqhRSighp5HJt9AL19jlFvzYmXcvGh2jPlRq76BXyID3/Z/AQY6IOMYmfSHYby4w==}
+  /@ckb-lumos/molecule@0.22.0-next.5:
+    resolution: {integrity: sha512-g5EWFRXR/w4EPsBLPbt5vNwFEFyLnruoeHrdiFa5IXgCyWpiToxTUHwOQ8EM4XtoDB8Xf3hTQ/D1g4XZb5EZhA==}
     engines: {node: '>=12.0.0'}
     hasBin: true
     dependencies:
-      '@ckb-lumos/bi': 0.22.0
-      '@ckb-lumos/codec': 0.22.0
+      '@ckb-lumos/bi': 0.22.0-next.5
+      '@ckb-lumos/codec': 0.22.0-next.5
       '@types/moo': 0.5.9
       '@types/nearley': 2.11.5
       glob: 10.3.12
@@ -935,18 +902,6 @@ packages:
       nearley: 2.20.1
       relative: 3.0.2
     dev: true
-
-  /@ckb-lumos/rpc@0.22.0:
-    resolution: {integrity: sha512-2tSEo7rday7KOepXXKkGCniTYWRPYRgFOLsY7FCmTnD8hVeYy1A6Nm2RzbslfF5jEeHIkEWM57OadlfOUb2uuQ==}
-    engines: {node: '>=12.0.0'}
-    dependencies:
-      '@ckb-lumos/base': 0.22.0
-      '@ckb-lumos/bi': 0.22.0
-      abort-controller: 3.0.0
-      cross-fetch: 3.1.8
-    transitivePeerDependencies:
-      - encoding
-    dev: false
 
   /@ckb-lumos/rpc@0.22.0-next.5:
     resolution: {integrity: sha512-ohH5kj/iiyKaTksgWCc4STwnEON9cCC2tPf3eP7XUaJ9ZO01ahOZ9C85NccBoK2lOqcLrZag3Y0LDQWw+eFbBg==}
@@ -965,13 +920,6 @@ packages:
     engines: {node: '>=12.0.0'}
     dependencies:
       '@ckb-lumos/bi': 0.21.1
-    dev: false
-
-  /@ckb-lumos/toolkit@0.22.0:
-    resolution: {integrity: sha512-tzusK0schFRIiUVo/PV0RocJrxisVDIeb5CQvEeluPCaEmsGpyumz7jcrjJcbMULYfiFigWmQcYIrOEcPBrzew==}
-    engines: {node: '>=12.0.0'}
-    dependencies:
-      '@ckb-lumos/bi': 0.22.0
     dev: false
 
   /@ckb-lumos/toolkit@0.22.0-next.5:
@@ -1452,6 +1400,11 @@ packages:
     resolution: {integrity: sha512-gMsVel9D7f2HLkBma9VbtzZRehRogVRfbr++f06nL2vnCGCNlzOD+/MUov/F4p8myyAHspEhVobgjpX64q5m6A==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
+
+  /@exact-realty/multipart-parser@1.0.13:
+    resolution: {integrity: sha512-BGnB0VVn18dkz85rvBmp/CyxAMvUcVrsNf3qw8Fdx80V6+MsQUTxRdQnC0PzLIxbN8PKGFs8afd+ur8V1JLv8g==}
+    engines: {node: '>=16.0.0', npm: '>=8.0.0'}
+    dev: false
 
   /@humanwhocodes/config-array@0.11.14:
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
@@ -1977,14 +1930,20 @@ packages:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
     dev: true
 
-  /@spore-sdk/core@0.2.0-beta.4(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21):
-    resolution: {integrity: sha512-liVxXk5ZY6+Kh24sJT30Gg7QuqqQk4tlY71lHoO9wj50y3iQWyODyPZEopEP+owmYjOZ5WLPPzKJTIlNRkqxPQ==}
-    peerDependencies:
-      '@ckb-lumos/lumos': 0.22.0-next.5
-      lodash: ^4.17.21
+  /@spore-sdk/core@0.2.0-beta.3:
+    resolution: {integrity: sha512-hyoo1HdvU7xWPDd+ASWeJGOfcher3QMFE+JcZWd54/vmOIQNlq2V9vLIptuoyn7wQRcJC1uU68fpd+C1AecGBw==}
     dependencies:
+      '@ckb-lumos/base': 0.22.0-next.5
+      '@ckb-lumos/bi': 0.22.0-next.5
+      '@ckb-lumos/codec': 0.22.0-next.5
+      '@ckb-lumos/common-scripts': 0.22.0-next.5
+      '@ckb-lumos/config-manager': 0.22.0-next.5
       '@ckb-lumos/lumos': 0.22.0-next.5
+      '@ckb-lumos/rpc': 0.22.0-next.5
+      '@exact-realty/multipart-parser': 1.0.13
       lodash: 4.17.21
+    transitivePeerDependencies:
+      - encoding
     dev: false
 
   /@swc/helpers@0.5.2:

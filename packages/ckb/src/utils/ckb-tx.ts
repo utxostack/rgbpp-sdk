@@ -1,4 +1,5 @@
 import { calculateTransactionFee as calculateTxFee } from '@nervosnetwork/ckb-sdk-utils/lib/calculateTransactionFee';
+import { RawClusterData, packRawClusterData } from '@spore-sdk/core';
 import { remove0x, u64ToLe } from './hex';
 import { CKB_UNIT, UNLOCKABLE_LOCK_SCRIPT, getXudtTypeScript } from '../constants';
 import { Hex, RgbppTokenInfo } from '../types';
@@ -82,4 +83,12 @@ export const generateUniqueTypeArgs = (firstInput: CKBComponents.CellInput, firs
   s.update(input);
   s.update(hexToBytes(`0x${u64ToLe(BigInt(firstOutputIndex))}`));
   return `0x${s.digest('hex').slice(0, 40)}`;
+};
+
+// https://docs.spore.pro/recipes/Create/create-private-cluster
+export const calculateRgbppClusterCellCapacity = (clusterData: RawClusterData): bigint => {
+  const clusterDataSize = packRawClusterData(clusterData).length;
+  const clusterTypeSize = 32 + 1 + 32;
+  const cellSize = RGBPP_LOCK_SIZE + clusterTypeSize + 8 + clusterDataSize;
+  return BigInt(cellSize) * CKB_UNIT;
 };
