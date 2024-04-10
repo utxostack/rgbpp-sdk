@@ -1,11 +1,8 @@
-import { Collector, buildRgbppLockArgs, appendCkbTxWitnesses, updateCkbTxWithRealBtcTxId, sendCkbTx, genCreateClusterCkbVirtualTx, getRgbppLockScript, buildPreLockArgs, genRgbppLockScript } from '@rgbpp-sdk/ckb';
-import { DataSource, ECPair, bitcoin, NetworkType, sendRgbppUtxos, transactionToHex } from '@rgbpp-sdk/btc';
+import { Collector, buildRgbppLockArgs, appendCkbTxWitnesses, updateCkbTxWithRealBtcTxId, sendCkbTx, genCreateClusterCkbVirtualTx, getRgbppLockScript, buildPreLockArgs, genRgbppLockScript, genCreateSporeCkbVirtualTx, Hex } from '@rgbpp-sdk/ckb';
+import { DataSource, ECPair, bitcoin, NetworkType, sendRgbppUtxos, transactionToHex, utf8ToBuffer } from '@rgbpp-sdk/btc';
 import { BtcAssetsApi, BtcAssetsApiError } from '@rgbpp-sdk/service';
+import { RawSporeData } from '@spore-sdk/core'
 import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils';
-import { predefinedSporeConfigs } from '@spore-sdk/core'
-import { CLUSTER_DATA } from './0-cluster-info';
-import { registerCustomLockScriptInfos } from '@ckb-lumos/common-scripts/lib/common';
-import { createRgbppScriptInfo } from './script-info';
 
 // BTC SECP256K1 private key
 const BTC_TEST_PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000001';
@@ -14,7 +11,15 @@ const BTC_ASSETS_API_URL = 'https://btc-assets-api.testnet.mibao.pro';
 // https://btc-assets-api.testnet.mibao.pro/docs/static/index.html#/Token/post_token_generate
 const BTC_ASSETS_TOKEN = '';
 
-const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: string }) => {
+interface Params {
+  clusterRgbppLockArgs: Hex;
+  receivers: {
+    toBtcAddress: string,
+    sporeData: RawSporeData
+  }[];
+}
+
+const createSpore = async ({ clusterRgbppLockArgs, receivers }: Params) => {
   const collector = new Collector({
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
@@ -34,35 +39,35 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
   const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, 'https://btc-test.app');
   const source = new DataSource(service, networkType);
 
-  registerCustomLockScriptInfos([createRgbppScriptInfo(isMainnet)]);
-
-  const ownerLock = {
+  const clusterLock = {
     ...getRgbppLockScript(isMainnet),
-    args: ownerRgbppLockArgs
-  }
-  const ownerAddress = scriptToAddress(ownerLock, isMainnet)
-  console.log(ownerAddress)
+    args: clusterRgbppLockArgs,
+  };
+  const clusterAddress = scriptToAddress(clusterLock);
 
-  const ckbVirtualTxResult = await genCreateClusterCkbVirtualTx({
-    clusterParams: {
-      data: CLUSTER_DATA,
-      // The BTC transaction Vouts[0] for OP_RETURN, Vouts[1] for cluster and Vouts[2] for change
-      toLock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
-      changeAddress: scriptToAddress(genRgbppLockScript(buildPreLockArgs(2), isMainnet), isMainnet),
-      fromInfos: [ownerAddress],
-      config: isMainnet ? predefinedSporeConfigs.Mainnet : predefinedSporeConfigs.Testnet
+  const ckbVirtualTxResult = await genCreateSporeCkbVirtualTx({
+    sporeParams: {
+      data: receivers.map(receiver => receiver.sporeData)[0],
+      cluster: {
+        // The BTC transaction Vouts[0] for OP_RETURN , Vouts[1] for cluster cell ,and Vouts[2], ... for spore cells
+        updateOutput(cell) {
+          cell.cellOutput.lock = genRgbppLockScript(buildPreLockArgs(1), isMainnet);
+          return cell;
+        },
+      },
+      // The BTC transaction Vouts[0] for OP_RETURN , Vouts[1] for cluster cell ,and Vouts[2], ... for spore cells
+      toLock: genRgbppLockScript(buildPreLockArgs(2), isMainnet),
+      fromInfos: [clusterAddress],
     },
   });
 
-  const { commitment, ckbRawTx, clusterId } = ckbVirtualTxResult;
-
-  console.log('clusterId: ', clusterId);
+  const { commitment, ckbRawTx } = ckbVirtualTxResult;
 
   // Send BTC tx
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
-    tos: [btcAddress!],
+    tos: receivers.map(receiver => receiver.toBtcAddress),
     ckbCollector: collector,
     from: btcAddress!,
     source,
@@ -101,6 +106,15 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
 
 // Use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
-createCluster({
-  ownerRgbppLockArgs: buildRgbppLockArgs(1, '2341bbc300ffca85031dfc1dee99580331165ba617d97ad11cb1c614de8c76ec'),
+createSpore({
+  clusterRgbppLockArgs: buildRgbppLockArgs(301, '92966139a07e1cce77293df58c360c0a64a83dd651a9a831d37bcf34fa6d882b'),
+  receivers: [
+    {
+      toBtcAddress: 'bc1p0ey32x7dwhlx569rh0l5qaxetsfnpvezanrezahelr0t02ytyegssdel0h',
+      sporeData: {
+        contentType: 'text/plain',
+        content: utf8ToBuffer('Hello Spore'),
+      },
+    },
+  ],
 });

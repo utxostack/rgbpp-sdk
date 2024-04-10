@@ -3,7 +3,7 @@ import { createCluster } from '@spore-sdk/core';
 import { append0x, calculateTransactionFee } from '../utils';
 import { calculateCommitment } from '../utils/rgbpp';
 import { CreateClusterCkbVirtualTxParams, SporeVirtualTxResult } from '../types';
-import { RGBPP_TX_WITNESS_MAX_SIZE } from '../constants';
+import { RGBPP_TX_WITNESS_MAX_SIZE, RGBPP_WITNESS_PLACEHOLDER } from '../constants';
 import { ckbTxFromTxSkeleton } from '../utils/spore';
 
 /**
@@ -29,6 +29,8 @@ export const genCreateClusterCkbVirtualTx = async ({
   changeCapacity -= increasedTxFee;
 
   ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
+
+  ckbRawTx.witnesses[0] = RGBPP_WITNESS_PLACEHOLDER;
 
   const virtualTx: RgbppCkbVirtualTx = {
     ...ckbRawTx,

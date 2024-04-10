@@ -11,7 +11,7 @@ import {
   genRgbppLockScript,
   getSecp256k1CellDep,
 } from '@rgbpp-sdk/ckb';
-import { CLUSTER_DATA } from './0-spore-info';
+import { CLUSTER_DATA } from './0-cluster-info';
 
 // CKB SECP256K1 private key
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
@@ -35,14 +35,16 @@ const prepareClusterCell = async ({
   console.log('ckb address: ', address);
 
   // The capacity required to launch cells is determined by the token info cell capacity, and transaction fee.
-  const clusterCellCapacity = calculateRgbppClusterCellCapacity(CLUSTER_DATA);
+  // Considering that spore sdk must have change, more capacity is needed
+  const clusterCellCapacity = calculateRgbppClusterCellCapacity(CLUSTER_DATA) * BigInt(2);
 
-  const emptyCells = await collector.getCells({
+  let emptyCells = await collector.getCells({
     lock: masterLock,
   });
   if (!emptyCells || emptyCells.length === 0) {
     throw new NoLiveCellError('The address has no empty cells');
   }
+  emptyCells = emptyCells.filter((cell) => !cell.output.type);
 
   let txFee = MAX_FEE;
   const { inputs, sumInputsCapacity } = collector.collectInputs(emptyCells, clusterCellCapacity, txFee);
@@ -75,6 +77,8 @@ const prepareClusterCell = async ({
     witnesses,
   };
 
+  console.log(JSON.stringify(unsignedTx));
+
   const txSize = getTransactionSize(unsignedTx) + SECP256K1_WITNESS_LOCK_SIZE;
   const estimatedTxFee = calculateTransactionFee(txSize);
   changeCapacity -= estimatedTxFee;
@@ -87,6 +91,6 @@ const prepareClusterCell = async ({
 };
 
 prepareClusterCell({
-  outIndex: 301,
-  btcTxId: '92966139a07e1cce77293df58c360c0a64a83dd651a9a831d37bcf34fa6d882b',
+  outIndex: 1,
+  btcTxId: '2341bbc300ffca85031dfc1dee99580331165ba617d97ad11cb1c614de8c76ec',
 });

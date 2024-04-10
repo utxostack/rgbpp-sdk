@@ -125,8 +125,23 @@ importers:
   examples/rgbpp:
     dependencies:
       '@ckb-lumos/base':
-        specifier: 0.21.1
-        version: 0.21.1
+        specifier: 0.22.0-next.5
+        version: 0.22.0-next.5
+      '@ckb-lumos/codec':
+        specifier: 0.22.0-next.5
+        version: 0.22.0-next.5
+      '@ckb-lumos/common-scripts':
+        specifier: 0.22.0-next.5
+        version: 0.22.0-next.5
+      '@ckb-lumos/config-manager':
+        specifier: 0.22.0-next.5
+        version: 0.22.0-next.5
+      '@ckb-lumos/helpers':
+        specifier: 0.22.0-next.5
+        version: 0.22.0-next.5
+      '@ckb-lumos/lumos':
+        specifier: 0.22.0-next.5
+        version: 0.22.0-next.5
       '@nervosnetwork/ckb-sdk-utils':
         specifier: ^0.109.1
         version: 0.109.1
@@ -139,6 +154,9 @@ importers:
       '@rgbpp-sdk/service':
         specifier: workspace:^
         version: link:../../packages/service
+      '@spore-sdk/core':
+        specifier: 0.2.0-beta.3
+        version: 0.2.0-beta.3
       axios:
         specifier: ^1.6.8
         version: 1.6.8
