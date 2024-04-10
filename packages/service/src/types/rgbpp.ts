@@ -23,9 +23,23 @@ export interface RgbppApiCkbTransactionHash {
   txhash: string;
 }
 
+export interface RgbppApiTransactionStateParams {
+  withData?: boolean;
+}
+
 export interface RgbppApiTransactionState {
   state: RgbppTransactionState;
-  failedReason: string;
+  attempts: number;
+  failedReason?: string;
+  data?: {
+    txid: string;
+    ckbVirtualResult: {
+      ckbRawTx: CKBComponents.RawTransaction;
+      needPaymasterCell: boolean;
+      sumInputsCapacity: string;
+      commitment: string;
+    };
+  };
 }
 
 export interface RgbppApiAssetsByAddressParams {
