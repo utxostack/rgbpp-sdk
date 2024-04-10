@@ -13,6 +13,7 @@ import {
   BtcApiTransaction,
   BtcApiUtxo,
   BtcApiUtxoParams,
+  RgbppApiTransactionStateParams,
 } from '../types';
 import {
   RgbppApis,
@@ -99,8 +100,10 @@ export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis
     return this.request<RgbppApiCkbTransactionHash>(`/rgbpp/v1/transaction/${btcTxId}`);
   }
 
-  getRgbppTransactionState(btcTxId: string) {
-    return this.request<RgbppApiTransactionState>(`/rgbpp/v1/transaction/${btcTxId}/job`);
+  getRgbppTransactionState(btcTxId: string, params?: RgbppApiTransactionStateParams) {
+    return this.request<RgbppApiTransactionState>(`/rgbpp/v1/transaction/${btcTxId}/job`, {
+      params,
+    });
   }
 
   getRgbppAssetsByBtcTxId(btcTxId: string) {
