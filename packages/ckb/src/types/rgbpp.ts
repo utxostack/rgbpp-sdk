@@ -229,6 +229,8 @@ export interface RgbppTokenInfo {
   name: string;
   // The symbol of the RGBPP token, and maximum number of characters is 255
   symbol: string;
+  // extra data of the RGBPP token info
+  extra?: string;
 }
 
 export interface RgbppLaunchCkbVirtualTxParams {

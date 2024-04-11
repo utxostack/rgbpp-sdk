@@ -201,7 +201,14 @@ export const encodeRgbppTokenInfo = (tokenInfo: RgbppTokenInfo) => {
   const nameSize = u8ToHex(name.length / 2);
   const symbol = remove0x(utf8ToHex(tokenInfo.symbol));
   const symbolSize = u8ToHex(symbol.length / 2);
-  return `0x${decimal}${nameSize}${name}${symbolSize}${symbol}`;
+  let extra: string;
+  if (tokenInfo.extra) {
+    extra = remove0x(tokenInfo.extra);
+  } else {
+    extra = '';
+  }
+
+  return `0x${decimal}${nameSize}${name}${symbolSize}${symbol}${extra}`;
 };
 
 export const calculateRgbppTokenInfoSize = (tokenInfo: RgbppTokenInfo): bigint => {
