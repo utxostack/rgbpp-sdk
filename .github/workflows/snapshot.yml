@@ -7,6 +7,7 @@ on:
     branches:
       - main
       - develop
+      - feat/rgbpp-launch
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
