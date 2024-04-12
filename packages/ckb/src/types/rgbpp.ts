@@ -246,5 +246,7 @@ export interface RgbppLaunchCkbVirtualTxParams {
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
+  // If is defined, launch to ckb address; else, launch to owner address.
+  toCkbAddress?: string;
   isMainnet: boolean;
 }

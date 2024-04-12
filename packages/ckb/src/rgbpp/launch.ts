@@ -28,7 +28,7 @@ import {
   UNLOCKABLE_LOCK_SCRIPT,
   getRgbppLockConfigDep,
 } from '../constants';
-import { getTransactionSize, scriptToHash } from '@nervosnetwork/ckb-sdk-utils';
+import { addressToScript, getTransactionSize, scriptToHash } from '@nervosnetwork/ckb-sdk-utils';
 
 /**
  * Generate the virtual ckb transaction for the btc transfer tx
@@ -38,6 +38,7 @@ import { getTransactionSize, scriptToHash } from '@nervosnetwork/ckb-sdk-utils';
  * @param rgbppTokenInfo The RGBPP token info https://github.com/ckb-cell/unique-cell?tab=readme-ov-file#xudt-information
  * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ * @param toCkbAddress If is defined, launch to ckb address; else, launch to owner address.
  * @param isMainnet
  */
 export const genRgbppLaunchCkbVirtualTx = async ({
@@ -47,6 +48,7 @@ export const genRgbppLaunchCkbVirtualTx = async ({
   rgbppTokenInfo,
   witnessLockPlaceholderSize,
   ckbFeeRate,
+  toCkbAddress,
   isMainnet,
 }: RgbppLaunchCkbVirtualTxParams): Promise<RgbppLaunchVirtualTxResult> => {
   const ownerLock = genRgbppLockScript(ownerRgbppLockArgs, isMainnet);
@@ -60,9 +62,12 @@ export const genRgbppLaunchCkbVirtualTx = async ({
   const { inputs, sumInputsCapacity } = collector.collectInputs(emptyCells, infoCellCapacity, txFee, { isMax: true });
 
   let rgbppCellCapacity = sumInputsCapacity - infoCellCapacity;
+  const lock = toCkbAddress
+    ? genBtcTimeLockScript(addressToScript(toCkbAddress), isMainnet)
+    : genRgbppLockScript(buildPreLockArgs(1), isMainnet);
   const outputs: CKBComponents.CellOutput[] = [
     {
-      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
+      lock,
       type: {
         ...getXudtTypeScript(isMainnet),
         args: append0x(scriptToHash(ownerLock)),
