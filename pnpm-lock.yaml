@@ -142,6 +142,9 @@ importers:
       '@ckb-lumos/lumos':
         specifier: 0.22.0-next.5
         version: 0.22.0-next.5
+      '@exact-realty/multipart-parser':
+        specifier: ^1.0.13
+        version: 1.0.13
       '@nervosnetwork/ckb-sdk-utils':
         specifier: ^0.109.1
         version: 0.109.1
@@ -155,8 +158,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/service
       '@spore-sdk/core':
-        specifier: 0.2.0-beta.3
-        version: 0.2.0-beta.3
+        specifier: 0.2.0-beta.6
+        version: 0.2.0-beta.6(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
       axios:
         specifier: ^1.6.8
         version: 1.6.8
@@ -219,6 +222,9 @@ importers:
       '@ckb-lumos/helpers':
         specifier: ^0.21.1
         version: 0.21.1
+      '@exact-realty/multipart-parser':
+        specifier: ^1.0.13
+        version: 1.0.13
       '@nervosnetwork/ckb-sdk-core':
         specifier: ^0.109.1
         version: 0.109.1
@@ -232,8 +238,8 @@ importers:
         specifier: workspace:^
         version: link:../service
       '@spore-sdk/core':
-        specifier: 0.2.0-beta.3
-        version: 0.2.0-beta.3
+        specifier: 0.2.0-beta.6
+        version: 0.2.0-beta.6(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
       axios:
         specifier: ^1.6.8
         version: 1.6.8
@@ -1948,20 +1954,14 @@ packages:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
     dev: true
 
-  /@spore-sdk/core@0.2.0-beta.3:
-    resolution: {integrity: sha512-hyoo1HdvU7xWPDd+ASWeJGOfcher3QMFE+JcZWd54/vmOIQNlq2V9vLIptuoyn7wQRcJC1uU68fpd+C1AecGBw==}
-    dependencies:
-      '@ckb-lumos/base': 0.22.0-next.5
-      '@ckb-lumos/bi': 0.22.0-next.5
-      '@ckb-lumos/codec': 0.22.0-next.5
-      '@ckb-lumos/common-scripts': 0.22.0-next.5
-      '@ckb-lumos/config-manager': 0.22.0-next.5
+  /@spore-sdk/core@0.2.0-beta.6(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21):
+    resolution: {integrity: sha512-g2QerxzNZ+ABKH7VfXDPHZ2saipJpG3oJPAmRRSm72T59YvFJMlrannVxMaIIkLseDL6YAyvqkTxLwPTuo55ww==}
+    peerDependencies:
       '@ckb-lumos/lumos': 0.22.0-next.5
-      '@ckb-lumos/rpc': 0.22.0-next.5
-      '@exact-realty/multipart-parser': 1.0.13
+      lodash: ^4.17.21
+    dependencies:
+      '@ckb-lumos/lumos': 0.22.0-next.5
       lodash: 4.17.21
-    transitivePeerDependencies:
-      - encoding
     dev: false
 
   /@swc/helpers@0.5.2:
