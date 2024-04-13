@@ -23,9 +23,13 @@ This repository offers utilities for Bitcoin and RGB++ asset integration.
 ## RGB++ Asset Workflow Overview
 
 1. **Creation of `rgbpp_ckb_tx_virtual` using [@rgbpp-sdk/ckb](https://github.com/ckb-cell/rgbpp-sdk/tree/develop/packages/ckb)**
+
     1. **[BTC → BTC](https://github.com/ckb-cell/rgbpp-sdk/tree/develop/packages/ckb#rgb-assets-transfer-on-btc)**
     2. **[BTC → CKB](https://github.com/ckb-cell/rgbpp-sdk/tree/develop/packages/ckb#rgb-assets-jump-from-btc-to-ckb)**
     3. **[CKB → BTC](https://github.com/ckb-cell/rgbpp-sdk/tree/develop/packages/ckb#rgb-assets-jump-from-ckb-to-btc)** *(isomorphic rgbpp_btc_tx is not required in this workflow)*
+
+  > [!IMPORTANT]  
+  > It's recommended to save the `rgbpp_ckb_tx_virtual` locally in case you need it in the future.
 
 2. **Creation of `rgbpp_btc_tx` through [@rgbpp-sdk/btc](https://github.com/ckb-cell/rgbpp-sdk/tree/develop/packages/btc)**
     1. construct isomorphic rgbpp_btc_tx based on rgbpp_ckb_tx_virtual and rgbpp commitment
