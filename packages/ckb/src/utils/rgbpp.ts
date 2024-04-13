@@ -162,6 +162,10 @@ export const isRgbppLockCell = (cell: CKBComponents.CellOutput, isMainnet: boole
   return isRgbppLock;
 };
 
+export const isRgbppLockCellIgnoreChain = (cell: CKBComponents.CellOutput): boolean => {
+  return isRgbppLockCell(cell, true) || isRgbppLockCell(cell, false);
+};
+
 export const isBtcTimeLockCell = (cell: CKBComponents.CellOutput, isMainnet: boolean): boolean => {
   const btcTimeLock = getBtcTimeLockScript(isMainnet);
   const isBtcTimeLock = cell.lock.codeHash === btcTimeLock.codeHash && cell.lock.hashType === btcTimeLock.hashType;

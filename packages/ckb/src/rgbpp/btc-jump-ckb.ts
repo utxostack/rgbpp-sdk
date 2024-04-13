@@ -67,7 +67,6 @@ export const genBtcJumpCkbVirtualTx = async ({
   const { inputs, sumInputsCapacity, sumAmount } = collector.collectUdtInputs({
     liveCells: rgbppCells,
     needAmount: transferAmount,
-    isMax: true,
   });
 
   const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);

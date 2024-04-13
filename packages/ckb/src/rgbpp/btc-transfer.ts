@@ -112,7 +112,6 @@ export const genBtcTransferCkbVirtualTx = async ({
     const collectResult = collector.collectUdtInputs({
       liveCells: rgbppCells,
       needAmount: transferAmount,
-      isMax: true,
     });
     inputs = collectResult.inputs;
     sumInputsCapacity = collectResult.sumInputsCapacity;
@@ -236,7 +235,6 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
   const { inputs, sumInputsCapacity, sumAmount } = collector.collectUdtInputs({
     liveCells: rgbppCells,
     needAmount: sumTransferAmount,
-    isMax: true,
   });
 
   // Rgbpp change cell index, if it is -1, it means there is no change rgbpp cell
