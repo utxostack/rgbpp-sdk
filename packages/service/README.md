@@ -27,7 +27,7 @@ $ pnpm add @rgbpp-sdk/service
 
 The BtcAssetsApi is currently limited to verified apps only.
 If you're a developer and want to access the BtcAssetsApi service,
-please email us to request a JWT token for your app: cipher@cell.studio.
+please email us to request a JWT token for your app: f@cell.studio.
 
 In the email, you should provide us some information about your app:
 
