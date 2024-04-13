@@ -10,6 +10,8 @@ const BTC_ASSETS_API_URL = 'https://btc-assets-api.testnet.mibao.pro';
 // https://btc-assets-api.testnet.mibao.pro/docs/static/index.html#/Token/post_token_generate
 const BTC_ASSETS_TOKEN = '';
 
+const BTC_ASSETS_ORIGIN = 'https://btc-test.app';
+
 interface Params {
   ownerRgbppLockArgs: string;
   launchAmount: bigint;
@@ -32,7 +34,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
   console.log('btc address: ', btcAddress);
 
   const networkType = isMainnet ? NetworkType.MAINNET : NetworkType.TESTNET;
-  const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, 'https://btc-test.app');
+  const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, BTC_ASSETS_ORIGIN);
   const source = new DataSource(service, networkType);
 
   const ckbVirtualTxResult = await genRgbppLaunchCkbVirtualTx({
@@ -45,7 +47,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
 
   const { commitment, ckbRawTx } = ckbVirtualTxResult;
 
-  console.log('RGB++ Asset type args: ', ckbRawTx.outputs[0].type?.args);
+  console.log('RGB++ Asset type script args: ', ckbRawTx.outputs[0].type?.args);
 
   // Send BTC tx
   const psbt = await sendRgbppUtxos({
@@ -91,7 +93,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
 // Use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 launchRgppAsset({
-  ownerRgbppLockArgs: buildRgbppLockArgs(301, '92966139a07e1cce77293df58c360c0a64a83dd651a9a831d37bcf34fa6d882b'),
+  ownerRgbppLockArgs: buildRgbppLockArgs(1, '6259ea7852e294afbd2aaf9ccd5c9c1f95087b0b08ba7e47ae35ce31170732bc'),
   rgbppTokenInfo: RGBPP_TOKEN_INFO,
   // The total issuance amount of RGBPP Token, the decimal is determined by RGBPP Token info
   launchAmount: BigInt(2100_0000) * BigInt(10 ** RGBPP_TOKEN_INFO.decimal),

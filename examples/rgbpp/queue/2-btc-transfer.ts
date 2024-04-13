@@ -16,6 +16,8 @@ const BTC_ASSETS_API_URL = 'https://btc-assets-api.testnet.mibao.pro';
 // https://btc-assets-api.testnet.mibao.pro/docs/static/index.html#/Token/post_token_generate
 const BTC_ASSETS_TOKEN = '';
 
+const BTC_ASSETS_ORIGIN = 'https://btc-test.app';
+
 interface Params {
   rgbppLockArgsList: string[];
   toBtcAddress: string;
@@ -43,7 +45,7 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
   console.log('btc address: ', btcAddress);
 
   const networkType = isMainnet ? NetworkType.MAINNET : NetworkType.TESTNET;
-  const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, 'https://btc-test.app');
+  const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, BTC_ASSETS_ORIGIN);
   const source = new DataSource(service, networkType);
 
   const xudtType: CKBComponents.Script = {
