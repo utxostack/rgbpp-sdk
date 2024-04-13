@@ -1,9 +1,15 @@
-import { createCluster, createSpore, transferSpore } from '@spore-sdk/core';
+import { RawClusterData, createCluster, createSpore, transferSpore } from '@spore-sdk/core';
 import { Hex } from './common';
+import { Collector } from '../collector';
 
 export interface CreateClusterCkbVirtualTxParams {
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // The rgbpp assets cell lock script args whose data structure is: out_index | bitcoin_tx_id
+  rgbppLockArgs: Hex;
   // The TransactionSkeletonType is from @ckb-lumos/helpers
-  clusterParams: Parameters<typeof createCluster>[0];
+  clusterData: RawClusterData;
+  isMainnet: boolean;
   // The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100

@@ -1,36 +1,84 @@
 import { RgbppCkbVirtualTx } from '../types/rgbpp';
-import { createCluster } from '@spore-sdk/core';
+import { packRawClusterData } from '@spore-sdk/core';
 import { append0x, calculateTransactionFee } from '../utils';
-import { calculateCommitment } from '../utils/rgbpp';
-import { CreateClusterCkbVirtualTxParams, SporeVirtualTxResult } from '../types';
-import { RGBPP_TX_WITNESS_MAX_SIZE, RGBPP_WITNESS_PLACEHOLDER } from '../constants';
-import { ckbTxFromTxSkeleton } from '../utils/spore';
+import { buildPreLockArgs, calculateCommitment, genRgbppLockScript } from '../utils/rgbpp';
+import { CreateClusterCkbVirtualTxParams, Hex, SporeVirtualTxResult } from '../types';
+import {
+  RGBPP_TX_WITNESS_MAX_SIZE,
+  RGBPP_WITNESS_PLACEHOLDER,
+  getClusterTypeDep,
+  getClusterTypeScript,
+  getRgbppLockConfigDep,
+  getRgbppLockScript,
+} from '../constants';
+import { generateClusterCreateCoBuild, generateClusterId } from '../utils/spore';
+import { NoRgbppLiveCellError } from '../error';
+import { bytesToHex, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
 /**
  * Generate the virtual ckb transaction for creating cluster
- * @param clusterParams The clusterParams is the same as the createCluster function of the spore-sdk
+ * @param clusterData The cluster's data, including name and description.
  * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 3000 (It can make most scenarios work properly)
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  */
 export const genCreateClusterCkbVirtualTx = async ({
-  clusterParams,
+  collector,
+  rgbppLockArgs,
+  clusterData,
+  isMainnet,
   witnessLockPlaceholderSize,
   ckbFeeRate,
 }: CreateClusterCkbVirtualTxParams): Promise<SporeVirtualTxResult> => {
-  const { txSkeleton, outputIndex } = await createCluster(clusterParams);
+  const rgbppLock = {
+    ...getRgbppLockScript(isMainnet),
+    args: append0x(rgbppLockArgs),
+  };
+  const rgbppCells = await collector.getCells({ lock: rgbppLock });
+  if (!rgbppCells || rgbppCells.length === 0) {
+    throw new NoRgbppLiveCellError('No rgbpp cells found with the rgbpp lock args');
+  }
+  const rgbppCell = rgbppCells[0];
 
-  const clusterCell = txSkeleton.get('outputs').get(outputIndex);
-  const clusterId = clusterCell?.cellOutput.type?.args;
+  const inputs: CKBComponents.CellInput[] = [
+    {
+      previousOutput: rgbppCell.outPoint,
+      since: '0x0',
+    },
+  ];
 
-  const ckbRawTx = ckbTxFromTxSkeleton(txSkeleton);
+  const clusterId = generateClusterId(inputs[0], 0);
+  const outputs: CKBComponents.CellOutput[] = [
+    {
+      ...rgbppCell.output,
+      // The BTC transaction Vouts[0] for OP_RETURN, Vouts[1] for cluster
+      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
+      type: {
+        ...getClusterTypeScript(isMainnet),
+        args: clusterId,
+      },
+    },
+  ];
+  const outputsData: Hex[] = [bytesToHex(packRawClusterData(clusterData))];
+  const cellDeps = [getRgbppLockConfigDep(isMainnet), getClusterTypeDep(isMainnet)];
+  const sporeCoBuild = generateClusterCreateCoBuild(outputs[0], outputsData[0]);
+  const witnesses = [RGBPP_WITNESS_PLACEHOLDER, sporeCoBuild];
 
-  let changeCapacity = BigInt(ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity);
-  const increasedTxFee = calculateTransactionFee(witnessLockPlaceholderSize ?? RGBPP_TX_WITNESS_MAX_SIZE, ckbFeeRate);
-  changeCapacity -= increasedTxFee;
+  const ckbRawTx: CKBComponents.RawTransaction = {
+    version: '0x0',
+    cellDeps,
+    headerDeps: [],
+    inputs,
+    outputs,
+    outputsData,
+    witnesses,
+  };
+
+  let changeCapacity = BigInt(rgbppCell.output.capacity);
+  const txSize = getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? RGBPP_TX_WITNESS_MAX_SIZE);
+  const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
+  changeCapacity -= estimatedTxFee;
 
   ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
-
-  ckbRawTx.witnesses[0] = RGBPP_WITNESS_PLACEHOLDER;
 
   const virtualTx: RgbppCkbVirtualTx = {
     ...ckbRawTx,
