@@ -39,7 +39,7 @@ describe('number to little endian', () => {
     expect(actual).toBe('08');
   });
 
-  it('u8ToHex', () => {
+  it('utf8ToHex', () => {
     const actual = utf8ToHex('RGBPP Test Token');
     expect(actual).toBe('0x5247425050205465737420546f6b656e');
   });
