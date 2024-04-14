@@ -148,6 +148,12 @@ const MainnetInfo = {
   } as CKBComponents.CellDep,
 };
 
+export const UNLOCKABLE_LOCK_SCRIPT = {
+  codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+  hashType: 'data',
+  args: '0x',
+} as CKBComponents.Script;
+
 export const getSecp256k1CellDep = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.Secp256k1LockDep : TestnetInfo.Secp256k1LockDep;
 

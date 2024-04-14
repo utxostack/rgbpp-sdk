@@ -1,18 +1,24 @@
 import { AddressPrefix, privateKeyToAddress, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { genCkbJumpBtcVirtualTx, Collector, getSecp256k1CellDep, buildRgbppLockArgs, genCkbBatchJumpBtcVirtualTx, RgbppCkbJumpReceiver } from '@rgbpp-sdk/ckb';
+import {
+  Collector,
+  getSecp256k1CellDep,
+  buildRgbppLockArgs,
+  genCkbBatchJumpBtcVirtualTx,
+  RgbppLockArgsReceiver,
+} from '@rgbpp-sdk/ckb';
 
 // CKB SECP256K1 private key
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
 
-const batchJumpFromCkbToBtc = async (rgbppReceivers: RgbppCkbJumpReceiver[]) => {
+const batchJumpFromCkbToBtc = async (rgbppReceivers: RgbppLockArgsReceiver[]) => {
   const collector = new Collector({
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
   });
   const isMainnet = false;
   const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
-      prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
-    });
+    prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
+  });
   console.log('ckb address: ', address);
 
   const xudtType: CKBComponents.Script = {
@@ -42,7 +48,7 @@ const batchJumpFromCkbToBtc = async (rgbppReceivers: RgbppCkbJumpReceiver[]) => 
 };
 
 // Use your real BTC UTXO information on the BTC Testnet
-const rgbppReceivers: RgbppCkbJumpReceiver[] = [
+const rgbppReceivers: RgbppLockArgsReceiver[] = [
   {
     // outIndex and btcTxId
     toRgbppLockArgs: buildRgbppLockArgs(1, 'bf991a2d6d08efffa089076d59b02bc78479b73c6300e640c148ec660bba0305'),

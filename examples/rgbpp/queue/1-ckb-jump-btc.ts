@@ -11,8 +11,8 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTx
   });
   const isMainnet = false;
   const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
-    prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
-  });
+      prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
+    });
   console.log('ckb address: ', address);
 
   const toRgbppLockArgs = buildRgbppLockArgs(outIndex, btcTxId);
@@ -47,7 +47,7 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTx
 
 // Use your real BTC UTXO information on the BTC Testnet
 jumpFromCkbToBtc({
-  outIndex: 0,
+  outIndex: 1,
   btcTxId: '4ff1855b64b309afa19a8b9be3d4da99dcb18b083b65d2d851662995c7d99e7a',
 });
 

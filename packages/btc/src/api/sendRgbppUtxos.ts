@@ -34,7 +34,6 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
 }> {
   const btcInputs: Utxo[] = [];
   const btcOutputs: InitOutput[] = [];
-  let lastCkbTypeInputIndex = -1;
   let lastCkbTypeOutputIndex = -1;
 
   const ckbVirtualTx = props.ckbVirtualTx;
@@ -47,16 +46,6 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
 
     const ckbLiveCell = await props.ckbCollector.getLiveCell(ckbInput.previousOutput!);
     const isRgbppLock = isRgbppLockCell(ckbLiveCell.output, isCkbMainnet);
-
-    // If input.type !== null, input.lock must be RgbppLock or RgbppTimeLock
-    if (ckbLiveCell.output.type) {
-      if (!isRgbppLock) {
-        throw new TxBuildError(ErrorCodes.CKB_INVALID_CELL_LOCK);
-      }
-
-      // If input.type !== null，update lastTypeInput
-      lastCkbTypeInputIndex = i;
-    }
 
     // If input.lock == RgbppLock, add to inputs if:
     // 1. input.lock.args can be unpacked to RgbppLockArgs
@@ -130,9 +119,9 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
 
   // Verify the provided commitment
   const calculatedCommitment = calculateCommitment({
-    inputs: [...ckbVirtualTx.inputs].slice(0, lastCkbTypeInputIndex + 1),
-    outputs: [...ckbVirtualTx.outputs].slice(0, lastCkbTypeOutputIndex + 1),
-    outputsData: [...ckbVirtualTx.outputsData].slice(0, lastCkbTypeOutputIndex + 1),
+    inputs: ckbVirtualTx.inputs,
+    outputs: ckbVirtualTx.outputs.slice(0, lastCkbTypeOutputIndex + 1),
+    outputsData: ckbVirtualTx.outputsData.slice(0, lastCkbTypeOutputIndex + 1),
   });
   if (props.commitment !== calculatedCommitment) {
     throw new TxBuildError(ErrorCodes.CKB_UNMATCHED_COMMITMENT);

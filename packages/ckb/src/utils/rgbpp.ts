@@ -1,6 +1,6 @@
 import { sha256 } from 'js-sha256';
 import { Hex, IndexerCell, RgbppCkbVirtualTx, RgbppTokenInfo, SpvClientCellTxProof } from '../types';
-import { append0x, remove0x, reverseHex, u32ToLe, u32ToLeHex, u8ToHex, utf8ToHex } from './hex';
+import { append0x, remove0x, reverseHex, u32ToLe, u8ToHex, utf8ToHex } from './hex';
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
   RGBPP_TX_ID_PLACEHOLDER,
@@ -160,6 +160,10 @@ export const isRgbppLockCell = (cell: CKBComponents.CellOutput, isMainnet: boole
   const rgbppLock = getRgbppLockScript(isMainnet);
   const isRgbppLock = cell.lock.codeHash === rgbppLock.codeHash && cell.lock.hashType === rgbppLock.hashType;
   return isRgbppLock;
+};
+
+export const isRgbppLockCellIgnoreChain = (cell: CKBComponents.CellOutput): boolean => {
+  return isRgbppLockCell(cell, true) || isRgbppLockCell(cell, false);
 };
 
 export const isBtcTimeLockCell = (cell: CKBComponents.CellOutput, isMainnet: boolean): boolean => {

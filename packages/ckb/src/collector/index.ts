@@ -1,10 +1,10 @@
 import axios from 'axios';
 import CKB from '@nervosnetwork/ckb-sdk-core';
 import { toCamelcase } from '../utils/case-parser';
-import { CollectResult, CollectUdtResult, IndexerCell } from '../types/collector';
+import { CollectConfig, CollectResult, CollectUdtResult, IndexerCell } from '../types/collector';
 import { MIN_CAPACITY } from '../constants';
 import { CapacityNotEnoughError, IndexerError, UdtAmountNotEnoughError } from '../error';
-import { leToU128 } from '../utils';
+import { isRgbppLockCellIgnoreChain, leToU128 } from '../utils';
 import { Hex } from '../types';
 
 const parseScript = (script: CKBComponents.Script) => ({
@@ -84,14 +84,8 @@ export class Collector {
     }
   }
 
-  collectInputs(
-    liveCells: IndexerCell[],
-    needCapacity: bigint,
-    fee: bigint,
-    minCapacity?: bigint,
-    errMsg?: string,
-  ): CollectResult {
-    const changeCapacity = minCapacity ?? MIN_CAPACITY;
+  collectInputs(liveCells: IndexerCell[], needCapacity: bigint, fee: bigint, config?: CollectConfig): CollectResult {
+    const changeCapacity = config?.minCapacity ?? MIN_CAPACITY;
     let inputs: CKBComponents.CellInput[] = [];
     let sumInputsCapacity = BigInt(0);
     for (let cell of liveCells) {
@@ -103,29 +97,22 @@ export class Collector {
         since: '0x0',
       });
       sumInputsCapacity += BigInt(cell.output.capacity);
-      if (sumInputsCapacity >= needCapacity + changeCapacity + fee) {
+      if (sumInputsCapacity >= needCapacity + changeCapacity + fee && !config?.isMax) {
         break;
       }
     }
     if (sumInputsCapacity < needCapacity + changeCapacity + fee) {
-      const message = errMsg ?? 'Insufficient free CKB balance';
+      const message = config?.errMsg ?? 'Insufficient free CKB balance';
       throw new CapacityNotEnoughError(message);
     }
     return { inputs, sumInputsCapacity };
   }
 
-  collectUdtInputs({
-    liveCells,
-    needAmount,
-    isMax,
-  }: {
-    liveCells: IndexerCell[];
-    needAmount: bigint;
-    isMax?: boolean;
-  }): CollectUdtResult {
+  collectUdtInputs({ liveCells, needAmount }: { liveCells: IndexerCell[]; needAmount: bigint }): CollectUdtResult {
     let inputs: CKBComponents.CellInput[] = [];
     let sumInputsCapacity = BigInt(0);
     let sumAmount = BigInt(0);
+    const isRgbppLock = liveCells.length > 0 && isRgbppLockCellIgnoreChain(liveCells[0].output);
     for (let cell of liveCells) {
       inputs.push({
         previousOutput: {
@@ -136,7 +123,7 @@ export class Collector {
       });
       sumInputsCapacity = sumInputsCapacity + BigInt(cell.output.capacity);
       sumAmount += leToU128(cell.outputData);
-      if (sumAmount >= needAmount && !isMax) {
+      if (sumAmount >= needAmount && !isRgbppLock) {
         break;
       }
     }

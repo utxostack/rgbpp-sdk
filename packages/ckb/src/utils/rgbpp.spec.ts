@@ -7,6 +7,8 @@ import {
   buildRgbppLockArgs,
   calculateCommitment,
   estimateWitnessSize,
+  calculateRgbppTokenInfoSize,
+  encodeRgbppTokenInfo,
   genBtcTimeLockArgs,
   genBtcTimeLockScript,
   lockScriptFromBtcTimeLockArgs,
@@ -217,5 +219,15 @@ describe('rgbpp tests', () => {
       '0x010000002f061a27abcab1d1d146514ffada6a83c0d974fe0813835ad8be2a39a6b1a6ee',
     ]);
     expect(actual).toBe(9000);
+  });
+
+  it('encodeRgbppTokenInfo', () => {
+    const actual = encodeRgbppTokenInfo({ decimal: 8, name: 'RGBPP Test Token', symbol: 'RTT' });
+    expect(actual).toBe('0x08105247425050205465737420546f6b656e03525454');
+  });
+
+  it('calculateRgbppTokenInfoSize', () => {
+    const actual = calculateRgbppTokenInfoSize({ decimal: 8, name: 'RGBPP Test Token', symbol: 'RTT' });
+    expect(actual).toBe(BigInt(22));
   });
 });

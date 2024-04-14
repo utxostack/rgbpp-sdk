@@ -17,6 +17,8 @@ const BTC_ASSETS_API_URL = 'https://btc-assets-api.testnet.mibao.pro';
 // https://btc-assets-api.testnet.mibao.pro/docs/static/index.html#/Token/post_token_generate
 const BTC_ASSETS_TOKEN = '';
 
+const BTC_ASSETS_ORIGIN = 'https://btc-test.app';
+
 // Warning: Wait at least 6 BTC confirmation blocks to spend the BTC time cells after 4-btc-jump-ckb.ts
 const spendBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }) => {
   const collector = new Collector({
@@ -41,7 +43,7 @@ const spendBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }
     throw new Error('No btc time cell found');
   }
   
-  const btcAssetsApi = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, 'https://btc-test.app');
+  const btcAssetsApi = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, BTC_ASSETS_ORIGIN);
 
   let ckbRawTx: CKBComponents.RawTransaction = await buildBtcTimeCellsSpentTx({
     btcTimeCells,

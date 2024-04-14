@@ -1,9 +1,9 @@
 import { calculateTransactionFee as calculateTxFee } from '@nervosnetwork/ckb-sdk-utils/lib/calculateTransactionFee';
 import { remove0x, u64ToLe } from './hex';
-import { CKB_UNIT, getXudtTypeScript } from '../constants';
+import { CKB_UNIT, UNLOCKABLE_LOCK_SCRIPT, getXudtTypeScript } from '../constants';
 import { Hex, RgbppTokenInfo } from '../types';
 import { PERSONAL, blake2b, hexToBytes, serializeInput, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { encodeRgbppTokenInfo } from './rgbpp';
+import { encodeRgbppTokenInfo, genBtcTimeLockScript } from './rgbpp';
 
 export const calculateTransactionFee = (txSize: number, feeRate?: bigint): bigint => {
   const rate = feeRate ?? BigInt(1100);
@@ -38,8 +38,8 @@ const BTC_TIME_CELL_INCREASED_SIZE = 95;
       out_index | bitcoin_tx_id
  */
 const RGBPP_LOCK_SIZE = 32 + 1 + 36;
-export const calculateRgbppCellCapacity = (xudtType: CKBComponents.Script): bigint => {
-  const typeArgsSize = remove0x(xudtType.args).length / 2;
+export const calculateRgbppCellCapacity = (xudtType?: CKBComponents.Script): bigint => {
+  const typeArgsSize = xudtType ? remove0x(xudtType.args).length / 2 : 32;
   const udtTypeSize = 33 + typeArgsSize;
   const cellSize = RGBPP_LOCK_SIZE + udtTypeSize + 8 + 16 + BTC_TIME_CELL_INCREASED_SIZE;
   return BigInt(cellSize + 1) * CKB_UNIT;
@@ -57,11 +57,21 @@ export const calculateUdtCellCapacity = (lock: CKBComponents.Script, udtType?: C
 };
 
 // Unique Type Script: https://github.com/ckb-cell/unique-cell?tab=readme-ov-file#unique-type-script
-export const calculateTokenInfoCellCapacity = (tokenInfo: RgbppTokenInfo, lock: CKBComponents.Script): bigint => {
+export const calculateXudtTokenInfoCellCapacity = (tokenInfo: RgbppTokenInfo, lock: CKBComponents.Script): bigint => {
   const lockSize = remove0x(lock.args).length / 2 + 33;
   const cellDataSize = remove0x(encodeRgbppTokenInfo(tokenInfo)).length / 2;
   const uniqueTypeSize = 32 + 1 + 20;
   const cellSize = lockSize + uniqueTypeSize + 8 + cellDataSize;
+  return BigInt(cellSize) * CKB_UNIT;
+};
+
+// Unique Type Script: https://github.com/ckb-cell/unique-cell?tab=readme-ov-file#unique-type-script
+export const calculateRgbppTokenInfoCellCapacity = (tokenInfo: RgbppTokenInfo, isMainnet: boolean): bigint => {
+  const btcTimeLock = genBtcTimeLockScript(UNLOCKABLE_LOCK_SCRIPT, isMainnet);
+  const lockSize = remove0x(btcTimeLock.args).length / 2 + 33;
+  const cellDataSize = remove0x(encodeRgbppTokenInfo(tokenInfo)).length / 2;
+  const typeSize = 32 + 1 + 20;
+  const cellSize = lockSize + typeSize + 8 + cellDataSize;
   return BigInt(cellSize) * CKB_UNIT;
 };
 
