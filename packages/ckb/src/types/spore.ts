@@ -1,6 +1,7 @@
 import { RawClusterData, RawSporeData, transferSpore } from '@spore-sdk/core';
 import { Address, Hex } from './common';
 import { Collector } from '../collector';
+import { IndexerCell } from './collector';
 
 export interface CreateClusterCkbVirtualTxParams {
   // The collector that collects CKB live cells and transactions
@@ -46,6 +47,8 @@ export interface SporeCreateVirtualTxResult {
   commitment: Hex;
   // The sum capacity of the ckb inputs
   sumInputsCapacity: Hex;
+  // The cluster cell from ckb-indexer
+  clusterCell: IndexerCell;
 }
 
 export interface AppendIssuerCellToSporeCreate {
@@ -62,4 +65,11 @@ export interface AppendIssuerCellToSporeCreate {
   isMainnet: boolean;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
+}
+
+export interface SporesCreateCobuildParams {
+  sporeOutputs: CKBComponents.CellOutput[];
+  sporeOutputsData: Hex[];
+  clusterCell: IndexerCell;
+  clusterOutputCell: CKBComponents.CellOutput;
 }

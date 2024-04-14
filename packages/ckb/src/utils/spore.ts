@@ -5,9 +5,10 @@ import {
   assembleCobuildWitnessLayout,
   assembleCreateClusterAction,
   assembleCreateSporeAction,
+  assembleTransferClusterAction,
 } from '@spore-sdk/core/lib/cobuild';
 import { u64ToLe } from './hex';
-import { Hex, IndexerCell } from '../types';
+import { Hex, IndexerCell, SporesCreateCobuildParams } from '../types';
 
 // Generate type id for cluster id
 export const generateClusterId = (firstInput: CKBComponents.CellInput, firstOutputIndex: number) => {
@@ -35,18 +36,34 @@ export const generateClusterCreateCoBuild = (
   return assembleCobuildWitnessLayout(actions);
 };
 
-export const generateSporeCreateCoBuild = (
-  sporeOutputs: CKBComponents.CellOutput[],
-  sporeOutputData: Hex[],
-): string => {
-  if (sporeOutputs.length !== sporeOutputData.length) {
+export const generateSporeCreateCoBuild = ({
+  sporeOutputs,
+  sporeOutputsData,
+  clusterCell,
+  clusterOutputCell,
+}: SporesCreateCobuildParams): string => {
+  if (sporeOutputs.length !== sporeOutputsData.length) {
     throw new Error('The length of spore outputs and spore cell data are not same');
   }
   let sporeActions: any[] = [];
+
+  // cluster transfer actions
+  const clusterInput = {
+    cellOutput: clusterCell.output,
+    data: clusterCell.outputData,
+  } as LumosCell;
+  const clusterOutput = {
+    cellOutput: clusterOutputCell,
+    data: clusterCell.outputData,
+  } as LumosCell;
+  const { actions } = assembleTransferClusterAction(clusterInput, clusterOutput);
+  sporeActions = sporeActions.concat(actions);
+
+  // spores create actions
   for (let index = 0; index < sporeOutputs.length; index++) {
     const sporeOutput = {
       cellOutput: sporeOutputs[index],
-      data: sporeOutputData[index],
+      data: sporeOutputsData[index],
     } as LumosCell;
     const { actions } = assembleCreateSporeAction(sporeOutput);
     sporeActions = sporeActions.concat(actions);
