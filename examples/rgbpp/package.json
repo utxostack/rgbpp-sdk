@@ -4,17 +4,12 @@
   "description": "Examples used for RGBPP assets issuance, transfer, and jumping between BTC and CKB",
   "private": true,
   "dependencies": {
-    "@ckb-lumos/lumos": "0.22.0-next.5",
-    "@ckb-lumos/base": "0.22.0-next.5",
-    "@ckb-lumos/codec": "0.22.0-next.5",
-    "@ckb-lumos/config-manager": "0.22.0-next.5",
-    "@ckb-lumos/common-scripts": "0.22.0-next.5",
-    "@ckb-lumos/helpers": "0.22.0-next.5",
     "@nervosnetwork/ckb-sdk-utils": "^0.109.1",
     "@rgbpp-sdk/btc": "workspace:^",
     "@rgbpp-sdk/ckb": "workspace:^",
     "@rgbpp-sdk/service": "workspace:^",
-    "@spore-sdk/core": "0.2.0-beta.3",
+    "@exact-realty/multipart-parser": "^1.0.13",
+    "@spore-sdk/core": "^0.2.0-beta.6",
     "axios": "^1.6.8"
   },
   "devDependencies": {

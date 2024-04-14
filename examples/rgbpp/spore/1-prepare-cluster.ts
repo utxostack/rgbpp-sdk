@@ -35,8 +35,7 @@ const prepareClusterCell = async ({
   console.log('ckb address: ', address);
 
   // The capacity required to launch cells is determined by the token info cell capacity, and transaction fee.
-  // Considering that spore sdk must have change, more capacity is needed
-  const clusterCellCapacity = calculateRgbppClusterCellCapacity(CLUSTER_DATA) * BigInt(2);
+  const clusterCellCapacity = calculateRgbppClusterCellCapacity(CLUSTER_DATA);
 
   let emptyCells = await collector.getCells({
     lock: masterLock,
@@ -77,8 +76,6 @@ const prepareClusterCell = async ({
     witnesses,
   };
 
-  console.log(JSON.stringify(unsignedTx));
-
   const txSize = getTransactionSize(unsignedTx) + SECP256K1_WITNESS_LOCK_SIZE;
   const estimatedTxFee = calculateTransactionFee(txSize);
   changeCapacity -= estimatedTxFee;
@@ -91,6 +88,6 @@ const prepareClusterCell = async ({
 };
 
 prepareClusterCell({
-  outIndex: 1,
-  btcTxId: '2341bbc300ffca85031dfc1dee99580331165ba617d97ad11cb1c614de8c76ec',
+  outIndex: 3,
+  btcTxId: 'aee4e8e3aa95e9e9ab1f0520714031d92d3263262099dcc7f7d64e62fa2fcb44',
 });

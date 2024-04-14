@@ -1,11 +1,15 @@
-import { Collector, buildRgbppLockArgs, appendCkbTxWitnesses, updateCkbTxWithRealBtcTxId, sendCkbTx, genCreateClusterCkbVirtualTx, getRgbppLockScript, buildPreLockArgs, genRgbppLockScript } from '@rgbpp-sdk/ckb';
+import {
+  Collector,
+  buildRgbppLockArgs,
+  appendCkbTxWitnesses,
+  updateCkbTxWithRealBtcTxId,
+  sendCkbTx,
+  genCreateClusterCkbVirtualTx,
+  generateClusterCreateCoBuild,
+} from '@rgbpp-sdk/ckb';
 import { DataSource, ECPair, bitcoin, NetworkType, sendRgbppUtxos, transactionToHex } from '@rgbpp-sdk/btc';
 import { BtcAssetsApi, BtcAssetsApiError } from '@rgbpp-sdk/service';
-import { scriptToAddress } from '@nervosnetwork/ckb-sdk-utils';
-import { predefinedSporeConfigs } from '@spore-sdk/core'
 import { CLUSTER_DATA } from './0-cluster-info';
-import { registerCustomLockScriptInfos } from '@ckb-lumos/common-scripts/lib/common';
-import { createRgbppScriptInfo } from './script-info';
 
 // BTC SECP256K1 private key
 const BTC_TEST_PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000001';
@@ -13,6 +17,8 @@ const BTC_TEST_PRIVATE_KEY = '00000000000000000000000000000000000000000000000000
 const BTC_ASSETS_API_URL = 'https://btc-assets-api.testnet.mibao.pro';
 // https://btc-assets-api.testnet.mibao.pro/docs/static/index.html#/Token/post_token_generate
 const BTC_ASSETS_TOKEN = '';
+
+const BTC_ASSETS_ORIGIN = 'https://btc-test.app';
 
 const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: string }) => {
   const collector = new Collector({
@@ -31,27 +37,14 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
   console.log('btc address: ', btcAddress);
 
   const networkType = isMainnet ? NetworkType.MAINNET : NetworkType.TESTNET;
-  const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, 'https://btc-test.app');
+  const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, BTC_ASSETS_ORIGIN);
   const source = new DataSource(service, networkType);
 
-  registerCustomLockScriptInfos([createRgbppScriptInfo(isMainnet)]);
-
-  const ownerLock = {
-    ...getRgbppLockScript(isMainnet),
-    args: ownerRgbppLockArgs
-  }
-  const ownerAddress = scriptToAddress(ownerLock, isMainnet)
-  console.log(ownerAddress)
-
   const ckbVirtualTxResult = await genCreateClusterCkbVirtualTx({
-    clusterParams: {
-      data: CLUSTER_DATA,
-      // The BTC transaction Vouts[0] for OP_RETURN, Vouts[1] for cluster and Vouts[2] for change
-      toLock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
-      changeAddress: scriptToAddress(genRgbppLockScript(buildPreLockArgs(2), isMainnet), isMainnet),
-      fromInfos: [ownerAddress],
-      config: isMainnet ? predefinedSporeConfigs.Mainnet : predefinedSporeConfigs.Testnet
-    },
+    collector,
+    rgbppLockArgs: ownerRgbppLockArgs,
+    clusterData: CLUSTER_DATA,
+    isMainnet
   });
 
   const { commitment, ckbRawTx, clusterId } = ckbVirtualTxResult;
@@ -66,6 +59,7 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
     ckbCollector: collector,
     from: btcAddress!,
     source,
+    feeRate: 30
   });
   psbt.signAllInputs(keyPair);
   psbt.finalizeAllInputs();
@@ -88,6 +82,13 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
         btcTxBytes,
         rgbppApiSpvProof,
       });
+      // Replace cobuild witness with the final rgbpp lock script
+      ckbTx.witnesses[ckbTx.witnesses.length - 1] = generateClusterCreateCoBuild(
+        ckbTx.outputs[0],
+        ckbTx.outputsData[0],
+      );
+
+      console.log(JSON.stringify(ckbTx))
 
       const txHash = await sendCkbTx({ collector, signedTx: ckbTx });
       console.info(`RGB++ Cluster has been created and tx hash is ${txHash}`);
@@ -102,5 +103,5 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
 // Use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 createCluster({
-  ownerRgbppLockArgs: buildRgbppLockArgs(1, '2341bbc300ffca85031dfc1dee99580331165ba617d97ad11cb1c614de8c76ec'),
+  ownerRgbppLockArgs: buildRgbppLockArgs(3, 'aee4e8e3aa95e9e9ab1f0520714031d92d3263262099dcc7f7d64e62fa2fcb44'),
 });
