@@ -1,5 +1,5 @@
 import { calculateTransactionFee as calculateTxFee } from '@nervosnetwork/ckb-sdk-utils/lib/calculateTransactionFee';
-import { RawClusterData, packRawClusterData } from '@spore-sdk/core';
+import { RawClusterData, packRawClusterData, SporeDataProps, packRawSporeData } from '@spore-sdk/core';
 import { remove0x, u64ToLe } from './hex';
 import { CKB_UNIT, UNLOCKABLE_LOCK_SCRIPT, getXudtTypeScript } from '../constants';
 import { Hex, RgbppTokenInfo } from '../types';
@@ -91,5 +91,14 @@ export const calculateRgbppClusterCellCapacity = (clusterData: RawClusterData): 
   const clusterDataSize = packRawClusterData(clusterData).length;
   const clusterTypeSize = 32 + 1 + 32;
   const cellSize = RGBPP_LOCK_SIZE + clusterTypeSize + 8 + clusterDataSize;
+  return BigInt(cellSize + 1) * CKB_UNIT;
+};
+
+// https://docs.spore.pro/recipes/Create/create-clustered-spore
+// Minimum occupied capacity and 1 ckb for transaction fee
+export const calculateRgbppSporeCellCapacity = (sporeData: SporeDataProps): bigint => {
+  const sporeDataSize = packRawSporeData(sporeData).length;
+  const sporeTypeSize = 32 + 1 + 32;
+  const cellSize = RGBPP_LOCK_SIZE + sporeTypeSize + 8 + sporeDataSize;
   return BigInt(cellSize + 1) * CKB_UNIT;
 };

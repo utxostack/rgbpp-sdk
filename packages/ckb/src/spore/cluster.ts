@@ -9,6 +9,7 @@ import {
   getClusterTypeDep,
   getClusterTypeScript,
   getRgbppLockConfigDep,
+  getRgbppLockDep,
   getRgbppLockScript,
 } from '../constants';
 import { generateClusterCreateCoBuild, generateClusterId } from '../utils/spore';
@@ -59,7 +60,7 @@ export const genCreateClusterCkbVirtualTx = async ({
     },
   ];
   const outputsData: Hex[] = [bytesToHex(packRawClusterData(clusterData))];
-  const cellDeps = [getRgbppLockConfigDep(isMainnet), getClusterTypeDep(isMainnet)];
+  const cellDeps = [getRgbppLockDep(isMainnet), getRgbppLockConfigDep(isMainnet), getClusterTypeDep(isMainnet)];
   const sporeCoBuild = generateClusterCreateCoBuild(outputs[0], outputsData[0]);
   const witnesses = [RGBPP_WITNESS_PLACEHOLDER, sporeCoBuild];
 

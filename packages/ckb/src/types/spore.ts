@@ -1,5 +1,5 @@
-import { RawClusterData, createCluster, createSpore, transferSpore } from '@spore-sdk/core';
-import { Hex } from './common';
+import { RawClusterData, RawSporeData, transferSpore } from '@spore-sdk/core';
+import { Address, Hex } from './common';
 import { Collector } from '../collector';
 
 export interface CreateClusterCkbVirtualTxParams {
@@ -7,7 +7,7 @@ export interface CreateClusterCkbVirtualTxParams {
   collector: Collector;
   // The rgbpp assets cell lock script args whose data structure is: out_index | bitcoin_tx_id
   rgbppLockArgs: Hex;
-  // The TransactionSkeletonType is from @ckb-lumos/helpers
+  // The cluster's data, including name and description.
   clusterData: RawClusterData;
   isMainnet: boolean;
   // The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
@@ -26,19 +26,40 @@ export interface SporeVirtualTxResult {
 }
 
 export interface CreateSporeCkbVirtualTxParams {
-  // The TransactionSkeletonType is from @ckb-lumos/helpers
-  sporeParams: Parameters<typeof createSpore>[0];
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // The cluster rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
+  clusterRgbppLockArgs: Hex;
+  // The cluster's data, including name and description.
+  sporeDataList: RawSporeData[];
+  isMainnet: boolean;
   // The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
 }
 
-export interface TransferSporeCkbVirtualTxParams {
-  // The TransactionSkeletonType is from @ckb-lumos/helpers
-  sporeParams: Parameters<typeof transferSpore>[0];
-  // The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
-  witnessLockPlaceholderSize?: number;
+export interface SporeCreateVirtualTxResult {
+  // CKB raw transaction
+  ckbRawTx: CKBComponents.RawTransaction;
+  // The rgbpp commitment to be inserted into BTC op_return
+  commitment: Hex;
+  // The sum capacity of the ckb inputs
+  sumInputsCapacity: Hex;
+}
+
+export interface AppendIssuerCellToSporeCreate {
+  // The Secp256k1 private key of the issuer cells maintainer
+  secp256k1PrivateKey: Hex;
+  // The issuer ckb address
+  issuerAddress: Address;
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // CKB raw transaction
+  ckbRawTx: CKBComponents.RawTransaction;
+  // The sum capacity of the ckb inputs
+  sumInputsCapacity: Hex;
+  isMainnet: boolean;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
 }

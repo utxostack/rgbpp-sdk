@@ -92,14 +92,14 @@ const TestnetInfo = {
   } as CKBComponents.CellDep,
 
   SporeTypeScript: {
-    codeHash: '0x5e063b4c0e7abeaa6a428df3b693521a3050934cf3b0ae97a800d1bc31449398',
+    codeHash: '0x685a60219309029d01310311dba953d67029170ca4848a4ff638e57002130a0d',
     hashType: 'data1',
     args: '',
   } as CKBComponents.Script,
 
   SporeTypeDep: {
     outPoint: {
-      txHash: '0x685a60219309029d01310311dba953d67029170ca4848a4ff638e57002130a0d',
+      txHash: '0x5e8d2a517d50fd4bb4d01737a7952a1f1d35c8afc77240695bb569cd7d9d5a1f',
       index: '0x0',
     },
     depType: 'code',

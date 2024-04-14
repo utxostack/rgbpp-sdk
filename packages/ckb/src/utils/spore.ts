@@ -1,17 +1,13 @@
-import { TransactionSkeletonType, createTransactionFromSkeleton } from '@ckb-lumos/helpers';
 import { PERSONAL, blake2b, hexToBytes, serializeInput } from '@nervosnetwork/ckb-sdk-utils';
 import { Cell as LumosCell } from '@ckb-lumos/base';
 import {
   assembleTransferSporeAction,
   assembleCobuildWitnessLayout,
   assembleCreateClusterAction,
+  assembleCreateSporeAction,
 } from '@spore-sdk/core/lib/cobuild';
 import { u64ToLe } from './hex';
 import { Hex, IndexerCell } from '../types';
-
-export const ckbTxFromTxSkeleton = (txSkeleton: TransactionSkeletonType): CKBComponents.RawTransaction => {
-  return createTransactionFromSkeleton(txSkeleton) as CKBComponents.RawTransaction;
-};
 
 // Generate type id for cluster id
 export const generateClusterId = (firstInput: CKBComponents.CellInput, firstOutputIndex: number) => {
@@ -20,6 +16,11 @@ export const generateClusterId = (firstInput: CKBComponents.CellInput, firstOutp
   s.update(input);
   s.update(hexToBytes(`0x${u64ToLe(BigInt(firstOutputIndex))}`));
   return `0x${s.digest('hex')}`;
+};
+
+// Generate type id for spore id
+export const generateSporeId = (firstInput: CKBComponents.CellInput, firstOutputIndex: number) => {
+  return generateClusterId(firstInput, firstOutputIndex);
 };
 
 export const generateClusterCreateCoBuild = (
@@ -32,6 +33,25 @@ export const generateClusterCreateCoBuild = (
   } as LumosCell;
   const { actions } = assembleCreateClusterAction(output);
   return assembleCobuildWitnessLayout(actions);
+};
+
+export const generateSporeCreateCoBuild = (
+  sporeOutputs: CKBComponents.CellOutput[],
+  sporeOutputData: Hex[],
+): string => {
+  if (sporeOutputs.length !== sporeOutputData.length) {
+    throw new Error('The length of spore outputs and spore cell data are not same');
+  }
+  let sporeActions: any[] = [];
+  for (let index = 0; index < sporeOutputs.length; index++) {
+    const sporeOutput = {
+      cellOutput: sporeOutputs[index],
+      data: sporeOutputData[index],
+    } as LumosCell;
+    const { actions } = assembleCreateSporeAction(sporeOutput);
+    sporeActions = sporeActions.concat(actions);
+  }
+  return assembleCobuildWitnessLayout(sporeActions);
 };
 
 export const generateSporeTransferCoBuild = (
