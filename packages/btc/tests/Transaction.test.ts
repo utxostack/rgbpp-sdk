@@ -4,6 +4,7 @@ import { accounts, config, network, service, source } from './shared/env';
 import { bitcoin, ErrorMessages, ErrorCodes, AddressType, createSendUtxosBuilder } from '../src';
 import { createSendBtcBuilder, sendBtc, sendUtxos, tweakSigner } from '../src';
 
+const STATIC_FEE_RATE = 1;
 const BTC_UTXO_DUST_LIMIT = config.btcUtxoDustLimit;
 const RGBPP_UTXO_DUST_LIMIT = config.rgbppUtxoDustLimit;
 
@@ -316,6 +317,7 @@ describe('Transaction', () => {
             fixed: true,
           },
         ],
+        feeRate: STATIC_FEE_RATE,
         source,
       });
 
@@ -327,7 +329,7 @@ describe('Transaction', () => {
       expect(psbt.txOutputs).toHaveLength(2);
 
       console.log('tx paid fee:', psbt.getFee());
-      expectPsbtFeeInRange(psbt);
+      expectPsbtFeeInRange(psbt, STATIC_FEE_RATE);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -354,6 +356,7 @@ describe('Transaction', () => {
             fixed: true,
           },
         ],
+        feeRate: STATIC_FEE_RATE,
         source,
       });
 
@@ -365,7 +368,7 @@ describe('Transaction', () => {
       expect(psbt.txOutputs).toHaveLength(2);
 
       console.log('tx paid fee:', psbt.getFee());
-      expectPsbtFeeInRange(psbt);
+      expectPsbtFeeInRange(psbt, STATIC_FEE_RATE);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -437,6 +440,7 @@ describe('Transaction', () => {
             value: 1000,
           },
         ],
+        feeRate: STATIC_FEE_RATE,
         source,
       });
 
@@ -448,7 +452,7 @@ describe('Transaction', () => {
       expect(psbt.txOutputs).toHaveLength(2);
 
       console.log('tx paid fee:', psbt.getFee());
-      expectPsbtFeeInRange(psbt);
+      expectPsbtFeeInRange(psbt, STATIC_FEE_RATE);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -484,6 +488,7 @@ describe('Transaction', () => {
             protected: true,
           },
         ],
+        feeRate: STATIC_FEE_RATE,
         source,
       });
 
@@ -497,7 +502,7 @@ describe('Transaction', () => {
       expect(psbt.txOutputs).toHaveLength(1);
 
       console.log('tx paid fee:', psbt.getFee());
-      expectPsbtFeeInRange(psbt);
+      expectPsbtFeeInRange(psbt, STATIC_FEE_RATE);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -562,6 +567,7 @@ describe('Transaction', () => {
             protected: true,
           },
         ],
+        feeRate: STATIC_FEE_RATE,
         source,
       });
 
@@ -573,7 +579,7 @@ describe('Transaction', () => {
       expect(psbt.txOutputs).toHaveLength(1);
 
       console.log('tx paid fee:', psbt.getFee());
-      expectPsbtFeeInRange(psbt);
+      expectPsbtFeeInRange(psbt, STATIC_FEE_RATE);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -710,6 +716,7 @@ describe('Transaction', () => {
             protected: true,
           },
         ],
+        feeRate: STATIC_FEE_RATE,
         source,
       });
 
@@ -724,7 +731,7 @@ describe('Transaction', () => {
       expect(psbt.txOutputs[1].value).toBeLessThan(psbt.txOutputs[2].value);
 
       console.log('tx paid fee:', psbt.getFee());
-      expectPsbtFeeInRange(psbt);
+      expectPsbtFeeInRange(psbt, STATIC_FEE_RATE);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -758,6 +765,7 @@ describe('Transaction', () => {
             protected: true,
           },
         ],
+        feeRate: STATIC_FEE_RATE,
         source,
       });
 
@@ -772,7 +780,7 @@ describe('Transaction', () => {
       expect(psbt.txOutputs[1].value).toBe(RGBPP_UTXO_DUST_LIMIT);
 
       console.log('tx paid fee:', psbt.getFee());
-      expectPsbtFeeInRange(psbt);
+      expectPsbtFeeInRange(psbt, STATIC_FEE_RATE);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
