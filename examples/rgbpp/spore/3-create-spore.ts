@@ -135,6 +135,7 @@ const createSpore = async ({ clusterRgbppLockArgs, receivers }: Params) => {
 // Use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 createSpore({
+  // The cluster rgbpp lock args is from 2-create-cluster.ts
   clusterRgbppLockArgs: buildRgbppLockArgs(1, 'f7176d8715d8f7e0fa439e69076a673fa480b19b789035c23cde994722ba4244'),
   receivers: [
     {
