@@ -18,6 +18,8 @@ import { bytesToHex, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
 /**
  * Generate the virtual ckb transaction for creating cluster
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param rgbppLockArgs The rgbpp assets cell lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param clusterData The cluster's data, including name and description.
  * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 3000 (It can make most scenarios work properly)
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100

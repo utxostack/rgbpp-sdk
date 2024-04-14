@@ -34,8 +34,10 @@ import {
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 
 /**
- * Generate the virtual ckb transaction for creating spore
- * @param sporeParams The sporeParams is the same as the createSpore function of the spore-sdk
+ * Generate the virtual ckb transaction for creating spores
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param clusterRgbppLockArgs The cluster rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
+ * @param sporeDataList The spore's data list, including name and description.
  * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 3000 (It can make most scenarios work properly)
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  */
@@ -49,16 +51,16 @@ export const genCreateSporeCkbVirtualTx = async ({
     ...getRgbppLockScript(isMainnet),
     args: append0x(clusterRgbppLockArgs),
   };
-  const clusterRgbppCells = await collector.getCells({ lock: clusterRgbppLock, isDataEmpty: false });
-  if (!clusterRgbppCells || clusterRgbppCells.length === 0) {
+  const clusterCells = await collector.getCells({ lock: clusterRgbppLock, isDataEmpty: false });
+  if (!clusterCells || clusterCells.length === 0) {
     throw new NoRgbppLiveCellError('No cluster rgbpp cells found with the cluster rgbpp lock args');
   }
-  const clusterRgbppCell = clusterRgbppCells[0];
-  const sumInputsCapacity = clusterRgbppCell.output.capacity;
+  const clusterCell = clusterCells[0];
+  const sumInputsCapacity = clusterCell.output.capacity;
 
   const inputs: CKBComponents.CellInput[] = [
     {
-      previousOutput: clusterRgbppCell.outPoint,
+      previousOutput: clusterCell.outPoint,
       since: '0x0',
     },
   ];
@@ -77,20 +79,25 @@ export const genCreateSporeCkbVirtualTx = async ({
 
   const outputs: CKBComponents.CellOutput[] = [
     {
-      ...clusterRgbppCell.output,
+      ...clusterCell.output,
       // The BTC transaction Vouts[0] for OP_RETURN, Vouts[1] for cluster
       lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
     },
     ...sporeOutputs,
   ];
-  const outputsData: Hex[] = [clusterRgbppCell.outputData, ...sporeOutputsData];
+  const outputsData: Hex[] = [clusterCell.outputData, ...sporeOutputsData];
   const cellDeps = [
     getRgbppLockDep(isMainnet),
     getRgbppLockConfigDep(isMainnet),
     getClusterTypeDep(isMainnet),
     getSporeTypeDep(isMainnet),
   ];
-  const sporeCoBuild = generateSporeCreateCoBuild(sporeOutputs, sporeOutputsData);
+  const sporeCoBuild = generateSporeCreateCoBuild({
+    sporeOutputs,
+    sporeOutputsData,
+    clusterCell,
+    clusterOutputCell: outputs[0],
+  });
   const witnesses = [RGBPP_WITNESS_PLACEHOLDER, sporeCoBuild];
 
   const ckbRawTx: CKBComponents.RawTransaction = {
@@ -112,6 +119,7 @@ export const genCreateSporeCkbVirtualTx = async ({
     ckbRawTx,
     commitment,
     sumInputsCapacity,
+    clusterCell,
   };
 };
 
@@ -124,7 +132,7 @@ export const genCreateSporeCkbVirtualTx = async ({
  * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  */
-export const appendIssuerCellToSporeCreate = async ({
+export const appendIssuerCellToSporesCreate = async ({
   secp256k1PrivateKey,
   issuerAddress,
   collector,
