@@ -14,11 +14,11 @@ The `@rgbpp-sdk/service` package provides a wrapped class to interact with `Bitc
 
 ```bash
 # Install via npm:
-$ npm i @rgbpp-sdk/service
+$ npm i @rgbpp-sdk/service@snap
 # Install via yarn:
-$ yarn add @rgbpp-sdk/service
+$ yarn add @rgbpp-sdk/service@snap
 # Install via pnpm:
-$ pnpm add @rgbpp-sdk/service
+$ pnpm add @rgbpp-sdk/service@snap
 ```
 
 ## Get started
