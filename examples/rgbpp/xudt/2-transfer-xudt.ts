@@ -75,7 +75,7 @@ const transferXudt = async ({ xudtType, receivers }: TransferParams) => {
       emptyCells,
       needCapacity,
       txFee,
-      {minCapacity: MIN_CAPACITY},
+      { minCapacity: MIN_CAPACITY },
     );
     inputs = [...inputs, ...emptyInputs];
     actualInputsCapacity += sumEmptyCapacity;

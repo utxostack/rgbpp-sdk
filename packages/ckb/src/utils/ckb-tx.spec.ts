@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   calculateRgbppCellCapacity,
+  calculateRgbppClusterCellCapacity,
   calculateTransactionFee,
   generateUniqueTypeArgs,
   isLockArgsSizeExceeded,
@@ -71,5 +72,14 @@ describe('ckb tx utils', () => {
 
     const typeId = generateUniqueTypeArgs(firstInput, 0);
     expect(typeId).toBe('0xdc03ec5c4086fcb813707c6dd8bf5b9848d7e335');
+  });
+
+  it('calculateRgbppClusterCellCapacity', () => {
+    const clusterData = {
+      name: 'Name of the cluster',
+      description: 'Description of the cluster',
+    };
+    const capacity = calculateRgbppClusterCellCapacity(clusterData);
+    expect(capacity).toBe(BigInt(212_0000_0000));
   });
 });

@@ -76,6 +76,34 @@ const TestnetInfo = {
     },
     depType: 'code',
   } as CKBComponents.CellDep,
+
+  ClusterTypeScript: {
+    codeHash: '0x0bbe768b519d8ea7b96d58f1182eb7e6ef96c541fbd9526975077ee09f049058',
+    hashType: 'data1',
+    args: '',
+  } as CKBComponents.Script,
+
+  ClusterTypeDep: {
+    outPoint: {
+      txHash: '0xcebb174d6e300e26074aea2f5dbd7f694bb4fe3de52b6dfe205e54f90164510a',
+      index: '0x0',
+    },
+    depType: 'code',
+  } as CKBComponents.CellDep,
+
+  SporeTypeScript: {
+    codeHash: '0x685a60219309029d01310311dba953d67029170ca4848a4ff638e57002130a0d',
+    hashType: 'data1',
+    args: '',
+  } as CKBComponents.Script,
+
+  SporeTypeDep: {
+    outPoint: {
+      txHash: '0x5e8d2a517d50fd4bb4d01737a7952a1f1d35c8afc77240695bb569cd7d9d5a1f',
+      index: '0x0',
+    },
+    depType: 'code',
+  } as CKBComponents.CellDep,
 };
 
 const MainnetInfo = {
@@ -146,6 +174,34 @@ const MainnetInfo = {
     },
     depType: 'code',
   } as CKBComponents.CellDep,
+
+  ClusterTypeScript: {
+    codeHash: '0x7366a61534fa7c7e6225ecc0d828ea3b5366adec2b58206f2ee84995fe030075',
+    hashType: 'data1',
+    args: '',
+  } as CKBComponents.Script,
+
+  ClusterTypeDep: {
+    outPoint: {
+      txHash: '0xe464b7fb9311c5e2820e61c99afc615d6b98bdefbe318c34868c010cbd0dc938',
+      index: '0x0',
+    },
+    depType: 'code',
+  } as CKBComponents.CellDep,
+
+  SporeTypeScript: {
+    codeHash: '0x4a4dce1df3dffff7f8b2cd7dff7303df3b6150c9788cb75dcf6747247132b9f5',
+    hashType: 'data1',
+    args: '',
+  } as CKBComponents.Script,
+
+  SporeTypeDep: {
+    outPoint: {
+      txHash: '0x96b198fb5ddbd1eed57ed667068f1f1e55d07907b4c0dbd38675a69ea1b69824',
+      index: '0x0',
+    },
+    depType: 'code',
+  } as CKBComponents.CellDep,
 };
 
 export const UNLOCKABLE_LOCK_SCRIPT = {
@@ -181,3 +237,13 @@ export const getUniqueTypeScript = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.UniqueTypeScript : TestnetInfo.UniqueTypeScript;
 export const getUniqueTypeDep = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.UniqueTypeDep : TestnetInfo.UniqueTypeDep;
+
+export const getClusterTypeScript = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.ClusterTypeScript : TestnetInfo.ClusterTypeScript;
+export const getClusterTypeDep = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.ClusterTypeDep : TestnetInfo.ClusterTypeDep;
+
+export const getSporeTypeScript = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.SporeTypeScript : TestnetInfo.SporeTypeScript;
+export const getSporeTypeDep = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.SporeTypeDep : TestnetInfo.SporeTypeDep;
