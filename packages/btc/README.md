@@ -10,11 +10,11 @@ This lib is based on the foundation of the [unisat wallet-sdk](https://github.co
 
 ```bash
 # Install via npm:
-$ npm i @rgbpp-sdk/btc
+$ npm i @rgbpp-sdk/btc@snap
 # Install via yarn:
-$ yarn add @rgbpp-sdk/btc
+$ yarn add @rgbpp-sdk/btc@snap
 # Install via pnpm:
-$ pnpm add @rgbpp-sdk/btc
+$ pnpm add @rgbpp-sdk/btc@snap
 ```
 
 ## Transaction
