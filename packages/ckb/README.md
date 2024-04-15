@@ -5,11 +5,11 @@ RGB++ SDK
 ## Installation
 
 ```
-$ npm i @rgbpp-sdk/ckb
+$ npm i @rgbpp-sdk/ckb@snap
 # or
-$ yarn add @rgbpp-sdk/ckb
+$ yarn add @rgbpp-sdk/ckb@snap
 # or
-$ pnpm add @rgbpp-sdk/ckb
+$ pnpm add @rgbpp-sdk/ckb@snap
 ```
 
 ## Split paymaster cells
