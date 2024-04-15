@@ -67,15 +67,17 @@ const createSpore = async ({ clusterRgbppLockArgs, receivers }: Params) => {
 
   const { commitment, ckbRawTx, sumInputsCapacity, clusterCell } = ckbVirtualTxResult;
 
-  // // Send BTC tx
+  // Send BTC tx
+  // The first btc address is the owner of the cluster cell and the rest btc addresses are spore receivers
+  const btcTos = [btcAddress!, ...receivers.map((receiver) => receiver.toBtcAddress)];
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
-    tos: receivers.map(receiver => receiver.toBtcAddress),
+    tos: btcTos,
     ckbCollector: collector,
     from: btcAddress!,
     source,
-    feeRate: 30
+    feeRate: 30,
   });
   psbt.signAllInputs(keyPair);
   psbt.finalizeAllInputs();
