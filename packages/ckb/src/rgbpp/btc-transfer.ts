@@ -26,6 +26,7 @@ import {
   compareInputs,
   estimateWitnessSize,
   genRgbppLockScript,
+  throwErrorWhenTxInputsExceeded,
 } from '../utils/rgbpp';
 import { Hex, IndexerCell } from '../types';
 import {
@@ -114,6 +115,9 @@ export const genBtcTransferCkbVirtualTx = async ({
       needAmount: transferAmount,
     });
     inputs = collectResult.inputs;
+
+    throwErrorWhenTxInputsExceeded(inputs.length);
+
     sumInputsCapacity = collectResult.sumInputsCapacity;
 
     rgbppCells = rgbppCells.slice(0, inputs.length);
@@ -236,6 +240,8 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
     liveCells: rgbppCells,
     needAmount: sumTransferAmount,
   });
+
+  throwErrorWhenTxInputsExceeded(inputs.length);
 
   // Rgbpp change cell index, if it is -1, it means there is no change rgbpp cell
   let rgbppChangeOutIndex = -1;

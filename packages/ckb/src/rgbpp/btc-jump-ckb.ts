@@ -12,6 +12,7 @@ import {
 import {
   buildPreLockArgs,
   calculateCommitment,
+  throwErrorWhenTxInputsExceeded,
   compareInputs,
   estimateWitnessSize,
   genBtcTimeLockScript,
@@ -68,6 +69,8 @@ export const genBtcJumpCkbVirtualTx = async ({
     liveCells: rgbppCells,
     needAmount: transferAmount,
   });
+
+  throwErrorWhenTxInputsExceeded(inputs.length);
 
   const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
   const outputsData = [append0x(u128ToLe(transferAmount))];
