@@ -47,7 +47,7 @@ export interface BtcTransferVirtualTxResult {
  * @param rgbppLockArgsList The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred, if the noMergeOutputCells is true, the transferAmount will be ignored
  * @param isMainnet
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
  * @param noMergeOutputCells The noMergeOutputCells indicates whether the CKB outputs need to be merged. By default, the outputs will be merged.
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  */
@@ -84,7 +84,7 @@ interface BtcJumpCkbVirtualTxResult {
  * @param xudtTypeBytes The serialized hex string of the XUDT type script
  * @param rgbppLockArgsList The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  * @param isMainnet
  */
@@ -111,7 +111,7 @@ The method `genCkbJumpBtcVirtualTx` can generate a CKB transaction for rgbpp ass
  * @param fromCkbAddress The from ckb address who will use his private key to sign the ckb tx
  * @param toRgbppLockArgs The receiver rgbpp lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  * @param isMainnet
  */

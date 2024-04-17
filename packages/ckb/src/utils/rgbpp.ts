@@ -4,6 +4,7 @@ import { append0x, remove0x, reverseHex, u32ToLe, u8ToHex, utf8ToHex } from './h
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
   RGBPP_TX_ID_PLACEHOLDER,
+  RGBPP_TX_INPUTS_MAX_LENGTH,
   RGBPP_TX_WITNESS_MAX_SIZE,
   getBtcTimeLockScript,
   getRgbppLockScript,
@@ -21,7 +22,7 @@ import { blockchain } from '@ckb-lumos/base';
 import { bytes } from '@ckb-lumos/codec';
 import { RgbppApiSpvProof } from '@rgbpp-sdk/service';
 import { toCamelcase } from './case-parser';
-import { InputsOrOutputsLenError } from '../error';
+import { InputsOrOutputsLenError, RgbppCkbTxInputsExceededError } from '../error';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
   return {
@@ -211,4 +212,10 @@ export const encodeRgbppTokenInfo = (tokenInfo: RgbppTokenInfo) => {
 export const calculateRgbppTokenInfoSize = (tokenInfo: RgbppTokenInfo): bigint => {
   const encodedTokenInfo = encodeRgbppTokenInfo(tokenInfo);
   return BigInt(remove0x(encodedTokenInfo).length / 2);
+};
+
+export const throwErrorWhenTxInputsExceeded = (inputLen: number) => {
+  if (inputLen > RGBPP_TX_INPUTS_MAX_LENGTH) {
+    throw new RgbppCkbTxInputsExceededError(`Please ensure the tx inputs do not exceed ${RGBPP_TX_INPUTS_MAX_LENGTH}`);
+  }
 };

@@ -11,7 +11,7 @@ export interface CreateClusterCkbVirtualTxParams {
   // The cluster's data, including name and description.
   clusterData: RawClusterData;
   isMainnet: boolean;
-  // The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
@@ -34,7 +34,7 @@ export interface CreateSporeCkbVirtualTxParams {
   // The cluster's data, including name and description.
   sporeDataList: RawSporeData[];
   isMainnet: boolean;
-  // The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;

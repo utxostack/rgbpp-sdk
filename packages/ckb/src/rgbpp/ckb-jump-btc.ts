@@ -20,7 +20,7 @@ import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-util
  * @param fromCkbAddress The from ckb address who will use his private key to sign the ckb tx
  * @param toRgbppLockArgs The receiver rgbpp lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  * @param isMainnet
  */
@@ -123,7 +123,7 @@ export const genCkbJumpBtcVirtualTx = async ({
  * @param xudtTypeBytes The serialized hex string of the XUDT type script
  * @param fromCkbAddress The from ckb address who will use his private key to sign the ckb tx
  * @param rgbppReceivers The rgbpp receiver list which include toRgbppLockArgs and transferAmount
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  * @param isMainnet
  */

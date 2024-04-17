@@ -14,10 +14,11 @@ import {
   lockScriptFromBtcTimeLockArgs,
   replaceLockArgsWithRealBtcTxId,
   transformSpvProof,
+  throwErrorWhenTxInputsExceeded,
 } from './rgbpp';
 import { RgbppCkbVirtualTx } from '../types';
 import { calculateUdtCellCapacity } from './ckb-tx';
-import { InputsOrOutputsLenError } from '../error';
+import { InputsOrOutputsLenError, RgbppCkbTxInputsExceededError } from '../error';
 import { remove0x } from './hex';
 
 describe('rgbpp tests', () => {
@@ -235,7 +236,7 @@ describe('rgbpp tests', () => {
       '0x01000000047b6894a0b7a4d7a73b1503d1ae35c51fc5fa6306776dcf22b1fb3daaa32a29',
       '0x010000002f061a27abcab1d1d146514ffada6a83c0d974fe0813835ad8be2a39a6b1a6ee',
     ]);
-    expect(actual).toBe(9000);
+    expect(actual).toBe(15000);
   });
 
   it('encodeRgbppTokenInfo', () => {
@@ -246,5 +247,16 @@ describe('rgbpp tests', () => {
   it('calculateRgbppTokenInfoSize', () => {
     const actual = calculateRgbppTokenInfoSize({ decimal: 8, name: 'RGBPP Test Token', symbol: 'RTT' });
     expect(actual).toBe(BigInt(22));
+  });
+
+  it('throwErrorWhenTxInputsExceeded', () => {
+    try {
+      throwErrorWhenTxInputsExceeded(10);
+    } catch (error) {
+      if (error instanceof RgbppCkbTxInputsExceededError) {
+        expect(109).toBe(error.code);
+        expect('Please ensure the tx inputs do not exceed 10').toBe(error.message);
+      }
+    }
   });
 });

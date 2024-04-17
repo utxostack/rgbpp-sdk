@@ -38,7 +38,7 @@ import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
  * @param collector The collector that collects CKB live cells and transactions
  * @param clusterRgbppLockArgs The cluster rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param sporeDataList The spore's data list, including name and description.
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 3000 (It can make most scenarios work properly)
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  */
 export const genCreateSporeCkbVirtualTx = async ({
