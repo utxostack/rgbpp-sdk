@@ -28,7 +28,7 @@ export interface BtcTransferVirtualTxParams {
   isMainnet: boolean;
   // The noMergeOutputCells indicates whether the CKB outputs need to be merged. By default, the outputs will be merged.
   noMergeOutputCells?: boolean;
-  // The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
@@ -158,7 +158,7 @@ export interface CkbJumpBtcVirtualTxParams {
   toRgbppLockArgs: Hex;
   // The XUDT amount to be transferred
   transferAmount: bigint;
-  // The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
@@ -197,7 +197,7 @@ export interface CkbBatchJumpBtcVirtualTxParams {
   fromCkbAddress: Address;
   // The rgbpp receiver list which include toRgbppLockArgs and transferAmount
   rgbppReceivers: RgbppLockArgsReceiver[];
-  // The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
@@ -240,7 +240,7 @@ export interface RgbppLaunchCkbVirtualTxParams {
   launchAmount: bigint;
   // The RGBPP token info https://github.com/ckb-cell/unique-cell?tab=readme-ov-file#xudt-information
   rgbppTokenInfo: RgbppTokenInfo;
-  // The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
