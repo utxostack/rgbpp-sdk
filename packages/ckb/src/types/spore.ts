@@ -73,3 +73,26 @@ export interface SporesCreateCobuildParams {
   clusterCell: IndexerCell;
   clusterOutputCell: CKBComponents.CellOutput;
 }
+
+export interface TransferSporeCkbVirtualTxParams {
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // The spore rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
+  sporeRgbppLockArgs: Hex;
+  // The spore type script serialized bytes
+  sporeTypeBytes: Hex;
+  isMainnet: boolean;
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+  witnessLockPlaceholderSize?: number;
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
+}
+
+export interface SporeTransferVirtualTxResult {
+  // CKB raw transaction
+  ckbRawTx: CKBComponents.RawTransaction;
+  // The rgbpp commitment to be inserted into BTC op_return
+  commitment: Hex;
+  // The spore cell from ckb-indexer
+  sporeCell: IndexerCell;
+}
