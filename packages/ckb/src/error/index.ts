@@ -9,6 +9,7 @@ enum ErrorCode {
   TypeAssetNotSupported = 107,
   InputsOrOutputsLenInvalid = 108,
   RgbppCkbTxInputsExceeded = 109,
+  RgbppUtxoBindMultiSpores = 110,
 }
 
 export class CapacityNotEnoughError extends Error {
@@ -76,6 +77,13 @@ export class InputsOrOutputsLenError extends Error {
 
 export class RgbppCkbTxInputsExceededError extends Error {
   code = ErrorCode.RgbppCkbTxInputsExceeded;
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+export class RgbppUtxoBindMultiSpores extends Error {
+  code = ErrorCode.RgbppUtxoBindMultiSpores;
   constructor(message: string) {
     super(message);
   }
