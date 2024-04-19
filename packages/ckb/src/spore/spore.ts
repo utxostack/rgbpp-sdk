@@ -26,7 +26,12 @@ import {
   getSporeTypeScript,
 } from '../constants';
 import { generateSporeCreateCoBuild, generateSporeId, generateSporeTransferCoBuild } from '../utils/spore';
-import { NoLiveCellError, NoRgbppLiveCellError, RgbppUtxoBindMultiSpores } from '../error';
+import {
+  NoLiveCellError,
+  NoRgbppLiveCellError,
+  RgbppUtxoBindMultiSporesError,
+  RgbppSporeTypeMismatchError,
+} from '../error';
 import {
   addressToScript,
   bytesToHex,
@@ -247,16 +252,16 @@ export const genTransferSporeCkbVirtualTx = async ({
     throw new NoRgbppLiveCellError('No spore rgbpp cells found with the spore rgbpp lock args');
   }
   if (sporeCells.length > 1) {
-    throw new RgbppUtxoBindMultiSpores('The UTXO is bound to multiple spores');
+    throw new RgbppUtxoBindMultiSporesError('The UTXO is bound to multiple spores');
   }
   const sporeCell = sporeCells[0];
 
   if (!sporeCell.output.type) {
-    throw new NoRgbppLiveCellError('The cell with the rgbpp lock args is not RGB++ asset');
+    throw new RgbppUtxoBindMultiSporesError('The cell with the rgbpp lock args has no spore asset');
   }
 
   if (append0x(serializeScript(sporeCell.output.type)) !== append0x(sporeTypeBytes)) {
-    throw new NoRgbppLiveCellError('The cell type with the rgbpp lock args does not match');
+    throw new RgbppUtxoBindMultiSporesError('The cell type with the rgbpp lock args does not match');
   }
 
   const inputs: CKBComponents.CellInput[] = [
@@ -304,5 +309,7 @@ export const genTransferSporeCkbVirtualTx = async ({
     ckbRawTx,
     commitment,
     sporeCell,
+    needPaymasterCell: false,
+    sumInputsCapacity: sporeCell.output.capacity,
   };
 };

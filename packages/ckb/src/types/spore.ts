@@ -95,4 +95,8 @@ export interface SporeTransferVirtualTxResult {
   commitment: Hex;
   // The spore cell from ckb-indexer
   sporeCell: IndexerCell;
+  // The needPaymasterCell indicates whether a paymaster cell is required
+  needPaymasterCell: boolean;
+  // The sum capacity of the ckb inputs
+  sumInputsCapacity: Hex;
 }
