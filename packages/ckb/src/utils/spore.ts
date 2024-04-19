@@ -71,14 +71,18 @@ export const generateSporeCreateCoBuild = ({
   return assembleCobuildWitnessLayout(sporeActions);
 };
 
-export const generateSporeTransferCoBuild = (sporeCell: IndexerCell, outputCell: CKBComponents.CellOutput): string => {
+export const generateSporeTransferCoBuild = (
+  sporeCell: IndexerCell | CKBComponents.LiveCell,
+  outputCell: CKBComponents.CellOutput,
+): string => {
+  const outputData = 'outputData' in sporeCell ? sporeCell.outputData : sporeCell.data?.content!;
   const sporeInput = {
     cellOutput: sporeCell.output,
-    data: sporeCell.outputData,
+    data: outputData,
   } as LumosCell;
   const sporeOutput = {
     cellOutput: outputCell,
-    data: sporeCell.outputData,
+    data: outputData,
   } as LumosCell;
   const { actions } = assembleTransferSporeAction(sporeInput, sporeOutput);
   return assembleCobuildWitnessLayout(actions);
