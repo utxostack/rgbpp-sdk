@@ -1,16 +1,12 @@
 import {
   Collector,
   buildRgbppLockArgs,
-  appendCkbTxWitnesses,
-  updateCkbTxWithRealBtcTxId,
-  sendCkbTx,
   getSporeTypeScript,
   Hex,
-  generateSporeTransferCoBuild,
   genTransferSporeCkbVirtualTx,
 } from '@rgbpp-sdk/ckb';
-import { DataSource, ECPair, bitcoin, NetworkType, sendRgbppUtxos, transactionToHex } from '@rgbpp-sdk/btc';
-import { BtcAssetsApi, BtcAssetsApiError } from '@rgbpp-sdk/service';
+import { DataSource, ECPair, bitcoin, NetworkType, sendRgbppUtxos } from '@rgbpp-sdk/btc';
+import { BtcAssetsApi } from '@rgbpp-sdk/service';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 
 // BTC SECP256K1 private key
@@ -55,7 +51,7 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress }: { sporeRgbppL
     isMainnet,
   });
 
-  const { commitment, ckbRawTx, sporeCell } = ckbVirtualTxResult;
+  const { commitment, ckbRawTx } = ckbVirtualTxResult;
 
   // console.log(JSON.stringify(ckbRawTx))
 
