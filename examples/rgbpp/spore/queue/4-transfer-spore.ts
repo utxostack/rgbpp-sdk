@@ -73,44 +73,34 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress }: { sporeRgbppL
   psbt.finalizeAllInputs();
 
   const btcTx = psbt.extractTransaction();
-  const btcTxBytes = transactionToHex(btcTx, false);
   const { txid: btcTxId } = await service.sendBtcTransaction(btcTx.toHex());
 
   console.log('BTC TxId: ', btcTxId);
 
-  const interval = setInterval(async () => {
-    try {
-      console.log('Waiting for BTC tx and proof to be ready');
-      const rgbppApiSpvProof = await service.getRgbppSpvProof(btcTxId, 0);
-      clearInterval(interval);
-      // Update CKB transaction with the real BTC txId
-      const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet });
-
-      const ckbTx = await appendCkbTxWitnesses({
-        ckbRawTx: newCkbRawTx,
-        btcTxBytes,
-        rgbppApiSpvProof,
-      });
-
-      // Replace cobuild witness with the final rgbpp lock script
-      ckbTx.witnesses[ckbTx.witnesses.length - 1] = generateSporeTransferCoBuild(sporeCell, ckbTx.outputs[0]);
-
-      // console.log('ckbTx: ', JSON.stringify(ckbTx));
-
-      const txHash = await sendCkbTx({ collector, signedTx: ckbTx });
-      console.info(`RGB++ Spore has been transferred and tx hash is ${txHash}`);
-    } catch (error) {
-      if (!(error instanceof BtcAssetsApiError)) {
-        console.error(error);
+  try {
+    await service.sendRgbppCkbTransaction({ btc_txid: btcTxId, ckb_virtual_result: ckbVirtualTxResult });
+    const interval = setInterval(async () => {
+      const { state, failedReason } = await service.getRgbppTransactionState(btcTxId);
+      console.log('state', state);
+      if (state === 'completed' || state === 'failed') {
+        clearInterval(interval);
+        if (state === 'completed') {
+          const { txhash: txHash } = await service.getRgbppTransactionHash(btcTxId);
+          console.info(`Rgbpp spore has been transferred on BTC and the related CKB tx hash is ${txHash}`);
+        } else {
+          console.warn(`Rgbpp CKB transaction failed and the reason is ${failedReason} `);
+        }
       }
-    }
-  }, 30 * 1000);
+    }, 30 * 1000);
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 // Use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 transferSpore({
   // The spore rgbpp lock args is from 3-create-spore.ts
-  sporeRgbppLockArgs: buildRgbppLockArgs(1, 'f203c8c13eacdbd126f85d286a963c85f233f8145363b1d997c4d552afb990e1'),
+  sporeRgbppLockArgs: buildRgbppLockArgs(2, 'd5868dbde4be5e49876b496449df10150c356843afb6f94b08f8d81f394bb350'),
   toBtcAddress: 'tb1qhp9fh9qsfeyh0yhewgu27ndqhs5qlrqwau28m7',
 });
