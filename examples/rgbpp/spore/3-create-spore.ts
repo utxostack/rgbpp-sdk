@@ -145,6 +145,8 @@ createSpore({
       sporeData: {
         contentType: 'text/plain',
         content: utf8ToBuffer('First Spore'),
+        // The cluster id is from 2-create-cluster.ts
+        clusterId: '0xbc5168a4f90116fada921e185d4b018e784dc0f6266e539a3c092321c932700a',
       },
     },
     {
@@ -152,6 +154,8 @@ createSpore({
       sporeData: {
         contentType: 'text/plain',
         content: utf8ToBuffer('Second Spore'),
+        // The cluster id is from 2-create-cluster.ts
+        clusterId: '0xbc5168a4f90116fada921e185d4b018e784dc0f6266e539a3c092321c932700a',
       },
     },
   ],
