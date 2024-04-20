@@ -75,6 +75,11 @@ export const genCreateSporeCkbVirtualTx = async ({
     },
   ];
 
+  const clusterCellDep: CKBComponents.CellDep = {
+    outPoint: clusterCell.outPoint,
+    depType: 'code',
+  };
+
   const sporeOutputs = sporeDataList.map((data, index) => ({
     // The BTC transaction Vouts[0] for OP_RETURN, Vouts[1] for cluster and Vouts[2]... for spore
     lock: genRgbppLockScript(buildPreLockArgs(index + 2), isMainnet),
@@ -101,6 +106,7 @@ export const genCreateSporeCkbVirtualTx = async ({
     getRgbppLockConfigDep(isMainnet),
     getClusterTypeDep(isMainnet),
     getSporeTypeDep(isMainnet),
+    clusterCellDep,
   ];
   const sporeCoBuild = generateSporeCreateCoBuild({
     sporeOutputs,
