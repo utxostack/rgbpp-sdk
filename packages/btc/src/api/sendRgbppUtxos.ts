@@ -156,17 +156,17 @@ async function getMergedBtcOutputs(btcOutputs: InitOutput[], props: SendRgbppUtx
   merged.push(...btcOutputs);
 
   // Add paymaster UTXO
-  const paymasterUTXOOutput = await props.source.getPaymasterUTXOOuput();
+  const paymasterOutput = await props.source.getPaymasterOutput();
   if (
-    paymasterUTXOOutput &&
+    paymasterOutput &&
     props.paymaster &&
-    (paymasterUTXOOutput?.address !== props.paymaster.address || paymasterUTXOOutput?.value !== props.paymaster.value)
+    (paymasterOutput?.address !== props.paymaster.address || paymasterOutput?.value !== props.paymaster.value)
   ) {
     throw new TxBuildError(ErrorCodes.PAYMASTER_MISMATCH);
   }
-  if (paymasterUTXOOutput || props.paymaster) {
+  if (paymasterOutput || props.paymaster) {
     merged.push({
-      ...(paymasterUTXOOutput ?? props.paymaster)!,
+      ...(paymasterOutput ?? props.paymaster)!,
       fixed: true,
     });
   }

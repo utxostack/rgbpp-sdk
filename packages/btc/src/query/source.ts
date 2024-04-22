@@ -167,7 +167,7 @@ export class DataSource {
     return fees.halfHourFee;
   }
 
-  async getPaymasterUTXOOuput(): Promise<TxAddressOutput | undefined> {
+  async getPaymasterOutput(): Promise<TxAddressOutput | undefined> {
     try {
       const paymasterInfo = await this.service.getRgbppPaymasterInfo();
       return {
