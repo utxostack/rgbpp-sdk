@@ -63,10 +63,13 @@ export class BtcAssetsApiBase implements BaseApis {
       comment = text ? `(${status}) ${text}` : `${status}`;
     }
     if (json && !ok) {
-      const directError = typeof json?.error === 'string' ? json.error : void 0;
-      const codeMessageError = json.code && json.message ? `(${json.code}) ${json.message}` : void 0;
-      const wrappedInnerError = json?.error?.error ? `(${json.error.error.code}) ${json.error.error.message}` : void 0;
-      comment = codeMessageError ?? wrappedInnerError ?? directError ?? JSON.stringify(json);
+      const code = json.code ?? json.statusCode ?? json.error?.error?.code ?? res.status;
+      const message = json.message ?? (typeof json.error === 'string' ? json.error : json.error?.error?.message);
+      if (message) {
+        comment = code ? `(${code}) ${message}` : message;
+      } else {
+        comment = JSON.stringify(json);
+      }
     }
 
     if (status === 200 && !json) {
