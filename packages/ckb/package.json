@@ -18,8 +18,8 @@
   ],
   "types": "./lib/index.d.ts",
   "dependencies": {
-    "@ckb-lumos/base": "^0.21.1",
-    "@ckb-lumos/codec": "^0.22.1",
+    "@ckb-lumos/base": "^0.22.2",
+    "@ckb-lumos/codec": "^0.22.2",
     "@spore-sdk/core": "^0.2.0-beta.6",
     "@nervosnetwork/ckb-sdk-core": "^0.109.1",
     "@nervosnetwork/ckb-sdk-utils": "^0.109.1",
@@ -31,7 +31,7 @@
     "js-sha256": "^0.11.0"
   },
   "devDependencies": {
-    "@ckb-lumos/molecule": "^0.22.1",
+    "@ckb-lumos/molecule": "^0.22.2",
     "@types/lodash": "^4.17.0",
     "vitest": "^1.4.0"
   },

@@ -1,5 +1,5 @@
 import { bitcoin, ecc, ECPair } from './bitcoin';
-import { bytes } from '@ckb-lumos/lumos/codec';
+import { bytes } from '@ckb-lumos/codec';
 
 const textEncoder = new TextEncoder();
 

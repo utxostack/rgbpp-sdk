@@ -1,4 +1,4 @@
-import { Cell } from '@ckb-lumos/lumos';
+import { Cell } from '@ckb-lumos/base';
 
 export interface RgbppApis {
   getRgbppPaymasterInfo(): Promise<RgbppApiPaymasterInfo>;

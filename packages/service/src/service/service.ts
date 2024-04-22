@@ -1,4 +1,4 @@
-import { Cell } from '@ckb-lumos/lumos';
+import { Cell } from '@ckb-lumos/base';
 import { BtcAssetsApiBase } from './base';
 import {
   BtcApis,
