@@ -2,12 +2,15 @@ import { describe, it, expect } from 'vitest';
 import {
   calculateRgbppCellCapacity,
   calculateRgbppClusterCellCapacity,
+  calculateRgbppSporeCellCapacity,
   calculateTransactionFee,
   generateUniqueTypeArgs,
   isClusterSporeTypeSupported,
   isLockArgsSizeExceeded,
   isTypeAssetSupported,
 } from './ckb-tx';
+import { utf8ToHex } from '.';
+import { hexToBytes } from '@nervosnetwork/ckb-sdk-utils';
 
 describe('ckb tx utils', () => {
   it('calculateTransactionFee', () => {
@@ -133,5 +136,16 @@ describe('ckb tx utils', () => {
     };
     const capacity = calculateRgbppClusterCellCapacity(clusterData);
     expect(capacity).toBe(BigInt(212_0000_0000));
+  });
+
+  it('calculateRgbppSporeCellCapacity', () => {
+    const sporeData = {
+      contentType: 'text/plain',
+      content: hexToBytes(utf8ToHex('First Spore')),
+      // The cluster id is from 2-create-cluster.ts
+      clusterId: '0xbc5168a4f90116fada921e185d4b018e784dc0f6266e539a3c092321c932700a',
+    };
+    const capacity = calculateRgbppSporeCellCapacity(sporeData);
+    expect(capacity).toBe(BigInt(319_0000_0000));
   });
 });

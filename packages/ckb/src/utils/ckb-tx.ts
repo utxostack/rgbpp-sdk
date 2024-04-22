@@ -114,10 +114,17 @@ export const calculateRgbppClusterCellCapacity = (clusterData: RawClusterData): 
 };
 
 // https://docs.spore.pro/recipes/Create/create-clustered-spore
-// Minimum occupied capacity and 1 ckb for transaction fee
+// For simplicity, we keep the capacity of the RGBPP cell the same as the BTC time cell
+// minimum occupied capacity and 1 ckb for transaction fee
+/**
+ * rgbpp_spore_cell:
+    lock: rgbpp_lock
+    type: spore_type
+    data: sporeData
+ */
 export const calculateRgbppSporeCellCapacity = (sporeData: SporeDataProps): bigint => {
   const sporeDataSize = packRawSporeData(sporeData).length;
   const sporeTypeSize = 32 + 1 + 32;
-  const cellSize = RGBPP_LOCK_SIZE + sporeTypeSize + 8 + sporeDataSize;
+  const cellSize = RGBPP_LOCK_SIZE + sporeTypeSize + 8 + sporeDataSize + BTC_TIME_CELL_INCREASED_SIZE;
   return BigInt(cellSize + 1) * CKB_UNIT;
 };
