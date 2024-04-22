@@ -102,6 +102,7 @@ export class DataSource {
     address: string;
     targetAmount: number;
     minUtxoSatoshi?: number;
+    onlyNonRgbppUtxos?: boolean;
     onlyConfirmedUtxos?: boolean;
     excludeUtxos?: {
       txid: string;
@@ -112,7 +113,7 @@ export class DataSource {
     satoshi: number;
     exceedSatoshi: number;
   }> {
-    const { address, targetAmount, minUtxoSatoshi, onlyConfirmedUtxos, excludeUtxos = [] } = props;
+    const { address, targetAmount, minUtxoSatoshi, onlyConfirmedUtxos, onlyNonRgbppUtxos, excludeUtxos = [] } = props;
     const utxos = await this.getUtxos(address, {
       only_confirmed: onlyConfirmedUtxos,
       min_satoshi: minUtxoSatoshi,
@@ -129,6 +130,12 @@ export class DataSource {
           return exclude.txid === utxo.txid && exclude.vout === utxo.vout;
         });
         if (excluded) {
+          continue;
+        }
+      }
+      if (onlyNonRgbppUtxos) {
+        const ckbRgbppAssets = await this.service.getRgbppAssetsByBtcUtxo(utxo.txid, utxo.vout);
+        if (ckbRgbppAssets && ckbRgbppAssets.length > 0) {
           continue;
         }
       }
