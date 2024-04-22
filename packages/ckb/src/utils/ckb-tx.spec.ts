@@ -4,6 +4,7 @@ import {
   calculateRgbppClusterCellCapacity,
   calculateTransactionFee,
   generateUniqueTypeArgs,
+  isClusterSporeTypeSupported,
   isLockArgsSizeExceeded,
   isTypeAssetSupported,
 } from './ckb-tx';
@@ -38,6 +39,43 @@ describe('ckb tx utils', () => {
     expect(actual).toBe(BigInt(254_0000_0000));
   });
 
+  it('isClusterSporeTypeSupported', () => {
+    const clusterTestnetType: CKBComponents.Script = {
+      codeHash: '0x0bbe768b519d8ea7b96d58f1182eb7e6ef96c541fbd9526975077ee09f049058',
+      hashType: 'data1',
+      args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
+    };
+    expect(isClusterSporeTypeSupported(clusterTestnetType, false)).toBe(true);
+
+    const clusterMainnetType: CKBComponents.Script = {
+      codeHash: '0x7366a61534fa7c7e6225ecc0d828ea3b5366adec2b58206f2ee84995fe030075',
+      hashType: 'data1',
+      args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
+    };
+    expect(isClusterSporeTypeSupported(clusterMainnetType, true)).toBe(true);
+
+    const sporeTestnetType: CKBComponents.Script = {
+      codeHash: '0x685a60219309029d01310311dba953d67029170ca4848a4ff638e57002130a0d',
+      hashType: 'data1',
+      args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
+    };
+    expect(isClusterSporeTypeSupported(sporeTestnetType, false)).toBe(true);
+
+    const sporeMainnetType: CKBComponents.Script = {
+      codeHash: '0x4a4dce1df3dffff7f8b2cd7dff7303df3b6150c9788cb75dcf6747247132b9f5',
+      hashType: 'data1',
+      args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
+    };
+    expect(isTypeAssetSupported(sporeMainnetType, true)).toBe(true);
+
+    const sporeMainnetErrorType: CKBComponents.Script = {
+      codeHash: '0x50bd8d6680b8b9cf98b73f3c08faf8b2a21914311954118ad6609be6e78a1b95',
+      hashType: 'type',
+      args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
+    };
+    expect(isTypeAssetSupported(sporeMainnetErrorType, true)).toBe(false);
+  });
+
   it('isTypeAssetSupported', () => {
     const xudtTestnetType: CKBComponents.Script = {
       codeHash: '0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb',
@@ -52,6 +90,20 @@ describe('ckb tx utils', () => {
       args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
     };
     expect(isTypeAssetSupported(xudtMainnetType, true)).toBe(true);
+
+    const sporeTestnetType: CKBComponents.Script = {
+      codeHash: '0x685a60219309029d01310311dba953d67029170ca4848a4ff638e57002130a0d',
+      hashType: 'data1',
+      args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
+    };
+    expect(isTypeAssetSupported(sporeTestnetType, false)).toBe(true);
+
+    const sporeMainnetType: CKBComponents.Script = {
+      codeHash: '0x4a4dce1df3dffff7f8b2cd7dff7303df3b6150c9788cb75dcf6747247132b9f5',
+      hashType: 'data1',
+      args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
+    };
+    expect(isTypeAssetSupported(sporeMainnetType, true)).toBe(true);
 
     const xudtMainnetErrorType: CKBComponents.Script = {
       codeHash: '0x50bd8d6680b8b9cf98b73f3c08faf8b2a21914311954118ad6609be6e78a1b95',

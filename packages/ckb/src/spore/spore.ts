@@ -1,6 +1,11 @@
 import { RgbppCkbVirtualTx } from '../types/rgbpp';
 import { packRawSporeData } from '@spore-sdk/core';
-import { append0x, calculateRgbppSporeCellCapacity, calculateTransactionFee } from '../utils';
+import {
+  append0x,
+  calculateRgbppSporeCellCapacity,
+  calculateTransactionFee,
+  isClusterSporeTypeSupported,
+} from '../utils';
 import { buildPreLockArgs, calculateCommitment, genRgbppLockScript } from '../utils/rgbpp';
 import {
   AppendIssuerCellToSporeCreate,
@@ -8,7 +13,6 @@ import {
   Hex,
   SporeCreateVirtualTxResult,
   SporeTransferVirtualTxResult,
-  SporeVirtualTxResult,
   TransferSporeCkbVirtualTxParams,
 } from '../types';
 import {
@@ -30,7 +34,7 @@ import {
   NoLiveCellError,
   NoRgbppLiveCellError,
   RgbppUtxoBindMultiSporesError,
-  RgbppSporeTypeMismatchError,
+  TypeAssetNotSupportedError,
 } from '../error';
 import {
   addressToScript,
@@ -65,7 +69,15 @@ export const genCreateSporeCkbVirtualTx = async ({
   if (!clusterCells || clusterCells.length === 0) {
     throw new NoRgbppLiveCellError('No cluster rgbpp cells found with the cluster rgbpp lock args');
   }
+  if (clusterCells.length > 1) {
+    throw new RgbppUtxoBindMultiSporesError('The UTXO is bound to multiple clusters');
+  }
   const clusterCell = clusterCells[0];
+
+  if (!clusterCell.output.type || !isClusterSporeTypeSupported(clusterCell.output.type, isMainnet)) {
+    throw new TypeAssetNotSupportedError('The type script asset is not supported now');
+  }
+
   const sumInputsCapacity = clusterCell.output.capacity;
 
   const inputs: CKBComponents.CellInput[] = [

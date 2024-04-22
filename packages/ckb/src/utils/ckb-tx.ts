@@ -1,7 +1,13 @@
 import { calculateTransactionFee as calculateTxFee } from '@nervosnetwork/ckb-sdk-utils/lib/calculateTransactionFee';
 import { RawClusterData, packRawClusterData, SporeDataProps, packRawSporeData } from '@spore-sdk/core';
 import { remove0x, u64ToLe } from './hex';
-import { CKB_UNIT, UNLOCKABLE_LOCK_SCRIPT, getXudtTypeScript } from '../constants';
+import {
+  CKB_UNIT,
+  UNLOCKABLE_LOCK_SCRIPT,
+  getClusterTypeScript,
+  getSporeTypeScript,
+  getXudtTypeScript,
+} from '../constants';
 import { Hex, RgbppTokenInfo } from '../types';
 import { PERSONAL, blake2b, hexToBytes, serializeInput, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { encodeRgbppTokenInfo, genBtcTimeLockScript } from './rgbpp';
@@ -12,14 +18,27 @@ export const calculateTransactionFee = (txSize: number, feeRate?: bigint): bigin
   return BigInt(fee);
 };
 
-export const isTypeAssetSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
-  const xudtType = getXudtTypeScript(isMainnet);
-  const typeAsset = {
+export const isUDTTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
+  const xudtType = serializeScript(getXudtTypeScript(isMainnet));
+  const typeAsset = serializeScript({
     ...type,
     args: '',
-  };
-  const isXudt = serializeScript(xudtType) === serializeScript(typeAsset);
-  return isXudt;
+  });
+  return xudtType === typeAsset;
+};
+
+export const isClusterSporeTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
+  const sporeType = serializeScript(getSporeTypeScript(isMainnet));
+  const typeAsset = serializeScript({
+    ...type,
+    args: '',
+  });
+  const clusterType = serializeScript(getClusterTypeScript(isMainnet));
+  return sporeType === typeAsset || clusterType === typeAsset;
+};
+
+export const isTypeAssetSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
+  return isUDTTypeSupported(type, isMainnet) || isClusterSporeTypeSupported(type, isMainnet);
 };
 
 // The BTC_TIME_CELL_INCREASED_SIZE is related to the specific lock script.

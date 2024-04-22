@@ -6,7 +6,7 @@ import {
   calculateRgbppCellCapacity,
   calculateTransactionFee,
   isLockArgsSizeExceeded,
-  isTypeAssetSupported,
+  isUDTTypeSupported,
   u128ToLe,
 } from '../utils';
 import {
@@ -50,7 +50,7 @@ export const genBtcJumpCkbVirtualTx = async ({
   const isMainnet = toCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
 
-  if (!isTypeAssetSupported(xudtType, isMainnet)) {
+  if (!isUDTTypeSupported(xudtType, isMainnet)) {
     throw new TypeAssetNotSupportedError('The type script asset is not supported now');
   }
 
