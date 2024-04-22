@@ -17,7 +17,7 @@
   ],
   "dependencies": {
     "@bitcoinerlab/secp256k1": "^1.1.1",
-    "@ckb-lumos/lumos": "0.22.1",
+    "@ckb-lumos/codec": "0.22.2",
     "@mempool/mempool.js": "^2.3.0",
     "@nervosnetwork/ckb-types": "^0.109.1",
     "@rgbpp-sdk/ckb": "workspace:^",

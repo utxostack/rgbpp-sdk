@@ -1,5 +1,5 @@
-import { Cell } from '@ckb-lumos/lumos';
-import { blockchain, bytes } from '@ckb-lumos/lumos/codec';
+import { Cell, blockchain } from '@ckb-lumos/base';
+import { bytes } from '@ckb-lumos/codec';
 import { describe, expect, it } from 'vitest';
 import { BtcAssetsApiError, BtcAssetsApi, ErrorCodes, ErrorMessages } from '../src';
 
@@ -248,13 +248,13 @@ function expectCell(cell: Cell) {
   expect(cell.cellOutput.lock.args).toBeTypeOf('string');
 
   expect(cell.cellOutput.type).toBeDefined();
-  expect(cell.cellOutput.type.codeHash).toBeTypeOf('string');
-  expect(cell.cellOutput.type.hashType).toBeTypeOf('string');
-  expect(cell.cellOutput.type.args).toBeTypeOf('string');
+  expect(cell.cellOutput.type?.codeHash).toBeTypeOf('string');
+  expect(cell.cellOutput.type?.hashType).toBeTypeOf('string');
+  expect(cell.cellOutput.type?.args).toBeTypeOf('string');
 
   expect(cell.outPoint).toBeDefined();
-  expect(cell.outPoint.txHash).toBeTypeOf('string');
-  expect(cell.outPoint.index).toBeTypeOf('string');
+  expect(cell.outPoint?.txHash).toBeTypeOf('string');
+  expect(cell.outPoint?.index).toBeTypeOf('string');
 
   expect(cell.data).toBeTypeOf('string');
 }

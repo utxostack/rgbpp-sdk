@@ -16,7 +16,8 @@
     "lib"
   ],
   "dependencies": {
-    "@ckb-lumos/lumos": "0.22.0-next.5",
+    "@ckb-lumos/codec": "0.22.2",
+    "@ckb-lumos/base": "0.22.2",
     "@nervosnetwork/ckb-types": "^0.109.1",
     "lodash": "^4.17.21"
   },
