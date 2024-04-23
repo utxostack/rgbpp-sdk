@@ -60,9 +60,10 @@ const createSpore = async ({ clusterRgbppLockArgs, receivers }: Params) => {
 
   const ckbVirtualTxResult = await genCreateSporeCkbVirtualTx({
     collector,
-    sporeDataList: receivers.map(receiver => receiver.sporeData),
+    sporeDataList: receivers.map((receiver) => receiver.sporeData),
     clusterRgbppLockArgs,
-    isMainnet
+    isMainnet,
+    ckbFeeRate: BigInt(5000),
   });
 
   const { commitment, ckbRawTx, sumInputsCapacity, clusterCell } = ckbVirtualTxResult;

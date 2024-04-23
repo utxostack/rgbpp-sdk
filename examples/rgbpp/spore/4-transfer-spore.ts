@@ -53,6 +53,7 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress }: { sporeRgbppL
     sporeRgbppLockArgs,
     sporeTypeBytes,
     isMainnet,
+    ckbFeeRate: BigInt(5000),
   });
 
   const { commitment, ckbRawTx, sporeCell } = ckbVirtualTxResult;

@@ -44,7 +44,8 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
     collector,
     rgbppLockArgs: ownerRgbppLockArgs,
     clusterData: CLUSTER_DATA,
-    isMainnet
+    isMainnet,
+    ckbFeeRate: BigInt(5000)
   });
 
   const { commitment, ckbRawTx, clusterId } = ckbVirtualTxResult;
