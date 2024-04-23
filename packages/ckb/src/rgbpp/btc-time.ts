@@ -37,9 +37,9 @@ export const buildBtcTimeUnlockWitness = (btcTxProof: Hex): Hex => {
 };
 
 /**
- * Collect btc time cells and spend them to create xudt cells for the specific lock scripts in the btc time lock args
+ * Collect btc time cells and spend them to create xUDT cells for the specific lock scripts in the btc time lock args
  * The btc time lock args data structure is: lock_script | after | new_bitcoin_tx_id
- * @param btcTimeCellPairs The pairs of the BTC time cell and the related btc tx(which is in the BTC time cell lock args) index in the block
+ * @param btcTimeCells The BTC time cells of xUDT
  * @param btcAssetsApi BTC Assets Api
  * @param isMainnet
  */
@@ -128,13 +128,15 @@ export const signBtcTimeCellSpentTx = async ({
   ckbFeeRate,
 }: SignBtcTimeCellsTxParams): Promise<CKBComponents.RawTransaction> => {
   const masterLock = addressToScript(masterCkbAddress);
-  const emptyCells = await collector.getCells({
+  let emptyCells = await collector.getCells({
     lock: masterLock,
+    isDataEmpty: true,
     outputCapacityRange,
   });
   if (!emptyCells || emptyCells.length === 0) {
     throw new Error('No empty cell found');
   }
+  emptyCells = emptyCells.filter((cell) => !cell.output.type);
   const emptyInput: CKBComponents.CellInput = {
     previousOutput: emptyCells[0].outPoint,
     since: '0x0',
