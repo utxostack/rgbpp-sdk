@@ -6,11 +6,12 @@ import {
   calculateTransactionFee,
   isClusterSporeTypeSupported,
 } from '../utils';
-import { buildPreLockArgs, calculateCommitment, genRgbppLockScript } from '../utils/rgbpp';
+import { buildPreLockArgs, calculateCommitment, genBtcTimeLockScript, genRgbppLockScript } from '../utils/rgbpp';
 import {
   AppendIssuerCellToSporeCreate,
   CreateSporeCkbVirtualTxParams,
   Hex,
+  LeapSporeFromBtcToCkbVirtualTxParams,
   SporeCreateVirtualTxResult,
   SporeTransferVirtualTxResult,
   TransferSporeCkbVirtualTxParams,
@@ -250,6 +251,7 @@ export const appendIssuerCellToSporesCreate = async ({
  * Generate the virtual ckb transaction for transferring spore
  * @param collector The collector that collects CKB live cells and transactions
  * @param sporeRgbppLockArgs The spore rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
+ * @param sporeTypeBytes The spore type script serialized bytes
  * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  */
@@ -294,6 +296,95 @@ export const genTransferSporeCkbVirtualTx = async ({
       ...sporeCell.output,
       // The BTC transaction Vouts[0] for OP_RETURN, Vouts[1] for spore
       lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
+    },
+  ];
+  const outputsData: Hex[] = [sporeCell.outputData];
+  const cellDeps = [getRgbppLockDep(isMainnet), getRgbppLockConfigDep(isMainnet), getSporeTypeDep(isMainnet)];
+  const sporeCoBuild = generateSporeTransferCoBuild(sporeCell, outputs[0]);
+  const witnesses = [RGBPP_WITNESS_PLACEHOLDER, sporeCoBuild];
+
+  const ckbRawTx: CKBComponents.RawTransaction = {
+    version: '0x0',
+    cellDeps,
+    headerDeps: [],
+    inputs,
+    outputs,
+    outputsData,
+    witnesses,
+  };
+
+  let changeCapacity = BigInt(sporeCell.output.capacity);
+  const txSize = getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? RGBPP_TX_WITNESS_MAX_SIZE);
+  const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
+  changeCapacity -= estimatedTxFee;
+
+  ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
+
+  const virtualTx: RgbppCkbVirtualTx = {
+    ...ckbRawTx,
+  };
+  const commitment = calculateCommitment(virtualTx);
+
+  return {
+    ckbRawTx,
+    commitment,
+    sporeCell,
+    needPaymasterCell: false,
+    sumInputsCapacity: sporeCell.output.capacity,
+  };
+};
+
+/**
+ * Generate the virtual ckb transaction for leaping spore from BTC to CKB
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param sporeRgbppLockArgs The spore rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
+ * @param sporeTypeBytes The spore type script serialized bytes
+ * @param toCkbAddress The receiver ckb address
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ */
+export const genLeapSporeFromBtcToCkbVirtualTx = async ({
+  collector,
+  sporeRgbppLockArgs,
+  sporeTypeBytes,
+  toCkbAddress,
+  isMainnet,
+  witnessLockPlaceholderSize,
+  ckbFeeRate,
+}: LeapSporeFromBtcToCkbVirtualTxParams): Promise<SporeTransferVirtualTxResult> => {
+  const sporeRgbppLock = {
+    ...getRgbppLockScript(isMainnet),
+    args: append0x(sporeRgbppLockArgs),
+  };
+  const sporeCells = await collector.getCells({ lock: sporeRgbppLock, isDataEmpty: false });
+  if (!sporeCells || sporeCells.length === 0) {
+    throw new NoRgbppLiveCellError('No spore rgbpp cells found with the spore rgbpp lock args');
+  }
+  if (sporeCells.length > 1) {
+    throw new RgbppUtxoBindMultiSporesError('The UTXO is bound to multiple spores');
+  }
+  const sporeCell = sporeCells[0];
+
+  if (!sporeCell.output.type) {
+    throw new RgbppUtxoBindMultiSporesError('The cell with the rgbpp lock args has no spore asset');
+  }
+
+  if (append0x(serializeScript(sporeCell.output.type)) !== append0x(sporeTypeBytes)) {
+    throw new RgbppUtxoBindMultiSporesError('The cell type with the rgbpp lock args does not match');
+  }
+
+  const inputs: CKBComponents.CellInput[] = [
+    {
+      previousOutput: sporeCell.outPoint,
+      since: '0x0',
+    },
+  ];
+
+  const toLock = addressToScript(toCkbAddress);
+  const outputs: CKBComponents.CellOutput[] = [
+    {
+      ...sporeCell.output,
+      lock: genBtcTimeLockScript(toLock, isMainnet),
     },
   ];
   const outputsData: Hex[] = [sporeCell.outputData];
