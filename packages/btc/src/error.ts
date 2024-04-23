@@ -14,6 +14,7 @@ export enum ErrorCodes {
   UNSUPPORTED_ADDRESS_TYPE,
   UNSUPPORTED_OP_RETURN_SCRIPT,
   INVALID_FEE_RATE,
+  PAYMASTER_MISMATCH,
 
   CKB_CANNOT_FIND_OUTPOINT = 40,
   CKB_INVALID_CELL_LOCK,
@@ -41,6 +42,7 @@ export const ErrorMessages = {
   [ErrorCodes.UNSUPPORTED_ADDRESS_TYPE]: 'Unsupported address type',
   [ErrorCodes.UNSUPPORTED_OP_RETURN_SCRIPT]: 'Unsupported OP_RETURN script format',
   [ErrorCodes.INVALID_FEE_RATE]: 'Invalid fee rate provided or recommended',
+  [ErrorCodes.PAYMASTER_MISMATCH]: 'Paymaster mismatched',
 
   [ErrorCodes.CKB_CANNOT_FIND_OUTPOINT]: 'Cannot find CKB cell by OutPoint, it may not exist or is not live',
   [ErrorCodes.CKB_INVALID_CELL_LOCK]: 'Invalid CKB cell lock, it should be RgbppLock, RgbppTimeLock or null',

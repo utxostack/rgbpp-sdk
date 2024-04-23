@@ -1,5 +1,5 @@
 import { FeesRecommended } from '@mempool/mempool.js/lib/interfaces/bitcoin/fees';
-import { BtcApiUtxoParams, BtcAssetsApi } from '@rgbpp-sdk/service';
+import { BtcApiUtxoParams, BtcAssetsApi, BtcAssetsApiError, ErrorCodes as ServiceErrorCodes } from '@rgbpp-sdk/service';
 import { Output, Utxo } from '../transaction/utxo';
 import { NetworkType } from '../preset/types';
 import { ErrorCodes, TxBuildError } from '../error';
@@ -7,6 +7,7 @@ import { isOpReturnScriptPubkey } from '../transaction/embed';
 import { addressToScriptPublicKeyHex, getAddressType } from '../address';
 import { createMempool, MempoolInstance } from './mempool';
 import { remove0x } from '../utils';
+import { TxAddressOutput } from '../transaction/build';
 
 export class DataSource {
   public service: BtcAssetsApi;
@@ -164,5 +165,20 @@ export class DataSource {
   async getAverageFeeRate(): Promise<number> {
     const fees = await this.getRecommendedFeeRates();
     return fees.halfHourFee;
+  }
+
+  async getPaymasterOutput(): Promise<TxAddressOutput | undefined> {
+    try {
+      const paymasterInfo = await this.service.getRgbppPaymasterInfo();
+      return {
+        address: paymasterInfo.btc_address,
+        value: paymasterInfo.fee,
+      };
+    } catch (err) {
+      if (err instanceof BtcAssetsApiError && err.code === ServiceErrorCodes.ASSETS_API_RESOURCE_NOT_FOUND) {
+        return undefined;
+      }
+      throw err;
+    }
   }
 }

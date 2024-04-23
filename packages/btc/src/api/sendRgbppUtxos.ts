@@ -127,29 +127,7 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
     throw new TxBuildError(ErrorCodes.CKB_UNMATCHED_COMMITMENT);
   }
 
-  const mergedBtcOutputs = (() => {
-    const merged: InitOutput[] = [];
-
-    // Add commitment to the beginning of outputs
-    merged.push({
-      data: props.commitment,
-      fixed: true,
-      value: 0,
-    });
-
-    // Add outputs
-    merged.push(...btcOutputs);
-
-    // Add paymaster if provided
-    if (props.paymaster) {
-      merged.push({
-        ...props.paymaster,
-        fixed: true,
-      });
-    }
-
-    return merged;
-  })();
+  const mergedBtcOutputs = await getMergedBtcOutputs(btcOutputs, props);
 
   return await createSendUtxosBuilder({
     inputs: btcInputs,
@@ -162,6 +140,38 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
     minUtxoSatoshi: props.minUtxoSatoshi,
     onlyConfirmedUtxos: props.onlyConfirmedUtxos,
   });
+}
+
+async function getMergedBtcOutputs(btcOutputs: InitOutput[], props: SendRgbppUtxosProps): Promise<InitOutput[]> {
+  const merged: InitOutput[] = [];
+
+  // Add commitment to the beginning of outputs
+  merged.push({
+    data: props.commitment,
+    fixed: true,
+    value: 0,
+  });
+
+  // Add outputs
+  merged.push(...btcOutputs);
+
+  // Add paymaster UTXO
+  const paymasterOutput = await props.source.getPaymasterOutput();
+  if (
+    paymasterOutput &&
+    props.paymaster &&
+    (paymasterOutput?.address !== props.paymaster.address || paymasterOutput?.value !== props.paymaster.value)
+  ) {
+    throw new TxBuildError(ErrorCodes.PAYMASTER_MISMATCH);
+  }
+  if (paymasterOutput || props.paymaster) {
+    merged.push({
+      ...(paymasterOutput ?? props.paymaster)!,
+      fixed: true,
+    });
+  }
+
+  return merged;
 }
 
 export async function sendRgbppUtxos(props: SendRgbppUtxosProps): Promise<bitcoin.Psbt> {
