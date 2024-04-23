@@ -201,3 +201,70 @@ export const buildSporeBtcTimeCellsSpentTx = async ({
 
   return ckbTx;
 };
+
+/**
+ * Generate the virtual ckb transaction for leaping spore from CKB to BTC
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param sporeRgbppLockArgs The spore rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
+ * @param sporeTypeBytes The spore type script serialized bytes
+ * @param toCkbAddress The receiver ckb address
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ */
+export const genLeapSporeFromCkbToBtcVirtualTx = async ({
+  collector,
+  sporeTypeBytes,
+  fromCkbAddress,
+  toRgbppLockArgs,
+  isMainnet,
+  witnessLockPlaceholderSize,
+  ckbFeeRate,
+}: LeapSporeFromCkbToBtcVirtualTxParams): Promise<CKBComponents.RawTransaction> => {
+  const fromLock = addressToScript(fromCkbAddress);
+  const sporeType = blockchain.Script.unpack(sporeTypeBytes) as CKBComponents.Script;
+  const sporeCells = await collector.getCells({ lock: fromLock, type: sporeType });
+  if (!sporeCells || sporeCells.length === 0) {
+    throw new NoRgbppLiveCellError('No spore rgbpp cells found with the spore rgbpp lock args and spore type script');
+  }
+  const sporeCell = sporeCells[0];
+
+  const inputs: CKBComponents.CellInput[] = [
+    {
+      previousOutput: sporeCell.outPoint,
+      since: '0x0',
+    },
+  ];
+
+  const outputs: CKBComponents.CellOutput[] = [
+    {
+      ...sporeCell.output,
+      lock: {
+        ...getRgbppLockScript(isMainnet),
+        args: append0x(toRgbppLockArgs),
+      },
+    },
+  ];
+  const outputsData: Hex[] = [sporeCell.outputData];
+  const cellDeps = [getRgbppLockDep(isMainnet), getRgbppLockConfigDep(isMainnet), getSporeTypeDep(isMainnet)];
+  const sporeCoBuild = generateSporeTransferCoBuild([sporeCell], outputs);
+  const witnesses = [RGBPP_WITNESS_PLACEHOLDER, sporeCoBuild];
+
+  const ckbRawTx: CKBComponents.RawTransaction = {
+    version: '0x0',
+    cellDeps,
+    headerDeps: [],
+    inputs,
+    outputs,
+    outputsData,
+    witnesses,
+  };
+
+  let changeCapacity = BigInt(sporeCell.output.capacity);
+  const txSize = getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? RGBPP_TX_WITNESS_MAX_SIZE);
+  const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
+  changeCapacity -= estimatedTxFee;
+
+  ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
+
+  return ckbRawTx;
+};
