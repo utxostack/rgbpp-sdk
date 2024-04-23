@@ -42,7 +42,7 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress }: { sporeRgbppL
   const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, BTC_ASSETS_ORIGIN);
   const source = new DataSource(service, networkType);
 
-  // The spore type script is from 3-create-spore.ts, you can find it from the ckb tx spore output cell
+  // The spore type script is from 3-create-spore.ts, you can find it from the ckb tx spore output cells
   const sporeTypeBytes = serializeScript({
     ...getSporeTypeScript(isMainnet),
     args: '0x205fe15af04e59d3ff1ff8e0b0a1e3bc201af406a38964760c24848ed6029b6b',
@@ -94,7 +94,7 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress }: { sporeRgbppL
       });
 
       // Replace cobuild witness with the final rgbpp lock script
-      ckbTx.witnesses[ckbTx.witnesses.length - 1] = generateSporeTransferCoBuild(sporeCell, ckbTx.outputs[0]);
+      ckbTx.witnesses[ckbTx.witnesses.length - 1] = generateSporeTransferCoBuild([sporeCell], ckbTx.outputs);
 
       // console.log('ckbTx: ', JSON.stringify(ckbTx));
 
