@@ -33,7 +33,7 @@ interface Params {
   }[];
 }
 
-const createSpore = async ({ clusterRgbppLockArgs, receivers }: Params) => {
+const createSpores = async ({ clusterRgbppLockArgs, receivers }: Params) => {
   const collector = new Collector({
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
@@ -140,7 +140,7 @@ const createSpore = async ({ clusterRgbppLockArgs, receivers }: Params) => {
 
 // Use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
-createSpore({
+createSpores({
   // The cluster rgbpp lock args is from 2-create-cluster.ts
   clusterRgbppLockArgs: buildRgbppLockArgs(1, '96bccaadd3c8f59b2411e3d64ae4c1743532415f953fc4f9741a5fd7a0a34483'),
   receivers: [

@@ -93,3 +93,51 @@ npx ts-node examples/rgbpp/local/3-btc-jump-ckb.ts
 ```shell
 npx ts-node examples/rgbpp/local/4-spend-btc-time-cell.ts 
 ```
+
+## Spore Examples
+
+**You can use RGB++ Queue service to complete spore transfer and leap and the examples can be found in `examples/rgbpp/spore/queue`**
+
+### Create cluster cell
+
+```shell
+npx ts-node examples/rgbpp/spore/1-prepare-cluster.ts
+
+npx ts-node examples/rgbpp/spore/2-create-cluster.ts
+```
+
+### Create spores with cluster on BTC
+
+```shell
+npx ts-node examples/rgbpp/spore/3-create-spores.ts
+```
+
+### Transfer spore on BTC
+
+```shell
+npx ts-node examples/rgbpp/spore/4-transfer-spore.ts
+```
+
+### Leap spore from BTC to CKB
+
+```shell
+npx ts-node examples/rgbpp/spore/5-leap-spore-to-ckb.ts
+```
+
+### Unlock spore BTC time cells on CKB
+
+A cron job in RGB++ Queue service will construct a transaction unlocking the mature BTC time cells to the their `target_ckb_address`.
+
+However, you can still manually unlock the spore btc time cell through the following command
+
+**Warning: Wait at least 6 BTC confirmation blocks to unlock the BTC time cells after 5-leap-spore-to-ckb.ts**
+
+```shell
+npx ts-node examples/rgbpp/spore/6-unlock-btc-time-cell.ts
+```
+
+### Leap spore from CKB to BTC
+
+```shell
+npx ts-node examples/rgbpp/spore/7-leap-spore-to-btc.ts
+```
