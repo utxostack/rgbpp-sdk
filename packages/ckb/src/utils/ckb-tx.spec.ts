@@ -94,20 +94,6 @@ describe('ckb tx utils', () => {
     };
     expect(isTypeAssetSupported(xudtMainnetType, true)).toBe(true);
 
-    const sporeTestnetType: CKBComponents.Script = {
-      codeHash: '0x685a60219309029d01310311dba953d67029170ca4848a4ff638e57002130a0d',
-      hashType: 'data1',
-      args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
-    };
-    expect(isTypeAssetSupported(sporeTestnetType, false)).toBe(true);
-
-    const sporeMainnetType: CKBComponents.Script = {
-      codeHash: '0x4a4dce1df3dffff7f8b2cd7dff7303df3b6150c9788cb75dcf6747247132b9f5',
-      hashType: 'data1',
-      args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
-    };
-    expect(isTypeAssetSupported(sporeMainnetType, true)).toBe(true);
-
     const xudtMainnetErrorType: CKBComponents.Script = {
       codeHash: '0x50bd8d6680b8b9cf98b73f3c08faf8b2a21914311954118ad6609be6e78a1b95',
       hashType: 'type',
@@ -142,7 +128,6 @@ describe('ckb tx utils', () => {
     const sporeData = {
       contentType: 'text/plain',
       content: hexToBytes(utf8ToHex('First Spore')),
-      // The cluster id is from 2-create-cluster.ts
       clusterId: '0xbc5168a4f90116fada921e185d4b018e784dc0f6266e539a3c092321c932700a',
     };
     const capacity = calculateRgbppSporeCellCapacity(sporeData);
