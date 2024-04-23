@@ -7,7 +7,6 @@ import {
   getSporeTypeScript,
   Hex,
   generateSporeTransferCoBuild,
-  genTransferSporeCkbVirtualTx,
   genLeapSporeFromBtcToCkbVirtualTx,
 } from '@rgbpp-sdk/ckb';
 import { DataSource, ECPair, bitcoin, NetworkType, sendRgbppUtxos, transactionToHex } from '@rgbpp-sdk/btc';
@@ -49,10 +48,10 @@ const transferSpore = async ({
   const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, BTC_ASSETS_ORIGIN);
   const source = new DataSource(service, networkType);
 
-  // The spore type script is from 3-create-spore.ts, you can find it from the ckb tx spore output cell
+  // The spore type script is from 3-create-spore.ts, you can find it from the ckb tx spore output cells
   const sporeTypeBytes = serializeScript({
     ...getSporeTypeScript(isMainnet),
-    args: '0x205fe15af04e59d3ff1ff8e0b0a1e3bc201af406a38964760c24848ed6029b6b',
+    args: '0x42898ea77062256f46e8f1b861d526ae47810ecc51ab50477945d5fa90452706',
   });
 
   const ckbVirtualTxResult = await genLeapSporeFromBtcToCkbVirtualTx({
@@ -75,7 +74,7 @@ const transferSpore = async ({
     ckbCollector: collector,
     from: btcAddress!,
     source,
-    feeRate: 30,
+    feeRate: 120,
   });
   psbt.signAllInputs(keyPair);
   psbt.finalizeAllInputs();
@@ -101,7 +100,7 @@ const transferSpore = async ({
       });
 
       // Replace cobuild witness with the final rgbpp lock script
-      ckbTx.witnesses[ckbTx.witnesses.length - 1] = generateSporeTransferCoBuild(sporeCell, ckbTx.outputs[0]);
+      ckbTx.witnesses[ckbTx.witnesses.length - 1] = generateSporeTransferCoBuild([sporeCell], ckbTx.outputs);
 
       // console.log('ckbTx: ', JSON.stringify(ckbTx));
 
@@ -119,6 +118,6 @@ const transferSpore = async ({
 // rgbppLockArgs: outIndexU32 + btcTxId
 transferSpore({
   // The spore rgbpp lock args is from 3-create-spore.ts
-  sporeRgbppLockArgs: buildRgbppLockArgs(1, 'f203c8c13eacdbd126f85d286a963c85f233f8145363b1d997c4d552afb990e1'),
+  sporeRgbppLockArgs: buildRgbppLockArgs(3, 'd8a31796fbd42c546f6b22014b9b82b16586ce1df81b0e7ca9a552cdc492a0af'),
   toCkbAddress: 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq0e4xk4rmg5jdkn8aams492a7jlg73ue0gc0ddfj',
 });
