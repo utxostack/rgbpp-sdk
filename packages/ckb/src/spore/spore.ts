@@ -1,16 +1,24 @@
 import { RgbppCkbVirtualTx } from '../types/rgbpp';
 import { packRawSporeData } from '@spore-sdk/core';
-import { append0x, calculateRgbppSporeCellCapacity, calculateTransactionFee } from '../utils';
+import {
+  append0x,
+  calculateRgbppSporeCellCapacity,
+  calculateTransactionFee,
+  isClusterSporeTypeSupported,
+} from '../utils';
 import { buildPreLockArgs, calculateCommitment, genRgbppLockScript } from '../utils/rgbpp';
 import {
   AppendIssuerCellToSporeCreate,
   CreateSporeCkbVirtualTxParams,
   Hex,
   SporeCreateVirtualTxResult,
+  SporeTransferVirtualTxResult,
+  TransferSporeCkbVirtualTxParams,
 } from '../types';
 import {
   MAX_FEE,
   MIN_CAPACITY,
+  RGBPP_TX_WITNESS_MAX_SIZE,
   RGBPP_WITNESS_PLACEHOLDER,
   SECP256K1_WITNESS_LOCK_SIZE,
   getClusterTypeDep,
@@ -21,14 +29,20 @@ import {
   getSporeTypeDep,
   getSporeTypeScript,
 } from '../constants';
-import { generateSporeCreateCoBuild, generateSporeId } from '../utils/spore';
-import { NoLiveCellError, NoRgbppLiveCellError } from '../error';
+import { generateSporeCreateCoBuild, generateSporeId, generateSporeTransferCoBuild } from '../utils/spore';
+import {
+  NoLiveCellError,
+  NoRgbppLiveCellError,
+  RgbppUtxoBindMultiSporesError,
+  TypeAssetNotSupportedError,
+} from '../error';
 import {
   addressToScript,
   bytesToHex,
   getTransactionSize,
   rawTransactionToHash,
   scriptToHash,
+  serializeScript,
   serializeWitnessArgs,
 } from '@nervosnetwork/ckb-sdk-utils';
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
@@ -55,7 +69,15 @@ export const genCreateSporeCkbVirtualTx = async ({
   if (!clusterCells || clusterCells.length === 0) {
     throw new NoRgbppLiveCellError('No cluster rgbpp cells found with the cluster rgbpp lock args');
   }
+  if (clusterCells.length > 1) {
+    throw new RgbppUtxoBindMultiSporesError('The UTXO is bound to multiple clusters');
+  }
   const clusterCell = clusterCells[0];
+
+  if (!clusterCell.output.type || !isClusterSporeTypeSupported(clusterCell.output.type, isMainnet)) {
+    throw new TypeAssetNotSupportedError('The type script asset is not supported now');
+  }
+
   const sumInputsCapacity = clusterCell.output.capacity;
 
   const inputs: CKBComponents.CellInput[] = [
@@ -64,6 +86,11 @@ export const genCreateSporeCkbVirtualTx = async ({
       since: '0x0',
     },
   ];
+
+  const clusterCellDep: CKBComponents.CellDep = {
+    outPoint: clusterCell.outPoint,
+    depType: 'code',
+  };
 
   const sporeOutputs = sporeDataList.map((data, index) => ({
     // The BTC transaction Vouts[0] for OP_RETURN, Vouts[1] for cluster and Vouts[2]... for spore
@@ -91,6 +118,7 @@ export const genCreateSporeCkbVirtualTx = async ({
     getRgbppLockConfigDep(isMainnet),
     getClusterTypeDep(isMainnet),
     getSporeTypeDep(isMainnet),
+    clusterCellDep,
   ];
   const sporeCoBuild = generateSporeCreateCoBuild({
     sporeOutputs,
@@ -216,4 +244,90 @@ export const appendIssuerCellToSporesCreate = async ({
     ),
   };
   return signedTx;
+};
+
+/**
+ * Generate the virtual ckb transaction for transferring spore
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param sporeRgbppLockArgs The spore rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ */
+export const genTransferSporeCkbVirtualTx = async ({
+  collector,
+  sporeRgbppLockArgs,
+  sporeTypeBytes,
+  isMainnet,
+  witnessLockPlaceholderSize,
+  ckbFeeRate,
+}: TransferSporeCkbVirtualTxParams): Promise<SporeTransferVirtualTxResult> => {
+  const sporeRgbppLock = {
+    ...getRgbppLockScript(isMainnet),
+    args: append0x(sporeRgbppLockArgs),
+  };
+  const sporeCells = await collector.getCells({ lock: sporeRgbppLock, isDataEmpty: false });
+  if (!sporeCells || sporeCells.length === 0) {
+    throw new NoRgbppLiveCellError('No spore rgbpp cells found with the spore rgbpp lock args');
+  }
+  if (sporeCells.length > 1) {
+    throw new RgbppUtxoBindMultiSporesError('The UTXO is bound to multiple spores');
+  }
+  const sporeCell = sporeCells[0];
+
+  if (!sporeCell.output.type) {
+    throw new RgbppUtxoBindMultiSporesError('The cell with the rgbpp lock args has no spore asset');
+  }
+
+  if (append0x(serializeScript(sporeCell.output.type)) !== append0x(sporeTypeBytes)) {
+    throw new RgbppUtxoBindMultiSporesError('The cell type with the rgbpp lock args does not match');
+  }
+
+  const inputs: CKBComponents.CellInput[] = [
+    {
+      previousOutput: sporeCell.outPoint,
+      since: '0x0',
+    },
+  ];
+
+  const outputs: CKBComponents.CellOutput[] = [
+    {
+      ...sporeCell.output,
+      // The BTC transaction Vouts[0] for OP_RETURN, Vouts[1] for spore
+      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
+    },
+  ];
+  const outputsData: Hex[] = [sporeCell.outputData];
+  const cellDeps = [getRgbppLockDep(isMainnet), getRgbppLockConfigDep(isMainnet), getSporeTypeDep(isMainnet)];
+  const sporeCoBuild = generateSporeTransferCoBuild(sporeCell, outputs[0]);
+  const witnesses = [RGBPP_WITNESS_PLACEHOLDER, sporeCoBuild];
+
+  const ckbRawTx: CKBComponents.RawTransaction = {
+    version: '0x0',
+    cellDeps,
+    headerDeps: [],
+    inputs,
+    outputs,
+    outputsData,
+    witnesses,
+  };
+
+  let changeCapacity = BigInt(sporeCell.output.capacity);
+  const txSize = getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? RGBPP_TX_WITNESS_MAX_SIZE);
+  const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
+  changeCapacity -= estimatedTxFee;
+
+  ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
+
+  const virtualTx: RgbppCkbVirtualTx = {
+    ...ckbRawTx,
+  };
+  const commitment = calculateCommitment(virtualTx);
+
+  return {
+    ckbRawTx,
+    commitment,
+    sporeCell,
+    needPaymasterCell: false,
+    sumInputsCapacity: sporeCell.output.capacity,
+  };
 };

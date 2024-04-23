@@ -60,9 +60,10 @@ const createSpore = async ({ clusterRgbppLockArgs, receivers }: Params) => {
 
   const ckbVirtualTxResult = await genCreateSporeCkbVirtualTx({
     collector,
-    sporeDataList: receivers.map(receiver => receiver.sporeData),
+    sporeDataList: receivers.map((receiver) => receiver.sporeData),
     clusterRgbppLockArgs,
-    isMainnet
+    isMainnet,
+    ckbFeeRate: BigInt(5000),
   });
 
   const { commitment, ckbRawTx, sumInputsCapacity, clusterCell } = ckbVirtualTxResult;
@@ -145,6 +146,8 @@ createSpore({
       sporeData: {
         contentType: 'text/plain',
         content: utf8ToBuffer('First Spore'),
+        // The cluster id is from 2-create-cluster.ts
+        clusterId: '0xbc5168a4f90116fada921e185d4b018e784dc0f6266e539a3c092321c932700a',
       },
     },
     {
@@ -152,6 +155,8 @@ createSpore({
       sporeData: {
         contentType: 'text/plain',
         content: utf8ToBuffer('Second Spore'),
+        // The cluster id is from 2-create-cluster.ts
+        clusterId: '0xbc5168a4f90116fada921e185d4b018e784dc0f6266e539a3c092321c932700a',
       },
     },
   ],

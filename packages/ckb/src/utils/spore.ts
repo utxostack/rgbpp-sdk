@@ -72,26 +72,18 @@ export const generateSporeCreateCoBuild = ({
 };
 
 export const generateSporeTransferCoBuild = (
-  sporeCells: IndexerCell[] | CKBComponents.LiveCell[],
-  outputCells: CKBComponents.CellOutput[],
+  sporeCell: IndexerCell | CKBComponents.LiveCell,
+  outputCell: CKBComponents.CellOutput,
 ): string => {
-  if (sporeCells.length !== outputCells.length) {
-    throw new Error('The length of spore input cells length and spore output cells are not same');
-  }
-  let sporeActions: any[] = [];
-  for (let index = 0; index < sporeCells.length; index++) {
-    const sporeCell = sporeCells[index];
-    const outputData = 'outputData' in sporeCell ? sporeCell.outputData : sporeCell.data?.content!;
-    const sporeInput = {
-      cellOutput: sporeCells[index].output,
-      data: outputData,
-    } as LumosCell;
-    const sporeOutput = {
-      cellOutput: outputCells[index],
-      data: outputData,
-    } as LumosCell;
-    const { actions } = assembleTransferSporeAction(sporeInput, sporeOutput);
-    sporeActions = sporeActions.concat(actions);
-  }
-  return assembleCobuildWitnessLayout(sporeActions);
+  const outputData = 'outputData' in sporeCell ? sporeCell.outputData : sporeCell.data?.content!;
+  const sporeInput = {
+    cellOutput: sporeCell.output,
+    data: outputData,
+  } as LumosCell;
+  const sporeOutput = {
+    cellOutput: outputCell,
+    data: outputData,
+  } as LumosCell;
+  const { actions } = assembleTransferSporeAction(sporeInput, sporeOutput);
+  return assembleCobuildWitnessLayout(actions);
 };

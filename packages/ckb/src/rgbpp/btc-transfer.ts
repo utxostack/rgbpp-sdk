@@ -7,19 +7,8 @@ import {
   RgbppCkbVirtualTx,
 } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
-import {
-  InputsCapacityNotEnoughError,
-  NoLiveCellError,
-  NoRgbppLiveCellError,
-  TypeAssetNotSupportedError,
-} from '../error';
-import {
-  append0x,
-  calculateRgbppCellCapacity,
-  calculateTransactionFee,
-  isTypeAssetSupported,
-  u128ToLe,
-} from '../utils';
+import { NoLiveCellError, NoRgbppLiveCellError, TypeAssetNotSupportedError } from '../error';
+import { append0x, calculateRgbppCellCapacity, calculateTransactionFee, isUDTTypeSupported, u128ToLe } from '../utils';
 import {
   buildPreLockArgs,
   calculateCommitment,
@@ -32,7 +21,6 @@ import { Hex, IndexerCell } from '../types';
 import {
   MAX_FEE,
   MIN_CAPACITY,
-  RGBPP_TX_WITNESS_MAX_SIZE,
   RGBPP_WITNESS_PLACEHOLDER,
   SECP256K1_WITNESS_LOCK_SIZE,
   getRgbppLockConfigDep,
@@ -73,7 +61,7 @@ export const genBtcTransferCkbVirtualTx = async ({
 }: BtcTransferVirtualTxParams): Promise<BtcTransferVirtualTxResult> => {
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
 
-  if (!isTypeAssetSupported(xudtType, isMainnet)) {
+  if (!isUDTTypeSupported(xudtType, isMainnet)) {
     throw new TypeAssetNotSupportedError('The type script asset is not supported now');
   }
 
@@ -208,7 +196,7 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
 }: BtcBatchTransferVirtualTxParams): Promise<BtcBatchTransferVirtualTxResult> => {
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
 
-  if (!isTypeAssetSupported(xudtType, isMainnet)) {
+  if (!isUDTTypeSupported(xudtType, isMainnet)) {
     throw new TypeAssetNotSupportedError('The type script asset is not supported now');
   }
 
