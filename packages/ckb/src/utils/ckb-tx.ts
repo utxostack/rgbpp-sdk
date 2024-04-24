@@ -128,3 +128,7 @@ export const calculateRgbppSporeCellCapacity = (sporeData: SporeDataProps): bigi
   const cellSize = RGBPP_LOCK_SIZE + sporeTypeSize + 8 + sporeDataSize + BTC_TIME_CELL_INCREASED_SIZE;
   return BigInt(cellSize + 1) * CKB_UNIT;
 };
+
+export const deduplicateList = (rgbppLockArgsList: Hex[]): Hex[] => {
+  return Array.from(new Set(rgbppLockArgsList));
+};

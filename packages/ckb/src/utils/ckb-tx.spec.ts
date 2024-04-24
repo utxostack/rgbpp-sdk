@@ -4,6 +4,7 @@ import {
   calculateRgbppClusterCellCapacity,
   calculateRgbppSporeCellCapacity,
   calculateTransactionFee,
+  deduplicateList,
   generateUniqueTypeArgs,
   isClusterSporeTypeSupported,
   isLockArgsSizeExceeded,
@@ -132,5 +133,13 @@ describe('ckb tx utils', () => {
     };
     const capacity = calculateRgbppSporeCellCapacity(sporeData);
     expect(capacity).toBe(BigInt(319_0000_0000));
+  });
+
+  it('deduplicateList', () => {
+    const rgbppLockArgsList = [
+      '0x01000000c12747f21eb725b02d8ce3fd062547756b30879504093389cd74f9b3cf357f05',
+      '0x01000000c12747f21eb725b02d8ce3fd062547756b30879504093389cd74f9b3cf357f05',
+    ];
+    expect(1).toBe(deduplicateList(rgbppLockArgsList).length);
   });
 });
