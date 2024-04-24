@@ -10,11 +10,11 @@ export interface MempoolConfig {
 
 export const mempoolConfigs: Record<'mainnet' | 'testnet', MempoolConfig> = {
   testnet: {
-    hostname: 'mempool.space',
+    hostname: 'cell.mempool.space',
     network: 'testnet',
   },
   mainnet: {
-    hostname: 'mempool.space',
+    hostname: 'cell.mempool.space',
     network: 'mainnet',
   },
 };
