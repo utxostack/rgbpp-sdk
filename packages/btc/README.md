@@ -369,6 +369,7 @@ interface DataSource {
     address: string;
     targetAmount: number;
     minUtxoSatoshi?: number;
+    onlyNonRgbppUtxos?: boolean;
     onlyConfirmedUtxos?: boolean;
     excludeUtxos?: {
       txid: string;

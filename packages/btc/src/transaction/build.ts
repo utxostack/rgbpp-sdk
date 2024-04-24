@@ -45,14 +45,22 @@ export class TxBuilder {
   source: DataSource;
   config: RgbppBtcConfig;
   networkType: NetworkType;
+  onlyNonRgbppUtxos: boolean;
   onlyConfirmedUtxos: boolean;
   minUtxoSatoshi: number;
   feeRate?: number;
 
-  constructor(props: { source: DataSource; onlyConfirmedUtxos?: boolean; minUtxoSatoshi?: number; feeRate?: number }) {
+  constructor(props: {
+    source: DataSource;
+    onlyNonRgbppUtxos?: boolean;
+    onlyConfirmedUtxos?: boolean;
+    minUtxoSatoshi?: number;
+    feeRate?: number;
+  }) {
     this.source = props.source;
     this.networkType = this.source.networkType;
     this.config = networkTypeToConfig(this.networkType);
+    this.onlyNonRgbppUtxos = props.onlyNonRgbppUtxos ?? true;
     this.onlyConfirmedUtxos = props.onlyConfirmedUtxos ?? false;
     this.minUtxoSatoshi = props.minUtxoSatoshi ?? this.config.btcUtxoDustLimit;
     this.feeRate = props.feeRate;
@@ -220,6 +228,7 @@ export class TxBuilder {
         address: props.address,
         targetAmount: _targetAmount,
         minUtxoSatoshi: this.minUtxoSatoshi,
+        onlyNonRgbppUtxos: this.onlyNonRgbppUtxos,
         onlyConfirmedUtxos: this.onlyConfirmedUtxos,
         excludeUtxos: this.inputs.map((row) => row.utxo),
       });
