@@ -1,6 +1,7 @@
 import { bitcoin } from '../bitcoin';
 import { DataSource } from '../query/source';
 import { InitOutput, TxBuilder } from '../transaction/build';
+import { createSendUtxosBuilder } from './sendUtxos';
 
 export interface SendBtcProps {
   from: string;
@@ -18,31 +19,23 @@ export async function createSendBtcBuilder(props: SendBtcProps): Promise<{
   feeRate: number;
   fee: number;
 }> {
-  const tx = new TxBuilder({
+  // By default, all outputs in the sendBtc() API are fixed
+  const outputs = props.tos.map((to) => ({
+    fixed: true,
+    ...to,
+  }));
+
+  return await createSendUtxosBuilder({
+    inputs: [],
+    outputs: outputs,
+    from: props.from,
     source: props.source,
     feeRate: props.feeRate,
+    fromPubkey: props.fromPubkey,
+    changeAddress: props.changeAddress,
     minUtxoSatoshi: props.minUtxoSatoshi,
     onlyConfirmedUtxos: props.onlyConfirmedUtxos,
   });
-
-  props.tos.forEach((to) => {
-    tx.addOutput({
-      fixed: true,
-      ...to,
-    });
-  });
-
-  const paid = await tx.payFee({
-    address: props.from,
-    publicKey: props.fromPubkey,
-    changeAddress: props.changeAddress,
-  });
-
-  return {
-    builder: tx,
-    fee: paid.fee,
-    feeRate: paid.feeRate,
-  };
 }
 
 export async function sendBtc(props: SendBtcProps): Promise<bitcoin.Psbt> {
