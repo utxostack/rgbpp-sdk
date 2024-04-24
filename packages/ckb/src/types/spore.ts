@@ -101,6 +101,8 @@ export interface SporeTransferVirtualTxResult {
   sumInputsCapacity: Hex;
 }
 
+export interface SporeLeapVirtualTxResult extends SporeTransferVirtualTxResult {}
+
 export interface LeapSporeFromBtcToCkbVirtualTxParams {
   // The collector that collects CKB live cells and transactions
   collector: Collector;

@@ -13,7 +13,7 @@ import {
   Hex,
   LeapSporeFromBtcToCkbVirtualTxParams,
   LeapSporeFromCkbToBtcVirtualTxParams,
-  SporeTransferVirtualTxResult,
+  SporeLeapVirtualTxResult,
 } from '../types';
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
@@ -55,7 +55,7 @@ export const genLeapSporeFromBtcToCkbVirtualTx = async ({
   isMainnet,
   witnessLockPlaceholderSize,
   ckbFeeRate,
-}: LeapSporeFromBtcToCkbVirtualTxParams): Promise<SporeTransferVirtualTxResult> => {
+}: LeapSporeFromBtcToCkbVirtualTxParams): Promise<SporeLeapVirtualTxResult> => {
   const sporeRgbppLock = {
     ...getRgbppLockScript(isMainnet),
     args: append0x(sporeRgbppLockArgs),
@@ -211,7 +211,7 @@ export const buildSporeBtcTimeCellsSpentTx = async ({
  * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  */
-export const genLeapSporeFromCkbToBtcVirtualTx = async ({
+export const genLeapSporeFromCkbToBtcRawTx = async ({
   collector,
   sporeTypeBytes,
   fromCkbAddress,

@@ -1,5 +1,11 @@
 import { AddressPrefix, privateKeyToAddress, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { Collector, getSecp256k1CellDep, buildRgbppLockArgs, getSporeTypeScript, genLeapSporeFromCkbToBtcVirtualTx } from '@rgbpp-sdk/ckb';
+import {
+  Collector,
+  getSecp256k1CellDep,
+  buildRgbppLockArgs,
+  getSporeTypeScript,
+  genLeapSporeFromCkbToBtcRawTx,
+} from '@rgbpp-sdk/ckb';
 
 // CKB SECP256K1 private key
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
@@ -22,7 +28,7 @@ const leapSporeFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; 
     args: '0x42898ea77062256f46e8f1b861d526ae47810ecc51ab50477945d5fa90452706',
   };
 
-  const ckbRawTx = await genLeapSporeFromCkbToBtcVirtualTx({
+  const ckbRawTx = await genLeapSporeFromCkbToBtcRawTx({
     collector,
     fromCkbAddress: address,
     toRgbppLockArgs,
