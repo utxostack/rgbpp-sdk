@@ -8,7 +8,14 @@ import {
 } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
 import { NoLiveCellError, NoRgbppLiveCellError, TypeAssetNotSupportedError } from '../error';
-import { append0x, calculateRgbppCellCapacity, calculateTransactionFee, isUDTTypeSupported, u128ToLe } from '../utils';
+import {
+  append0x,
+  calculateRgbppCellCapacity,
+  calculateTransactionFee,
+  deduplicateList,
+  isUDTTypeSupported,
+  u128ToLe,
+} from '../utils';
 import {
   buildPreLockArgs,
   calculateCommitment,
@@ -65,7 +72,9 @@ export const genBtcTransferCkbVirtualTx = async ({
     throw new TypeAssetNotSupportedError('The type script asset is not supported now');
   }
 
-  const rgbppLocks = rgbppLockArgsList.map((args) => genRgbppLockScript(args, isMainnet));
+  const deduplicatedLockArgsList = deduplicateList(rgbppLockArgsList);
+
+  const rgbppLocks = deduplicatedLockArgsList.map((args) => genRgbppLockScript(args, isMainnet));
   let rgbppCells: IndexerCell[] = [];
   for await (const rgbppLock of rgbppLocks) {
     const cells = await collector.getCells({ lock: rgbppLock, type: xudtType });
@@ -159,7 +168,7 @@ export const genBtcTransferCkbVirtualTx = async ({
 
   if (!needPaymasterCell) {
     const txSize =
-      getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? estimateWitnessSize(rgbppLockArgsList));
+      getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? estimateWitnessSize(deduplicatedLockArgsList));
     const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
 
     changeCapacity -= estimatedTxFee;

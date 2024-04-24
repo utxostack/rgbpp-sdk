@@ -5,6 +5,7 @@ import {
   append0x,
   calculateRgbppCellCapacity,
   calculateTransactionFee,
+  deduplicateList,
   isLockArgsSizeExceeded,
   isUDTTypeSupported,
   u128ToLe,
@@ -54,7 +55,9 @@ export const genBtcJumpCkbVirtualTx = async ({
     throw new TypeAssetNotSupportedError('The type script asset is not supported now');
   }
 
-  const rgbppLocks = rgbppLockArgsList.map((args) => genRgbppLockScript(args, isMainnet));
+  const deduplicatedLockArgsList = deduplicateList(rgbppLockArgsList);
+
+  const rgbppLocks = deduplicatedLockArgsList.map((args) => genRgbppLockScript(args, isMainnet));
   let rgbppCells: IndexerCell[] = [];
   for await (const rgbppLock of rgbppLocks) {
     const cells = await collector.getCells({ lock: rgbppLock, type: xudtType });
@@ -129,7 +132,7 @@ export const genBtcJumpCkbVirtualTx = async ({
 
   if (!needPaymasterCell) {
     const txSize =
-      getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? estimateWitnessSize(rgbppLockArgsList));
+      getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? estimateWitnessSize(deduplicatedLockArgsList));
     const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
 
     changeCapacity -= estimatedTxFee;
