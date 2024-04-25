@@ -24,9 +24,17 @@ This repository offers utilities for Bitcoin and RGB++ asset integration.
 
 1. **Creation of `rgbpp_ckb_tx_virtual` using [@rgbpp-sdk/ckb](https://github.com/ckb-cell/rgbpp-sdk/tree/develop/packages/ckb)**
 
-    1. **[BTC → BTC](https://github.com/ckb-cell/rgbpp-sdk/tree/develop/packages/ckb#rgb-assets-transfer-on-btc)**
-    2. **[BTC → CKB](https://github.com/ckb-cell/rgbpp-sdk/tree/develop/packages/ckb#rgb-assets-jump-from-btc-to-ckb)**
-    3. **[CKB → BTC](https://github.com/ckb-cell/rgbpp-sdk/tree/develop/packages/ckb#rgb-assets-jump-from-ckb-to-btc)** *(isomorphic rgbpp_btc_tx is not required in this workflow)*
+  - xUDT
+
+    1. **[BTC → BTC](https://github.com/ckb-cell/rgbpp-sdk/tree/develop/packages/ckb#rgb-xudt-transfer-on-btc)**
+    2. **[BTC → CKB](https://github.com/ckb-cell/rgbpp-sdk/tree/develop/packages/ckb#rgb-xudt-leap-from-btc-to-ckb)**
+    3. **[CKB → BTC](https://github.com/ckb-cell/rgbpp-sdk/tree/develop/packages/ckb#rgb-xudt-leap-from-ckb-to-btc)** *(isomorphic rgbpp_btc_tx is not required in this workflow)*
+
+  - Spore
+  
+    1. **[BTC → BTC](https://github.com/ckb-cell/rgbpp-sdk/blob/develop/packages/ckb/README.md#rgb-spore-transfer-on-btc)**
+    2. **[BTC → CKB](https://github.com/ckb-cell/rgbpp-sdk/blob/develop/packages/ckb/README.md#rgb-spore-leap-from-btc-to-ckb)**
+    3. **[CKB → BTC](https://github.com/ckb-cell/rgbpp-sdk/blob/develop/packages/ckb/README.md#rgb-spore-leap-from-ckb-to-btc)** *(isomorphic rgbpp_btc_tx is not required in this workflow)*
 
   > [!IMPORTANT]  
   > It's recommended to save the `rgbpp_ckb_tx_virtual` locally in case you need it in the future.
