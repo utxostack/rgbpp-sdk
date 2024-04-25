@@ -6,7 +6,7 @@ import { BtcAssetsApiError, BtcAssetsApi, ErrorCodes, ErrorMessages } from '../s
 describe(
   'BtcServiceApi',
   {
-    retry: 3,
+    retry: 5,
   },
   () => {
     const btcAddress = 'tb1qm06rvrq8jyyckzc5v709u7qpthel9j4d9f7nh3';
