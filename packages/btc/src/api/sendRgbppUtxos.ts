@@ -27,7 +27,12 @@ export interface SendRgbppUtxosProps {
   onlyConfirmedUtxos?: boolean;
 }
 
-export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise<{
+/**
+ * @deprecated Use createSendRgbppUtxosBuilder() API instead.
+ */
+export const sendRgbppUtxosBuilder = createSendRgbppUtxosBuilder;
+
+export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise<{
   builder: TxBuilder;
   feeRate: number;
   fee: number;
@@ -178,6 +183,6 @@ async function getMergedBtcOutputs(btcOutputs: InitOutput[], props: SendRgbppUtx
 }
 
 export async function sendRgbppUtxos(props: SendRgbppUtxosProps): Promise<bitcoin.Psbt> {
-  const { builder } = await sendRgbppUtxosBuilder(props);
+  const { builder } = await createSendRgbppUtxosBuilder(props);
   return builder.toPsbt();
 }
