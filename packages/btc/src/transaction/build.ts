@@ -228,6 +228,7 @@ export class TxBuilder {
       const { utxos, satoshi } = await this.source.collectSatoshi({
         address: props.address,
         targetAmount: _targetAmount,
+        allowInsufficient: true,
         minUtxoSatoshi: this.minUtxoSatoshi,
         onlyNonRgbppUtxos: this.onlyNonRgbppUtxos,
         onlyConfirmedUtxos: this.onlyConfirmedUtxos,
@@ -308,7 +309,7 @@ export class TxBuilder {
     }
     const insufficientForChange = changeAmount > 0 && changeAmount < this.minUtxoSatoshi;
     if (insufficientForChange) {
-      const shiftedExpectAmount = targetAmount + changeUtxoNeedAmount;
+      const shiftedExpectAmount = collected + changeUtxoNeedAmount;
       throw TxBuildError.withComment(
         ErrorCodes.INSUFFICIENT_UTXO,
         `expected: ${shiftedExpectAmount}, actual: ${collected}`,

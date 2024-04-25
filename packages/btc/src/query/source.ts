@@ -105,6 +105,7 @@ export class DataSource {
     address: string;
     targetAmount: number;
     minUtxoSatoshi?: number;
+    allowInsufficient?: boolean;
     onlyNonRgbppUtxos?: boolean;
     onlyConfirmedUtxos?: boolean;
     excludeUtxos?: {
@@ -116,7 +117,15 @@ export class DataSource {
     satoshi: number;
     exceedSatoshi: number;
   }> {
-    const { address, targetAmount, minUtxoSatoshi, onlyConfirmedUtxos, onlyNonRgbppUtxos, excludeUtxos = [] } = props;
+    const {
+      address,
+      targetAmount,
+      minUtxoSatoshi,
+      onlyConfirmedUtxos,
+      onlyNonRgbppUtxos,
+      allowInsufficient = false,
+      excludeUtxos = [],
+    } = props;
     const utxos = await this.getUtxos(address, {
       only_confirmed: onlyConfirmedUtxos,
       min_satoshi: minUtxoSatoshi,
@@ -146,7 +155,7 @@ export class DataSource {
       collectedAmount += utxo.value;
     }
 
-    if (collectedAmount < targetAmount) {
+    if (!allowInsufficient && collectedAmount < targetAmount) {
       throw TxBuildError.withComment(
         ErrorCodes.INSUFFICIENT_UTXO,
         `expected: ${targetAmount}, actual: ${collectedAmount}`,
