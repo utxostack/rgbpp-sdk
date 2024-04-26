@@ -169,13 +169,13 @@ describe(
     });
 
     describe('RGBPP', () => {
-      const rgbppBtcAddress = 'tb1q3k837txmex9p294h6trmzquf9vyx36k740dpv4';
-      const rgbppBtcTxId = 'a7c3f37227a2becbaeb5840be2bdaa33bb4bc88d0ffb5f90f814c92982b8c367';
-      const rgbppBtcVout = 1;
+      const rgbppBtcAddress = 'tb1qwksrmna6emxrerrgyc8hrlxvl2z4x4tdhzzyej';
+      const rgbppBtcTxId = 'da1f32672e3fb0432e1c94ed41298820c8dcca9495cf04a49d992ca4dfc5853d';
+      const rgbppBtcVout = 0;
       const rgbppCellType = bytes.hexify(
         blockchain.Script.pack({
           codeHash: '0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb',
-          args: '0x1ba116c119d1cfd98a53e9d1a615cf2af2bb87d95515c9d217d367054cfc696b',
+          args: '0x661cfbe2124b3e79e50e505c406be5b2dcf9da15d8654b749ec536fa4c2eaaae',
           hashType: 'type',
         }),
       );
