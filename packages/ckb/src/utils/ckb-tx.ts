@@ -11,6 +11,7 @@ import {
 import { Hex, RgbppTokenInfo } from '../types';
 import { PERSONAL, blake2b, hexToBytes, serializeInput, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { encodeRgbppTokenInfo, genBtcTimeLockScript } from './rgbpp';
+import { blockchain } from '@ckb-lumos/base';
 
 export const calculateTransactionFee = (txSize: number, feeRate?: bigint): bigint => {
   const rate = feeRate ?? BigInt(1100);
@@ -131,4 +132,30 @@ export const calculateRgbppSporeCellCapacity = (sporeData: SporeDataProps): bigi
 
 export const deduplicateList = (rgbppLockArgsList: Hex[]): Hex[] => {
   return Array.from(new Set(rgbppLockArgsList));
+};
+
+// Compare the whole script
+export const isScriptEqual = (s1: Hex | CKBComponents.Script, s2: Hex | CKBComponents.Script) => {
+  const temp1 = typeof s1 === 'string' ? remove0x(s1) : remove0x(serializeScript(s1));
+  const temp2 = typeof s2 === 'string' ? remove0x(s2) : remove0x(serializeScript(s2));
+  return temp1 === temp2;
+};
+
+// Only compare the codeHash and hashType of the script
+export const isScriptPartialEqual = (s1: Hex | CKBComponents.Script, s2: Hex | CKBComponents.Script) => {
+  const temp1: CKBComponents.Script = typeof s1 === 'string' ? blockchain.Script.unpack(s1) : s1;
+  const temp2: CKBComponents.Script = typeof s2 === 'string' ? blockchain.Script.unpack(s2) : s2;
+  const partial1 = remove0x(
+    serializeScript({
+      ...temp1,
+      args: '0x',
+    }),
+  );
+  const partial2 = remove0x(
+    serializeScript({
+      ...temp2,
+      args: '0x',
+    }),
+  );
+  return partial1 === partial2;
 };
