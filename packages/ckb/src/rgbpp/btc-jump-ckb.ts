@@ -1,12 +1,14 @@
 import { RgbppCkbVirtualTx, BtcJumpCkbVirtualTxParams, BtcJumpCkbVirtualTxResult } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
-import { NoRgbppLiveCellError, TypeAssetNotSupportedError } from '../error';
+import { NoRgbppLiveCellError, RgbppSporeXudtMixtureError, TypeAssetNotSupportedError } from '../error';
 import {
   append0x,
   calculateRgbppCellCapacity,
   calculateTransactionFee,
   deduplicateList,
   isLockArgsSizeExceeded,
+  isScriptEqual,
+  isScriptPartialEqual,
   isUDTTypeSupported,
   u128ToLe,
 } from '../utils';
@@ -25,6 +27,7 @@ import {
   getRgbppLockConfigDep,
   getRgbppLockDep,
   getSecp256k1CellDep,
+  getSporeTypeScript,
   getXudtDep,
 } from '../constants';
 import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
@@ -59,49 +62,86 @@ export const genBtcJumpCkbVirtualTx = async ({
   const deduplicatedLockArgsList = deduplicateList(rgbppLockArgsList);
 
   const rgbppLocks = deduplicatedLockArgsList.map((args) => genRgbppLockScript(args, isMainnet));
-  let rgbppCells: IndexerCell[] = [];
+  let rgbppTargetCells: IndexerCell[] = [];
+  let rgbppOtherTypeCells: IndexerCell[] = [];
   for await (const rgbppLock of rgbppLocks) {
-    const cells = await collector.getCells({ lock: rgbppLock, type: xudtType });
+    const cells = await collector.getCells({ lock: rgbppLock, isDataEmpty: false });
     if (!cells || cells.length === 0) {
+      throw new NoRgbppLiveCellError('No rgbpp cells found with the rgbpp lock args');
+    }
+    const typeCells = cells.filter((cell) => !!cell.output.type);
+    if (typeCells.length === 0) {
+      throw new NoRgbppLiveCellError('No rgbpp cells found with the rgbpp lock args');
+    }
+    const isSporeExist = typeCells.some((cell) =>
+      isScriptPartialEqual(cell.output.type!, getSporeTypeScript(isMainnet)),
+    );
+    if (isSporeExist) {
+      throw new RgbppSporeXudtMixtureError('One UTXO does not allow binding of Spore and xUDT assets');
+    }
+    const targetCells = typeCells.filter((cell) => isScriptEqual(cell.output.type!, xudtTypeBytes));
+    if (targetCells.length === 0) {
       throw new NoRgbppLiveCellError('No rgbpp cells found with the xudt type script and the rgbpp lock args');
     }
-    rgbppCells = [...rgbppCells, ...cells];
+    const otherTypeCells = typeCells.filter((cell) => !isScriptEqual(cell.output.type!, xudtTypeBytes));
+    rgbppTargetCells = [...rgbppTargetCells, ...targetCells];
+    rgbppOtherTypeCells = [...rgbppOtherTypeCells, ...otherTypeCells];
   }
-  rgbppCells = rgbppCells.sort(compareInputs);
+  rgbppTargetCells = rgbppTargetCells.sort(compareInputs);
+  rgbppOtherTypeCells = rgbppOtherTypeCells.sort(compareInputs);
 
-  const { inputs, sumInputsCapacity, sumAmount } = collector.collectUdtInputs({
-    liveCells: rgbppCells,
+  const {
+    inputs,
+    sumInputsCapacity: sumUdtCapacity,
+    sumAmount,
+  } = collector.collectUdtInputs({
+    liveCells: rgbppTargetCells,
     needAmount: transferAmount,
   });
+  let sumInputsCapacity = sumUdtCapacity;
 
   throwErrorWhenTxInputsExceeded(inputs.length);
 
-  const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
-  const outputsData = [append0x(u128ToLe(transferAmount))];
+  const rgbppCellCapacity = calculateRgbppCellCapacity(xudtType);
 
   const toLock = addressToScript(toCkbAddress);
   if (isLockArgsSizeExceeded(toLock.args)) {
     throw new Error('The lock script size of the to ckb address is too large');
   }
 
-  let changeCapacity = sumInputsCapacity;
+  const needChange = sumAmount > transferAmount;
   const outputs: CKBComponents.CellOutput[] = [
     {
       lock: genBtcTimeLockScript(toLock, isMainnet),
       type: xudtType,
-      capacity: append0x(rpbppCellCapacity.toString(16)),
+      capacity: append0x((needChange ? rgbppCellCapacity : sumInputsCapacity).toString(16)),
     },
   ];
+  const outputsData = [append0x(u128ToLe(transferAmount))];
 
-  if (sumAmount > transferAmount) {
+  if (needChange) {
     outputs.push({
       // The Vouts[0] for OP_RETURN and Vouts[1] for RGBPP assets, BTC time cells don't need btc tx out_index
       lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
       type: xudtType,
-      capacity: append0x(rpbppCellCapacity.toString(16)),
+      capacity: append0x((sumInputsCapacity - rgbppCellCapacity).toString(16)),
     });
     outputsData.push(append0x(u128ToLe(sumAmount - transferAmount)));
-    changeCapacity -= rpbppCellCapacity;
+  }
+
+  const targetRgbppOutputLen = outputs.length;
+  for (const [index, otherRgbppCell] of rgbppOtherTypeCells.entries()) {
+    inputs.push({
+      previousOutput: otherRgbppCell.outPoint,
+      since: '0x0',
+    });
+    sumInputsCapacity += BigInt(otherRgbppCell.output.capacity);
+    outputs.push({
+      ...otherRgbppCell.output,
+      // Vouts[targetRgbppOutputLen + 1], ..., Vouts[targetRgbppOutputLen + rgbppOtherTypeCells.length] for other RGBPP assets
+      lock: genRgbppLockScript(buildPreLockArgs(targetRgbppOutputLen + index + 1), isMainnet),
+    });
+    outputsData.push(otherRgbppCell.outputData);
   }
 
   const cellDeps = [getRgbppLockDep(isMainnet), getXudtDep(isMainnet), getRgbppLockConfigDep(isMainnet)];
@@ -112,7 +152,8 @@ export const genBtcJumpCkbVirtualTx = async ({
 
   const witnesses: Hex[] = [];
   const lockArgsSet: Set<string> = new Set();
-  for (const cell of rgbppCells) {
+  const allRgbppCells = rgbppTargetCells.concat(rgbppOtherTypeCells);
+  for (const cell of allRgbppCells) {
     if (lockArgsSet.has(cell.output.lock.args)) {
       witnesses.push('0x');
     } else {
@@ -135,8 +176,7 @@ export const genBtcJumpCkbVirtualTx = async ({
     const txSize =
       getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? estimateWitnessSize(deduplicatedLockArgsList));
     const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
-
-    changeCapacity -= estimatedTxFee;
+    const changeCapacity = BigInt(outputs[outputs.length - 1].capacity) - estimatedTxFee;
     ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
   }
 
