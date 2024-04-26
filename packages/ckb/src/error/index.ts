@@ -11,6 +11,7 @@ enum ErrorCode {
   RgbppCkbTxInputsExceeded = 109,
   RgbppUtxoBindMultiSpores = 110,
   RgbppSporeTypeMismatch = 111,
+  RgbppSporeXudtMixture = 112,
 }
 
 export class CapacityNotEnoughError extends Error {
@@ -92,6 +93,13 @@ export class RgbppUtxoBindMultiSporesError extends Error {
 
 export class RgbppSporeTypeMismatchError extends Error {
   code = ErrorCode.RgbppSporeTypeMismatch;
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+export class RgbppSporeXudtMixtureError extends Error {
+  code = ErrorCode.RgbppSporeXudtMixture;
   constructor(message: string) {
     super(message);
   }
