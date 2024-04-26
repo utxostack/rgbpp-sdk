@@ -19,6 +19,7 @@ describe('Transaction', () => {
             value: 1000,
           },
         ],
+        feeRate: STATIC_FEE_RATE,
         source,
       });
 
@@ -45,6 +46,7 @@ describe('Transaction', () => {
             value: 1000,
           },
         ],
+        feeRate: STATIC_FEE_RATE,
         source,
       });
 
@@ -61,7 +63,7 @@ describe('Transaction', () => {
       console.log(psbt.txOutputs);
 
       console.log('tx paid fee:', psbt.getFee());
-      expectPsbtFeeInRange(psbt);
+      expectPsbtFeeInRange(psbt, STATIC_FEE_RATE);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -78,6 +80,7 @@ describe('Transaction', () => {
               value: 546,
             },
           ],
+          feeRate: STATIC_FEE_RATE,
           source,
         }),
       ).rejects.toThrow();
@@ -99,6 +102,7 @@ describe('Transaction', () => {
             },
           ],
           minUtxoSatoshi: impossibleLimit,
+          feeRate: STATIC_FEE_RATE,
           source,
         }),
       ).rejects.toThrow(ErrorMessages[ErrorCodes.INSUFFICIENT_UTXO]);
@@ -116,6 +120,7 @@ describe('Transaction', () => {
             value: 1000,
           },
         ],
+        feeRate: STATIC_FEE_RATE,
         source,
       });
 
@@ -142,7 +147,7 @@ describe('Transaction', () => {
       expect((data as Buffer).toString('hex')).toEqual('00'.repeat(32));
 
       console.log('tx paid fee:', psbt.getFee());
-      expectPsbtFeeInRange(psbt);
+      expectPsbtFeeInRange(psbt, STATIC_FEE_RATE);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -153,7 +158,7 @@ describe('Transaction', () => {
 
   describe('sendUtxos()', () => {
     it('Transfer fixed UTXO, sum(ins) = sum(outs)', async () => {
-      const { builder, feeRate } = await createSendUtxosBuilder({
+      const { builder } = await createSendUtxosBuilder({
         from: accounts.charlie.p2wpkh.address,
         inputs: [
           {
@@ -172,6 +177,7 @@ describe('Transaction', () => {
             fixed: true,
           },
         ],
+        feeRate: STATIC_FEE_RATE,
         source,
       });
 
@@ -184,7 +190,7 @@ describe('Transaction', () => {
       expect(psbt.txOutputs).toHaveLength(2);
 
       console.log('tx paid fee:', psbt.getFee());
-      expectPsbtFeeInRange(psbt, feeRate);
+      expectPsbtFeeInRange(psbt, STATIC_FEE_RATE);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -192,7 +198,7 @@ describe('Transaction', () => {
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
     it('Transfer fixed UTXO, sum(ins) = sum(outs) = 0', async () => {
-      const { builder, feeRate } = await createSendUtxosBuilder({
+      const { builder } = await createSendUtxosBuilder({
         from: accounts.charlie.p2wpkh.address,
         inputs: [],
         outputs: [
@@ -202,6 +208,7 @@ describe('Transaction', () => {
             value: 0,
           },
         ],
+        feeRate: STATIC_FEE_RATE,
         source,
       });
 
@@ -214,7 +221,7 @@ describe('Transaction', () => {
       expect(psbt.txOutputs).toHaveLength(2);
 
       console.log('tx paid fee:', psbt.getFee());
-      expectPsbtFeeInRange(psbt, feeRate);
+      expectPsbtFeeInRange(psbt, STATIC_FEE_RATE);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -241,6 +248,7 @@ describe('Transaction', () => {
             fixed: true,
           },
         ],
+        feeRate: STATIC_FEE_RATE,
         source,
       });
 
@@ -252,7 +260,7 @@ describe('Transaction', () => {
       expect(psbt.txOutputs).toHaveLength(2);
 
       console.log('tx paid fee:', psbt.getFee());
-      expectPsbtFeeInRange(psbt);
+      expectPsbtFeeInRange(psbt, STATIC_FEE_RATE);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -279,6 +287,7 @@ describe('Transaction', () => {
             fixed: true,
           },
         ],
+        feeRate: STATIC_FEE_RATE,
         source,
       });
 
@@ -290,7 +299,7 @@ describe('Transaction', () => {
       expect(psbt.txOutputs).toHaveLength(2);
 
       console.log('tx paid fee:', psbt.getFee());
-      expectPsbtFeeInRange(psbt);
+      expectPsbtFeeInRange(psbt, STATIC_FEE_RATE);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -529,6 +538,7 @@ describe('Transaction', () => {
             protected: true,
           },
         ],
+        feeRate: STATIC_FEE_RATE,
         source,
       });
 
@@ -540,7 +550,7 @@ describe('Transaction', () => {
       expect(psbt.txOutputs).toHaveLength(1);
 
       console.log('tx paid fee:', psbt.getFee());
-      expectPsbtFeeInRange(psbt);
+      expectPsbtFeeInRange(psbt, STATIC_FEE_RATE);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -663,6 +673,7 @@ describe('Transaction', () => {
             protected: true,
           },
         ],
+        feeRate: STATIC_FEE_RATE,
         source,
       });
 
@@ -676,7 +687,7 @@ describe('Transaction', () => {
       expect(psbt.txOutputs[1].value).toBe(RGBPP_UTXO_DUST_LIMIT);
 
       console.log('tx paid fee:', psbt.getFee());
-      expectPsbtFeeInRange(psbt);
+      expectPsbtFeeInRange(psbt, STATIC_FEE_RATE);
 
       // Broadcast transaction
       // const tx = psbt.extractTransaction();
@@ -809,6 +820,7 @@ describe('Transaction', () => {
             },
           ],
           onlyConfirmedUtxos: true,
+          feeRate: STATIC_FEE_RATE,
           source,
         }),
       ).rejects.toThrow();
