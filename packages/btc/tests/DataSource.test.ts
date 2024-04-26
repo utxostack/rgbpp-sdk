@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { source } from './shared/env';
 import { ErrorCodes } from '../src';
 
-describe('DataSource', () => {
+describe('DataSource', { retry: 5 }, () => {
   it('Get recommended fee rates', async () => {
     const fees = await source.getRecommendedFeeRates();
 
