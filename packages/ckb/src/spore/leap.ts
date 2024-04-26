@@ -27,7 +27,7 @@ import {
   getSporeTypeDep,
 } from '../constants';
 import { generateSporeTransferCoBuild } from '../utils/spore';
-import { NoRgbppLiveCellError, RgbppUtxoBindMultiSporesError } from '../error';
+import { NoRgbppLiveCellError, RgbppUtxoBindMultiTypeAssetsError } from '../error';
 import {
   addressToScript,
   getTransactionSize,
@@ -65,16 +65,16 @@ export const genLeapSporeFromBtcToCkbVirtualTx = async ({
     throw new NoRgbppLiveCellError('No spore rgbpp cells found with the spore rgbpp lock args');
   }
   if (sporeCells.length > 1) {
-    throw new RgbppUtxoBindMultiSporesError('The BTC UTXO must not be bound to multiple CKB cells');
+    throw new RgbppUtxoBindMultiTypeAssetsError('The BTC UTXO must not be bound to multiple CKB cells');
   }
   const sporeCell = sporeCells[0];
 
   if (!sporeCell.output.type) {
-    throw new RgbppUtxoBindMultiSporesError('The cell with the rgbpp lock args has no spore asset');
+    throw new RgbppUtxoBindMultiTypeAssetsError('The cell with the rgbpp lock args has no spore asset');
   }
 
   if (append0x(serializeScript(sporeCell.output.type)) !== append0x(sporeTypeBytes)) {
-    throw new RgbppUtxoBindMultiSporesError('The cell type with the rgbpp lock args does not match');
+    throw new RgbppUtxoBindMultiTypeAssetsError('The cell type with the rgbpp lock args does not match');
   }
 
   const inputs: CKBComponents.CellInput[] = [

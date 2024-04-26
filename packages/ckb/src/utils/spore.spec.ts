@@ -1,6 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { generateClusterId, generateSporeCreateCoBuild, generateSporeTransferCoBuild } from './spore';
+import {
+  generateClusterId,
+  generateSporeCreateCoBuild,
+  generateSporeTransferCoBuild,
+  throwErrorWhenSporeCellsInvalid,
+} from './spore';
 import { IndexerCell } from '../types';
+import { getSporeTypeScript } from '../constants';
+import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
+import { NoRgbppLiveCellError, RgbppSporeTypeMismatchError, RgbppUtxoBindMultiTypeAssetsError } from '../error';
+import { throwErrorWhenRgbppCellsInvalid } from './rgbpp';
 
 describe('spore utils', () => {
   it('generateClusterId', () => {
@@ -100,5 +109,109 @@ describe('spore utils', () => {
     expect(sporeCoBuild).toBe(
       '0x010000ff620100000c000000100000000000000052010000080000004a0100000800000042010000100000003000000050000000aad7f6a215b3b115dcf4a5c595b05aac12013adf97278d163cc4bb9a7987414a7d70430a5c4be5955b954abb394afb745a9027ba931dab9575ef45f3303947c7ee00000001000000ea00000010000000300000008d000000205fe15af04e59d3ff1ff8e0b0a1e3bc201af406a38964760c24848ed6029b6b000000005900000010000000300000003100000061ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c324801240000000200000050b34b391fd8f8084bf9b6af4368350c1510df4964496b87495ebee4bd8d86d5000000005900000010000000300000003100000061ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248012400000001000000e190b9af52d5c497d9b1635314f833f2853c966a285df826d1dbac3ec1c803f2',
     );
+  });
+
+  it('checkRgbppLiveCells', () => {
+    const sporeTypeBytes = serializeScript({
+      ...getSporeTypeScript(false),
+      args: '0x205fe15af04e59d3ff1ff8e0b0a1e3bc201af406a38964760c24848ed6029b6b',
+    });
+
+    try {
+      throwErrorWhenSporeCellsInvalid([], sporeTypeBytes);
+    } catch (error) {
+      if (error instanceof NoRgbppLiveCellError) {
+        expect(104).toBe(error.code);
+        expect('No spore rgbpp cells found with the spore rgbpp lock args').toBe(error.message);
+      }
+    }
+
+    const multiSporeCells: IndexerCell[] = [
+      {
+        blockNumber: '0x0',
+        outPoint: {
+          txHash: '0xf2bfcd0ec5f7b2a33577168b7a647e71cc81a731560a7ad23b1c31fc08bbe1bb',
+          index: '0x1',
+        },
+        output: {
+          capacity: '0x460913c00',
+          lock: {
+            args: '0x0200000050b34b391fd8f8084bf9b6af4368350c1510df4964496b87495ebee4bd8d86d5',
+            codeHash: '0x61ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248',
+            hashType: 'type',
+          },
+          type: {
+            args: '0xf2bfcd0ec5f7b2a33577168b7a647e71cc81a731560a7ad23b1c31fc08bbe1bb',
+            codeHash: '0x685a60219309029d01310311dba953d67029170ca4848a4ff638e57002130a0d',
+            hashType: 'data1',
+          },
+        },
+        outputData: '0x2d000000100000001e0000002d0000000a000000746578742f706c61696e0b00000046697273742053706f7265',
+        txIndex: '0x0',
+      },
+      {
+        blockNumber: '0x0',
+        outPoint: {
+          txHash: '0xf2bfcd0ec5f7b2a33577168b7a647e71cc81a731560a7ad23b1c31fc08bbe1bb',
+          index: '0x1',
+        },
+        output: {
+          capacity: '0x460913c00',
+          lock: {
+            args: '0x0200000050b34b391fd8f8084bf9b6af4368350c1510df4964496b87495ebee4bd8d86d5',
+            codeHash: '0x61ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248',
+            hashType: 'type',
+          },
+          type: {
+            args: '0x61ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248',
+            codeHash: '0x685a60219309029d01310311dba953d67029170ca4848a4ff638e57002130a0d',
+            hashType: 'data1',
+          },
+        },
+        outputData: '0x2d000000100000001e0000002d0000000a000000746578742f706c61696e0b00000046697273742053706f7265',
+        txIndex: '0x0',
+      },
+    ];
+    try {
+      throwErrorWhenSporeCellsInvalid(multiSporeCells, sporeTypeBytes);
+    } catch (error) {
+      if (error instanceof RgbppUtxoBindMultiTypeAssetsError) {
+        expect(110).toBe(error.code);
+        expect('The UTXO is bound to multiple type assets').toBe(error.message);
+      }
+    }
+
+    const noTargetCells: IndexerCell[] = [
+      {
+        blockNumber: '0x0',
+        outPoint: {
+          txHash: '0xf2bfcd0ec5f7b2a33577168b7a647e71cc81a731560a7ad23b1c31fc08bbe1bb',
+          index: '0x1',
+        },
+        output: {
+          capacity: '0x460913c00',
+          lock: {
+            args: '0x0200000050b34b391fd8f8084bf9b6af4368350c1510df4964496b87495ebee4bd8d86d5',
+            codeHash: '0x61ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248',
+            hashType: 'type',
+          },
+          type: {
+            args: '0xf2bfcd0ec5f7b2a33577168b7a647e71cc81a731560a7ad23b1c31fc08bbe1bb',
+            codeHash: '0x685a60219309029d01310311dba953d67029170ca4848a4ff638e57002130a0d',
+            hashType: 'data1',
+          },
+        },
+        outputData: '0x2d000000100000001e0000002d0000000a000000746578742f706c61696e0b00000046697273742053706f7265',
+        txIndex: '0x0',
+      },
+    ];
+    try {
+      throwErrorWhenSporeCellsInvalid(noTargetCells, sporeTypeBytes);
+    } catch (error) {
+      if (error instanceof RgbppSporeTypeMismatchError) {
+        expect(111).toBe(error.code);
+        expect('The spore cell type with the rgbpp lock args does not match').toBe(error.message);
+      }
+    }
   });
 });

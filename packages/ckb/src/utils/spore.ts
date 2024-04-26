@@ -9,6 +9,8 @@ import {
 } from '@spore-sdk/core/lib/cobuild';
 import { u64ToLe } from './hex';
 import { Hex, IndexerCell, SporesCreateCobuildParams } from '../types';
+import { NoRgbppLiveCellError, RgbppSporeTypeMismatchError, RgbppUtxoBindMultiTypeAssetsError } from '../error';
+import { isScriptEqual } from './ckb-tx';
 
 // Generate type id for cluster id
 export const generateClusterId = (firstInput: CKBComponents.CellInput, firstOutputIndex: number) => {
@@ -94,4 +96,22 @@ export const generateSporeTransferCoBuild = (
     sporeActions = sporeActions.concat(actions);
   }
   return assembleCobuildWitnessLayout(sporeActions);
+};
+
+export const throwErrorWhenSporeCellsInvalid = (sporeCells: IndexerCell[] | undefined, sporeTypeBytes: Hex) => {
+  if (!sporeCells || sporeCells.length === 0) {
+    throw new NoRgbppLiveCellError('No spore rgbpp cells found with the spore rgbpp lock args');
+  }
+  if (sporeCells.length > 1) {
+    throw new RgbppUtxoBindMultiTypeAssetsError('The UTXO is bound to multiple type assets');
+  }
+  const sporeCell = sporeCells[0];
+
+  if (!sporeCell.output.type) {
+    throw new NoRgbppLiveCellError('The cell with the rgbpp lock args has no spore asset');
+  }
+
+  if (!isScriptEqual(sporeCell.output.type, sporeTypeBytes)) {
+    throw new RgbppSporeTypeMismatchError('The spore cell type with the rgbpp lock args does not match');
+  }
 };

@@ -7,19 +7,13 @@ import {
   RgbppCkbVirtualTx,
 } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
-import {
-  NoLiveCellError,
-  NoRgbppLiveCellError,
-  RgbppSporeXudtMixtureError,
-  TypeAssetNotSupportedError,
-} from '../error';
+import { NoLiveCellError, NoRgbppLiveCellError, TypeAssetNotSupportedError } from '../error';
 import {
   append0x,
   calculateRgbppCellCapacity,
   calculateTransactionFee,
   deduplicateList,
   isScriptEqual,
-  isScriptPartialEqual,
   isUDTTypeSupported,
   u128ToLe,
 } from '../utils';
@@ -29,6 +23,7 @@ import {
   compareInputs,
   estimateWitnessSize,
   genRgbppLockScript,
+  throwErrorWhenRgbppCellsInvalid,
   throwErrorWhenTxInputsExceeded,
 } from '../utils/rgbpp';
 import { Hex, IndexerCell } from '../types';
@@ -41,7 +36,6 @@ import {
   getRgbppLockDep,
   getRgbppLockScript,
   getSecp256k1CellDep,
-  getSporeTypeScript,
   getXudtDep,
 } from '../constants';
 import {
@@ -86,25 +80,12 @@ export const genBtcTransferCkbVirtualTx = async ({
   let rgbppTargetCells: IndexerCell[] = [];
   let rgbppOtherTypeCells: IndexerCell[] = [];
   for await (const rgbppLock of rgbppLocks) {
-    const cells = await collector.getCells({ lock: rgbppLock, isDataEmpty: false });
-    if (!cells || cells.length === 0) {
-      throw new NoRgbppLiveCellError('No rgbpp cells found with the rgbpp lock args');
-    }
-    const typeCells = cells.filter((cell) => !!cell.output.type);
-    if (typeCells.length === 0) {
-      throw new NoRgbppLiveCellError('No rgbpp cells found with the rgbpp lock args');
-    }
-    const isSporeExist = typeCells.some((cell) =>
-      isScriptPartialEqual(cell.output.type!, getSporeTypeScript(isMainnet)),
-    );
-    if (isSporeExist) {
-      throw new RgbppSporeXudtMixtureError('One UTXO does not allow binding of Spore and xUDT assets');
-    }
-    const targetCells = typeCells.filter((cell) => isScriptEqual(cell.output.type!, xudtTypeBytes));
-    if (targetCells.length === 0) {
-      throw new NoRgbppLiveCellError('No rgbpp cells found with the xudt type script and the rgbpp lock args');
-    }
-    const otherTypeCells = typeCells.filter((cell) => !isScriptEqual(cell.output.type!, xudtTypeBytes));
+    const cells = await collector.getCells({ lock: rgbppLock, isDataMustBeEmpty: false });
+
+    throwErrorWhenRgbppCellsInvalid(cells, xudtTypeBytes, isMainnet);
+
+    const targetCells = cells!.filter((cell) => isScriptEqual(cell.output.type!, xudtTypeBytes));
+    const otherTypeCells = cells!.filter((cell) => !isScriptEqual(cell.output.type!, xudtTypeBytes));
     rgbppTargetCells = [...rgbppTargetCells, ...targetCells];
     rgbppOtherTypeCells = [...rgbppOtherTypeCells, ...otherTypeCells];
   }

@@ -9,9 +9,8 @@ enum ErrorCode {
   TypeAssetNotSupported = 107,
   InputsOrOutputsLenInvalid = 108,
   RgbppCkbTxInputsExceeded = 109,
-  RgbppUtxoBindMultiSpores = 110,
+  RgbppUtxoBindMultiTypeAssets = 110,
   RgbppSporeTypeMismatch = 111,
-  RgbppSporeXudtMixture = 112,
 }
 
 export class CapacityNotEnoughError extends Error {
@@ -84,8 +83,8 @@ export class RgbppCkbTxInputsExceededError extends Error {
   }
 }
 
-export class RgbppUtxoBindMultiSporesError extends Error {
-  code = ErrorCode.RgbppUtxoBindMultiSpores;
+export class RgbppUtxoBindMultiTypeAssetsError extends Error {
+  code = ErrorCode.RgbppUtxoBindMultiTypeAssets;
   constructor(message: string) {
     super(message);
   }
@@ -93,13 +92,6 @@ export class RgbppUtxoBindMultiSporesError extends Error {
 
 export class RgbppSporeTypeMismatchError extends Error {
   code = ErrorCode.RgbppSporeTypeMismatch;
-  constructor(message: string) {
-    super(message);
-  }
-}
-
-export class RgbppSporeXudtMixtureError extends Error {
-  code = ErrorCode.RgbppSporeXudtMixture;
   constructor(message: string) {
     super(message);
   }

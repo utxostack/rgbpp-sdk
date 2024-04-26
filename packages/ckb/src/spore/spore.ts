@@ -5,6 +5,7 @@ import {
   calculateRgbppSporeCellCapacity,
   calculateTransactionFee,
   isClusterSporeTypeSupported,
+  isScriptEqual,
 } from '../utils';
 import { buildPreLockArgs, calculateCommitment, genBtcTimeLockScript, genRgbppLockScript } from '../utils/rgbpp';
 import {
@@ -30,11 +31,17 @@ import {
   getSporeTypeDep,
   getSporeTypeScript,
 } from '../constants';
-import { generateSporeCreateCoBuild, generateSporeId, generateSporeTransferCoBuild } from '../utils/spore';
+import {
+  generateSporeCreateCoBuild,
+  generateSporeId,
+  generateSporeTransferCoBuild,
+  throwErrorWhenSporeCellsInvalid,
+} from '../utils/spore';
 import {
   NoLiveCellError,
   NoRgbppLiveCellError,
-  RgbppUtxoBindMultiSporesError,
+  RgbppSporeTypeMismatchError,
+  RgbppUtxoBindMultiTypeAssetsError,
   TypeAssetNotSupportedError,
 } from '../error';
 import {
@@ -43,7 +50,6 @@ import {
   getTransactionSize,
   rawTransactionToHash,
   scriptToHash,
-  serializeScript,
   serializeWitnessArgs,
 } from '@nervosnetwork/ckb-sdk-utils';
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
@@ -71,7 +77,7 @@ export const genCreateSporeCkbVirtualTx = async ({
     throw new NoRgbppLiveCellError('No cluster rgbpp cells found with the cluster rgbpp lock args');
   }
   if (clusterCells.length > 1) {
-    throw new RgbppUtxoBindMultiSporesError('The UTXO is bound to multiple clusters');
+    throw new RgbppUtxoBindMultiTypeAssetsError('The UTXO is bound to multiple clusters');
   }
   const clusterCell = clusterCells[0];
 
@@ -268,21 +274,10 @@ export const genTransferSporeCkbVirtualTx = async ({
     args: append0x(sporeRgbppLockArgs),
   };
   const sporeCells = await collector.getCells({ lock: sporeRgbppLock, isDataMustBeEmpty: false });
-  if (!sporeCells || sporeCells.length === 0) {
-    throw new NoRgbppLiveCellError('No spore rgbpp cells found with the spore rgbpp lock args');
-  }
-  if (sporeCells.length > 1) {
-    throw new RgbppUtxoBindMultiSporesError('The UTXO is bound to multiple spores');
-  }
-  const sporeCell = sporeCells[0];
 
-  if (!sporeCell.output.type) {
-    throw new RgbppUtxoBindMultiSporesError('The cell with the rgbpp lock args has no spore asset');
-  }
+  throwErrorWhenSporeCellsInvalid(sporeCells, sporeTypeBytes);
 
-  if (append0x(serializeScript(sporeCell.output.type)) !== append0x(sporeTypeBytes)) {
-    throw new RgbppUtxoBindMultiSporesError('The cell type with the rgbpp lock args does not match');
-  }
+  const sporeCell = sporeCells![0];
 
   const inputs: CKBComponents.CellInput[] = [
     {
