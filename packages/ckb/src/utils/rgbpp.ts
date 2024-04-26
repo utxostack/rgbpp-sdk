@@ -227,6 +227,7 @@ export const throwErrorWhenTxInputsExceeded = (inputLen: number) => {
   }
 };
 
+// Check the validity of RGB++ cells and throw an exception if the conditions are not met to avoid building invalid CKB TX
 export const throwErrorWhenRgbppCellsInvalid = (
   cells: IndexerCell[] | undefined,
   xudtTypeBytes: Hex,
@@ -241,7 +242,9 @@ export const throwErrorWhenRgbppCellsInvalid = (
   }
   const isSporeExist = typeCells.some((cell) => isScriptPartialEqual(cell.output.type!, getSporeTypeScript(isMainnet)));
   if (isSporeExist) {
-    throw new RgbppUtxoBindMultiTypeAssetsError('One UTXO does not allow binding of Spore and xUDT assets');
+    throw new RgbppUtxoBindMultiTypeAssetsError(
+      'One UTXO does not allow binding of Spore and xUDT assets at the same time',
+    );
   }
   const isTargetExist = typeCells.filter((cell) => isScriptEqual(cell.output.type!, xudtTypeBytes));
   if (isTargetExist) {

@@ -267,7 +267,7 @@ describe('rgbpp tests', () => {
     }
   });
 
-  it('checkRgbppLiveCells', () => {
+  it('throwErrorWhenRgbppCellsInvalid', () => {
     const xudtTypeBytes = serializeScript({
       ...getXudtTypeScript(false),
       args: '0x205fe15af04e59d3ff1ff8e0b0a1e3bc201af406a38964760c24848ed6029b6b',

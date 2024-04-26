@@ -111,7 +111,7 @@ describe('spore utils', () => {
     );
   });
 
-  it('checkRgbppLiveCells', () => {
+  it('throwErrorWhenSporeCellsInvalid', () => {
     const sporeTypeBytes = serializeScript({
       ...getSporeTypeScript(false),
       args: '0x205fe15af04e59d3ff1ff8e0b0a1e3bc201af406a38964760c24848ed6029b6b',

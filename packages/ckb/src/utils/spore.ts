@@ -98,6 +98,7 @@ export const generateSporeTransferCoBuild = (
   return assembleCobuildWitnessLayout(sporeActions);
 };
 
+// Check the validity of RGB++ spore cells and throw an exception if the conditions are not met to avoid building invalid CKB TX
 export const throwErrorWhenSporeCellsInvalid = (sporeCells: IndexerCell[] | undefined, sporeTypeBytes: Hex) => {
   if (!sporeCells || sporeCells.length === 0) {
     throw new NoRgbppLiveCellError('No spore rgbpp cells found with the spore rgbpp lock args');
