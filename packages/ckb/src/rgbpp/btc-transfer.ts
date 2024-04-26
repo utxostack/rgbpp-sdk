@@ -7,12 +7,19 @@ import {
   RgbppCkbVirtualTx,
 } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
-import { NoLiveCellError, NoRgbppLiveCellError, TypeAssetNotSupportedError } from '../error';
+import {
+  NoLiveCellError,
+  NoRgbppLiveCellError,
+  RgbppSporeXudtMixtureError,
+  TypeAssetNotSupportedError,
+} from '../error';
 import {
   append0x,
   calculateRgbppCellCapacity,
   calculateTransactionFee,
   deduplicateList,
+  isScriptEqual,
+  isScriptPartialEqual,
   isUDTTypeSupported,
   u128ToLe,
 } from '../utils';
@@ -34,6 +41,7 @@ import {
   getRgbppLockDep,
   getRgbppLockScript,
   getSecp256k1CellDep,
+  getSporeTypeScript,
   getXudtDep,
 } from '../constants';
 import {
@@ -75,69 +83,103 @@ export const genBtcTransferCkbVirtualTx = async ({
   const deduplicatedLockArgsList = deduplicateList(rgbppLockArgsList);
 
   const rgbppLocks = deduplicatedLockArgsList.map((args) => genRgbppLockScript(args, isMainnet));
-  let rgbppCells: IndexerCell[] = [];
+  let rgbppTargetCells: IndexerCell[] = [];
+  let rgbppOtherTypeCells: IndexerCell[] = [];
   for await (const rgbppLock of rgbppLocks) {
-    const cells = await collector.getCells({ lock: rgbppLock, type: xudtType });
+    const cells = await collector.getCells({ lock: rgbppLock, isDataEmpty: false });
     if (!cells || cells.length === 0) {
+      throw new NoRgbppLiveCellError('No rgbpp cells found with the rgbpp lock args');
+    }
+    const typeCells = cells.filter((cell) => !!cell.output.type);
+    if (typeCells.length === 0) {
+      throw new NoRgbppLiveCellError('No rgbpp cells found with the rgbpp lock args');
+    }
+    const isSporeExist = typeCells.some((cell) =>
+      isScriptPartialEqual(cell.output.type!, getSporeTypeScript(isMainnet)),
+    );
+    if (isSporeExist) {
+      throw new RgbppSporeXudtMixtureError('One UTXO does not allow binding of Spore and xUDT assets');
+    }
+    const targetCells = typeCells.filter((cell) => isScriptEqual(cell.output.type!, xudtTypeBytes));
+    if (targetCells.length === 0) {
       throw new NoRgbppLiveCellError('No rgbpp cells found with the xudt type script and the rgbpp lock args');
     }
-    rgbppCells = [...rgbppCells, ...cells];
+    const otherTypeCells = typeCells.filter((cell) => !isScriptEqual(cell.output.type!, xudtTypeBytes));
+    rgbppTargetCells = [...rgbppTargetCells, ...targetCells];
+    rgbppOtherTypeCells = [...rgbppOtherTypeCells, ...otherTypeCells];
   }
-  rgbppCells = rgbppCells.sort(compareInputs);
+  rgbppTargetCells = rgbppTargetCells.sort(compareInputs);
+  rgbppOtherTypeCells = rgbppOtherTypeCells.sort(compareInputs);
 
   let inputs: CKBComponents.CellInput[] = [];
   let sumInputsCapacity = BigInt(0);
   let outputs: CKBComponents.CellOutput[] = [];
   let outputsData: Hex[] = [];
-  let changeCapacity = BigInt(0);
 
-  if (noMergeOutputCells) {
-    for (const [index, rgbppCell] of rgbppCells.entries()) {
+  // The non-target RGBPP outputs correspond to the RGBPP inputs one-to-one, and the outputs are still bound to the sender’s BTC UTXOs
+  const handleNonTargetRgbppCells = (targetRgbppOutputLen: number) => {
+    for (const [index, otherRgbppCell] of rgbppOtherTypeCells.entries()) {
       inputs.push({
-        previousOutput: rgbppCell.outPoint,
+        previousOutput: otherRgbppCell.outPoint,
         since: '0x0',
       });
-      sumInputsCapacity += BigInt(rgbppCell.output.capacity);
+      sumInputsCapacity += BigInt(otherRgbppCell.output.capacity);
       outputs.push({
-        ...rgbppCell.output,
-        // The Vouts[0] for OP_RETURN and Vouts[1], Vouts[2], ... for RGBPP assets
+        ...otherRgbppCell.output,
+        // Vouts[targetRgbppOutputLen + 1], ..., Vouts[targetRgbppOutputLen + rgbppOtherTypeCells.length] for other RGBPP assets
+        lock: genRgbppLockScript(buildPreLockArgs(targetRgbppOutputLen + index + 1), isMainnet),
+      });
+      outputsData.push(otherRgbppCell.outputData);
+    }
+  };
+
+  if (noMergeOutputCells) {
+    // The target RGBPP outputs correspond to the RGBPP inputs one-to-one, and the outputs are bound to the receivers' BTC UTXOs
+    for (const [index, targetRgbppCell] of rgbppTargetCells.entries()) {
+      inputs.push({
+        previousOutput: targetRgbppCell.outPoint,
+        since: '0x0',
+      });
+      sumInputsCapacity += BigInt(targetRgbppCell.output.capacity);
+      outputs.push({
+        ...targetRgbppCell.output,
+        // The Vouts[0] for OP_RETURN and Vouts[1], ..., Vouts[rgbppTargetCells.length] for target RGBPP assets
         lock: genRgbppLockScript(buildPreLockArgs(index + 1), isMainnet),
       });
-      outputsData.push(rgbppCell.outputData);
+      outputsData.push(targetRgbppCell.outputData);
     }
-    changeCapacity = BigInt(rgbppCells[rgbppCells.length - 1].output.capacity);
+    handleNonTargetRgbppCells(rgbppTargetCells.length);
   } else {
+    // The target RGBPP assets are divided into two parts: transfer(bound to the receivers' BTC UTXO) and change(bound to the sender’s BTC UTXO).
     const collectResult = collector.collectUdtInputs({
-      liveCells: rgbppCells,
+      liveCells: rgbppTargetCells,
       needAmount: transferAmount,
     });
     inputs = collectResult.inputs;
-
     throwErrorWhenTxInputsExceeded(inputs.length);
-
     sumInputsCapacity = collectResult.sumInputsCapacity;
 
-    rgbppCells = rgbppCells.slice(0, inputs.length);
+    const rgbppCellCapacity = calculateRgbppCellCapacity(xudtType);
 
-    const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
-    outputsData.push(append0x(u128ToLe(transferAmount)));
-
-    changeCapacity = sumInputsCapacity;
-    // The Vouts[0] for OP_RETURN and Vouts[1], Vouts[2], ... for RGBPP assets
+    const needChange = collectResult.sumAmount > transferAmount;
+    // The Vouts[0] for OP_RETURN and Vouts[1] for target transfer RGBPP assets
     outputs.push({
       lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
       type: xudtType,
-      capacity: append0x(rpbppCellCapacity.toString(16)),
+      capacity: append0x((needChange ? rgbppCellCapacity : sumInputsCapacity).toString(16)),
     });
+    outputsData.push(append0x(u128ToLe(transferAmount)));
+
     if (collectResult.sumAmount > transferAmount) {
+      // The Vouts[2] for target change RGBPP assets
       outputs.push({
         lock: genRgbppLockScript(buildPreLockArgs(2), isMainnet),
         type: xudtType,
-        capacity: append0x(rpbppCellCapacity.toString(16)),
+        capacity: append0x((sumInputsCapacity - rgbppCellCapacity).toString(16)),
       });
       outputsData.push(append0x(u128ToLe(collectResult.sumAmount - transferAmount)));
-      changeCapacity -= rpbppCellCapacity;
     }
+    handleNonTargetRgbppCells(outputs.length);
   }
 
   const cellDeps = [getRgbppLockDep(isMainnet), getXudtDep(isMainnet), getRgbppLockConfigDep(isMainnet)];
@@ -147,7 +189,8 @@ export const genBtcTransferCkbVirtualTx = async ({
   }
   const witnesses: Hex[] = [];
   const lockArgsSet: Set<string> = new Set();
-  for (const cell of rgbppCells) {
+  const allRgbppCells = rgbppTargetCells.concat(rgbppOtherTypeCells);
+  for (const cell of allRgbppCells) {
     if (lockArgsSet.has(cell.output.lock.args)) {
       witnesses.push('0x');
     } else {
@@ -171,7 +214,7 @@ export const genBtcTransferCkbVirtualTx = async ({
       getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? estimateWitnessSize(deduplicatedLockArgsList));
     const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
 
-    changeCapacity -= estimatedTxFee;
+    const changeCapacity = BigInt(outputs[outputs.length - 1].capacity) - estimatedTxFee;
     ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
   }
 
@@ -244,11 +287,10 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
   let rgbppChangeOutIndex = -1;
   if (sumAmount > sumTransferAmount) {
     // Rgbpp change cell is placed at the last position by default
-    const lastUtxoIndex = rgbppReceivers.length + 1;
-    rgbppChangeOutIndex = lastUtxoIndex;
+    rgbppChangeOutIndex = rgbppReceivers.length + 1;
     outputs.push({
-      // The Vouts[0] for OP_RETURN and Vouts[1], Vouts[2], ... for RGBPP assets
-      lock: genRgbppLockScript(buildPreLockArgs(lastUtxoIndex), isMainnet),
+      // The Vouts[0] for OP_RETURN and Vouts[rgbppChangeOutIndex] for RGBPP change assets
+      lock: genRgbppLockScript(buildPreLockArgs(rgbppChangeOutIndex), isMainnet),
       type: xudtType,
       capacity: append0x(rpbppCellCapacity.toString(16)),
     });
