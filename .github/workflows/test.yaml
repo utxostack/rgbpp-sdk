@@ -47,7 +47,7 @@ jobs:
         run: pnpm run build:packages
         
       - name: Run tests for packages
-        run: pnpm run test:packages
+        run: pnpm run test:ckb
         env:
           VITE_SERVICE_URL: ${{ secrets.SERVICE_URL }}
           VITE_SERVICE_TOKEN: ${{ secrets.SERVICE_TOKEN }}
