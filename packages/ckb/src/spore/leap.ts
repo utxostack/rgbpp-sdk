@@ -60,7 +60,7 @@ export const genLeapSporeFromBtcToCkbVirtualTx = async ({
     ...getRgbppLockScript(isMainnet),
     args: append0x(sporeRgbppLockArgs),
   };
-  const sporeCells = await collector.getCells({ lock: sporeRgbppLock });
+  const sporeCells = await collector.getCells({ lock: sporeRgbppLock, isDataMustBeEmpty: false });
   if (!sporeCells || sporeCells.length === 0) {
     throw new NoRgbppLiveCellError('No spore rgbpp cells found with the spore rgbpp lock args');
   }

@@ -66,7 +66,7 @@ export const genCreateSporeCkbVirtualTx = async ({
     ...getRgbppLockScript(isMainnet),
     args: append0x(clusterRgbppLockArgs),
   };
-  const clusterCells = await collector.getCells({ lock: clusterRgbppLock, isDataEmpty: false });
+  const clusterCells = await collector.getCells({ lock: clusterRgbppLock, isDataMustBeEmpty: false });
   if (!clusterCells || clusterCells.length === 0) {
     throw new NoRgbppLiveCellError('No cluster rgbpp cells found with the cluster rgbpp lock args');
   }
@@ -267,7 +267,7 @@ export const genTransferSporeCkbVirtualTx = async ({
     ...getRgbppLockScript(isMainnet),
     args: append0x(sporeRgbppLockArgs),
   };
-  const sporeCells = await collector.getCells({ lock: sporeRgbppLock, isDataEmpty: false });
+  const sporeCells = await collector.getCells({ lock: sporeRgbppLock, isDataMustBeEmpty: false });
   if (!sporeCells || sporeCells.length === 0) {
     throw new NoRgbppLiveCellError('No spore rgbpp cells found with the spore rgbpp lock args');
   }

@@ -201,7 +201,7 @@ export const isBtcTimeCellsSpent = async ({
     ...getBtcTimeLockScript(isMainnet),
     args: genBtcTimeLockArgs(lock, btcTxId, BTC_JUMP_CONFIRMATION_BLOCKS),
   };
-  const btcTimeCells = await collector.getCells({ lock: btcTimeLock, isDataEmpty: false });
+  const btcTimeCells = await collector.getCells({ lock: btcTimeLock, isDataMustBeEmpty: false });
   const isSpent = !btcTimeCells || btcTimeCells.length === 0;
   return isSpent;
 };

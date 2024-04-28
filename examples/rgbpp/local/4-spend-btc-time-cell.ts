@@ -36,7 +36,7 @@ const spendBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }
       ...getBtcTimeLockScript(false),
       args: btcTimeCellArgs,
     },
-    isDataEmpty: false,
+    isDataMustBeEmpty: false,
   });
 
   if (!btcTimeCells || btcTimeCells.length === 0) {
