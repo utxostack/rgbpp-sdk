@@ -177,7 +177,7 @@ describe('spore utils', () => {
     } catch (error) {
       if (error instanceof RgbppUtxoBindMultiTypeAssetsError) {
         expect(110).toBe(error.code);
-        expect('The UTXO is bound to multiple type assets').toBe(error.message);
+        expect('The BTC UTXO must not be bound to multiple CKB cells').toBe(error.message);
       }
     }
 

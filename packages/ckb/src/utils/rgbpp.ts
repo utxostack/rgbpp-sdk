@@ -243,7 +243,7 @@ export const throwErrorWhenRgbppCellsInvalid = (
   const isSporeExist = typeCells.some((cell) => isScriptPartialEqual(cell.output.type!, getSporeTypeScript(isMainnet)));
   if (isSporeExist) {
     throw new RgbppUtxoBindMultiTypeAssetsError(
-      'One UTXO does not allow binding of Spore and xUDT assets at the same time',
+      'The BTC UTXO must not be bound to Spore and xUDT cells at the same time',
     );
   }
   const isTargetExist = typeCells.some((cell) => isScriptEqual(cell.output.type!, xudtTypeBytes));

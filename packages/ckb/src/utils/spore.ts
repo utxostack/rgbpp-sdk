@@ -104,7 +104,7 @@ export const throwErrorWhenSporeCellsInvalid = (sporeCells: IndexerCell[] | unde
     throw new NoRgbppLiveCellError('No spore rgbpp cells found with the spore rgbpp lock args');
   }
   if (sporeCells.length > 1) {
-    throw new RgbppUtxoBindMultiTypeAssetsError('The UTXO is bound to multiple type assets');
+    throw new RgbppUtxoBindMultiTypeAssetsError('The BTC UTXO must not be bound to multiple CKB cells');
   }
   const sporeCell = sporeCells[0];
 

@@ -339,7 +339,7 @@ describe('rgbpp tests', () => {
     } catch (error) {
       if (error instanceof RgbppUtxoBindMultiTypeAssetsError) {
         expect(110).toBe(error.code);
-        expect('One UTXO does not allow binding of Spore and xUDT assets at the same time').toBe(error.message);
+        expect('The BTC UTXO must not be bound to Spore and xUDT cells at the same time').toBe(error.message);
       }
     }
 
