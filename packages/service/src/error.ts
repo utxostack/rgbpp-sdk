@@ -1,3 +1,5 @@
+import { BtcAssetsApiContext } from './types';
+
 export enum ErrorCodes {
   UNKNOWN,
 
@@ -20,14 +22,22 @@ export const ErrorMessages = {
 
 export class BtcAssetsApiError extends Error {
   public code = ErrorCodes.UNKNOWN;
-  constructor(code: ErrorCodes, message = ErrorMessages[code] || 'Unknown error') {
+  public message: string;
+  public context?: BtcAssetsApiContext;
+
+  constructor(payload: { code: ErrorCodes; message?: string; context?: BtcAssetsApiContext }) {
+    const message = payload.message ?? ErrorMessages[payload.code] ?? ErrorMessages[ErrorCodes.UNKNOWN];
+
     super(message);
-    this.code = code;
+    this.message = message;
+    this.code = payload.code;
+    this.context = payload.context;
     Object.setPrototypeOf(this, BtcAssetsApiError.prototype);
   }
 
-  static withComment(code: ErrorCodes, comment?: string): BtcAssetsApiError {
-    const message = ErrorMessages[code] || 'Unknown error';
-    return new BtcAssetsApiError(code, comment ? `${message}: ${comment}` : message);
+  static withComment(code: ErrorCodes, comment?: string, context?: BtcAssetsApiContext): BtcAssetsApiError {
+    const prefixMessage = ErrorMessages[code] ?? ErrorMessages[ErrorCodes.UNKNOWN];
+    const message = comment ? `${prefixMessage}: ${comment}` : void 0;
+    return new BtcAssetsApiError({ code, message, context });
   }
 }

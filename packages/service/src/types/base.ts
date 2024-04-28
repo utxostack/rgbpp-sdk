@@ -15,3 +15,15 @@ export interface BaseApiRequestOptions extends RequestInit {
 export interface BtcAssetsApiToken {
   token: string;
 }
+
+export interface BtcAssetsApiContext {
+  request: {
+    url: string;
+    body?: Record<string, any>;
+    params?: Record<string, any>;
+  };
+  response: {
+    status: number;
+    data?: Record<string, any> | string;
+  };
+}
