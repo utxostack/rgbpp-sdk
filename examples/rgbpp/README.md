@@ -1,6 +1,10 @@
 # RGB++ Examples
 
-**All examples are just to demonstrate the use of RGB++ SDK. SPV proof is not ready yet, so these examples do not involve the verification of SPV proof.**
+**All examples are just to demonstrate the use of RGB++ SDK.**
+
+- Local and Queue directories: The examples for RGB++ UDT issuance, transfer, and leap
+- Spore directory: The examples for RGB++ spore creation, transfer and leap
+- xUDT directory: The examples for xUDT issuance, mint and transfer on CKB
 
 ## What you must know about BTC transaction id
 
@@ -25,15 +29,15 @@ But when you're searching for this transaction in [Bitcoin Core](https://bitcoin
 018025fb6989eed484774170eefa2bef1074b0c24537f992a64dbc138277bc4a
 ```
 
-## xUDT Examples
+## xUDT on CKB Examples
 
-### Issue xUDT
+### Issue xUDT on CKB
 
 ```shell
 npx ts-node examples/rgbpp/xudt/1-issue-xudt.ts 
 ```
 
-### Mint/Transfer xUDT
+### Mint/Transfer xUDT on CKB
 
 You can use this command to mint or transfer xUDT assets
 
@@ -41,55 +45,103 @@ You can use this command to mint or transfer xUDT assets
 npx ts-node examples/rgbpp/xudt/2-transfer-xudt.ts 
 ```
 
-## Examples with Queue service(Recommended)
+## RGB++ xUDT Examples with Queue service(Recommended)
 
-### Jump xUDT from CKB to BTC
+### Leap xUDT from CKB to BTC
 
 ```shell
 npx ts-node examples/rgbpp/queue/1-ckb-jump-btc.ts 
 ```
 
-### Transfer RGB++ asset on BTC
+### Transfer RGB++ xUDT on BTC
 
 ```shell
 npx ts-node examples/rgbpp/queue/2-btc-transfer.ts 
 ```
 
-### Jump RGB++ asset from BTC to CKB
+### Leap RGB++ xUDT from BTC to CKB
 
 ```shell
 npx ts-node examples/rgbpp/queue/3-btc-jump-ckb.ts 
 ```
 
-### Unlock BTC time cells on CKB
+### Unlock xUDT BTC time cells on CKB
 
 A cron job in RGB++ Queue service will construct a transaction unlocking the mature BTC time cells to the their `target_ckb_address`.
 
 
-## Local Examples
+## RGB++ xUDT Local Examples
 
-### Jump xUDT from CKB to BTC
+### Leap RGB++ xUDT from CKB to BTC
 
 ```shell
 npx ts-node examples/rgbpp/local/1-ckb-jump-btc.ts 
 ```
 
-### Transfer RGB++ asset on BTC
+### Transfer RGB++ xUDT on BTC
 
 ```shell
 npx ts-node examples/rgbpp/local/2-btc-transfer.ts 
 ```
 
-### Jump RGB++ asset from BTC to CKB
+### Leap RGB++ xUDT from BTC to CKB
 
 ```shell
 npx ts-node examples/rgbpp/local/3-btc-jump-ckb.ts 
 ```
 
-### Unlock BTC time cells on CKB
+### Unlock xUDT BTC time cells on CKB
 
 **Warning: Wait at least 6 BTC confirmation blocks to unlock the BTC time cells after 4-btc-jump-ckb.ts**
 
 ```shell
 npx ts-node examples/rgbpp/local/4-spend-btc-time-cell.ts 
+```
+
+## RGB++ Spore Examples
+
+**You can use RGB++ Queue service to complete spore transfer and leap, and the examples can be found in `examples/rgbpp/spore/queue`**
+
+### Create RGB++ Cluster Cell
+
+```shell
+npx ts-node examples/rgbpp/spore/1-prepare-cluster.ts
+
+npx ts-node examples/rgbpp/spore/2-create-cluster.ts
+```
+
+### Create RGB++ Spores with Cluster on BTC
+
+```shell
+npx ts-node examples/rgbpp/spore/3-create-spores.ts
+```
+
+### Transfer RGB++ Spore on BTC
+
+```shell
+npx ts-node examples/rgbpp/spore/4-transfer-spore.ts
+```
+
+### Leap RGB++ Spore from BTC to CKB
+
+```shell
+npx ts-node examples/rgbpp/spore/5-leap-spore-to-ckb.ts
+```
+
+### Unlock Spore BTC time cells on CKB
+
+A cron job in RGB++ Queue service will construct a transaction unlocking the mature BTC time cells to the their `target_ckb_address`.
+
+However, you can still manually unlock the spore btc time cell through the following command
+
+**Warning: Wait at least 6 BTC confirmation blocks to unlock the BTC time cells after 5-leap-spore-to-ckb.ts**
+
+```shell
+npx ts-node examples/rgbpp/spore/6-unlock-btc-time-cell.ts
+```
+
+### Leap Spore from CKB to BTC
+
+```shell
+npx ts-node examples/rgbpp/spore/7-leap-spore-to-btc.ts
 ```

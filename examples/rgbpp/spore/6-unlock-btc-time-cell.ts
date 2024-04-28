@@ -1,11 +1,9 @@
-import {
-  AddressPrefix, privateKeyToAddress,
-} from '@nervosnetwork/ckb-sdk-utils';
+import { AddressPrefix, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
 import {
   Collector,
   sendCkbTx,
-  buildBtcTimeCellsSpentTx,
   getBtcTimeLockScript,
+  buildSporeBtcTimeCellsSpentTx,
   signBtcTimeCellSpentTx,
 } from '@rgbpp-sdk/ckb';
 import { BtcAssetsApi } from '@rgbpp-sdk/service';
@@ -20,12 +18,13 @@ const BTC_ASSETS_TOKEN = '';
 const BTC_ASSETS_ORIGIN = 'https://btc-test.app';
 
 // Warning: Wait at least 6 BTC confirmation blocks to spend the BTC time cells after 4-btc-jump-ckb.ts
-const spendBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }) => {
+const unlockSporeBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }) => {
   const collector = new Collector({
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
   });
   const isMainnet = false;
+
   const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
     prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
   });
@@ -36,16 +35,16 @@ const spendBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }
       ...getBtcTimeLockScript(false),
       args: btcTimeCellArgs,
     },
-    isDataMustBeEmpty: false,
+    isDataEmpty: false,
   });
 
   if (!btcTimeCells || btcTimeCells.length === 0) {
-    throw new Error('No btc time cell found');
+    throw new Error('No btc time cells found');
   }
-  
+
   const btcAssetsApi = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, BTC_ASSETS_ORIGIN);
 
-  let ckbRawTx: CKBComponents.RawTransaction = await buildBtcTimeCellsSpentTx({
+  const ckbRawTx: CKBComponents.RawTransaction = await buildSporeBtcTimeCellsSpentTx({
     btcTimeCells,
     btcAssetsApi,
     isMainnet,
@@ -59,14 +58,12 @@ const spendBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }
     isMainnet,
   });
 
-  console.log(JSON.stringify(signedTx));
-
   const txHash = await sendCkbTx({ collector, signedTx });
-  console.info(`BTC time cell has been spent and tx hash is ${txHash}`);
+  console.info(`Spore BTC time cell has been unlocked and tx hash is ${txHash}`);
 };
 
-// The btcTimeCellArgs is from the outputs[0].lock.args(BTC Time lock args) of the 4-btc-jump-ckb.ts CKB transaction
-spendBtcTimeCell({
+// The btcTimeCellArgs is from the outputs[0].lock.args(BTC Time lock args) of the 5-leap-spore-to-ckb.ts CKB transaction
+unlockSporeBtcTimeCell({
   btcTimeCellArgs:
-    '0x7f000000100000005b0000005f0000004b000000100000003000000031000000d23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac011600000000016c61f984f12d3c8a4f649e60acda5deda0b8837c060000001c95b9d726e4ab337d6a4572680598947954d7b6ff4f1e767e605eeeec49e7ed',
+    '0x7d00000010000000590000005d000000490000001000000030000000310000009bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce80114000000f9a9ad51ed14936d33f7bb854aaefa5f47a3ccbd060000002997fa043e977cb0a9bcc75ec308ad1323331c5295caf8fc721b0a2761bef305',
 });

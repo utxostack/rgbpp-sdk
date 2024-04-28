@@ -6,11 +6,12 @@ import {
   calculateTransactionFee,
   isClusterSporeTypeSupported,
 } from '../utils';
-import { buildPreLockArgs, calculateCommitment, genRgbppLockScript } from '../utils/rgbpp';
+import { buildPreLockArgs, calculateCommitment, genBtcTimeLockScript, genRgbppLockScript } from '../utils/rgbpp';
 import {
   AppendIssuerCellToSporeCreate,
   CreateSporeCkbVirtualTxParams,
   Hex,
+  LeapSporeFromBtcToCkbVirtualTxParams,
   SporeCreateVirtualTxResult,
   SporeTransferVirtualTxResult,
   TransferSporeCkbVirtualTxParams,
@@ -65,7 +66,7 @@ export const genCreateSporeCkbVirtualTx = async ({
     ...getRgbppLockScript(isMainnet),
     args: append0x(clusterRgbppLockArgs),
   };
-  const clusterCells = await collector.getCells({ lock: clusterRgbppLock, isDataEmpty: false });
+  const clusterCells = await collector.getCells({ lock: clusterRgbppLock, isDataMustBeEmpty: false });
   if (!clusterCells || clusterCells.length === 0) {
     throw new NoRgbppLiveCellError('No cluster rgbpp cells found with the cluster rgbpp lock args');
   }
@@ -250,6 +251,7 @@ export const appendIssuerCellToSporesCreate = async ({
  * Generate the virtual ckb transaction for transferring spore
  * @param collector The collector that collects CKB live cells and transactions
  * @param sporeRgbppLockArgs The spore rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
+ * @param sporeTypeBytes The spore type script serialized bytes
  * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  */
@@ -265,7 +267,7 @@ export const genTransferSporeCkbVirtualTx = async ({
     ...getRgbppLockScript(isMainnet),
     args: append0x(sporeRgbppLockArgs),
   };
-  const sporeCells = await collector.getCells({ lock: sporeRgbppLock, isDataEmpty: false });
+  const sporeCells = await collector.getCells({ lock: sporeRgbppLock, isDataMustBeEmpty: false });
   if (!sporeCells || sporeCells.length === 0) {
     throw new NoRgbppLiveCellError('No spore rgbpp cells found with the spore rgbpp lock args');
   }
@@ -298,7 +300,7 @@ export const genTransferSporeCkbVirtualTx = async ({
   ];
   const outputsData: Hex[] = [sporeCell.outputData];
   const cellDeps = [getRgbppLockDep(isMainnet), getRgbppLockConfigDep(isMainnet), getSporeTypeDep(isMainnet)];
-  const sporeCoBuild = generateSporeTransferCoBuild(sporeCell, outputs[0]);
+  const sporeCoBuild = generateSporeTransferCoBuild([sporeCell], outputs);
   const witnesses = [RGBPP_WITNESS_PLACEHOLDER, sporeCoBuild];
 
   const ckbRawTx: CKBComponents.RawTransaction = {

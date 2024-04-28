@@ -1,40 +1,39 @@
 import { AddressPrefix, privateKeyToAddress, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import {
-  genCkbJumpBtcVirtualTx,
   Collector,
   getSecp256k1CellDep,
   buildRgbppLockArgs,
-  getXudtTypeScript,
+  getSporeTypeScript,
+  genLeapSporeFromCkbToBtcRawTx,
 } from '@rgbpp-sdk/ckb';
 
 // CKB SECP256K1 private key
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
 
-const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTxId: string }) => {
+const leapSporeFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTxId: string }) => {
   const collector = new Collector({
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
   });
   const isMainnet = false;
   const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
-      prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
-    });
+    prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
+  });
   console.log('ckb address: ', address);
 
   const toRgbppLockArgs = buildRgbppLockArgs(outIndex, btcTxId);
 
-  const xudtType: CKBComponents.Script = {
-    ...getXudtTypeScript(isMainnet),
-    args: '0x1ba116c119d1cfd98a53e9d1a615cf2af2bb87d95515c9d217d367054cfc696b',
+  const sporeType: CKBComponents.Script = {
+    ...getSporeTypeScript(isMainnet),
+    args: '0x42898ea77062256f46e8f1b861d526ae47810ecc51ab50477945d5fa90452706',
   };
 
-  const ckbRawTx = await genCkbJumpBtcVirtualTx({
+  const ckbRawTx = await genLeapSporeFromCkbToBtcRawTx({
     collector,
     fromCkbAddress: address,
     toRgbppLockArgs,
-    xudtTypeBytes: serializeScript(xudtType),
-    transferAmount: BigInt(800_0000_0000),
-    witnessLockPlaceholderSize: 1000
+    sporeTypeBytes: serializeScript(sporeType),
+    isMainnet,
   });
 
   const emptyWitness = { lock: '', inputType: '', outputType: '' };
@@ -47,12 +46,11 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTx
   const signedTx = collector.getCkb().signTransaction(CKB_TEST_PRIVATE_KEY)(unsignedTx);
 
   let txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
-  console.info(`Rgbpp asset has been jumped from CKB to BTC and tx hash is ${txHash}`);
+  console.info(`RGB++ Spore has been jumped from CKB to BTC and tx hash is ${txHash}`);
 };
 
 // Use your real BTC UTXO information on the BTC Testnet
-jumpFromCkbToBtc({
+leapSporeFromCkbToBtc({
   outIndex: 1,
-  btcTxId: '4ff1855b64b309afa19a8b9be3d4da99dcb18b083b65d2d851662995c7d99e7a',
+  btcTxId: '448897515cf07b4ca0cd38af9806399ede55775b4c760b274ed2322121ed185f',
 });
-

@@ -1,6 +1,6 @@
 # @rgbpp-sdk/ckb
 
-RGB++ SDK
+RGB++ CKB SDK
 
 ## Installation
 
@@ -24,9 +24,9 @@ The `example/paymaster.ts` demonstrates how to use `@rgbpp-sdk/ckb` SDK to split
 cd packages/ckb && pnpm splitCells
 ```
 
-## RGB++ assets transfer on BTC
+## RGB++ xUDT Transfer on BTC
 
-The method `genBtcTransferCkbVirtualTx` can generate a CKB virtual transaction which contains the necessary `inputCells/outputCells` for rgbpp asset transfer and the commitment to be inserted to the BTC tx OP_RETURN.
+The method `genBtcTransferCkbVirtualTx` can generate a CKB virtual transaction which contains the necessary `inputCells/outputCells` for RGB++ xUDT transfer and the commitment to be inserted to the BTC tx OP_RETURN.
 
 ```TypeScript
 export interface BtcTransferVirtualTxResult {
@@ -63,9 +63,9 @@ export const genBtcTransferCkbVirtualTx = async ({
 }: BtcTransferVirtualTxParams): Promise<BtcTransferVirtualTxResult>
 ```
 
-## RGB++ assets jump from BTC to CKB
+## RGB++ xUDT Leap from BTC to CKB
 
-The method `genBtcJumpCkbVirtualTx` can generate a CKB virtual transaction which contains the necessary `inputCells/outputCells` for rgbpp asset jumping from BTC to CKB and the commitment to be inserted to the BTC tx OP_RETURN.
+The method `genBtcJumpCkbVirtualTx` can generate a CKB virtual transaction which contains the necessary `inputCells/outputCells` for RGB++ xUDT leaping from BTC to CKB and the commitment to be inserted to the BTC tx OP_RETURN.
 
 ```TypeScript
 interface BtcJumpCkbVirtualTxResult {
@@ -99,9 +99,9 @@ export const genBtcJumpCkbVirtualTx = async ({
 }: BtcJumpCkbVirtualTxParams): Promise<BtcJumpCkbVirtualTxResult>
 ```
 
-## RGB++ assets jump from CKB to BTC
+## RGB++ xUDT Leap from CKB to BTC
 
-The method `genCkbJumpBtcVirtualTx` can generate a CKB transaction for rgbpp assets jumping from CKB to BTC
+The method `genCkbJumpBtcVirtualTx` can generate a CKB transaction for RGB++ xUDT leaping from CKB to BTC
 
 ```TypeScript
 /**
@@ -124,4 +124,135 @@ export const genCkbJumpBtcVirtualTx = async ({
   witnessLockPlaceholderSize,
   ckbFeeRate,
 }: CkbJumpBtcVirtualTxParams): Promise<CKBComponents.RawTransaction>
+```
+
+## RGB++ Spore Creation on BTC
+
+The method `genCreateSporeCkbVirtualTx` can generate a CKB virtual transaction which contains the necessary `inputCells/outputCells` for RGB++ Spore creation and the commitment to be inserted to the BTC tx OP_RETURN.
+
+```TypeScript
+export interface SporeCreateVirtualTxResult {
+  // CKB raw transaction
+  ckbRawTx: CKBComponents.RawTransaction;
+  // The rgbpp commitment to be inserted into BTC op_return
+  commitment: Hex;
+  // The sum capacity of the ckb inputs
+  sumInputsCapacity: Hex;
+  // The cluster cell from ckb-indexer
+  clusterCell: IndexerCell;
+}
+
+/**
+ * Generate the virtual ckb transaction for creating spores
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param clusterRgbppLockArgs The cluster rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
+ * @param sporeDataList The spore's data list, including name and description.
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ */
+export const genCreateSporeCkbVirtualTx = async ({
+  collector,
+  clusterRgbppLockArgs,
+  sporeDataList,
+  isMainnet,
+}: CreateSporeCkbVirtualTxParams): Promise<SporeCreateVirtualTxResult>
+```
+
+## RGB++ Spore Transfer on BTC
+
+The method `genTransferSporeCkbVirtualTx` can generate a CKB virtual transaction which contains the necessary `inputCells/outputCells` for RGB++ Spore creation and the commitment to be inserted to the BTC tx OP_RETURN.
+
+```TypeScript
+export interface SporeTransferVirtualTxResult {
+  // CKB raw transaction
+  ckbRawTx: CKBComponents.RawTransaction;
+  // The rgbpp commitment to be inserted into BTC op_return
+  commitment: Hex;
+  // The spore cell from ckb-indexer
+  sporeCell: IndexerCell;
+  // The needPaymasterCell indicates whether a paymaster cell is required
+  needPaymasterCell: boolean;
+  // The sum capacity of the ckb inputs
+  sumInputsCapacity: Hex;
+}
+
+/**
+ * Generate the virtual ckb transaction for transferring spore
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param sporeRgbppLockArgs The spore rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
+ * @param sporeTypeBytes The spore type script serialized bytes
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ */
+export const genTransferSporeCkbVirtualTx = async ({
+  collector,
+  sporeRgbppLockArgs,
+  sporeTypeBytes,
+  isMainnet,
+  witnessLockPlaceholderSize,
+  ckbFeeRate,
+}: TransferSporeCkbVirtualTxParams): Promise<SporeTransferVirtualTxResult>
+```
+
+## RGB++ Spore Leap from BTC to CKB
+
+The method `genBtcJumpCkbVirtualTx` can generate a CKB virtual transaction which contains the necessary `inputCells/outputCells` for RGB++ Spore leaping from BTC to CKB and the commitment to be inserted to the BTC tx OP_RETURN.
+
+```TypeScript
+export interface SporeLeapVirtualTxResult {
+  // CKB raw transaction
+  ckbRawTx: CKBComponents.RawTransaction;
+  // The rgbpp commitment to be inserted into BTC op_return
+  commitment: Hex;
+  // The spore cell from ckb-indexer
+  sporeCell: IndexerCell;
+  // The needPaymasterCell indicates whether a paymaster cell is required
+  needPaymasterCell: boolean;
+  // The sum capacity of the ckb inputs
+  sumInputsCapacity: Hex;
+}
+
+/**
+ * Generate the virtual ckb transaction for leaping spore from BTC to CKB
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param sporeRgbppLockArgs The spore rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
+ * @param sporeTypeBytes The spore type script serialized bytes
+ * @param toCkbAddress The receiver ckb address
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ */
+export const genLeapSporeFromBtcToCkbVirtualTx = async ({
+  collector,
+  sporeRgbppLockArgs,
+  sporeTypeBytes,
+  toCkbAddress,
+  isMainnet,
+  witnessLockPlaceholderSize,
+  ckbFeeRate,
+}: LeapSporeFromBtcToCkbVirtualTxParams): Promise<SporeLeapVirtualTxResult>
+```
+
+## RGB++ Spore Leap from CKB to BTC
+
+The method `genLeapSporeFromCkbToBtcRawTx` can generate a CKB transaction for RGB++ Spore leaping from CKB to BTC
+
+```TypeScript
+/**
+ * Generate the virtual ckb transaction for leaping spore from CKB to BTC
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param sporeRgbppLockArgs The spore rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
+ * @param sporeTypeBytes The spore type script serialized bytes
+ * @param toCkbAddress The receiver ckb address
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ */
+export const genLeapSporeFromCkbToBtcRawTx = async ({
+  collector,
+  sporeTypeBytes,
+  fromCkbAddress,
+  toRgbppLockArgs,
+  isMainnet,
+  witnessLockPlaceholderSize,
+  ckbFeeRate,
+}: LeapSporeFromCkbToBtcVirtualTxParams): Promise<CKBComponents.RawTransaction>
 ```

@@ -100,3 +100,37 @@ export interface SporeTransferVirtualTxResult {
   // The sum capacity of the ckb inputs
   sumInputsCapacity: Hex;
 }
+
+export interface SporeLeapVirtualTxResult extends SporeTransferVirtualTxResult {}
+
+export interface LeapSporeFromBtcToCkbVirtualTxParams {
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // The spore rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
+  sporeRgbppLockArgs: Hex;
+  // The spore type script serialized bytes
+  sporeTypeBytes: Hex;
+  // The receiver ckb address
+  toCkbAddress: Address;
+  isMainnet: boolean;
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+  witnessLockPlaceholderSize?: number;
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
+}
+
+export interface LeapSporeFromCkbToBtcVirtualTxParams {
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // The sender ckb address
+  fromCkbAddress: Address;
+  // The receiver spore rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
+  toRgbppLockArgs: Hex;
+  // The spore type script serialized bytes
+  sporeTypeBytes: Hex;
+  isMainnet: boolean;
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+  witnessLockPlaceholderSize?: number;
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
+}

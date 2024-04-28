@@ -7,7 +7,7 @@ import {
   getSporeTypeScript,
   Hex,
   generateSporeTransferCoBuild,
-  genTransferSporeCkbVirtualTx,
+  genLeapSporeFromBtcToCkbVirtualTx,
 } from '@rgbpp-sdk/ckb';
 import { DataSource, ECPair, bitcoin, NetworkType, sendRgbppUtxos, transactionToHex } from '@rgbpp-sdk/btc';
 import { BtcAssetsApi, BtcAssetsApiError } from '@rgbpp-sdk/service';
@@ -22,7 +22,13 @@ const BTC_ASSETS_TOKEN = '';
 
 const BTC_ASSETS_ORIGIN = 'https://btc-test.app';
 
-const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress }: { sporeRgbppLockArgs: Hex; toBtcAddress: string}) => {
+const transferSpore = async ({
+  sporeRgbppLockArgs,
+  toCkbAddress,
+}: {
+  sporeRgbppLockArgs: Hex;
+  toCkbAddress: string;
+}) => {
   const collector = new Collector({
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
@@ -45,15 +51,15 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress }: { sporeRgbppL
   // The spore type script is from 3-create-spore.ts, you can find it from the ckb tx spore output cells
   const sporeTypeBytes = serializeScript({
     ...getSporeTypeScript(isMainnet),
-    args: '0x205fe15af04e59d3ff1ff8e0b0a1e3bc201af406a38964760c24848ed6029b6b',
+    args: '0x42898ea77062256f46e8f1b861d526ae47810ecc51ab50477945d5fa90452706',
   });
 
-  const ckbVirtualTxResult = await genTransferSporeCkbVirtualTx({
+  const ckbVirtualTxResult = await genLeapSporeFromBtcToCkbVirtualTx({
     collector,
     sporeRgbppLockArgs,
     sporeTypeBytes,
+    toCkbAddress,
     isMainnet,
-    ckbFeeRate: BigInt(5000),
   });
 
   const { commitment, ckbRawTx, sporeCell } = ckbVirtualTxResult;
@@ -64,11 +70,11 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress }: { sporeRgbppL
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
-    tos: [toBtcAddress],
+    tos: [btcAddress!],
     ckbCollector: collector,
     from: btcAddress!,
     source,
-    feeRate: 30,
+    feeRate: 120,
   });
   psbt.signAllInputs(keyPair);
   psbt.finalizeAllInputs();
@@ -99,7 +105,7 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress }: { sporeRgbppL
       // console.log('ckbTx: ', JSON.stringify(ckbTx));
 
       const txHash = await sendCkbTx({ collector, signedTx: ckbTx });
-      console.info(`RGB++ Spore has been transferred and tx hash is ${txHash}`);
+      console.info(`RGB++ Spore has been leaped from BTC to CKB and tx hash is ${txHash}`);
     } catch (error) {
       if (!(error instanceof BtcAssetsApiError)) {
         console.error(error);
@@ -112,6 +118,6 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress }: { sporeRgbppL
 // rgbppLockArgs: outIndexU32 + btcTxId
 transferSpore({
   // The spore rgbpp lock args is from 3-create-spore.ts
-  sporeRgbppLockArgs: buildRgbppLockArgs(1, 'f203c8c13eacdbd126f85d286a963c85f233f8145363b1d997c4d552afb990e1'),
-  toBtcAddress: 'tb1qhp9fh9qsfeyh0yhewgu27ndqhs5qlrqwau28m7',
+  sporeRgbppLockArgs: buildRgbppLockArgs(3, 'd8a31796fbd42c546f6b22014b9b82b16586ce1df81b0e7ca9a552cdc492a0af'),
+  toCkbAddress: 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq0e4xk4rmg5jdkn8aams492a7jlg73ue0gc0ddfj',
 });

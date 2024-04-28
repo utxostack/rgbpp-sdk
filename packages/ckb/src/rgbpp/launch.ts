@@ -50,10 +50,11 @@ export const genRgbppLaunchCkbVirtualTx = async ({
   isMainnet,
 }: RgbppLaunchCkbVirtualTxParams): Promise<RgbppLaunchVirtualTxResult> => {
   const ownerLock = genRgbppLockScript(ownerRgbppLockArgs, isMainnet);
-  const emptyCells = await collector.getCells({ lock: ownerLock });
+  let emptyCells = await collector.getCells({ lock: ownerLock });
   if (!emptyCells || emptyCells.length === 0) {
     throw new NoLiveCellError('The owner address has no empty cells');
   }
+  emptyCells = emptyCells.filter((cell) => !cell.output.type);
   const infoCellCapacity = calculateRgbppTokenInfoCellCapacity(rgbppTokenInfo, isMainnet);
 
   let txFee = MAX_FEE;

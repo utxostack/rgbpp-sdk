@@ -33,7 +33,7 @@ interface Params {
   }[];
 }
 
-const createSpore = async ({ clusterRgbppLockArgs, receivers }: Params) => {
+const createSpores = async ({ clusterRgbppLockArgs, receivers }: Params) => {
   const collector = new Collector({
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
@@ -78,7 +78,7 @@ const createSpore = async ({ clusterRgbppLockArgs, receivers }: Params) => {
     ckbCollector: collector,
     from: btcAddress!,
     source,
-    feeRate: 30,
+    feeRate: 120,
   });
   psbt.signAllInputs(keyPair);
   psbt.finalizeAllInputs();
@@ -96,7 +96,7 @@ const createSpore = async ({ clusterRgbppLockArgs, receivers }: Params) => {
       clearInterval(interval);
       // Update CKB transaction with the real BTC txId
       const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet });
-      console.log('The new cluster lock args: ', newCkbRawTx.outputs[0].lock.args);
+      console.log('The new cluster cell lock script args: ', newCkbRawTx.outputs[0].lock.args);
 
       const ckbTx = await appendCkbTxWitnesses({
         ckbRawTx: newCkbRawTx,
@@ -104,15 +104,18 @@ const createSpore = async ({ clusterRgbppLockArgs, receivers }: Params) => {
         rgbppApiSpvProof,
       });
 
+      // The outputs[1..] are spore cells from which you can find spore type scripts,
+      // and the spore type scripts will be used to transfer and leap spores
+      console.log('Spore type scripts: ', JSON.stringify(ckbTx.outputs.slice(1).map((output) => output.type)));
+
       // Replace cobuild witness with the final rgbpp lock script
       ckbTx.witnesses[ckbTx.witnesses.length - 1] = generateSporeCreateCoBuild({
         // The first output is cluster cell and the rest of the outputs are spore cells
         sporeOutputs: ckbTx.outputs.slice(1),
         sporeOutputsData: ckbTx.outputsData.slice(1),
         clusterCell,
-        clusterOutputCell: ckbTx.outputs[0]
-      }
-      );
+        clusterOutputCell: ckbTx.outputs[0],
+      });
 
       // console.log('ckbTx: ', JSON.stringify(ckbTx));
 
@@ -137,9 +140,9 @@ const createSpore = async ({ clusterRgbppLockArgs, receivers }: Params) => {
 
 // Use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
-createSpore({
+createSpores({
   // The cluster rgbpp lock args is from 2-create-cluster.ts
-  clusterRgbppLockArgs: buildRgbppLockArgs(1, 'f7176d8715d8f7e0fa439e69076a673fa480b19b789035c23cde994722ba4244'),
+  clusterRgbppLockArgs: buildRgbppLockArgs(1, '96bccaadd3c8f59b2411e3d64ae4c1743532415f953fc4f9741a5fd7a0a34483'),
   receivers: [
     {
       toBtcAddress: 'tb1qhp9fh9qsfeyh0yhewgu27ndqhs5qlrqwau28m7',

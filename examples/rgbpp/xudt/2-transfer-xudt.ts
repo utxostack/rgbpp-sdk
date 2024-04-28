@@ -64,12 +64,13 @@ const transferXudt = async ({ xudtType, receivers }: TransferParams) => {
 
   let txFee = MAX_FEE;
   if (sumXudtInputsCapacity < sumXudtCapacity) {
-    const emptyCells = await collector.getCells({
+    let emptyCells = await collector.getCells({
       lock: fromLock,
     });
     if (!emptyCells || emptyCells.length === 0) {
       throw new NoLiveCellError('The address has no empty cells');
     }
+    emptyCells = emptyCells.filter((cell) => !cell.output.type);
     const needCapacity = sumXudtCapacity - sumXudtInputsCapacity + xudtCapacity;
     const { inputs: emptyInputs, sumInputsCapacity: sumEmptyCapacity } = collector.collectInputs(
       emptyCells,

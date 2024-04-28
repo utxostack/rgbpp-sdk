@@ -314,10 +314,11 @@ export const appendIssuerCellToBtcBatchTransfer = async ({
     .reduce((prev, current) => prev + current, BigInt(0));
 
   const issuerLock = addressToScript(issuerAddress);
-  const emptyCells = await collector.getCells({ lock: issuerLock });
+  let emptyCells = await collector.getCells({ lock: issuerLock });
   if (!emptyCells || emptyCells.length === 0) {
     throw new NoLiveCellError('The issuer address has no empty cells');
   }
+  emptyCells = emptyCells.filter((cell) => !cell.output.type);
 
   let actualInputsCapacity = BigInt(sumInputsCapacity);
   let txFee = MAX_FEE;
