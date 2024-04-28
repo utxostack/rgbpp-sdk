@@ -151,12 +151,12 @@ export const genBtcTransferCkbVirtualTx = async ({
     });
     outputsData.push(append0x(u128ToLe(transferAmount)));
 
-    if (collectResult.sumAmount > transferAmount) {
+    if (needChange) {
       // The Vouts[2] for target change RGBPP assets
       outputs.push({
         lock: genRgbppLockScript(buildPreLockArgs(2), isMainnet),
         type: xudtType,
-        capacity: append0x((sumInputsCapacity - rgbppCellCapacity).toString(16)),
+        capacity: append0x(rgbppCellCapacity.toString(16)),
       });
       outputsData.push(append0x(u128ToLe(collectResult.sumAmount - transferAmount)));
     }
