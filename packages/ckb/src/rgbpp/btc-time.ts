@@ -130,7 +130,6 @@ export const signBtcTimeCellSpentTx = async ({
   const masterLock = addressToScript(masterCkbAddress);
   let emptyCells = await collector.getCells({
     lock: masterLock,
-    isDataEmpty: true,
     outputCapacityRange,
   });
   if (!emptyCells || emptyCells.length === 0) {

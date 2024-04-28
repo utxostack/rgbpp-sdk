@@ -23,12 +23,13 @@ const issueXudt = async ({ xudtTotalAmount }: { xudtTotalAmount: bigint }) => {
 
   const issueLock = addressToScript(issueAddress);
 
-  const emptyCells = await collector.getCells({
+  let emptyCells = await collector.getCells({
     lock: issueLock,
   });
   if (!emptyCells || emptyCells.length === 0) {
     throw new NoLiveCellError('The address has no empty cells');
   }
+  emptyCells = emptyCells.filter((cell) => !cell.output.type);
 
   const xudtCapacity = calculateUdtCellCapacity(issueLock);
   const xudtInfoCapacity = calculateXudtTokenInfoCellCapacity(XUDT_TOKEN_INFO, issueLock);

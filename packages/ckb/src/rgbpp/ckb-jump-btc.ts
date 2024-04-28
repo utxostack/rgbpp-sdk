@@ -65,10 +65,11 @@ export const genCkbJumpBtcVirtualTx = async ({
   let txFee = MAX_FEE;
   const xudtCellCapacity = calculateUdtCellCapacity(fromLock, xudtType);
   if (sumInputsCapacity < xudtCellCapacity + rpbppCellCapacity + MIN_CAPACITY + txFee) {
-    const emptyCells = await collector.getCells({ lock: fromLock });
+    let emptyCells = await collector.getCells({ lock: fromLock });
     if (!emptyCells || emptyCells.length === 0) {
       throw new NoLiveCellError('The address has no empty cells');
     }
+    emptyCells = emptyCells.filter((cell) => !cell.output.type);
     const { inputs: emptyInputs, sumInputsCapacity: sumEmptyCapacity } = collector.collectInputs(
       emptyCells,
       rpbppCellCapacity,
@@ -169,10 +170,11 @@ export const genCkbBatchJumpBtcVirtualTx = async ({
   let txFee = MAX_FEE;
   const xudtCellCapacity = calculateUdtCellCapacity(fromLock, xudtType);
   if (sumInputsCapacity < xudtCellCapacity + sumRgbppCellCapacity + MIN_CAPACITY + txFee) {
-    const emptyCells = await collector.getCells({ lock: fromLock });
+    let emptyCells = await collector.getCells({ lock: fromLock });
     if (!emptyCells || emptyCells.length === 0) {
       throw new NoLiveCellError('The address has no empty cells');
     }
+    emptyCells = emptyCells.filter((cell) => !cell.output.type);
     const { inputs: emptyInputs, sumInputsCapacity: sumEmptyCapacity } = collector.collectInputs(
       emptyCells,
       rpbppCellCapacity,

@@ -29,12 +29,13 @@ const prepareLaunchCell = async ({
   const launchCellCapacity =
     calculateRgbppCellCapacity() + calculateRgbppTokenInfoCellCapacity(rgbppTokenInfo, isMainnet);
 
-  const emptyCells = await collector.getCells({
+  let emptyCells = await collector.getCells({
     lock: masterLock,
   });
   if (!emptyCells || emptyCells.length === 0) {
     throw new NoLiveCellError('The address has no empty cells');
   }
+  emptyCells = emptyCells.filter(cell => !cell.output.type)
 
   let txFee = MAX_FEE;
   const { inputs, sumInputsCapacity } = collector.collectInputs(emptyCells, launchCellCapacity, txFee);
