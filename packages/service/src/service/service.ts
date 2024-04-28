@@ -13,7 +13,8 @@ import {
   BtcApiTransaction,
   BtcApiUtxo,
   BtcApiUtxoParams,
-  RgbppApiTransactionStateParams,
+  BtcApiTransactionParams,
+  BtcApiRecommendedFeeRates,
 } from '../types';
 import {
   RgbppApis,
@@ -24,6 +25,7 @@ import {
   RgbppApiCkbTransactionHash,
   RgbppApiAssetsByAddressParams,
   RgbppApiRetryCkbTransactionPayload,
+  RgbppApiTransactionStateParams,
   RgbppApiTransactionRetry,
 } from '../types';
 
@@ -60,6 +62,10 @@ export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis
     return this.request<BtcApiBlockTransactionIds>(`/bitcoin/v1/block/${blockHash}/txids`);
   }
 
+  getBtcRecommendedFeeRates() {
+    return this.request<BtcApiRecommendedFeeRates>(`/bitcoin/v1/fees/recommended`);
+  }
+
   getBtcBalance(address: string, params?: BtcApiBalanceParams) {
     return this.request<BtcApiBalance>(`/bitcoin/v1/address/${address}/balance`, {
       params,
@@ -72,8 +78,10 @@ export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis
     });
   }
 
-  getBtcTransactions(address: string) {
-    return this.request<BtcApiTransaction[]>(`/bitcoin/v1/address/${address}/txs`);
+  getBtcTransactions(address: string, params?: BtcApiTransactionParams) {
+    return this.request<BtcApiTransaction[]>(`/bitcoin/v1/address/${address}/txs`, {
+      params,
+    });
   }
 
   getBtcTransaction(txId: string) {
