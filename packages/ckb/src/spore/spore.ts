@@ -77,7 +77,7 @@ export const genCreateSporeCkbVirtualTx = async ({
     throw new NoRgbppLiveCellError('No cluster rgbpp cells found with the cluster rgbpp lock args');
   }
   if (clusterCells.length > 1) {
-    throw new RgbppUtxoBindMultiTypeAssetsError('The UTXO is bound to multiple clusters');
+    throw new RgbppUtxoBindMultiTypeAssetsError('The BTC UTXO must not be bound to multiple CKB cells');
   }
   const clusterCell = clusterCells[0];
 
