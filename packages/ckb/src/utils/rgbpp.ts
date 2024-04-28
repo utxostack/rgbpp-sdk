@@ -246,8 +246,8 @@ export const throwErrorWhenRgbppCellsInvalid = (
       'One UTXO does not allow binding of Spore and xUDT assets at the same time',
     );
   }
-  const isTargetExist = typeCells.filter((cell) => isScriptEqual(cell.output.type!, xudtTypeBytes));
-  if (isTargetExist) {
+  const isTargetExist = typeCells.some((cell) => isScriptEqual(cell.output.type!, xudtTypeBytes));
+  if (!isTargetExist) {
     throw new NoRgbppLiveCellError('No rgbpp cells found with the xudt type script and the rgbpp lock args');
   }
 };
