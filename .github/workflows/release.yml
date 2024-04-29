@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-    - main
+      - main
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -47,7 +47,7 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      - name: Create Release Pull Request or Publish to npm
+      - name: Create bump PR or release version
         id: changesets
         uses: changesets/action@v1
         with:
@@ -56,4 +56,4 @@ jobs:
           commit: "bump: assumable rgbpp-sdk version"
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
