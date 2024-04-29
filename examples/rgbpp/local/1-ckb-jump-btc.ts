@@ -23,6 +23,7 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTx
 
   const toRgbppLockArgs = buildRgbppLockArgs(outIndex, btcTxId);
 
+  // Warning: Please replace with your real xUDT type script here
   const xudtType: CKBComponents.Script = {
     ...getXudtTypeScript(isMainnet),
     args: '0x1ba116c119d1cfd98a53e9d1a615cf2af2bb87d95515c9d217d367054cfc696b',
@@ -34,7 +35,6 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTx
     toRgbppLockArgs,
     xudtTypeBytes: serializeScript(xudtType),
     transferAmount: BigInt(800_0000_0000),
-    witnessLockPlaceholderSize: 1000,
   });
 
   const emptyWitness = { lock: '', inputType: '', outputType: '' };
