@@ -7,15 +7,8 @@ import {
   updateCkbTxWithRealBtcTxId,
   buildRgbppLockArgs,
 } from '@rgbpp-sdk/ckb';
-import {
-  sendRgbppUtxos,
-  DataSource,
-  NetworkType,
-  bitcoin,
-  ECPair,
-  transactionToHex,
-} from '@rgbpp-sdk/btc';
-import { BtcAssetsApi, BtcAssetsApiError } from '@rgbpp-sdk/service'
+import { sendRgbppUtxos, DataSource, NetworkType, bitcoin, ECPair, transactionToHex } from '@rgbpp-sdk/btc';
+import { BtcAssetsApi, BtcAssetsApiError } from '@rgbpp-sdk/service';
 
 // CKB SECP256K1 private key
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
@@ -116,7 +109,7 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
       }
     }
   }, 30 * 1000);
-}
+};
 
 // rgbppLockArgs: outIndexU32 + btcTxId
 jumpFromBtcToCkb({
@@ -127,4 +120,3 @@ jumpFromBtcToCkb({
   // To simplify, keep the transferAmount the same as 2-ckb-jump-btc
   transferAmount: BigInt(800_0000_0000),
 });
-

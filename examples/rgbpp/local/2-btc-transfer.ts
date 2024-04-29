@@ -109,7 +109,6 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
   }, 30 * 1000);
 };
 
-
 // Use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 transferRgbppOnBtc({
@@ -118,4 +117,3 @@ transferRgbppOnBtc({
   // To simplify, keep the transferAmount the same as 2-ckb-jump-btc
   transferAmount: BigInt(800_0000_0000),
 });
-

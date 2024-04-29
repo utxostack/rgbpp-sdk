@@ -22,7 +22,13 @@ const BTC_ASSETS_TOKEN = '';
 
 const BTC_ASSETS_ORIGIN = 'https://btc-test.app';
 
-const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress }: { sporeRgbppLockArgs: Hex; toBtcAddress: string}) => {
+const transferSpore = async ({
+  sporeRgbppLockArgs,
+  toBtcAddress,
+}: {
+  sporeRgbppLockArgs: Hex;
+  toBtcAddress: string;
+}) => {
   const collector = new Collector({
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',

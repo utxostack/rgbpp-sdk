@@ -1,10 +1,4 @@
-import {
-  Collector,
-  buildRgbppLockArgs,
-  getSporeTypeScript,
-  Hex,
-  genTransferSporeCkbVirtualTx,
-} from '@rgbpp-sdk/ckb';
+import { Collector, buildRgbppLockArgs, getSporeTypeScript, Hex, genTransferSporeCkbVirtualTx } from '@rgbpp-sdk/ckb';
 import { DataSource, ECPair, bitcoin, NetworkType, sendRgbppUtxos } from '@rgbpp-sdk/btc';
 import { BtcAssetsApi } from '@rgbpp-sdk/service';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
@@ -18,7 +12,13 @@ const BTC_ASSETS_TOKEN = '';
 
 const BTC_ASSETS_ORIGIN = 'https://btc-test.app';
 
-const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress }: { sporeRgbppLockArgs: Hex; toBtcAddress: string}) => {
+const transferSpore = async ({
+  sporeRgbppLockArgs,
+  toBtcAddress,
+}: {
+  sporeRgbppLockArgs: Hex;
+  toBtcAddress: string;
+}) => {
   const collector = new Collector({
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',

@@ -37,7 +37,7 @@ const leapSporeFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; 
   });
 
   const emptyWitness = { lock: '', inputType: '', outputType: '' };
-  let unsignedTx: CKBComponents.RawTransactionToSign = {
+  const unsignedTx: CKBComponents.RawTransactionToSign = {
     ...ckbRawTx,
     cellDeps: [...ckbRawTx.cellDeps, getSecp256k1CellDep(isMainnet)],
     witnesses: [emptyWitness, ...ckbRawTx.witnesses.slice(1)],
@@ -45,7 +45,7 @@ const leapSporeFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; 
 
   const signedTx = collector.getCkb().signTransaction(CKB_TEST_PRIVATE_KEY)(unsignedTx);
 
-  let txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
+  const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
   console.info(`RGB++ Spore has been jumped from CKB to BTC and tx hash is ${txHash}`);
 };
 

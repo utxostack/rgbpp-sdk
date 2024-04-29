@@ -1,12 +1,26 @@
 import { AddressPrefix, addressToScript, getTransactionSize, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
-import { getSecp256k1CellDep,Collector, NoLiveCellError, calculateUdtCellCapacity, MAX_FEE, MIN_CAPACITY, append0x, u128ToLe, getXudtDep, getUniqueTypeDep, SECP256K1_WITNESS_LOCK_SIZE, calculateTransactionFee, NoXudtLiveCellError } from '@rgbpp-sdk/ckb';
+import {
+  getSecp256k1CellDep,
+  Collector,
+  NoLiveCellError,
+  calculateUdtCellCapacity,
+  MAX_FEE,
+  MIN_CAPACITY,
+  append0x,
+  u128ToLe,
+  getXudtDep,
+  getUniqueTypeDep,
+  SECP256K1_WITNESS_LOCK_SIZE,
+  calculateTransactionFee,
+  NoXudtLiveCellError,
+} from '@rgbpp-sdk/ckb';
 import { XUDT_TOKEN_INFO } from './0-token-info';
 
 // CKB SECP256K1 private key
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
 
 interface TransferParams {
-  xudtType: CKBComponents.Script,
+  xudtType: CKBComponents.Script;
   receivers: {
     toAddress: string;
     transferAmount: bigint;
@@ -42,8 +56,8 @@ const transferXudt = async ({ xudtType, receivers }: TransferParams) => {
     .map((receiver) => receiver.transferAmount)
     .reduce((prev, current) => prev + current, BigInt(0));
 
-  let {
-    inputs,
+  const {
+    inputs: udtInputs,
     sumInputsCapacity: sumXudtInputsCapacity,
     sumAmount,
   } = collector.collectUdtInputs({
@@ -51,6 +65,7 @@ const transferXudt = async ({ xudtType, receivers }: TransferParams) => {
     needAmount: sumTransferAmount,
   });
   let actualInputsCapacity = sumXudtInputsCapacity;
+  let inputs = udtInputs;
 
   const xudtCapacity = calculateUdtCellCapacity(fromLock);
   const sumXudtCapacity = xudtCapacity * BigInt(receivers.length);
@@ -62,7 +77,7 @@ const transferXudt = async ({ xudtType, receivers }: TransferParams) => {
   }));
   const outputsData = receivers.map((receiver) => append0x(u128ToLe(receiver.transferAmount)));
 
-  let txFee = MAX_FEE;
+  const txFee = MAX_FEE;
   if (sumXudtInputsCapacity < sumXudtCapacity) {
     let emptyCells = await collector.getCells({
       lock: fromLock,
@@ -127,7 +142,6 @@ const transferXudt = async ({ xudtType, receivers }: TransferParams) => {
 
   console.info(`xUDT asset has been minted or transferred and tx hash is ${txHash}`);
 };
-
 
 transferXudt({
   // The xudtType comes from 1-issue-xudt

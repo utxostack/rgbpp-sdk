@@ -17,8 +17,8 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTx
   });
   const isMainnet = false;
   const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
-      prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
-    });
+    prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
+  });
   console.log('ckb address: ', address);
 
   const toRgbppLockArgs = buildRgbppLockArgs(outIndex, btcTxId);
@@ -34,11 +34,11 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTx
     toRgbppLockArgs,
     xudtTypeBytes: serializeScript(xudtType),
     transferAmount: BigInt(800_0000_0000),
-    witnessLockPlaceholderSize: 1000
+    witnessLockPlaceholderSize: 1000,
   });
 
   const emptyWitness = { lock: '', inputType: '', outputType: '' };
-  let unsignedTx: CKBComponents.RawTransactionToSign = {
+  const unsignedTx: CKBComponents.RawTransactionToSign = {
     ...ckbRawTx,
     cellDeps: [...ckbRawTx.cellDeps, getSecp256k1CellDep(isMainnet)],
     witnesses: [emptyWitness, ...ckbRawTx.witnesses.slice(1)],
@@ -46,7 +46,7 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTx
 
   const signedTx = collector.getCkb().signTransaction(CKB_TEST_PRIVATE_KEY)(unsignedTx);
 
-  let txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
+  const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
   console.info(`Rgbpp asset has been jumped from CKB to BTC and tx hash is ${txHash}`);
 };
 
@@ -55,4 +55,3 @@ jumpFromCkbToBtc({
   outIndex: 1,
   btcTxId: '4ff1855b64b309afa19a8b9be3d4da99dcb18b083b65d2d851662995c7d99e7a',
 });
-

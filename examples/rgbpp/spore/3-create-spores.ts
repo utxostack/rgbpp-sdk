@@ -9,9 +9,17 @@ import {
   appendIssuerCellToSporesCreate,
   generateSporeCreateCoBuild,
 } from '@rgbpp-sdk/ckb';
-import { DataSource, ECPair, bitcoin, NetworkType, sendRgbppUtxos, transactionToHex, utf8ToBuffer } from '@rgbpp-sdk/btc';
+import {
+  DataSource,
+  ECPair,
+  bitcoin,
+  NetworkType,
+  sendRgbppUtxos,
+  transactionToHex,
+  utf8ToBuffer,
+} from '@rgbpp-sdk/btc';
 import { BtcAssetsApi, BtcAssetsApiError } from '@rgbpp-sdk/service';
-import { RawSporeData } from '@spore-sdk/core'
+import { RawSporeData } from '@spore-sdk/core';
 import { AddressPrefix, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
 
 // CKB SECP256K1 private key
@@ -28,8 +36,8 @@ const BTC_ASSETS_ORIGIN = 'https://btc-test.app';
 interface Params {
   clusterRgbppLockArgs: Hex;
   receivers: {
-    toBtcAddress: string,
-    sporeData: RawSporeData
+    toBtcAddress: string;
+    sporeData: RawSporeData;
   }[];
 }
 
@@ -40,10 +48,10 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: Params) => {
   });
   const isMainnet = false;
 
-   const ckbAddress = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
-     prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
-   });
-   console.log('ckb address: ', ckbAddress);
+  const ckbAddress = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
+    prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
+  });
+  console.log('ckb address: ', ckbAddress);
 
   const network = isMainnet ? bitcoin.networks.bitcoin : bitcoin.networks.testnet;
   const keyPair = ECPair.fromPrivateKey(Buffer.from(BTC_TEST_PRIVATE_KEY, 'hex'), { network });
