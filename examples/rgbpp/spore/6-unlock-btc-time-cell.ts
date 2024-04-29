@@ -35,7 +35,7 @@ const unlockSporeBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: st
       ...getBtcTimeLockScript(false),
       args: btcTimeCellArgs,
     },
-    isDataEmpty: false,
+    isDataMustBeEmpty: false,
   });
 
   if (!btcTimeCells || btcTimeCells.length === 0) {
