@@ -55,6 +55,8 @@ jobs:
 
       - name: Version packages
         run: npx changeset version --snapshot snap
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
 
       - name: Publish to npm (ignore GitHub)
         id: changesets
