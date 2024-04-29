@@ -56,7 +56,7 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
     xudtTypeBytes: serializeScript(xudtType),
     transferAmount,
     isMainnet,
-    noMergeOutputCells: true
+    noMergeOutputCells: true,
   });
 
   const { commitment, ckbRawTx } = ckbVirtualTxResult;

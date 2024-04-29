@@ -1,4 +1,4 @@
-import { RgbppTokenInfo } from "@rgbpp-sdk/ckb";
+import { RgbppTokenInfo } from '@rgbpp-sdk/ckb';
 
 export const RGBPP_TOKEN_INFO: RgbppTokenInfo = {
   decimal: 8,

@@ -1,6 +1,4 @@
-import {
-  AddressPrefix, privateKeyToAddress,
-} from '@nervosnetwork/ckb-sdk-utils';
+import { AddressPrefix, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
 import {
   Collector,
   sendCkbTx,
@@ -42,10 +40,10 @@ const spendBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }
   if (!btcTimeCells || btcTimeCells.length === 0) {
     throw new Error('No btc time cell found');
   }
-  
+
   const btcAssetsApi = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, BTC_ASSETS_ORIGIN);
 
-  let ckbRawTx: CKBComponents.RawTransaction = await buildBtcTimeCellsSpentTx({
+  const ckbRawTx: CKBComponents.RawTransaction = await buildBtcTimeCellsSpentTx({
     btcTimeCells,
     btcAssetsApi,
     isMainnet,

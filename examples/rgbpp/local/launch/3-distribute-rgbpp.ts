@@ -1,5 +1,15 @@
 import { AddressPrefix, privateKeyToAddress, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { Collector, RgbppBtcAddressReceiver, appendCkbTxWitnesses, appendIssuerCellToBtcBatchTransfer, buildRgbppLockArgs, genBtcBatchTransferCkbVirtualTx, getXudtTypeScript, sendCkbTx, updateCkbTxWithRealBtcTxId } from '@rgbpp-sdk/ckb';
+import {
+  Collector,
+  RgbppBtcAddressReceiver,
+  appendCkbTxWitnesses,
+  appendIssuerCellToBtcBatchTransfer,
+  buildRgbppLockArgs,
+  genBtcBatchTransferCkbVirtualTx,
+  getXudtTypeScript,
+  sendCkbTx,
+  updateCkbTxWithRealBtcTxId,
+} from '@rgbpp-sdk/ckb';
 import { sendRgbppUtxos, DataSource, ECPair, bitcoin, NetworkType, transactionToHex } from '@rgbpp-sdk/btc';
 import { BtcAssetsApi, BtcAssetsApiError } from '@rgbpp-sdk/service';
 import { RGBPP_TOKEN_INFO } from './0-rgbpp-token-info';
@@ -113,7 +123,6 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers }: Param
   }, 20 * 1000);
 };
 
-
 // Use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 distributeRgbppAssetOnBtc({
@@ -126,4 +135,3 @@ distributeRgbppAssetOnBtc({
     },
   ],
 });
-

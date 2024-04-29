@@ -45,7 +45,7 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
     rgbppLockArgs: ownerRgbppLockArgs,
     clusterData: CLUSTER_DATA,
     isMainnet,
-    ckbFeeRate: BigInt(5000)
+    ckbFeeRate: BigInt(5000),
   });
 
   const { commitment, ckbRawTx, clusterId } = ckbVirtualTxResult;
@@ -60,7 +60,7 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
     ckbCollector: collector,
     from: btcAddress!,
     source,
-    feeRate: 30
+    feeRate: 30,
   });
   psbt.signAllInputs(keyPair);
   psbt.finalizeAllInputs();
@@ -89,7 +89,7 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
         ckbTx.outputsData[0],
       );
 
-      console.log(JSON.stringify(ckbTx))
+      console.log(JSON.stringify(ckbTx));
 
       const txHash = await sendCkbTx({ collector, signedTx: ckbTx });
       console.info(`RGB++ Cluster has been created and tx hash is ${txHash}`);

@@ -1,5 +1,18 @@
 import { AddressPrefix, addressToScript, getTransactionSize, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
-import { Collector, MAX_FEE, NoLiveCellError, RgbppTokenInfo, SECP256K1_WITNESS_LOCK_SIZE, append0x, buildRgbppLockArgs, calculateRgbppCellCapacity, calculateRgbppTokenInfoCellCapacity, calculateTransactionFee, genRgbppLockScript, getSecp256k1CellDep } from '@rgbpp-sdk/ckb';
+import {
+  Collector,
+  MAX_FEE,
+  NoLiveCellError,
+  RgbppTokenInfo,
+  SECP256K1_WITNESS_LOCK_SIZE,
+  append0x,
+  buildRgbppLockArgs,
+  calculateRgbppCellCapacity,
+  calculateRgbppTokenInfoCellCapacity,
+  calculateTransactionFee,
+  genRgbppLockScript,
+  getSecp256k1CellDep,
+} from '@rgbpp-sdk/ckb';
 import { RGBPP_TOKEN_INFO } from './0-rgbpp-token-info';
 
 // CKB SECP256K1 private key
@@ -35,9 +48,9 @@ const prepareLaunchCell = async ({
   if (!emptyCells || emptyCells.length === 0) {
     throw new NoLiveCellError('The address has no empty cells');
   }
-  emptyCells = emptyCells.filter(cell => !cell.output.type)
+  emptyCells = emptyCells.filter((cell) => !cell.output.type);
 
-  let txFee = MAX_FEE;
+  const txFee = MAX_FEE;
   const { inputs, sumInputsCapacity } = collector.collectInputs(emptyCells, launchCellCapacity, txFee);
 
   const outputs: CKBComponents.CellOutput[] = [
@@ -84,4 +97,3 @@ prepareLaunchCell({
   btcTxId: '6259ea7852e294afbd2aaf9ccd5c9c1f95087b0b08ba7e47ae35ce31170732bc',
   rgbppTokenInfo: RGBPP_TOKEN_INFO,
 });
-

@@ -35,7 +35,7 @@ const batchJumpFromCkbToBtc = async (rgbppReceivers: RgbppLockArgsReceiver[]) =>
   });
 
   const emptyWitness = { lock: '', inputType: '', outputType: '' };
-  let unsignedTx: CKBComponents.RawTransactionToSign = {
+  const unsignedTx: CKBComponents.RawTransactionToSign = {
     ...ckbRawTx,
     cellDeps: [...ckbRawTx.cellDeps, getSecp256k1CellDep(false)],
     witnesses: [emptyWitness, ...ckbRawTx.witnesses.slice(1)],
@@ -43,7 +43,7 @@ const batchJumpFromCkbToBtc = async (rgbppReceivers: RgbppLockArgsReceiver[]) =>
 
   const signedTx = collector.getCkb().signTransaction(CKB_TEST_PRIVATE_KEY)(unsignedTx);
 
-  let txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
+  const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
   console.info(`Rgbpp asset has been jumped from CKB to BTC and tx hash is ${txHash}`);
 };
 
@@ -61,4 +61,3 @@ const rgbppReceivers: RgbppLockArgsReceiver[] = [
   },
 ];
 batchJumpFromCkbToBtc(rgbppReceivers);
-

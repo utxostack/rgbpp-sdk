@@ -16,13 +16,7 @@ import { CLUSTER_DATA } from './0-cluster-info';
 // CKB SECP256K1 private key
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
 
-const prepareClusterCell = async ({
-  outIndex,
-  btcTxId,
-}: {
-  outIndex: number;
-  btcTxId: string;
-}) => {
+const prepareClusterCell = async ({ outIndex, btcTxId }: { outIndex: number; btcTxId: string }) => {
   const collector = new Collector({
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
@@ -45,7 +39,7 @@ const prepareClusterCell = async ({
   }
   emptyCells = emptyCells.filter((cell) => !cell.output.type);
 
-  let txFee = MAX_FEE;
+  const txFee = MAX_FEE;
   const { inputs, sumInputsCapacity } = collector.collectInputs(emptyCells, clusterCellCapacity, txFee);
 
   const outputs: CKBComponents.CellOutput[] = [

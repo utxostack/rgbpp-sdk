@@ -1,5 +1,28 @@
-import { AddressPrefix, addressToScript, getTransactionSize, privateKeyToAddress, scriptToHash } from '@nervosnetwork/ckb-sdk-utils';
-import { getSecp256k1CellDep,Collector, NoLiveCellError, calculateUdtCellCapacity, MAX_FEE, MIN_CAPACITY, getXudtTypeScript, append0x, getUniqueTypeScript, u128ToLe, encodeRgbppTokenInfo, getXudtDep, getUniqueTypeDep, SECP256K1_WITNESS_LOCK_SIZE, calculateTransactionFee, generateUniqueTypeArgs } from '@rgbpp-sdk/ckb';
+import {
+  AddressPrefix,
+  addressToScript,
+  getTransactionSize,
+  privateKeyToAddress,
+  scriptToHash,
+} from '@nervosnetwork/ckb-sdk-utils';
+import {
+  getSecp256k1CellDep,
+  Collector,
+  NoLiveCellError,
+  calculateUdtCellCapacity,
+  MAX_FEE,
+  MIN_CAPACITY,
+  getXudtTypeScript,
+  append0x,
+  getUniqueTypeScript,
+  u128ToLe,
+  encodeRgbppTokenInfo,
+  getXudtDep,
+  getUniqueTypeDep,
+  SECP256K1_WITNESS_LOCK_SIZE,
+  calculateTransactionFee,
+  generateUniqueTypeArgs,
+} from '@rgbpp-sdk/ckb';
 import { calculateXudtTokenInfoCellCapacity } from '@rgbpp-sdk/ckb/src/utils';
 import { XUDT_TOKEN_INFO } from './0-token-info';
 
@@ -34,20 +57,17 @@ const issueXudt = async ({ xudtTotalAmount }: { xudtTotalAmount: bigint }) => {
   const xudtCapacity = calculateUdtCellCapacity(issueLock);
   const xudtInfoCapacity = calculateXudtTokenInfoCellCapacity(XUDT_TOKEN_INFO, issueLock);
 
-  let txFee = MAX_FEE;
-  const { inputs, sumInputsCapacity } = collector.collectInputs(
-    emptyCells,
-    xudtCapacity + xudtInfoCapacity,
-    txFee,
-    { minCapacity: MIN_CAPACITY },
-  );
+  const txFee = MAX_FEE;
+  const { inputs, sumInputsCapacity } = collector.collectInputs(emptyCells, xudtCapacity + xudtInfoCapacity, txFee, {
+    minCapacity: MIN_CAPACITY,
+  });
 
   const xudtType: CKBComponents.Script = {
     ...getXudtTypeScript(isMainnet),
-    args: append0x(scriptToHash(issueLock))
-  }
+    args: append0x(scriptToHash(issueLock)),
+  };
 
-  console.log('xUDT type script', xudtType)
+  console.log('xUDT type script', xudtType);
 
   let changeCapacity = sumInputsCapacity - xudtCapacity - xudtInfoCapacity;
   const outputs: CKBComponents.CellOutput[] = [
@@ -58,9 +78,9 @@ const issueXudt = async ({ xudtTotalAmount }: { xudtTotalAmount: bigint }) => {
     },
     {
       lock: issueLock,
-      type: { 
+      type: {
         ...getUniqueTypeScript(isMainnet),
-        args: generateUniqueTypeArgs(inputs[0], 1)
+        args: generateUniqueTypeArgs(inputs[0], 1),
       },
       capacity: append0x(xudtInfoCapacity.toString(16)),
     },
@@ -100,4 +120,4 @@ const issueXudt = async ({ xudtTotalAmount }: { xudtTotalAmount: bigint }) => {
   console.info(`xUDT asset has been issued and tx hash is ${txHash}`);
 };
 
-issueXudt({xudtTotalAmount: BigInt(2100_0000)});
+issueXudt({ xudtTotalAmount: BigInt(2100_0000) });

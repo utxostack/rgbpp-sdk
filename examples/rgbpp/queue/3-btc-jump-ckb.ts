@@ -1,17 +1,7 @@
 import { AddressPrefix, privateKeyToAddress, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import {
-  Collector,
-  genBtcJumpCkbVirtualTx,
-  buildRgbppLockArgs,
-} from '@rgbpp-sdk/ckb';
-import {
-  sendRgbppUtxos,
-  DataSource,
-  NetworkType,
-  bitcoin,
-  ECPair,
-} from '@rgbpp-sdk/btc';
-import { BtcAssetsApi } from '@rgbpp-sdk/service'
+import { Collector, genBtcJumpCkbVirtualTx, buildRgbppLockArgs } from '@rgbpp-sdk/ckb';
+import { sendRgbppUtxos, DataSource, NetworkType, bitcoin, ECPair } from '@rgbpp-sdk/btc';
+import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
 // CKB SECP256K1 private key
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
@@ -73,7 +63,7 @@ const jumpFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, transferAmoun
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
-    tos: [btcAddress!], 
+    tos: [btcAddress!],
     ckbCollector: collector,
     from: btcAddress!,
     source,
@@ -115,4 +105,3 @@ jumpFromBtcToCkb({
   // To simplify, keep the transferAmount the same as 2-ckb-jump-btc
   transferAmount: BigInt(800_0000_0000),
 });
-
