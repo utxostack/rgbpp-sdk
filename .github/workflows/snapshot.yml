@@ -3,11 +3,11 @@
 name: Release Snapshots
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
       - develop
-      - feat/transfer-spore
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -55,6 +55,8 @@ jobs:
 
       - name: Version packages
         run: npx changeset version --snapshot snap
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to npm (ignore GitHub)
         id: changesets
