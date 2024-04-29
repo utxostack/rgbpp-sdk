@@ -85,6 +85,28 @@ console.log(res);
 
 All available APIs in the [BtcAssetsApi](#btcassetsapi-1) section.
 
+### Handling service errors
+
+You can identify the error by its `code` and `message`, or by its detailed `context`:
+
+```ts
+import { BtcAssetsApiError, ErrorCodes } from '@rgbpp-sdk/service';
+
+try {
+...
+} catch (e) {
+  if (e instanceof BtcAssetsApiError) {
+    // error code
+    console.log(e.code === ErrorCodes.ASSETS_API_UNAUTHORIZED);
+    // error message
+    console.log(e.message);
+    // detailed context info  (if thrown from a request)
+    console.log(e.context?.request);
+    console.log(e.context?.response);
+  }
+}
+```
+
 ## Types
 
 ### BtcAssetsApi
