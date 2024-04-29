@@ -1,7 +1,7 @@
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { sendRgbppUtxos, DataSource, NetworkType, bitcoin, ECPair } from '@rgbpp-sdk/btc';
 import { Collector, genBtcJumpCkbVirtualTx, buildRgbppLockArgs, getXudtTypeScript } from '@rgbpp-sdk/ckb';
-import { BtcAssetsApi } from '@rgbpp-sdk/service'
+import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
 // BTC SECP256K1 private key
 const BTC_TEST_PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000001';
