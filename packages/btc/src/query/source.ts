@@ -1,23 +1,25 @@
-import { FeesRecommended } from '@mempool/mempool.js/lib/interfaces/bitcoin/fees';
-import { BtcApiUtxoParams, BtcAssetsApi, BtcAssetsApiError, ErrorCodes as ServiceErrorCodes } from '@rgbpp-sdk/service';
+import {
+  BtcApiRecommendedFeeRates,
+  BtcApiUtxoParams,
+  BtcAssetsApi,
+  BtcAssetsApiError,
+  ErrorCodes as ServiceErrorCodes,
+} from '@rgbpp-sdk/service';
 import { Output, Utxo } from '../transaction/utxo';
 import { NetworkType } from '../preset/types';
 import { ErrorCodes, TxBuildError } from '../error';
+import { TxAddressOutput } from '../transaction/build';
 import { isOpReturnScriptPubkey } from '../transaction/embed';
 import { addressToScriptPublicKeyHex, getAddressType } from '../address';
-import { createMempool, MempoolInstance } from './mempool';
 import { remove0x } from '../utils';
-import { TxAddressOutput } from '../transaction/build';
 
 export class DataSource {
   public service: BtcAssetsApi;
   public networkType: NetworkType;
-  public mempool: MempoolInstance;
 
   constructor(service: BtcAssetsApi, networkType: NetworkType) {
     this.service = service;
     this.networkType = networkType;
-    this.mempool = createMempool(networkType);
   }
 
   // Query a UTXO from the service.
@@ -156,22 +158,6 @@ export class DataSource {
       satoshi: collectedAmount,
       exceedSatoshi: collectedAmount - targetAmount,
     };
-  }
-
-  // Get recommended fee rates from mempool.space.
-  // From fastest to slowest: fastestFee > halfHourFee > economyFee > hourFee > minimumFee
-  async getRecommendedFeeRates(): Promise<FeesRecommended> {
-    try {
-      return await this.mempool.bitcoin.fees.getFeesRecommended();
-    } catch (err: any) {
-      throw TxBuildError.withComment(ErrorCodes.MEMPOOL_API_RESPONSE_ERROR, err.message ?? JSON.stringify(err));
-    }
-  }
-
-  // Get the recommended average fee rate.
-  async getAverageFeeRate(): Promise<number> {
-    const fees = await this.getRecommendedFeeRates();
-    return fees.halfHourFee;
   }
 
   async getPaymasterOutput(): Promise<TxAddressOutput | undefined> {

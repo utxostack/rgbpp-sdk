@@ -173,9 +173,6 @@ importers:
       '@ckb-lumos/codec':
         specifier: 0.22.2
         version: 0.22.2
-      '@mempool/mempool.js':
-        specifier: ^2.3.0
-        version: 2.3.0
       '@nervosnetwork/ckb-types':
         specifier: ^0.109.1
         version: 0.109.1
@@ -1520,17 +1517,6 @@ packages:
       read-yaml-file: 1.1.0
     dev: true
 
-  /@mempool/mempool.js@2.3.0:
-    resolution: {integrity: sha512-FrN9WjZCEyyLodrTPQxmlWDh8B/UGK0jlKfVNzJxqzQ1IMPo/Hpdws8xwYEcsks5JqsaxbjLwaC3GAtJ6Brd0A==}
-    dependencies:
-      axios: 0.24.0
-      ws: 8.3.0
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - utf-8-validate
-    dev: false
-
   /@nervosnetwork/ckb-sdk-core@0.109.1:
     resolution: {integrity: sha512-YU3yJZvz69WU6Bw//vRxzxLGcIj74CwGffdp6GYZbQpZwFaACT6FCojvOMjHIyJ8Rw32r114LhMKHvyBwagWjw==}
     dependencies:
@@ -2582,14 +2568,6 @@ packages:
     dependencies:
       possible-typed-array-names: 1.0.0
     dev: true
-
-  /axios@0.24.0:
-    resolution: {integrity: sha512-Q6cWsys88HoPgAaFAVUb0WpPk0O8iTeisR9IMqy9G8AbO4NlpVknrnQS03zzF9PGAWgO3cgletO3VjV/P7VztA==}
-    dependencies:
-      follow-redirects: 1.15.6
-    transitivePeerDependencies:
-      - debug
-    dev: false
 
   /axios@1.6.7:
     resolution: {integrity: sha512-/hDJGff6/c7u0hDkvkGxR/oy6CbCs8ziCsC7SqmhjfozqiJGc8Z11wrv9z9lYfY4K8l+H9TpjcMDX0xOZmx+RA==}
@@ -6632,19 +6610,6 @@ packages:
   /wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
     dev: true
-
-  /ws@8.3.0:
-    resolution: {integrity: sha512-Gs5EZtpqZzLvmIM59w4igITU57lrtYVFneaa434VROv4thzJyV6UjIL3D42lslWlI+D4KzLYnxSwtfuiO79sNw==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: ^5.0.2
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-    dev: false
 
   /xtend@4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}

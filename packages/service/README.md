@@ -131,9 +131,10 @@ interface BtcApis {
   getBtcBlockHeaderByHash(blockHash: string): Promise<BtcApiBlockHeader>;
   getBtcBlockHashByHeight(blockHeight: number): Promise<BtcApiBlockHash>;
   getBtcBlockTransactionIdsByHash(blockHash: number): Promise<BtcApiBlockTransactionIds>;
+  getBtcRecommendedFeeRates(): Promise<BtcApiRecommendedFeeRates>;
   getBtcBalance(address: string, params?: BtcApiBalanceParams): Promise<BtcApiBalance>;
   getBtcUtxos(address: string, params?: BtcApiUtxoParams): Promise<BtcApiUtxo[]>;
-  getBtcTransactions(address: string): Promise<BtcApiTransaction[]>;
+  getBtcTransactions(address: string, params?: BtcApiTransactionParams): Promise<BtcApiTransaction[]>;
   getBtcTransaction(txId: string): Promise<BtcApiTransaction>;
   sendBtcTransaction(txHex: string): Promise<BtcApiSentTransaction>;
 }
@@ -206,6 +207,10 @@ interface BtcApiUtxo {
 
 interface BtcApiSentTransaction {
   txid: string;
+}
+
+export interface BtcApiTransactionParams {
+  after_txid?: string;
 }
 
 interface BtcApiTransaction {
