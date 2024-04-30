@@ -146,21 +146,22 @@ describe(
           }
         });
       });
-      // TODO: wait for the btc-assets-api with org mempool api updates
-      it.todo('getBtcTransactions() with after_txid', async () => {
+      it('getBtcTransactions() with after_txid', async () => {
         const txs = await service.getBtcTransactions(btcAddress);
-        expect(Array.isArray(txs)).toBe(true);
         expect(Array.isArray(txs)).toBe(true);
         expect(txs.length).toBeGreaterThan(0);
 
-        const lastSecondId = txs[1].txid;
         const filteredTxs = await service.getBtcTransactions(btcAddress, {
-          after_txid: lastSecondId,
+          after_txid: txs[0].txid,
         });
-        console.log(filteredTxs.length);
         expect(Array.isArray(filteredTxs)).toBe(true);
-        expect(filteredTxs).toHaveLength(1);
-        expect(filteredTxs[0].txid).toEqual(lastSecondId);
+
+        if (txs.length > 1) {
+          expect(txs.length).toBeGreaterThan(0);
+          expect(filteredTxs[0].txid).toEqual(txs[1].txid);
+        } else {
+          expect(filteredTxs).toHaveLength(0);
+        }
       });
       it('getBtcTransaction()', async () => {
         const res = await service.getBtcTransaction('102d5a002e72f0781944eef636117377da6d3601061e47e03025e7cd29a91579');
