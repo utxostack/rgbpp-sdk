@@ -61,9 +61,9 @@ export class BtcAssetsApiBase implements BaseApis {
     const status = res.status;
     const context: BtcAssetsApiContext = {
       request: {
-        url: `${this.url}${route}${packedParams}`,
-        body: tryParseBody(otherOptions.body),
+        url,
         params,
+        body: tryParseBody(otherOptions.body),
       },
       response: {
         status,
