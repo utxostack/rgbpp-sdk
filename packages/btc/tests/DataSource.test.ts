@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { service, source } from './shared/env';
 import { ErrorCodes } from '../src';
 
-describe('DataSource', () => {
+describe('DataSource', { retry: 3 }, () => {
   it('Get average fee rate', async () => {
     const [feeRates, averageFeeRate] = await Promise.all([
       service.getBtcRecommendedFeeRates(),
