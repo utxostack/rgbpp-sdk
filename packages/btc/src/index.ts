@@ -6,6 +6,7 @@ export * from './utils';
 export * from './error';
 export * from './bitcoin';
 export * from './address';
+export * from './script';
 
 export * from './query/source';
 
