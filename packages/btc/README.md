@@ -380,8 +380,6 @@ interface DataSource {
     satoshi: number;
     exceedSatoshi: number;
   }>;
-  getRecommendedFeeRates(): Promise<FeesRecommended>;
-  getAverageFeeRate(): Promise<number>;
 }
 ```
 

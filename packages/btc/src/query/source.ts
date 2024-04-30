@@ -160,21 +160,6 @@ export class DataSource {
     };
   }
 
-  /**
-   * Get recommended fee rates from mempool.space.
-   * From fastest to slowest: fastestFee > halfHourFee > economyFee > hourFee > minimumFee
-   * @deprecated Use BtcAssetsApi.getBtcRecommendedFeeRates() instead.
-   */
-  async getRecommendedFeeRates(): Promise<BtcApiRecommendedFeeRates> {
-    return await this.service.getBtcRecommendedFeeRates();
-  }
-
-  // Get the recommended average fee rate.
-  async getAverageFeeRate(): Promise<number> {
-    const fees = await this.service.getBtcRecommendedFeeRates();
-    return fees.halfHourFee;
-  }
-
   async getPaymasterOutput(): Promise<TxAddressOutput | undefined> {
     try {
       const paymasterInfo = await this.service.getRgbppPaymasterInfo();

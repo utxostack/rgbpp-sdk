@@ -149,7 +149,8 @@ export class TxBuilder {
     // The transaction is expected be confirmed within half an hour with the fee rate
     let averageFeeRate: number | undefined;
     if (!feeRate && !this.feeRate) {
-      averageFeeRate = await this.source.getAverageFeeRate();
+      const feeRates = await this.source.service.getBtcRecommendedFeeRates();
+      averageFeeRate = feeRates.fastestFee;
     }
 
     // Use the feeRate param if it is specified,
