@@ -96,13 +96,25 @@ try {
 ...
 } catch (e) {
   if (e instanceof BtcAssetsApiError) {
-    // error code
-    console.log(e.code === ErrorCodes.ASSETS_API_UNAUTHORIZED);
-    // error message
-    console.log(e.message);
-    // detailed context info  (if thrown from a request)
-    console.log(e.context?.request);
-    console.log(e.context?.response);
+    // check error code
+    console.log(e.code === ErrorCodes.ASSETS_API_UNAUTHORIZED); // true
+    // print the whole error
+    console.log(JSON.stringify(e));
+    /*{
+      "message": "BtcAssetsAPI unauthorized, please check your token/origin: (401) Authorization token is invalid: The token header is not a valid base64url serialized JSON.",
+      "code": 2,
+      "context": {
+        "request": {
+          "url": "https://btc-assets-api.url/bitcoin/v1/info"
+        },
+        "response": {
+          "status": 401,
+            "data": {
+            "message": "Authorization token is invalid: The token header is not a valid base64url serialized JSON."
+          }
+        }
+      }
+    }*/
   }
 }
 ```
