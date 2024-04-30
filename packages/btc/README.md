@@ -225,6 +225,30 @@ const psbt = await sendRgbppUtxos({
 });
 ```
 
+### Construct a Full-RBF transaction
+
+```typescript
+import { sendRbf, networkTypeToConfig, DataSource, Collector, NetworkType } from '@rgbpp-sdk/btc';
+import { BtcAssetsApi } from '@rgbpp-sdk/service';
+
+const networkType = NetworkType.TESTNET;
+const config = networkTypeToConfig(networkType);
+
+const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
+const source = new DataSource(service, networkType);
+
+const psbt = await sendRbf({
+  txHex: 'your_original_transaction_hex',
+  from: account.address,
+  feeRate: 40, // the feeRate should be greater than the feeRate of the original transaction
+  changeIndex: 1, // optional, return change to outputs[changeIndex], will return a new output if not specified
+  changeAddress: 'address_to_return_change', // optional, where should the change satoshi be returned to
+  requireValidOutputsValue: false, // optional, default to false, require each output's value to be >= minUtxoSatoshi
+  requireGreaterFeeAndRate: true, // optional, default to true, require the fee rate&amount to be greater than the original transction
+  source,
+});
+```
+
 ## Types
 
 ### Transaction
@@ -317,6 +341,39 @@ interface SendRgbppUtxosProps {
   changeAddress?: string;
   minUtxoSatoshi?: number;
   onlyConfirmedUtxos?: boolean;
+}
+```
+
+#### sendRbf / createSendRbfBuilder / SendRbfProps
+
+```typescript
+declare function sendRbf(props: SendRbfProps): Promise<bitcoin.Psbt>;
+```
+
+```typescript
+declare function createSendRbfBuilder(props: SendRbfProps): Promise<{
+  builder: TxBuilder;
+  feeRate: number;
+  fee: number;
+}>
+```
+
+```typescript
+interface SendRbfProps {
+  from: string;
+  txHex: string;
+  source: DataSource;
+  feeRate?: number;
+  fromPubkey?: string;
+  changeIndex?: number;
+  changeAddress?: string;
+  minUtxoSatoshi?: number;
+  onlyConfirmedUtxos?: boolean;
+  requireValidOutputsValue?: boolean;
+  requireGreaterFeeAndRate?: boolean;
+
+  // EXPERIMENTAL: the below props are experimental and can be altered at any time
+  inputsPubkey?: Record<string, string>; // Record<address, pubkey>
 }
 ```
 

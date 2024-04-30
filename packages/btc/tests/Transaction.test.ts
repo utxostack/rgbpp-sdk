@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { expectPsbtFeeInRange } from './shared/utils';
 import { accounts, config, network, service, source } from './shared/env';
-import { bitcoin, ErrorMessages, ErrorCodes, AddressType, createSendUtxosBuilder } from '../src';
+import { expectPsbtFeeInRange, signAndBroadcastPsbt, waitFor } from './shared/utils';
+import { bitcoin, ErrorMessages, ErrorCodes, AddressType, createSendUtxosBuilder, sendRbf } from '../src';
 import { createSendBtcBuilder, sendBtc, sendUtxos, tweakSigner } from '../src';
 
 const STATIC_FEE_RATE = 1;
@@ -813,6 +813,213 @@ describe('Transaction', () => {
         }),
       ).rejects.toThrow();
     });
+  });
+
+  describe.skip('sendRbf()', () => {
+    it('Full RBF', async () => {
+      /**
+       * TX_1, feeRate=minimumFee/2
+       */
+      const feeRates = await service.getBtcRecommendedFeeRates();
+      const expectFeeRate = Math.round(feeRates.minimumFee / 2);
+      const psbt = await sendBtc({
+        from: accounts.charlie.p2wpkh.address,
+        tos: [
+          {
+            address: accounts.charlie.p2wpkh.address,
+            value: BTC_UTXO_DUST_LIMIT,
+          },
+        ],
+        feeRate: expectFeeRate,
+        source,
+      });
+      const { txHex } = await signAndBroadcastPsbt({
+        psbt,
+        account: accounts.charlie,
+        feeRate: expectFeeRate,
+      });
+
+      /**
+       * Wait for 2 seconds
+       */
+      await waitFor(2000);
+      console.log('---');
+
+      /**
+       * TX_2, feeRate=fastestFee
+       */
+      const expectFeeRate2 = feeRates.fastestFee;
+      const psbt2 = await sendRbf({
+        txHex: txHex,
+        from: accounts.charlie.p2wpkh.address,
+        feeRate: expectFeeRate2,
+        source,
+      });
+      await signAndBroadcastPsbt({
+        psbt: psbt2,
+        account: accounts.charlie,
+        feeRate: expectFeeRate2,
+      });
+    }, 0);
+    it('Full RBF with changeIndex', async () => {
+      /**
+       * TX_1, feeRate=1
+       */
+      const feeRates = await service.getBtcRecommendedFeeRates();
+      const expectFeeRate = Math.round(feeRates.minimumFee / 2);
+      const psbt = await sendBtc({
+        from: accounts.charlie.p2wpkh.address,
+        tos: [
+          {
+            address: accounts.charlie.p2wpkh.address,
+            value: BTC_UTXO_DUST_LIMIT,
+          },
+        ],
+        feeRate: expectFeeRate,
+        source,
+      });
+      const { tx, txHex } = await signAndBroadcastPsbt({
+        psbt,
+        account: accounts.charlie,
+        feeRate: expectFeeRate,
+      });
+
+      /**
+       * Wait for 2 seconds
+       */
+      await waitFor(2000);
+      console.log('---');
+
+      /**
+       * TX_2, feeRate=fastestFee
+       */
+      const expectFeeRate2 = feeRates.fastestFee;
+      const changeIndex = tx.outs.length - 1;
+      const psbt2 = await sendRbf({
+        txHex: txHex,
+        from: accounts.charlie.p2wpkh.address,
+        feeRate: expectFeeRate2,
+        changeIndex,
+        source,
+      });
+      await signAndBroadcastPsbt({
+        psbt: psbt2,
+        account: accounts.charlie,
+        feeRate: expectFeeRate2,
+      });
+    }, 0);
+    it('Try Full RBF with invalid change', async () => {
+      /**
+       * TX_1, feeRate=1
+       */
+      const expectFeeRate = 1;
+      const psbt = await sendBtc({
+        from: accounts.charlie.p2wpkh.address,
+        tos: [
+          {
+            data: Buffer.from('hello'),
+            value: 0,
+          },
+          {
+            address: accounts.charlie.p2tr.address,
+            value: BTC_UTXO_DUST_LIMIT,
+          },
+        ],
+        feeRate: expectFeeRate,
+        source,
+      });
+      const { tx, txHex } = await signAndBroadcastPsbt({
+        psbt,
+        account: accounts.charlie,
+        feeRate: expectFeeRate,
+      });
+
+      /**
+       * Wait for 2 seconds
+       */
+      console.log('---');
+      await waitFor(2000);
+      const expectFeeRate2 = expectFeeRate * 2;
+
+      /**
+       * TX_2, outputs[changeIndex] == undefined
+       */
+      await expect(() =>
+        sendRbf({
+          txHex: txHex,
+          from: accounts.charlie.p2wpkh.address,
+          changeAddress: accounts.charlie.p2tr.address,
+          feeRate: expectFeeRate2,
+          changeIndex: 3,
+          source,
+        }),
+      ).rejects.toHaveProperty('code', ErrorCodes.INVALID_CHANGE_OUTPUT);
+      /**
+       * TX_3, changeOutput is not returnable
+       */
+      await expect(() =>
+        sendRbf({
+          txHex: txHex,
+          from: accounts.charlie.p2wpkh.address,
+          feeRate: expectFeeRate2,
+          changeIndex: 0,
+          source,
+        }),
+      ).rejects.toHaveProperty('code', ErrorCodes.INVALID_CHANGE_OUTPUT);
+      /**
+       * TX_4, changeAddress !== changeOutputAddress
+       */
+      await expect(() =>
+        sendRbf({
+          txHex: txHex,
+          from: accounts.charlie.p2wpkh.address,
+          changeAddress: accounts.charlie.p2tr.address,
+          changeIndex: tx.outs.length - 1,
+          feeRate: expectFeeRate2,
+          source,
+        }),
+      ).rejects.toHaveProperty('code', ErrorCodes.INVALID_CHANGE_OUTPUT);
+    }, 0);
+    it('Try Full RBF with invalid feeRate', async () => {
+      /**
+       * TX_1, feeRate=1
+       */
+      const expectFeeRate = 1;
+      const psbt = await sendBtc({
+        from: accounts.charlie.p2wpkh.address,
+        tos: [
+          {
+            address: accounts.charlie.p2wpkh.address,
+            value: BTC_UTXO_DUST_LIMIT,
+          },
+        ],
+        feeRate: expectFeeRate,
+        source,
+      });
+      const { txHex } = await signAndBroadcastPsbt({
+        psbt,
+        account: accounts.charlie,
+        feeRate: expectFeeRate,
+      });
+
+      /**
+       * Wait for 2 seconds
+       */
+      await waitFor(2000);
+      console.log('---');
+
+      /**
+       * TX_2, feeRate=1
+       */
+      await expect(
+        await sendRbf({
+          txHex: txHex,
+          from: accounts.charlie.p2wpkh.address,
+          feeRate: expectFeeRate,
+          source,
+        }),
+      ).rejects.toHaveProperty('code', ErrorCodes.INVALID_FEE_RATE);
+    }, 0);
   });
 
   describe.todo('sendRgbppUtxos()', () => {
