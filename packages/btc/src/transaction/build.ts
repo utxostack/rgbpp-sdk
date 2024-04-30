@@ -305,7 +305,11 @@ export class TxBuilder {
     // If not collected enough satoshi, throw error
     const insufficientBalance = collected < targetAmount;
     if (insufficientBalance) {
-      throw TxBuildError.withComment(ErrorCodes.INSUFFICIENT_UTXO, `expected: ${targetAmount}, actual: ${collected}`);
+      const recommendedDeposit = collected - targetAmount + this.minUtxoSatoshi;
+      throw TxBuildError.withComment(
+        ErrorCodes.INSUFFICIENT_UTXO,
+        `expected: ${targetAmount}, actual: ${collected}. You may wanna deposit more satoshi to prevent the error, for example: ${recommendedDeposit}`,
+      );
     }
     const insufficientForChange = changeAmount > 0 && changeAmount < this.minUtxoSatoshi;
     if (insufficientForChange) {
