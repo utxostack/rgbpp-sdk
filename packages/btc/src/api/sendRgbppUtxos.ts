@@ -1,7 +1,7 @@
 import { Collector, checkCkbTxInputsCapacitySufficient } from '@rgbpp-sdk/ckb';
 import { isRgbppLockCell, isBtcTimeLockCell, calculateCommitment } from '@rgbpp-sdk/ckb';
 import { bitcoin } from '../bitcoin';
-import { Utxo } from '../transaction/utxo';
+import { BaseOutput, Utxo } from '../transaction/utxo';
 import { DataSource } from '../query/source';
 import { NetworkType } from '../preset/types';
 import { ErrorCodes, TxBuildError } from '../error';
@@ -28,6 +28,10 @@ export interface SendRgbppUtxosProps {
   changeAddress?: string;
   minUtxoSatoshi?: number;
   onlyConfirmedUtxos?: boolean;
+  excludeUtxos?: BaseOutput[];
+
+  // EXPERIMENTAL: the below props are unstable and can be altered at any time
+  onlyProvableUtxos?: boolean;
 }
 
 /**
@@ -37,9 +41,12 @@ export const sendRgbppUtxosBuilder = createSendRgbppUtxosBuilder;
 
 export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise<{
   builder: TxBuilder;
-  feeRate: number;
   fee: number;
+  feeRate: number;
+  changeIndex: number;
 }> {
+  const onlyProvableUtxos = props.onlyProvableUtxos ?? true;
+
   const btcInputs: Utxo[] = [];
   const btcOutputs: InitOutput[] = [];
   let lastCkbTypeOutputIndex = -1;
@@ -90,7 +97,7 @@ export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): P
       if (!utxo) {
         throw TxBuildError.withComment(ErrorCodes.CANNOT_FIND_UTXO, `hash: ${args.btcTxid}, index: ${args.outIndex}`);
       }
-      if (utxo.address !== props.from) {
+      if (onlyProvableUtxos && utxo.address !== props.from) {
         throw TxBuildError.withComment(
           ErrorCodes.REFERENCED_UNPROVABLE_UTXO,
           `hash: ${args.btcTxid}, index: ${args.outIndex}`,
@@ -171,6 +178,7 @@ export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): P
     changeAddress: props.changeAddress,
     minUtxoSatoshi: props.minUtxoSatoshi,
     onlyConfirmedUtxos: props.onlyConfirmedUtxos,
+    excludeUtxos: props.excludeUtxos,
   });
 }
 

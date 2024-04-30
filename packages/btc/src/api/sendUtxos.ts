@@ -1,6 +1,6 @@
 import { bitcoin } from '../bitcoin';
-import { Utxo } from '../transaction/utxo';
 import { DataSource } from '../query/source';
+import { BaseOutput, Utxo } from '../transaction/utxo';
 import { TxBuilder, InitOutput } from '../transaction/build';
 
 export interface SendUtxosProps {
@@ -13,12 +13,17 @@ export interface SendUtxosProps {
   changeAddress?: string;
   minUtxoSatoshi?: number;
   onlyConfirmedUtxos?: boolean;
+  excludeUtxos?: BaseOutput[];
+
+  // EXPERIMENTAL: the below props are unstable and can be altered at any time
+  skipInputsValidation?: boolean;
 }
 
 export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
   builder: TxBuilder;
-  feeRate: number;
   fee: number;
+  feeRate: number;
+  changeIndex: number;
 }> {
   const tx = new TxBuilder({
     source: props.source,
@@ -30,7 +35,7 @@ export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
   tx.addInputs(props.inputs);
   tx.addOutputs(props.outputs);
 
-  if (props.onlyConfirmedUtxos) {
+  if (props.onlyConfirmedUtxos && !props.skipInputsValidation) {
     await tx.validateInputs();
   }
 
@@ -38,12 +43,14 @@ export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
     address: props.from,
     publicKey: props.fromPubkey,
     changeAddress: props.changeAddress,
+    excludeUtxos: props.excludeUtxos,
   });
 
   return {
     builder: tx,
     fee: paid.fee,
     feeRate: paid.feeRate,
+    changeIndex: paid.changeIndex,
   };
 }
 

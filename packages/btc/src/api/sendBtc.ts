@@ -16,8 +16,9 @@ export interface SendBtcProps {
 
 export async function createSendBtcBuilder(props: SendBtcProps): Promise<{
   builder: TxBuilder;
-  feeRate: number;
   fee: number;
+  feeRate: number;
+  changeIndex: number;
 }> {
   // By default, all outputs in the sendBtc() API are fixed
   const outputs = props.tos.map((to) => ({
