@@ -78,7 +78,7 @@ export const generateSporeTransferCoBuild = (
   outputCells: CKBComponents.CellOutput[],
 ): string => {
   if (sporeCells.length !== outputCells.length) {
-    throw new Error('The length of spore input cells length and spore output cells are not same');
+    throw new Error('The length of spore input cells and spore output cells are not same');
   }
   let sporeActions: any[] = [];
   for (let index = 0; index < sporeCells.length; index++) {
