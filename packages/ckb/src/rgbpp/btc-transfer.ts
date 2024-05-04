@@ -143,23 +143,28 @@ export const genBtcTransferCkbVirtualTx = async ({
     const rgbppCellCapacity = calculateRgbppCellCapacity(xudtType);
 
     const needChange = collectResult.sumAmount > transferAmount;
+    // To simplify, when the xUDT does not need change, all the capacity of the inputs will be given to the receiver
+    const receiverOutputCapacity = needChange ? BigInt(rgbppTargetCells[0].output.capacity) : sumInputsCapacity;
     // The Vouts[0] for OP_RETURN and Vouts[1] for target transfer RGBPP assets
     outputs.push({
       lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
       type: xudtType,
-      capacity: append0x((needChange ? rgbppCellCapacity : sumInputsCapacity).toString(16)),
+      capacity: append0x(receiverOutputCapacity.toString(16)),
     });
     outputsData.push(append0x(u128ToLe(transferAmount)));
 
     if (needChange) {
+      // When the number of sender's inputs is greater than 1, the sender needs to recover the excess capacity.
+      const udtChangeCapacity = inputs.length > 1 ? sumInputsCapacity - receiverOutputCapacity : rgbppCellCapacity;
       // The Vouts[2] for target change RGBPP assets
       outputs.push({
         lock: genRgbppLockScript(buildPreLockArgs(2), isMainnet),
         type: xudtType,
-        capacity: append0x(rgbppCellCapacity.toString(16)),
+        capacity: append0x(udtChangeCapacity.toString(16)),
       });
       outputsData.push(append0x(u128ToLe(collectResult.sumAmount - transferAmount)));
     }
+
     handleNonTargetRgbppCells(outputs.length);
   }
 

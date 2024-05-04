@@ -96,21 +96,26 @@ export const genBtcJumpCkbVirtualTx = async ({
   }
 
   const needChange = sumAmount > transferAmount;
+  // To simplify, when the xUDT does not need change, all the capacity of the inputs will be given to the receiver
+  const receiverOutputCapacity = needChange ? BigInt(rgbppTargetCells[0].output.capacity) : sumInputsCapacity;
+  // The BTC time cell does not need to be bound to the BTC UTXO
   const outputs: CKBComponents.CellOutput[] = [
     {
       lock: genBtcTimeLockScript(toLock, isMainnet),
       type: xudtType,
-      capacity: append0x((needChange ? rgbppCellCapacity : sumInputsCapacity).toString(16)),
+      capacity: append0x(receiverOutputCapacity.toString(16)),
     },
   ];
   const outputsData = [append0x(u128ToLe(transferAmount))];
 
   if (needChange) {
+    // When the number of sender's inputs is greater than 1, the sender needs to recover the excess capacity.
+    const udtChangeCapacity = inputs.length > 1 ? sumInputsCapacity - receiverOutputCapacity : rgbppCellCapacity;
     outputs.push({
       // The Vouts[0] for OP_RETURN and Vouts[1] for RGBPP assets, BTC time cells don't need btc tx out_index
       lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
       type: xudtType,
-      capacity: append0x(rgbppCellCapacity.toString(16)),
+      capacity: append0x(udtChangeCapacity.toString(16)),
     });
     outputsData.push(append0x(u128ToLe(sumAmount - transferAmount)));
   }
