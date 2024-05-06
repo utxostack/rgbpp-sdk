@@ -4,7 +4,7 @@ import { getDeployVariables, readStepLog } from './shared/utils';
 import { describe, it } from 'vitest';
 
 const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTxId: string }) => {
-  await new Promise(resolve => setTimeout(resolve, 30 * 1000));
+  await new Promise(resolve => setTimeout(resolve, 90 * 1000));
   const { collector, ckbAddress } = getDeployVariables();
 
   const toRgbppLockArgs = buildRgbppLockArgs(outIndex, btcTxId);
