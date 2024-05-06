@@ -1,10 +1,10 @@
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { buildRgbppLockArgs, genCkbJumpBtcVirtualTx, getSecp256k1CellDep } from '@rgbpp-sdk/ckb';
-import { getDeployVariables, readStepLog } from './shared/utils';
+import { CKB_PRIVATE_KEY, getDeployVariables, readStepLog } from './shared/utils';
 import { describe, it } from 'vitest';
 
 const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTxId: string }) => {
-  await new Promise(resolve => setTimeout(resolve, 90 * 1000));
+  await new Promise(resolve => setTimeout(resolve, 30 * 1000));
   const { collector, ckbAddress } = getDeployVariables();
 
   const toRgbppLockArgs = buildRgbppLockArgs(outIndex, btcTxId);
@@ -31,7 +31,7 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTx
     witnesses: [emptyWitness, ...ckbRawTx.witnesses.slice(1)],
   };
 
-  const signedTx = collector.getCkb().signTransaction(process.env.CKB_PRIVATE_KEY)(unsignedTx);
+  const signedTx = collector.getCkb().signTransaction(CKB_PRIVATE_KEY)(unsignedTx);
 
   const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
 
@@ -48,5 +48,5 @@ describe('ckb-jump-btc', () => {
       outIndex: readStepLog('0').index,
       btcTxId: readStepLog('0').txid,
     });
-  }, 500000);
+  }, 5000000);
 });

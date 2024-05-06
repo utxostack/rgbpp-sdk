@@ -18,7 +18,7 @@ import {
 } from '@rgbpp-sdk/ckb';
 import { calculateXudtTokenInfoCellCapacity } from '@rgbpp-sdk/ckb/lib/utils';
 import { XUDT_TOKEN_INFO } from './shared/token-info';
-import { getDeployVariables, writeStepLog } from './shared/utils';
+import { CKB_PRIVATE_KEY, getDeployVariables, writeStepLog } from './shared/utils';
 import { describe, it } from 'vitest';
 
 /**
@@ -103,12 +103,10 @@ const issueXudtTest = async ({ xudtTotalAmount }: { xudtTotalAmount: bigint }) =
     unsignedTx.outputs[unsignedTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
   }
 
-  if (process.env.CKB_PRIVATE_KEY) {
-    const signedTx = collector.getCkb().signTransaction(process.env.CKB_PRIVATE_KEY)(unsignedTx);
-    const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
+  const signedTx = collector.getCkb().signTransaction(CKB_PRIVATE_KEY)(unsignedTx);
+  const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
 
-    console.info(`xUDT asset has been issued and tx hash is ${txHash}`);
-  }
+  console.info(`xUDT asset has been issued and tx hash is ${txHash}`);
 };
 
 describe('issue-xudt', () => {
