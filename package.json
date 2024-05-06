@@ -10,7 +10,7 @@
     "build:packages": "turbo run build --filter=./packages/*",
     "lint:fix": "turbo run lint:fix",
     "lint:packages": "turbo run lint --filter=./{packages,examples}/*",
-    "lint:fix-all": "prettier --write '{packages,apps,examples}/**/*.{js,jsx,ts,tsx,md,json}'",
+    "format": "prettier --write '{packages,apps,examples}/**/*.{js,jsx,ts,tsx,md,json}'",
     "clean": "turbo run clean",
     "clean:packages": "turbo run clean --filter=./packags/*",
     "clean:dependencies": "pnpm clean:sub-dependencies && rimraf node_modules",
