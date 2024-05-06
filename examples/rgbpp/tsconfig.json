@@ -7,6 +7,7 @@
     "composite": false,
     "resolveJsonModule": true,
     "strictNullChecks": true,
+    "noEmit": true,
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,
@@ -18,7 +19,7 @@
     "noUnusedParameters": false,
     "preserveWatchOutput": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": true
   },
   "include": ["local/**/*.ts", "queue/**/*.ts"],
   "exclude": ["node_modules"]

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { service, source } from './shared/env';
+import { source } from './shared/env';
 import { ErrorCodes } from '../src';
 
 describe('DataSource', { retry: 3 }, () => {

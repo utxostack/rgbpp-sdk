@@ -14,11 +14,16 @@
     },
     "test": {
       "outputs": ["coverage/**"],
-      "dependsOn": ["^build"],
+      "dependsOn": ["build"],
       "cache": false
     },
+    "lint": {
+      "cache": false,
+      "dependsOn": ["^lint"]
+    },
     "lint:fix": {
-      "cache": false
+      "cache": false,
+      "dependsOn": ["^lint:fix"]
     },
     "clean": {
       "cache": false

@@ -61,7 +61,7 @@ export const appendCkbTxWitnesses = async ({
   btcTxBytes,
   rgbppApiSpvProof,
 }: AppendWitnessesParams): Promise<CKBComponents.RawTransaction> => {
-  let rawTx = ckbRawTx;
+  const rawTx = ckbRawTx;
 
   const { spvClient, proof } = transformSpvProof(rgbppApiSpvProof);
   rawTx.cellDeps.push(buildSpvClientCellDep(spvClient));
@@ -89,7 +89,7 @@ export const appendPaymasterCellAndSignCkbTx = async ({
   isMainnet,
   ckbFeeRate,
 }: AppendPaymasterCellAndSignTxParams): Promise<CKBComponents.RawTransaction> => {
-  let rawTx = ckbRawTx as CKBComponents.RawTransactionToSign;
+  const rawTx = ckbRawTx as CKBComponents.RawTransactionToSign;
   const paymasterInput = { previousOutput: paymasterCell.outPoint, since: '0x0' };
   rawTx.inputs = [...rawTx.inputs, paymasterInput];
   const inputsCapacity = BigInt(sumInputsCapacity) + BigInt(paymasterCell.output.capacity);
@@ -115,7 +115,7 @@ export const appendPaymasterCellAndSignCkbTx = async ({
   changeCapacity -= estimatedTxFee;
   rawTx.outputs[rawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
 
-  let keyMap = new Map<string, string>();
+  const keyMap = new Map<string, string>();
   keyMap.set(scriptToHash(paymasterCell.output.lock), secp256k1PrivateKey);
   keyMap.set(scriptToHash(getRgbppLockScript(isMainnet)), '');
 

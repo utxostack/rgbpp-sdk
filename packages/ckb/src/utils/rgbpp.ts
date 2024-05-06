@@ -62,7 +62,7 @@ export const genBtcTimeLockScript = (toLock: CKBComponents.Script, isMainnet: bo
 const MAX_RGBPP_CELL_NUM = 255;
 // refer to https://github.com/ckb-cell/rgbpp/blob/0c090b039e8d026aad4336395b908af283a70ebf/contracts/rgbpp-lock/src/main.rs#L173-L211
 export const calculateCommitment = (rgbppVirtualTx: RgbppCkbVirtualTx | CKBComponents.RawTransaction): Hex => {
-  var hash = sha256.create();
+  const hash = sha256.create();
   hash.update(hexToBytes(utf8ToHex('RGB++')));
   const version = [0, 0];
   hash.update(version);

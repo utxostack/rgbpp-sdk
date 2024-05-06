@@ -1,10 +1,10 @@
 import camelcaseKeys from 'camelcase-keys';
 
-export const toCamelcase = (object: any) => {
+export const toCamelcase = (object: unknown) => {
   try {
     return JSON.parse(
       JSON.stringify(
-        camelcaseKeys(object, {
+        camelcaseKeys(object!, {
           deep: true,
         }),
       ),

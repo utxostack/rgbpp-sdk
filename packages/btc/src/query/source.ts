@@ -1,10 +1,4 @@
-import {
-  BtcApiRecommendedFeeRates,
-  BtcApiUtxoParams,
-  BtcAssetsApi,
-  BtcAssetsApiError,
-  ErrorCodes as ServiceErrorCodes,
-} from '@rgbpp-sdk/service';
+import { BtcApiUtxoParams, BtcAssetsApi, BtcAssetsApiError, ErrorCodes as ServiceErrorCodes } from '@rgbpp-sdk/service';
 import { Output, Utxo } from '../transaction/utxo';
 import { NetworkType } from '../preset/types';
 import { ErrorCodes, TxBuildError } from '../error';

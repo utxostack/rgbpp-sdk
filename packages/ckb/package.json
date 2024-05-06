@@ -4,8 +4,8 @@
   "scripts": {
     "test": "vitest",
     "build": "tsc -p tsconfig.build.json",
-    "lint": "prettier --check 'src/**/*.{js,jsx,ts,tsx}'",
-    "lint:fix": "prettier --write 'src/**/*.{js,jsx,ts,tsx}'",
+    "lint": "tsc && eslint --ext .ts {src,example}/* && prettier --check '{src,example}/**/*.{js,ts}'",
+    "lint:fix": "tsc && eslint --fix --ext .ts {src,example}/* && prettier --write '{src,example}/**/*.{js,ts}'",
     "splitCells": "npx ts-node example/paymaster.ts",
     "clean": "pnpm run clean:cache & pnpm run clean:build",
     "clean:build": "rimraf lib && pnpm run clean:buildinfo",

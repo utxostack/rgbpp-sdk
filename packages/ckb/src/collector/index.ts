@@ -37,12 +37,12 @@ export class Collector {
     isDataMustBeEmpty?: boolean;
     outputCapacityRange?: Hex[];
   }): Promise<IndexerCell[] | undefined> {
-    let param: any = {
+    let param: unknown = {
       script_search_mode: 'exact',
     };
     if (lock) {
       param = {
-        ...param,
+        ...param!,
         script: parseScript(lock),
         script_type: 'lock',
         filter: {
@@ -53,19 +53,19 @@ export class Collector {
       };
     } else if (type) {
       param = {
-        ...param,
+        ...param!,
         script: parseScript(type),
         script_type: 'type',
       };
     }
-    let payload = {
+    const payload = {
       id: Math.floor(Math.random() * 100000),
       jsonrpc: '2.0',
       method: 'get_cells',
       params: [param, 'asc', '0x3E8'],
     };
     const body = JSON.stringify(payload, null, '  ');
-    let response = (
+    const response = (
       await axios({
         method: 'post',
         url: this.ckbIndexerUrl,
@@ -86,9 +86,9 @@ export class Collector {
 
   collectInputs(liveCells: IndexerCell[], needCapacity: bigint, fee: bigint, config?: CollectConfig): CollectResult {
     const changeCapacity = config?.minCapacity ?? MIN_CAPACITY;
-    let inputs: CKBComponents.CellInput[] = [];
+    const inputs: CKBComponents.CellInput[] = [];
     let sumInputsCapacity = BigInt(0);
-    for (let cell of liveCells) {
+    for (const cell of liveCells) {
       inputs.push({
         previousOutput: {
           txHash: cell.outPoint.txHash,
@@ -109,11 +109,11 @@ export class Collector {
   }
 
   collectUdtInputs({ liveCells, needAmount }: { liveCells: IndexerCell[]; needAmount: bigint }): CollectUdtResult {
-    let inputs: CKBComponents.CellInput[] = [];
+    const inputs: CKBComponents.CellInput[] = [];
     let sumInputsCapacity = BigInt(0);
     let sumAmount = BigInt(0);
     const isRgbppLock = liveCells.length > 0 && isRgbppLockCellIgnoreChain(liveCells[0].output);
-    for (let cell of liveCells) {
+    for (const cell of liveCells) {
       inputs.push({
         previousOutput: {
           txHash: cell.outPoint.txHash,

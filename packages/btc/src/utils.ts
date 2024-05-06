@@ -1,6 +1,10 @@
 import { bitcoin, ecc, ECPair } from './bitcoin';
 import { bytes } from '@ckb-lumos/codec';
 
+interface TweakableSigner extends bitcoin.Signer {
+  privateKey?: Buffer;
+}
+
 const textEncoder = new TextEncoder();
 
 export function toXOnly(pubKey: Buffer): Buffer {
@@ -11,14 +15,14 @@ function tapTweakHash(publicKey: Buffer, hash: Buffer | undefined): Buffer {
   return bitcoin.crypto.taggedHash('TapTweak', Buffer.concat(hash ? [publicKey, hash] : [publicKey]));
 }
 
-export function tweakSigner<T extends bitcoin.Signer>(
+export function tweakSigner<T extends TweakableSigner>(
   signer: T,
   options?: {
     network?: bitcoin.Network;
     tweakHash?: Buffer;
   },
 ): bitcoin.Signer {
-  let privateKey: Uint8Array | undefined = (signer as any).privateKey;
+  let privateKey: Uint8Array | undefined = signer.privateKey ? new Uint8Array(signer.privateKey) : undefined;
   if (!privateKey) {
     throw new Error('Private key is required for tweaking signer!');
   }
@@ -54,7 +58,7 @@ export function remove0x(hex: string): string {
  * utf8ToBuffer('hello') // => Uint8Array(5) [ 104, 101, 108, 108, 111 ]
  */
 export function utf8ToBuffer(text: string): Uint8Array {
-  let result = text.trim();
+  const result = text.trim();
   if (result.startsWith('0x')) {
     return bytes.bytify(result);
   }
