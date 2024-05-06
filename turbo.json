@@ -9,7 +9,7 @@
     },
     "build": {
       "outputs": ["lib/**", "dist/**", ".next/**", "!.next/cache/**"],
-      "dependsOn": ["^build"],
+      "dependsOn": ["clean", "^build"],
       "cache": false
     },
     "test": {
