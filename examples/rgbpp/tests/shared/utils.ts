@@ -6,27 +6,24 @@ import { AddressPrefix, addressToScript, privateKeyToAddress } from '@nervosnetw
 import * as fs from 'fs';
 import * as path from 'path';
 
-
-export const CKB_PRIVATE_KEY = process.env.CKB_PRIVATE_KEY!;
+export const CKB_PRIVATE_KEY = '0x4ea7c74d8296f0063d61f62cb71cd9e4a7bb758f1e25a66f0c4809fc4123fa49';
 
 // BTC SECP256K1 private key
-const BTC_PRIVATE_KEY = process.env.BTC_PRIVATE_KEY!;
+const BTC_PRIVATE_KEY = '9028533606d62fd48c00009d02f0c706e82b1d5ee848bdc9b6cbd7bb26eb94ac';
 // API docs: https://btc-assets-api.testnet.mibao.pro/docs
-const BTC_ASSETS_API_URL = process.env.BTC_ASSETS_API_URL!;
+const BTC_ASSETS_API_URL = 'https://btc-assets-api.testnet.mibao.pro';
 // https://btc-assets-api.testnet.mibao.pro/docs/static/index.html#/Token/post_token_generate
-const BTC_ASSETS_TOKEN = process.env.BTC_ASSETS_TOKEN!;
+const BTC_ASSETS_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJteS1hcHAiLCJhdWQiOiJidGMtYXNzZXRzLWFwaS50ZXN0bmV0Lm1pYmFvLnBybyIsImp0aSI6ImJiYmNjZjMyLTNlMjctNDQ3MS1iNDJkLTU0Mzg4ZDU4MzliMSIsImlhdCI6MTcxMzc2MzgwMX0.vsevi5y_j7x_IFj3INXs9KIeMx5tIIWKhkGHun48b1s\n';
 
-const BTC_ASSETS_ORIGIN = process.env.BTC_ASSETS_ORIGIN!;
+const BTC_ASSETS_ORIGIN = 'https://btc-assets-api.testnet.mibao.pro';
 
 
-export const network = process.env.NETWORK!;
+export const network = "testnet";
 
 
 export function getDeployVariables() {
-  const isMainnet = network === 'false';
+  const isMainnet = false;
   const btcNetwork = isMainnet ? bitcoin.networks.bitcoin : bitcoin.networks.testnet;
-  // console.log(btcNetwork);
-  console.log(BTC_PRIVATE_KEY);
   const btcKeyPair = ECPair.fromPrivateKey(Buffer.from(BTC_PRIVATE_KEY, 'hex'), { network: btcNetwork });
   const { address: btcAddress } = bitcoin.payments.p2wpkh({
     pubkey: btcKeyPair.publicKey,
@@ -37,8 +34,8 @@ export function getDeployVariables() {
   const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, BTC_ASSETS_ORIGIN);
   const source = new DataSource(service, networkType);
   const collector = new Collector({
-    ckbNodeUrl: process.env.CKB_NODE_URL!,
-    ckbIndexerUrl: process.env.CKB_INDEXER_URL!,
+    ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
+    ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
   });
 
   const ckbAddress = privateKeyToAddress(CKB_PRIVATE_KEY, {
