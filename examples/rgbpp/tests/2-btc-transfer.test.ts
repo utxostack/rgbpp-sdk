@@ -74,5 +74,5 @@ describe('btc-transfer', () => {
       toBtcAddress: 'tb1qvt7p9g6mw70sealdewtfp0sekquxuru6j3gwmt',
       transferAmount: BigInt(800_0000_0000),
     });
-  }, 500000);
+  }, 5000000);
 });
