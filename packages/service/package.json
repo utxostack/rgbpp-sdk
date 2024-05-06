@@ -4,8 +4,8 @@
   "scripts": {
     "test": "vitest",
     "build": "tsc -p tsconfig.build.json",
-    "lint": "tsc && eslint --ext .js,.ts {src,tests}/** && prettier --check '{src,tests}/**/*.{js,ts}'",
-    "lint:fix": "tsc && eslint --fix --ext .js,.ts {src,tests}/** && prettier --write '{src,tests}/**/*.{js,ts}'",
+    "lint": "tsc && eslint '{src,tests}/**/*.{js,ts}' && prettier --check '{src,tests}/**/*.{js,ts}'",
+    "lint:fix": "tsc && eslint --fix '{src,tests}/**/*.{js,ts}' && prettier --write '{src,tests}/**/*.{js,ts}'",
     "clean": "pnpm run clean:cache & pnpm run clean:build",
     "clean:build": "rimraf lib && pnpm run clean:buildinfo",
     "clean:buildinfo": "rimraf tsconfig.*tsbuildinfo",
