@@ -15,13 +15,15 @@
     "@rgbpp-sdk/ckb": "workspace:^",
     "@rgbpp-sdk/service": "workspace:^",
     "@spore-sdk/core": "^0.2.0-beta.6",
-    "axios": "^1.6.8"
+    "axios": "^1.6.8",
+    "vitest": "^1.4.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.1.1",
     "@types/node": "^20.11.28",
     "eslint": "^8.56.0",
     "typescript": "^5.4.2",
-    "typescript-eslint": "^7.7.1"
+    "typescript-eslint": "^7.7.1",
+    "dotenv": "^16.4.5"
   }
 }

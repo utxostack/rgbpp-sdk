@@ -1,0 +1,54 @@
+# Test the functionality of the rgbpp-sdk packages.
+
+name: xudtTest
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout rgbpp-sdk
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - uses: pnpm/action-setup@v3
+        name: Install -g pnpm
+        with:
+          version: 8
+          run_install: false
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build packages
+        run: pnpm run build:packages
+
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Change directory to examples/rgbpp
+        run: cd examples/rgbpp
+
+      - name: Install vitest
+        run: pnpm install vitest --save-dev --workspace-root
+
+      - name: Run tests
+        run: |
+          npx vitest tests/prepare-utxo.test.ts &&
+          npx vitest tests/issue-xudt.test.ts &&
+          npx vitest tests/1-ckb-jump-btc.test.ts &&
+          npx vitest tests/2-btc-transfer.test.ts
+
+
+
