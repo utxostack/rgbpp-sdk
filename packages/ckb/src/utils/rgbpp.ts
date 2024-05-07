@@ -8,7 +8,6 @@ import {
   RGBPP_TX_WITNESS_MAX_SIZE,
   getBtcTimeLockScript,
   getRgbppLockScript,
-  getSporeTypeScript,
 } from '../constants';
 import {
   bytesToHex,
@@ -29,7 +28,7 @@ import {
   RgbppCkbTxInputsExceededError,
   RgbppUtxoBindMultiTypeAssetsError,
 } from '../error';
-import { isScriptEqual, isScriptPartialEqual } from './ckb-tx';
+import { isScriptEqual, isUDTTypeSupported } from './ckb-tx';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
   return {
@@ -240,12 +239,15 @@ export const throwErrorWhenRgbppCellsInvalid = (
   if (typeCells.length === 0) {
     throw new NoRgbppLiveCellError('No rgbpp cells found with the rgbpp lock args');
   }
-  const isSporeExist = typeCells.some((cell) => isScriptPartialEqual(cell.output.type!, getSporeTypeScript(isMainnet)));
-  if (isSporeExist) {
+  const isuDTTypeNotSupported = typeCells.some(
+    (cell) => cell.output.type && !isUDTTypeSupported(cell.output.type, isMainnet),
+  );
+  if (isuDTTypeNotSupported) {
     throw new RgbppUtxoBindMultiTypeAssetsError(
-      'The BTC UTXO must not be bound to Spore and xUDT cells at the same time',
+      'The BTC UTXO must not be bound to xUDT and other type cells at the same time',
     );
   }
+
   const isTargetExist = typeCells.some((cell) => isScriptEqual(cell.output.type!, xudtTypeBytes));
   if (!isTargetExist) {
     throw new NoRgbppLiveCellError('No rgbpp cells found with the xudt type script and the rgbpp lock args');

@@ -109,7 +109,7 @@ export const throwErrorWhenSporeCellsInvalid = (sporeCells: IndexerCell[] | unde
   const sporeCell = sporeCells[0];
 
   if (!sporeCell.output.type) {
-    throw new NoRgbppLiveCellError('The cell with the rgbpp lock args has no spore asset');
+    throw new RgbppSporeTypeMismatchError('The cell with the rgbpp lock args has no spore asset');
   }
 
   if (!isScriptEqual(sporeCell.output.type, sporeTypeBytes)) {

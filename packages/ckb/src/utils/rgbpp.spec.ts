@@ -310,7 +310,7 @@ describe('rgbpp tests', () => {
       }
     }
 
-    const sporeCells: IndexerCell[] = [
+    const nonXUDTCells: IndexerCell[] = [
       {
         blockNumber: '0x0',
         outPoint: {
@@ -326,7 +326,7 @@ describe('rgbpp tests', () => {
           },
           type: {
             args: '0xf2bfcd0ec5f7b2a33577168b7a647e71cc81a731560a7ad23b1c31fc08bbe1bb',
-            codeHash: '0x685a60219309029d01310311dba953d67029170ca4848a4ff638e57002130a0d',
+            codeHash: '0xf2bfcd0ec5f7b2a33577168b7a647e71cc81a731560a7ad23b1c31fc08bbe1bb',
             hashType: 'data1',
           },
         },
@@ -335,11 +335,11 @@ describe('rgbpp tests', () => {
       },
     ];
     try {
-      throwErrorWhenRgbppCellsInvalid(sporeCells, xudtTypeBytes, false);
+      throwErrorWhenRgbppCellsInvalid(nonXUDTCells, xudtTypeBytes, false);
     } catch (error) {
       if (error instanceof RgbppUtxoBindMultiTypeAssetsError) {
         expect(110).toBe(error.code);
-        expect('The BTC UTXO must not be bound to Spore and xUDT cells at the same time').toBe(error.message);
+        expect('The BTC UTXO must not be bound to xUDT and other type cells at the same time').toBe(error.message);
       }
     }
 

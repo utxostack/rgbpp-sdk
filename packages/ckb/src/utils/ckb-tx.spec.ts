@@ -9,7 +9,6 @@ import {
   isClusterSporeTypeSupported,
   isLockArgsSizeExceeded,
   isScriptEqual,
-  isScriptPartialEqual,
   isTypeAssetSupported,
 } from './ckb-tx';
 import { utf8ToHex } from '.';
@@ -166,29 +165,6 @@ describe('ckb tx utils', () => {
           args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
         },
         '0x123456',
-      ),
-    );
-  });
-
-  it('isScriptPartialEqual', () => {
-    expect(true).toBe(
-      isScriptPartialEqual(
-        {
-          codeHash: '0x50bd8d6680b8b9cf98b73f3c08faf8b2a21914311954118ad6609be6e78a1b95',
-          hashType: 'type',
-          args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
-        },
-        '0x5500000010000000300000003100000050bd8d6680b8b9cf98b73f3c08faf8b2a21914311954118ad6609be6e78a1b95012000000006ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
-      ),
-    );
-    expect(false).toBe(
-      isScriptPartialEqual(
-        {
-          codeHash: '0xbc5168a4f90116fada921e185d4b018e784dc0f6266e539a3c092321c932700a',
-          hashType: 'type',
-          args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
-        },
-        '0x5500000010000000300000003100000050bd8d6680b8b9cf98b73f3c08faf8b2a21914311954118ad6609be6e78a1b95012000000006ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
       ),
     );
   });
