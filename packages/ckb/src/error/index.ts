@@ -9,7 +9,7 @@ enum ErrorCode {
   TypeAssetNotSupported = 107,
   InputsOrOutputsLenInvalid = 108,
   RgbppCkbTxInputsExceeded = 109,
-  RgbppUtxoBindMultiSpores = 110,
+  RgbppUtxoBindMultiTypeAssets = 110,
   RgbppSporeTypeMismatch = 111,
 }
 
@@ -83,8 +83,8 @@ export class RgbppCkbTxInputsExceededError extends Error {
   }
 }
 
-export class RgbppUtxoBindMultiSporesError extends Error {
-  code = ErrorCode.RgbppUtxoBindMultiSpores;
+export class RgbppUtxoBindMultiTypeAssetsError extends Error {
+  code = ErrorCode.RgbppUtxoBindMultiTypeAssets;
   constructor(message: string) {
     super(message);
   }

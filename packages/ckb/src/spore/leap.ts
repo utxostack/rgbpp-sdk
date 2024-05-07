@@ -26,13 +26,12 @@ import {
   getRgbppLockScript,
   getSporeTypeDep,
 } from '../constants';
-import { generateSporeTransferCoBuild } from '../utils/spore';
-import { NoRgbppLiveCellError, RgbppUtxoBindMultiSporesError } from '../error';
+import { generateSporeTransferCoBuild, throwErrorWhenSporeCellsInvalid } from '../utils/spore';
+import { NoRgbppLiveCellError } from '../error';
 import {
   addressToScript,
   getTransactionSize,
   serializeOutPoint,
-  serializeScript,
   serializeWitnessArgs,
 } from '@nervosnetwork/ckb-sdk-utils';
 import { blockchain } from '@ckb-lumos/base';
@@ -61,21 +60,10 @@ export const genLeapSporeFromBtcToCkbVirtualTx = async ({
     args: append0x(sporeRgbppLockArgs),
   };
   const sporeCells = await collector.getCells({ lock: sporeRgbppLock, isDataMustBeEmpty: false });
-  if (!sporeCells || sporeCells.length === 0) {
-    throw new NoRgbppLiveCellError('No spore rgbpp cells found with the spore rgbpp lock args');
-  }
-  if (sporeCells.length > 1) {
-    throw new RgbppUtxoBindMultiSporesError('The BTC UTXO must not be bound to multiple CKB cells');
-  }
-  const sporeCell = sporeCells[0];
 
-  if (!sporeCell.output.type) {
-    throw new RgbppUtxoBindMultiSporesError('The cell with the rgbpp lock args has no spore asset');
-  }
+  throwErrorWhenSporeCellsInvalid(sporeCells, sporeTypeBytes);
 
-  if (append0x(serializeScript(sporeCell.output.type)) !== append0x(sporeTypeBytes)) {
-    throw new RgbppUtxoBindMultiSporesError('The cell type with the rgbpp lock args does not match');
-  }
+  const sporeCell = sporeCells![0];
 
   const inputs: CKBComponents.CellInput[] = [
     {

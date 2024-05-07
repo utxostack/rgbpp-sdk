@@ -1,5 +1,11 @@
 import { AddressPrefix, privateKeyToAddress, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { genCkbJumpBtcVirtualTx, Collector, getSecp256k1CellDep, buildRgbppLockArgs } from '@rgbpp-sdk/ckb';
+import {
+  genCkbJumpBtcVirtualTx,
+  Collector,
+  getSecp256k1CellDep,
+  buildRgbppLockArgs,
+  getXudtTypeScript,
+} from '@rgbpp-sdk/ckb';
 
 // CKB SECP256K1 private key
 const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
@@ -17,9 +23,9 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTx
 
   const toRgbppLockArgs = buildRgbppLockArgs(outIndex, btcTxId);
 
+  // Warning: Please replace with your real xUDT type script here
   const xudtType: CKBComponents.Script = {
-    codeHash: '0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb',
-    hashType: 'type',
+    ...getXudtTypeScript(isMainnet),
     args: '0x1ba116c119d1cfd98a53e9d1a615cf2af2bb87d95515c9d217d367054cfc696b',
   };
 
@@ -29,7 +35,6 @@ const jumpFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTx
     toRgbppLockArgs,
     xudtTypeBytes: serializeScript(xudtType),
     transferAmount: BigInt(800_0000_0000),
-    witnessLockPlaceholderSize: 1000,
   });
 
   const emptyWitness = { lock: '', inputType: '', outputType: '' };

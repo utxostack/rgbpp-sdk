@@ -22,7 +22,13 @@ import { blockchain } from '@ckb-lumos/base';
 import { bytes } from '@ckb-lumos/codec';
 import { RgbppApiSpvProof } from '@rgbpp-sdk/service';
 import { toCamelcase } from './case-parser';
-import { InputsOrOutputsLenError, RgbppCkbTxInputsExceededError } from '../error';
+import {
+  InputsOrOutputsLenError,
+  NoRgbppLiveCellError,
+  RgbppCkbTxInputsExceededError,
+  RgbppUtxoBindMultiTypeAssetsError,
+} from '../error';
+import { isScriptEqual, isUDTTypeSupported } from './ckb-tx';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
   return {
@@ -217,5 +223,33 @@ export const calculateRgbppTokenInfoSize = (tokenInfo: RgbppTokenInfo): bigint =
 export const throwErrorWhenTxInputsExceeded = (inputLen: number) => {
   if (inputLen > RGBPP_TX_INPUTS_MAX_LENGTH) {
     throw new RgbppCkbTxInputsExceededError(`Please ensure the tx inputs do not exceed ${RGBPP_TX_INPUTS_MAX_LENGTH}`);
+  }
+};
+
+// Check the validity of RGB++ cells and throw an exception if the conditions are not met to avoid building invalid CKB TX
+export const throwErrorWhenRgbppCellsInvalid = (
+  cells: IndexerCell[] | undefined,
+  xudtTypeBytes: Hex,
+  isMainnet: boolean,
+) => {
+  if (!cells || cells.length === 0) {
+    throw new NoRgbppLiveCellError('No rgbpp cells found with the rgbpp lock args');
+  }
+  const typeCells = cells.filter((cell) => !!cell.output.type);
+  if (typeCells.length === 0) {
+    throw new NoRgbppLiveCellError('No rgbpp cells found with the rgbpp lock args');
+  }
+  const isUDTTypeNotSupported = typeCells.some(
+    (cell) => cell.output.type && !isUDTTypeSupported(cell.output.type, isMainnet),
+  );
+  if (isUDTTypeNotSupported) {
+    throw new RgbppUtxoBindMultiTypeAssetsError(
+      'The BTC UTXO must not be bound to xUDT and other type cells at the same time',
+    );
+  }
+
+  const isTargetExist = typeCells.some((cell) => isScriptEqual(cell.output.type!, xudtTypeBytes));
+  if (!isTargetExist) {
+    throw new NoRgbppLiveCellError('No rgbpp cells found with the xudt type script and the rgbpp lock args');
   }
 };

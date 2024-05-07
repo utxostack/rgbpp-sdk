@@ -9,6 +9,8 @@ import {
 } from '@spore-sdk/core/lib/cobuild';
 import { u64ToLe } from './hex';
 import { Hex, IndexerCell, SporesCreateCobuildParams } from '../types';
+import { NoRgbppLiveCellError, RgbppSporeTypeMismatchError, RgbppUtxoBindMultiTypeAssetsError } from '../error';
+import { isScriptEqual } from './ckb-tx';
 
 // Generate type id for cluster id
 export const generateClusterId = (firstInput: CKBComponents.CellInput, firstOutputIndex: number) => {
@@ -76,7 +78,7 @@ export const generateSporeTransferCoBuild = (
   outputCells: CKBComponents.CellOutput[],
 ): string => {
   if (sporeCells.length !== outputCells.length) {
-    throw new Error('The length of spore input cells length and spore output cells are not same');
+    throw new Error('The length of spore input cells and spore output cells are not same');
   }
   let sporeActions: any[] = [];
   for (let index = 0; index < sporeCells.length; index++) {
@@ -94,4 +96,23 @@ export const generateSporeTransferCoBuild = (
     sporeActions = sporeActions.concat(actions);
   }
   return assembleCobuildWitnessLayout(sporeActions);
+};
+
+// Check the validity of RGB++ spore cells and throw an exception if the conditions are not met to avoid building invalid CKB TX
+export const throwErrorWhenSporeCellsInvalid = (sporeCells: IndexerCell[] | undefined, sporeTypeBytes: Hex) => {
+  if (!sporeCells || sporeCells.length === 0) {
+    throw new NoRgbppLiveCellError('No spore rgbpp cells found with the spore rgbpp lock args');
+  }
+  if (sporeCells.length > 1) {
+    throw new RgbppUtxoBindMultiTypeAssetsError('The BTC UTXO must not be bound to multiple CKB cells');
+  }
+  const sporeCell = sporeCells[0];
+
+  if (!sporeCell.output.type) {
+    throw new RgbppSporeTypeMismatchError('The cell with the rgbpp lock args has no spore asset');
+  }
+
+  if (!isScriptEqual(sporeCell.output.type, sporeTypeBytes)) {
+    throw new RgbppSporeTypeMismatchError('The spore cell type with the rgbpp lock args does not match');
+  }
 };

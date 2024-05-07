@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { sha256 } from 'js-sha256';
-import { addressToScript, hexToBytes } from '@nervosnetwork/ckb-sdk-utils';
+import { addressToScript, hexToBytes, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import {
   btcTxIdFromBtcTimeLockArgs,
   buildPreLockArgs,
@@ -15,10 +15,17 @@ import {
   replaceLockArgsWithRealBtcTxId,
   transformSpvProof,
   throwErrorWhenTxInputsExceeded,
+  throwErrorWhenRgbppCellsInvalid,
 } from './rgbpp';
-import { RgbppCkbVirtualTx } from '../types';
+import { getXudtTypeScript } from '../constants';
+import { IndexerCell, RgbppCkbVirtualTx } from '../types';
 import { calculateUdtCellCapacity } from './ckb-tx';
-import { InputsOrOutputsLenError, RgbppCkbTxInputsExceededError } from '../error';
+import {
+  InputsOrOutputsLenError,
+  NoRgbppLiveCellError,
+  RgbppCkbTxInputsExceededError,
+  RgbppUtxoBindMultiTypeAssetsError,
+} from '../error';
 import { remove0x } from './hex';
 
 describe('rgbpp tests', () => {
@@ -256,6 +263,116 @@ describe('rgbpp tests', () => {
       if (error instanceof RgbppCkbTxInputsExceededError) {
         expect(109).toBe(error.code);
         expect('Please ensure the tx inputs do not exceed 10').toBe(error.message);
+      }
+    }
+  });
+
+  it('throwErrorWhenRgbppCellsInvalid', () => {
+    const xudtTypeBytes = serializeScript({
+      ...getXudtTypeScript(false),
+      args: '0x205fe15af04e59d3ff1ff8e0b0a1e3bc201af406a38964760c24848ed6029b6b',
+    });
+
+    try {
+      throwErrorWhenRgbppCellsInvalid([], xudtTypeBytes, false);
+    } catch (error) {
+      if (error instanceof NoRgbppLiveCellError) {
+        expect(104).toBe(error.code);
+        expect('No rgbpp cells found with the rgbpp lock args').toBe(error.message);
+      }
+    }
+
+    const typeNullCells: IndexerCell[] = [
+      {
+        blockNumber: '0x0',
+        outPoint: {
+          txHash: '0xf2bfcd0ec5f7b2a33577168b7a647e71cc81a731560a7ad23b1c31fc08bbe1bb',
+          index: '0x1',
+        },
+        output: {
+          capacity: '0x460913c00',
+          lock: {
+            args: '0x0200000050b34b391fd8f8084bf9b6af4368350c1510df4964496b87495ebee4bd8d86d5',
+            codeHash: '0x61ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248',
+            hashType: 'type',
+          },
+        },
+        outputData: '0x2d000000100000001e0000002d0000000a000000746578742f706c61696e0b00000046697273742053706f7265',
+        txIndex: '0x0',
+      },
+    ];
+    try {
+      throwErrorWhenRgbppCellsInvalid(typeNullCells, xudtTypeBytes, false);
+    } catch (error) {
+      if (error instanceof NoRgbppLiveCellError) {
+        expect(104).toBe(error.code);
+        expect('No rgbpp cells found with the rgbpp lock args').toBe(error.message);
+      }
+    }
+
+    const nonXUDTCells: IndexerCell[] = [
+      {
+        blockNumber: '0x0',
+        outPoint: {
+          txHash: '0xf2bfcd0ec5f7b2a33577168b7a647e71cc81a731560a7ad23b1c31fc08bbe1bb',
+          index: '0x1',
+        },
+        output: {
+          capacity: '0x460913c00',
+          lock: {
+            args: '0x0200000050b34b391fd8f8084bf9b6af4368350c1510df4964496b87495ebee4bd8d86d5',
+            codeHash: '0x61ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248',
+            hashType: 'type',
+          },
+          type: {
+            args: '0xf2bfcd0ec5f7b2a33577168b7a647e71cc81a731560a7ad23b1c31fc08bbe1bb',
+            codeHash: '0xf2bfcd0ec5f7b2a33577168b7a647e71cc81a731560a7ad23b1c31fc08bbe1bb',
+            hashType: 'data1',
+          },
+        },
+        outputData: '0x2d000000100000001e0000002d0000000a000000746578742f706c61696e0b00000046697273742053706f7265',
+        txIndex: '0x0',
+      },
+    ];
+    try {
+      throwErrorWhenRgbppCellsInvalid(nonXUDTCells, xudtTypeBytes, false);
+    } catch (error) {
+      if (error instanceof RgbppUtxoBindMultiTypeAssetsError) {
+        expect(110).toBe(error.code);
+        expect('The BTC UTXO must not be bound to xUDT and other type cells at the same time').toBe(error.message);
+      }
+    }
+
+    const noTargetCells: IndexerCell[] = [
+      {
+        blockNumber: '0x0',
+        outPoint: {
+          txHash: '0xf2bfcd0ec5f7b2a33577168b7a647e71cc81a731560a7ad23b1c31fc08bbe1bb',
+          index: '0x1',
+        },
+        output: {
+          capacity: '0x460913c00',
+          lock: {
+            args: '0x0200000050b34b391fd8f8084bf9b6af4368350c1510df4964496b87495ebee4bd8d86d5',
+            codeHash: '0x61ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248',
+            hashType: 'type',
+          },
+          type: {
+            args: '0xf2bfcd0ec5f7b2a33577168b7a647e71cc81a731560a7ad23b1c31fc08bbe1bb',
+            codeHash: '0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb',
+            hashType: 'data1',
+          },
+        },
+        outputData: '0x2d000000100000001e0000002d0000000a000000746578742f706c61696e0b00000046697273742053706f7265',
+        txIndex: '0x0',
+      },
+    ];
+    try {
+      throwErrorWhenRgbppCellsInvalid(noTargetCells, xudtTypeBytes, false);
+    } catch (error) {
+      if (error instanceof NoRgbppLiveCellError) {
+        expect(104).toBe(error.code);
+        expect('No rgbpp cells found with the xudt type script and the rgbpp lock args').toBe(error.message);
       }
     }
   });

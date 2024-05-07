@@ -11,6 +11,7 @@ import {
 import { Hex, RgbppTokenInfo } from '../types';
 import { PERSONAL, blake2b, hexToBytes, serializeInput, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { encodeRgbppTokenInfo, genBtcTimeLockScript } from './rgbpp';
+import { blockchain } from '@ckb-lumos/base';
 
 export const calculateTransactionFee = (txSize: number, feeRate?: bigint): bigint => {
   const rate = feeRate ?? BigInt(1100);
@@ -131,4 +132,11 @@ export const calculateRgbppSporeCellCapacity = (sporeData: SporeDataProps): bigi
 
 export const deduplicateList = (rgbppLockArgsList: Hex[]): Hex[] => {
   return Array.from(new Set(rgbppLockArgsList));
+};
+
+// Compare the whole script
+export const isScriptEqual = (s1: Hex | CKBComponents.Script, s2: Hex | CKBComponents.Script) => {
+  const temp1 = typeof s1 === 'string' ? remove0x(s1) : remove0x(serializeScript(s1));
+  const temp2 = typeof s2 === 'string' ? remove0x(s2) : remove0x(serializeScript(s2));
+  return temp1 === temp2;
 };

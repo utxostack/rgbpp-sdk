@@ -1,12 +1,13 @@
 import { RgbppCkbVirtualTx, BtcJumpCkbVirtualTxParams, BtcJumpCkbVirtualTxResult } from '../types/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
-import { NoRgbppLiveCellError, TypeAssetNotSupportedError } from '../error';
+import { TypeAssetNotSupportedError } from '../error';
 import {
   append0x,
   calculateRgbppCellCapacity,
   calculateTransactionFee,
   deduplicateList,
   isLockArgsSizeExceeded,
+  isScriptEqual,
   isUDTTypeSupported,
   u128ToLe,
 } from '../utils';
@@ -18,6 +19,7 @@ import {
   estimateWitnessSize,
   genBtcTimeLockScript,
   genRgbppLockScript,
+  throwErrorWhenRgbppCellsInvalid,
 } from '../utils/rgbpp';
 import { Hex, IndexerCell } from '../types';
 import {
@@ -59,49 +61,78 @@ export const genBtcJumpCkbVirtualTx = async ({
   const deduplicatedLockArgsList = deduplicateList(rgbppLockArgsList);
 
   const rgbppLocks = deduplicatedLockArgsList.map((args) => genRgbppLockScript(args, isMainnet));
-  let rgbppCells: IndexerCell[] = [];
+  let rgbppTargetCells: IndexerCell[] = [];
+  let rgbppOtherTypeCells: IndexerCell[] = [];
   for await (const rgbppLock of rgbppLocks) {
-    const cells = await collector.getCells({ lock: rgbppLock, type: xudtType });
-    if (!cells || cells.length === 0) {
-      throw new NoRgbppLiveCellError('No rgbpp cells found with the xudt type script and the rgbpp lock args');
-    }
-    rgbppCells = [...rgbppCells, ...cells];
-  }
-  rgbppCells = rgbppCells.sort(compareInputs);
+    const cells = await collector.getCells({ lock: rgbppLock, isDataMustBeEmpty: false });
 
-  const { inputs, sumInputsCapacity, sumAmount } = collector.collectUdtInputs({
-    liveCells: rgbppCells,
+    throwErrorWhenRgbppCellsInvalid(cells, xudtTypeBytes, isMainnet);
+
+    const targetCells = cells!.filter((cell) => isScriptEqual(cell.output.type!, xudtTypeBytes));
+    const otherTypeCells = cells!.filter((cell) => !isScriptEqual(cell.output.type!, xudtTypeBytes));
+    rgbppTargetCells = [...rgbppTargetCells, ...targetCells];
+    rgbppOtherTypeCells = [...rgbppOtherTypeCells, ...otherTypeCells];
+  }
+  rgbppTargetCells = rgbppTargetCells.sort(compareInputs);
+  rgbppOtherTypeCells = rgbppOtherTypeCells.sort(compareInputs);
+
+  const {
+    inputs,
+    sumInputsCapacity: sumUdtCapacity,
+    sumAmount,
+  } = collector.collectUdtInputs({
+    liveCells: rgbppTargetCells,
     needAmount: transferAmount,
   });
+  let sumInputsCapacity = sumUdtCapacity;
 
   throwErrorWhenTxInputsExceeded(inputs.length);
 
-  const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
-  const outputsData = [append0x(u128ToLe(transferAmount))];
+  const rgbppCellCapacity = calculateRgbppCellCapacity(xudtType);
 
   const toLock = addressToScript(toCkbAddress);
   if (isLockArgsSizeExceeded(toLock.args)) {
     throw new Error('The lock script size of the to ckb address is too large');
   }
 
-  let changeCapacity = sumInputsCapacity;
+  const needChange = sumAmount > transferAmount;
+  // To simplify, when the xUDT does not need change, all the capacity of the inputs will be given to the receiver
+  const receiverOutputCapacity = needChange ? BigInt(rgbppTargetCells[0].output.capacity) : sumInputsCapacity;
+  // The BTC time cell does not need to be bound to the BTC UTXO
   const outputs: CKBComponents.CellOutput[] = [
     {
       lock: genBtcTimeLockScript(toLock, isMainnet),
       type: xudtType,
-      capacity: append0x(rpbppCellCapacity.toString(16)),
+      capacity: append0x(receiverOutputCapacity.toString(16)),
     },
   ];
+  const outputsData = [append0x(u128ToLe(transferAmount))];
 
-  if (sumAmount > transferAmount) {
+  if (needChange) {
+    // When the number of sender's inputs is greater than 1, the sender needs to recover the excess capacity.
+    const udtChangeCapacity = inputs.length > 1 ? sumInputsCapacity - receiverOutputCapacity : rgbppCellCapacity;
     outputs.push({
       // The Vouts[0] for OP_RETURN and Vouts[1] for RGBPP assets, BTC time cells don't need btc tx out_index
       lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
       type: xudtType,
-      capacity: append0x(rpbppCellCapacity.toString(16)),
+      capacity: append0x(udtChangeCapacity.toString(16)),
     });
     outputsData.push(append0x(u128ToLe(sumAmount - transferAmount)));
-    changeCapacity -= rpbppCellCapacity;
+  }
+
+  const targetRgbppOutputLen = outputs.length;
+  for (const [index, otherRgbppCell] of rgbppOtherTypeCells.entries()) {
+    inputs.push({
+      previousOutput: otherRgbppCell.outPoint,
+      since: '0x0',
+    });
+    sumInputsCapacity += BigInt(otherRgbppCell.output.capacity);
+    outputs.push({
+      ...otherRgbppCell.output,
+      // Vouts[targetRgbppOutputLen + 1], ..., Vouts[targetRgbppOutputLen + rgbppOtherTypeCells.length] for other RGBPP assets
+      lock: genRgbppLockScript(buildPreLockArgs(targetRgbppOutputLen + index + 1), isMainnet),
+    });
+    outputsData.push(otherRgbppCell.outputData);
   }
 
   const cellDeps = [getRgbppLockDep(isMainnet), getXudtDep(isMainnet), getRgbppLockConfigDep(isMainnet)];
@@ -112,7 +143,8 @@ export const genBtcJumpCkbVirtualTx = async ({
 
   const witnesses: Hex[] = [];
   const lockArgsSet: Set<string> = new Set();
-  for (const cell of rgbppCells) {
+  const allRgbppCells = rgbppTargetCells.concat(rgbppOtherTypeCells);
+  for (const cell of allRgbppCells) {
     if (lockArgsSet.has(cell.output.lock.args)) {
       witnesses.push('0x');
     } else {
@@ -135,8 +167,7 @@ export const genBtcJumpCkbVirtualTx = async ({
     const txSize =
       getTransactionSize(ckbRawTx) + (witnessLockPlaceholderSize ?? estimateWitnessSize(deduplicatedLockArgsList));
     const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
-
-    changeCapacity -= estimatedTxFee;
+    const changeCapacity = BigInt(outputs[outputs.length - 1].capacity) - estimatedTxFee;
     ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
   }
 
