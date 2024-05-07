@@ -7,7 +7,27 @@ import { CapacityNotEnoughError, IndexerError, UdtAmountNotEnoughError } from '.
 import { isRgbppLockCellIgnoreChain, leToU128 } from '../utils';
 import { Hex } from '../types';
 
-const parseScript = (script: CKBComponents.Script) => ({
+interface IndexerScript {
+  code_hash: Hex;
+  hash_type: Hex;
+  args: Hex;
+}
+
+interface IndexerSearchKey {
+  script?: IndexerScript;
+  script_type?: 'lock' | 'type';
+  script_search_mode?: 'prefix' | 'exact';
+  filter?: {
+    script?: IndexerScript;
+    script_len_range?: Hex[];
+    output_data_len_range?: Hex[];
+    output_capacity_range?: Hex[];
+    block_range?: Hex[];
+  };
+  with_data?: boolean;
+}
+
+const parseScript = (script: CKBComponents.Script): IndexerScript => ({
   code_hash: script.codeHash,
   hash_type: script.hashType,
   args: script.args,
@@ -37,23 +57,21 @@ export class Collector {
     isDataMustBeEmpty?: boolean;
     outputCapacityRange?: Hex[];
   }): Promise<IndexerCell[] | undefined> {
-    let param: unknown = {
-      script_search_mode: 'exact',
-    };
+    let searchKey: IndexerSearchKey = {};
     if (lock) {
-      param = {
-        ...param!,
+      searchKey = {
+        script_search_mode: 'exact',
         script: parseScript(lock),
         script_type: 'lock',
         filter: {
-          script: type ? parseScript(type) : null,
-          output_data_len_range: isDataMustBeEmpty && !type ? ['0x0', '0x1'] : null,
+          script: type ? parseScript(type) : undefined,
+          output_data_len_range: isDataMustBeEmpty && !type ? ['0x0', '0x1'] : undefined,
           output_capacity_range: outputCapacityRange,
         },
       };
     } else if (type) {
-      param = {
-        ...param!,
+      searchKey = {
+        script_search_mode: 'exact',
         script: parseScript(type),
         script_type: 'type',
       };
@@ -62,7 +80,7 @@ export class Collector {
       id: Math.floor(Math.random() * 100000),
       jsonrpc: '2.0',
       method: 'get_cells',
-      params: [param, 'asc', '0x3E8'],
+      params: [searchKey, 'asc', '0x3E8'],
     };
     const body = JSON.stringify(payload, null, '  ');
     const response = (
@@ -78,7 +96,7 @@ export class Collector {
     ).data;
     if (response.error) {
       console.error(response.error);
-      throw new IndexerError('Get cells error');
+      throw new IndexerError('Get cells from indexer error');
     } else {
       return toCamelcase(response.result.objects);
     }
