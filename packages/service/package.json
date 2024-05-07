@@ -1,10 +1,10 @@
 {
   "name": "@rgbpp-sdk/service",
   "version": "0.1.0",
-  "main": "./lib/index.js",
-  "browser": "./lib/index.umd.js",
-  "module": "./lib/index.mjs",
-  "types": "./lib/index.d.ts",
+  "main": "./dist/index.js",
+  "browser": "./dist/index.umd.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "sideEffects": false,
   "scripts": {
     "test": "vitest",
@@ -19,9 +19,9 @@
   },
   "exports": {
     ".": {
-      "import": "./lib/index.mjs",
-      "require": "./lib/index.js",
-      "types": "./lib/index.d.ts"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "files": [

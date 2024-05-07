@@ -11,7 +11,7 @@
     "target": "ES2015",
     "lib": ["dom", "dom.iterable", "esnext"],
     "module": "ES2020",
-    "outDir": "./lib",
+    "outDir": "lib",
     "composite": false,
     "resolveJsonModule": true,
     "strictNullChecks": true,

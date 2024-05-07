@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Examples used for RGBPP assets issuance, transfer, and jumping between BTC and CKB",
   "private": true,
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "format": "prettier --write '**/*.{js,ts}'",
     "lint": "tsc && eslint . && prettier --check '**/*.{js,ts}'",
