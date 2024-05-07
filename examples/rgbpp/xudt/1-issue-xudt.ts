@@ -22,8 +22,8 @@ import {
   SECP256K1_WITNESS_LOCK_SIZE,
   calculateTransactionFee,
   generateUniqueTypeArgs,
+  calculateXudtTokenInfoCellCapacity,
 } from '@rgbpp-sdk/ckb';
-import { calculateXudtTokenInfoCellCapacity } from '@rgbpp-sdk/ckb/src/utils';
 import { XUDT_TOKEN_INFO } from './0-token-info';
 
 // CKB SECP256K1 private key
