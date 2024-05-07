@@ -43,7 +43,7 @@
     "js-sha256": "^0.11.0"
   },
   "devDependencies": {
-    "@types/node": "^18.19.32",
+    "@types/node": "^20.12.10",
     "@ckb-lumos/molecule": "^0.22.2",
     "@types/lodash": "^4.17.1",
     "rollup-plugin-polyfill-node": "^0.13.0",
