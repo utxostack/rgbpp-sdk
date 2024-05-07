@@ -1,9 +1,15 @@
 {
   "name": "@rgbpp-sdk/ckb",
   "version": "0.1.0",
+  "main": "./lib/index.js",
+  "browser": "./lib/index.umd.js",
+  "module": "./lib/index.mjs",
+  "types": "./lib/index.d.ts",
+  "sideEffects": false,
   "scripts": {
     "test": "vitest",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "vite build && tsc -p tsconfig.build.json && rollup -c --bundleConfigAsCjs",
+    "rollup": "rollup -c --bundleConfigAsCjs",
     "lint": "tsc && eslint --ext .ts {src,example}/* && prettier --check '{src,example}/**/*.{js,ts}'",
     "lint:fix": "tsc && eslint --fix --ext .ts {src,example}/* && prettier --write '{src,example}/**/*.{js,ts}'",
     "splitCells": "npx ts-node example/paymaster.ts",
@@ -12,11 +18,17 @@
     "clean:buildinfo": "rimraf tsconfig.*tsbuildinfo",
     "clean:cache": "rimraf .turbo"
   },
-  "main": "lib",
+  "exports": {
+    ".": {
+      "import": "./lib/index.mjs",
+      "require": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    }
+  },
   "files": [
-    "lib"
+    "src",
+    "dist"
   ],
-  "types": "./lib/index.d.ts",
   "dependencies": {
     "@ckb-lumos/base": "^0.22.2",
     "@ckb-lumos/codec": "^0.22.2",
@@ -31,9 +43,14 @@
     "js-sha256": "^0.11.0"
   },
   "devDependencies": {
+    "@types/node": "^18.19.32",
     "@ckb-lumos/molecule": "^0.22.2",
-    "@types/lodash": "^4.17.0",
-    "vitest": "^1.4.0"
+    "@types/lodash": "^4.17.1",
+    "rollup-plugin-polyfill-node": "^0.13.0",
+    "rollup": "^4.17.2",
+    "rollup-plugin-dts": "6.1.0",
+    "vite": "5.2.11",
+    "vitest": "^1.6.0"
   },
   "publishConfig": {
     "access": "public"
