@@ -239,10 +239,10 @@ export const throwErrorWhenRgbppCellsInvalid = (
   if (typeCells.length === 0) {
     throw new NoRgbppLiveCellError('No rgbpp cells found with the rgbpp lock args');
   }
-  const isuDTTypeNotSupported = typeCells.some(
+  const isUDTTypeNotSupported = typeCells.some(
     (cell) => cell.output.type && !isUDTTypeSupported(cell.output.type, isMainnet),
   );
-  if (isuDTTypeNotSupported) {
+  if (isUDTTypeNotSupported) {
     throw new RgbppUtxoBindMultiTypeAssetsError(
       'The BTC UTXO must not be bound to xUDT and other type cells at the same time',
     );
