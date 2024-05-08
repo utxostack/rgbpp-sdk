@@ -1,5 +1,5 @@
 import { RgbppTokenInfo } from '@rgbpp-sdk/ckb';
-import { transferXudt } from './src/core';
+import { transferXudt } from 'examples-core';
 
 const XUDT_TOKEN_INFO: RgbppTokenInfo = {
   decimal: 8,
