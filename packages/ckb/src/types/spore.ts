@@ -1,4 +1,4 @@
-import { RawClusterData, RawSporeData, transferSpore } from '@spore-sdk/core';
+import { RawClusterData, RawSporeData } from '@spore-sdk/core';
 import { Address, Hex } from './common';
 import { Collector } from '../collector';
 import { IndexerCell } from './collector';

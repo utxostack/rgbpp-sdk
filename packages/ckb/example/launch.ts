@@ -36,7 +36,7 @@ const launchRgbppAsset = async () => {
   });
 
   const emptyWitness = { lock: '', inputType: '', outputType: '' };
-  let unsignedTx: CKBComponents.RawTransactionToSign = {
+  const unsignedTx: CKBComponents.RawTransactionToSign = {
     ...ckbRawTx,
     cellDeps: [...ckbRawTx.cellDeps, getSecp256k1CellDep(false)],
     witnesses: [emptyWitness, ...ckbRawTx.witnesses.slice(1)],
@@ -44,7 +44,7 @@ const launchRgbppAsset = async () => {
 
   const signedTx = collector.getCkb().signTransaction(LAUNCH_SECP256K1_PRIVATE_KEY)(unsignedTx);
 
-  let txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
+  const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
   console.info(`Rgbpp asset has been jumping from CKB to BTC and tx hash is ${txHash}`);
 };
 

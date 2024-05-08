@@ -1,6 +1,8 @@
 import { PERSONAL, blake2b, hexToBytes, serializeInput } from '@nervosnetwork/ckb-sdk-utils';
 import { Cell as LumosCell } from '@ckb-lumos/base';
+import { UnpackResult } from '@ckb-lumos/codec';
 import {
+  Action,
   assembleTransferSporeAction,
   assembleCobuildWitnessLayout,
   assembleCreateClusterAction,
@@ -47,7 +49,7 @@ export const generateSporeCreateCoBuild = ({
   if (sporeOutputs.length !== sporeOutputsData.length) {
     throw new Error('The length of spore outputs and spore cell data are not same');
   }
-  let sporeActions: any[] = [];
+  let sporeActions: UnpackResult<typeof Action>[] = [];
 
   // cluster transfer actions
   const clusterInput = {
@@ -80,10 +82,10 @@ export const generateSporeTransferCoBuild = (
   if (sporeCells.length !== outputCells.length) {
     throw new Error('The length of spore input cells and spore output cells are not same');
   }
-  let sporeActions: any[] = [];
+  let sporeActions: UnpackResult<typeof Action>[] = [];
   for (let index = 0; index < sporeCells.length; index++) {
     const sporeCell = sporeCells[index];
-    const outputData = 'outputData' in sporeCell ? sporeCell.outputData : sporeCell.data?.content!;
+    const outputData = 'outputData' in sporeCell ? sporeCell.outputData : sporeCell.data!.content!;
     const sporeInput = {
       cellOutput: sporeCells[index].output,
       data: outputData,

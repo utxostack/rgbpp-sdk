@@ -94,8 +94,8 @@ export const genBtcTransferCkbVirtualTx = async ({
 
   let inputs: CKBComponents.CellInput[] = [];
   let sumInputsCapacity = BigInt(0);
-  let outputs: CKBComponents.CellOutput[] = [];
-  let outputsData: Hex[] = [];
+  const outputs: CKBComponents.CellOutput[] = [];
+  const outputsData: Hex[] = [];
 
   // The non-target RGBPP outputs correspond to the RGBPP inputs one-to-one, and the outputs are still bound to the sender’s BTC UTXOs
   const handleNonTargetRgbppCells = (targetRgbppOutputLen: number) => {
@@ -333,7 +333,7 @@ export const appendIssuerCellToBtcBatchTransfer = async ({
   isMainnet,
   ckbFeeRate,
 }: AppendIssuerCellToBtcBatchTransfer): Promise<CKBComponents.RawTransaction> => {
-  let rawTx = ckbRawTx as CKBComponents.RawTransactionToSign;
+  const rawTx = ckbRawTx as CKBComponents.RawTransactionToSign;
 
   const rgbppInputsLength = rawTx.inputs.length;
 
@@ -349,7 +349,7 @@ export const appendIssuerCellToBtcBatchTransfer = async ({
   emptyCells = emptyCells.filter((cell) => !cell.output.type);
 
   let actualInputsCapacity = BigInt(sumInputsCapacity);
-  let txFee = MAX_FEE;
+  const txFee = MAX_FEE;
   if (actualInputsCapacity <= sumOutputsCapacity) {
     const needCapacity = sumOutputsCapacity - actualInputsCapacity + MIN_CAPACITY;
     const { inputs, sumInputsCapacity: sumEmptyCapacity } = collector.collectInputs(emptyCells, needCapacity, txFee);
@@ -370,7 +370,7 @@ export const appendIssuerCellToBtcBatchTransfer = async ({
   changeCapacity -= estimatedTxFee;
   rawTx.outputs[rawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
 
-  let keyMap = new Map<string, string>();
+  const keyMap = new Map<string, string>();
   keyMap.set(scriptToHash(issuerLock), secp256k1PrivateKey);
   keyMap.set(scriptToHash(getRgbppLockScript(isMainnet)), '');
 

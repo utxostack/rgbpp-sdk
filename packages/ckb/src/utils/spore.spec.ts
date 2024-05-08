@@ -9,7 +9,6 @@ import { IndexerCell } from '../types';
 import { getSporeTypeScript } from '../constants';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { NoRgbppLiveCellError, RgbppSporeTypeMismatchError, RgbppUtxoBindMultiTypeAssetsError } from '../error';
-import { throwErrorWhenRgbppCellsInvalid } from './rgbpp';
 
 describe('spore utils', () => {
   it('generateClusterId', () => {

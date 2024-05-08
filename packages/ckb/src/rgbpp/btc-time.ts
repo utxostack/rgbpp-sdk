@@ -157,7 +157,7 @@ export const signBtcTimeCellSpentTx = async ({
   const changeCapacity = BigInt(emptyCells[0].output.capacity) - estimatedTxFee;
   rawTx.outputs[0].capacity = append0x(changeCapacity.toString(16));
 
-  let keyMap = new Map<string, string>();
+  const keyMap = new Map<string, string>();
   keyMap.set(scriptToHash(masterLock), secp256k1PrivateKey);
   keyMap.set(scriptToHash(getBtcTimeLockScript(isMainnet)), '');
 

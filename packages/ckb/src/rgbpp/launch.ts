@@ -2,7 +2,6 @@ import { RgbppCkbVirtualTx, RgbppLaunchCkbVirtualTxParams, RgbppLaunchVirtualTxR
 import { NoLiveCellError } from '../error';
 import {
   append0x,
-  calculateRgbppCellCapacity,
   calculateRgbppTokenInfoCellCapacity,
   calculateTransactionFee,
   generateUniqueTypeArgs,
@@ -57,7 +56,7 @@ export const genRgbppLaunchCkbVirtualTx = async ({
   emptyCells = emptyCells.filter((cell) => !cell.output.type);
   const infoCellCapacity = calculateRgbppTokenInfoCellCapacity(rgbppTokenInfo, isMainnet);
 
-  let txFee = MAX_FEE;
+  const txFee = MAX_FEE;
   const { inputs, sumInputsCapacity } = collector.collectInputs(emptyCells, infoCellCapacity, txFee, { isMax: true });
 
   let rgbppCellCapacity = sumInputsCapacity - infoCellCapacity;

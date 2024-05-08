@@ -154,7 +154,9 @@ export function decodeAddress(address: string): {
           dust: getAddressTypeDust(addressType),
         };
       }
-    } catch (e) {}
+    } catch (e) {
+      // Do nothing (no need to throw here)
+    }
   } else {
     try {
       decodeBase58 = bitcoin.address.fromBase58Check(address);
@@ -187,7 +189,9 @@ export function decodeAddress(address: string): {
           dust: getAddressTypeDust(addressType),
         };
       }
-    } catch (e) {}
+    } catch (e) {
+      // Do nothing (no need to throw here)
+    }
   }
 
   return {

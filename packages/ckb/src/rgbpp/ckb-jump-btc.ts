@@ -46,10 +46,13 @@ export const genCkbJumpBtcVirtualTx = async ({
     throw new NoXudtLiveCellError('No rgbpp cells found with the xudt type script and the rgbpp lock args');
   }
 
-  let { inputs, sumInputsCapacity, sumAmount } = collector.collectUdtInputs({
+  const collected = collector.collectUdtInputs({
     liveCells: xudtCells,
     needAmount: transferAmount,
   });
+
+  let { inputs, sumInputsCapacity } = collected;
+  const { sumAmount } = collected;
 
   const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
   const outputsData = [append0x(u128ToLe(transferAmount))];
@@ -62,7 +65,7 @@ export const genCkbJumpBtcVirtualTx = async ({
     },
   ];
 
-  let txFee = MAX_FEE;
+  const txFee = MAX_FEE;
   const xudtCellCapacity = calculateUdtCellCapacity(fromLock, xudtType);
   if (sumInputsCapacity < xudtCellCapacity + rpbppCellCapacity + MIN_CAPACITY + txFee) {
     let emptyCells = await collector.getCells({ lock: fromLock });
@@ -96,7 +99,7 @@ export const genCkbJumpBtcVirtualTx = async ({
   outputsData.push('0x');
 
   const cellDeps = [getXudtDep(isMainnet)];
-  const witnesses = inputs.map((_) => '0x');
+  const witnesses = inputs.map(() => '0x');
 
   const ckbRawTx: CKBComponents.RawTransaction = {
     version: '0x0',
@@ -153,10 +156,13 @@ export const genCkbBatchJumpBtcVirtualTx = async ({
     .map((receiver) => receiver.transferAmount)
     .reduce((prev, current) => prev + current, BigInt(0));
 
-  let { inputs, sumInputsCapacity, sumAmount } = collector.collectUdtInputs({
+  const collected = collector.collectUdtInputs({
     liveCells: xudtCells,
     needAmount: sumTransferAmount,
   });
+
+  let { inputs, sumInputsCapacity } = collected;
+  const { sumAmount } = collected;
 
   const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
   const sumRgbppCellCapacity = rpbppCellCapacity * BigInt(rgbppReceivers.length);
@@ -167,7 +173,7 @@ export const genCkbBatchJumpBtcVirtualTx = async ({
   }));
   const outputsData = rgbppReceivers.map((receiver) => append0x(u128ToLe(receiver.transferAmount)));
 
-  let txFee = MAX_FEE;
+  const txFee = MAX_FEE;
   const xudtCellCapacity = calculateUdtCellCapacity(fromLock, xudtType);
   if (sumInputsCapacity < xudtCellCapacity + sumRgbppCellCapacity + MIN_CAPACITY + txFee) {
     let emptyCells = await collector.getCells({ lock: fromLock });
@@ -201,7 +207,7 @@ export const genCkbBatchJumpBtcVirtualTx = async ({
   outputsData.push('0x');
 
   const cellDeps = [getXudtDep(isMainnet)];
-  const witnesses = inputs.map((_) => '0x');
+  const witnesses = inputs.map(() => '0x');
 
   const ckbRawTx: CKBComponents.RawTransaction = {
     version: '0x0',

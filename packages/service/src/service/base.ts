@@ -1,7 +1,7 @@
 import pickBy from 'lodash/pickBy';
 import { isDomain } from '../utils';
 import { BtcAssetsApiError, ErrorCodes } from '../error';
-import { BaseApis, BaseApiRequestOptions, BtcAssetsApiToken, BtcAssetsApiContext } from '../types';
+import { BaseApis, BaseApiRequestOptions, BtcAssetsApiToken, BtcAssetsApiContext, Json } from '../types';
 
 export class BtcAssetsApiBase implements BaseApis {
   public url: string;
@@ -47,7 +47,7 @@ export class BtcAssetsApiBase implements BaseApis {
     } as RequestInit);
 
     let text: string | undefined;
-    let json: Record<string, any> | undefined;
+    let json: Json | undefined;
     let ok: boolean = false;
     try {
       text = await res.text();
@@ -139,7 +139,7 @@ export class BtcAssetsApiBase implements BaseApis {
   }
 }
 
-function tryParseBody(body: unknown): Record<string, any> | undefined {
+function tryParseBody(body: unknown): Record<string, unknown> | undefined {
   try {
     return typeof body === 'string' ? JSON.parse(body) : void 0;
   } catch {

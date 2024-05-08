@@ -157,9 +157,17 @@ export class TxBuilder {
     // otherwise use the average fee rate from the DataSource
     const currentFeeRate = feeRate ?? this.feeRate ?? averageFeeRate!;
 
-    let currentFee: number = 0;
-    let previousFee: number = 0;
-    while (true) {
+    let currentFee = 0;
+    let previousFee = 0;
+    let isLoopedOnce = false;
+    let isFeeExpected = false;
+    while (!isFeeExpected) {
+      if (isLoopedOnce) {
+        previousFee = currentFee;
+        this.inputs = clone(originalInputs);
+        this.outputs = clone(originalOutputs);
+      }
+
       const { needCollect, needReturn, inputsTotal } = this.summary();
       const safeToProcess = inputsTotal > 0 || previousFee > 0;
       const returnAmount = needReturn - previousFee;
@@ -186,13 +194,10 @@ export class TxBuilder {
 
       const addressType = getAddressType(address);
       currentFee = await this.calculateFee(addressType, currentFeeRate);
-      if ([-1, 0, 1].includes(currentFee - previousFee)) {
-        break;
+      isFeeExpected = [-1, 0, 1].includes(currentFee - previousFee);
+      if (!isLoopedOnce) {
+        isLoopedOnce = true;
       }
-
-      previousFee = currentFee;
-      this.inputs = clone(originalInputs);
-      this.outputs = clone(originalOutputs);
     }
 
     return {

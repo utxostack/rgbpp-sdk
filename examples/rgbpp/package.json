@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "format": "prettier --write '**/*.{js,ts}'",
-    "lint:fix": "pnpm eslint . && prettier --check '**/*.{js,ts}'"
+    "lint": "tsc && eslint . && prettier --check '**/*.{js,ts}'",
+    "lint:fix": "tsc && eslint --fix --ext .js,.ts . && prettier --write '**/*.{js,ts}'"
   },
   "dependencies": {
     "@exact-realty/multipart-parser": "^1.0.13",
@@ -18,10 +19,7 @@
     "axios": "^1.6.8"
   },
   "devDependencies": {
-    "@eslint/js": "^9.1.1",
     "@types/node": "^20.11.28",
-    "eslint": "^8.56.0",
-    "typescript": "^5.4.2",
-    "typescript-eslint": "^7.7.1"
+    "typescript": "^5.4.2"
   }
 }
