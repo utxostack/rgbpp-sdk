@@ -4,7 +4,6 @@
 
 - Local and Queue directories: The examples for RGB++ UDT issuance, transfer, and leap
 - Spore directory: The examples for RGB++ spore creation, transfer and leap
-- xUDT directory: The examples for xUDT issuance, mint and transfer on CKB
 
 ## What you must know about BTC transaction id
 
@@ -27,22 +26,6 @@ But when you're searching for this transaction in [Bitcoin Core](https://bitcoin
 
 ```
 018025fb6989eed484774170eefa2bef1074b0c24537f992a64dbc138277bc4a
-```
-
-## xUDT on CKB Examples
-
-### Issue xUDT on CKB
-
-```shell
-npx ts-node examples/rgbpp/xudt/1-issue-xudt.ts 
-```
-
-### Mint/Transfer xUDT on CKB
-
-You can use this command to mint or transfer xUDT assets
-
-```shell
-npx ts-node examples/rgbpp/xudt/2-transfer-xudt.ts 
 ```
 
 ## RGB++ xUDT Examples with Queue service(Recommended)

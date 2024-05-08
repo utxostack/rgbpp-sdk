@@ -165,6 +165,15 @@ importers:
         specifier: ^5.4.2
         version: 5.4.2
 
+  examples/xudt:
+    dependencies:
+      '@nervosnetwork/ckb-sdk-utils':
+        specifier: ^0.109.1
+        version: 0.109.1
+      '@rgbpp-sdk/ckb':
+        specifier: workspace:^
+        version: link:../../packages/ckb
+
   packages/btc:
     dependencies:
       '@bitcoinerlab/secp256k1':
