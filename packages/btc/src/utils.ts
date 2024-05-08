@@ -22,7 +22,7 @@ export function tweakSigner<T extends TweakableSigner>(
     tweakHash?: Buffer;
   },
 ): bitcoin.Signer {
-  let privateKey: Uint8Array | undefined = signer.privateKey ? new Uint8Array(signer.privateKey) : undefined;
+  let privateKey: Uint8Array | undefined = signer.privateKey;
   if (!privateKey) {
     throw new Error('Private key is required for tweaking signer!');
   }
