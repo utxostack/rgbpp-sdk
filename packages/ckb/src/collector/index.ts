@@ -56,7 +56,7 @@ export class Collector {
     type?: CKBComponents.Script;
     isDataMustBeEmpty?: boolean;
     outputCapacityRange?: Hex[];
-  }): Promise<IndexerCell[] | undefined> {
+  }): Promise<IndexerCell[]> {
     let searchKey: IndexerSearchKey = {};
     if (lock) {
       searchKey = {
@@ -98,7 +98,11 @@ export class Collector {
       console.error(response.error);
       throw new IndexerError('Get cells from indexer error');
     } else {
-      return toCamelcase(response.result.objects);
+      const res = toCamelcase<IndexerCell[]>(response.result.objects);
+      if (res === null) {
+        throw new IndexerError('The response of indexer RPC get_cells is invalid');
+      }
+      return res;
     }
   }
 
