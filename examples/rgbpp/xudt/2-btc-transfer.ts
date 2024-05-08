@@ -1,5 +1,5 @@
 import { buildRgbppLockArgs } from '@rgbpp-sdk/ckb';
-import { RgbppTransferParams, btcService, transferRgbppOnBtc } from 'examples-core';
+import { RgbppTransferParams, btcService, transferRgbppOnBtc } from '../core';
 
 const transfer = async (params: RgbppTransferParams) => {
   const btcTxId = await transferRgbppOnBtc(params);

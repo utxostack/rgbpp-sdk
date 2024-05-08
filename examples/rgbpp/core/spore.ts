@@ -6,7 +6,7 @@ import {
 } from '@rgbpp-sdk/ckb';
 import { sendRgbppUtxos } from '@rgbpp-sdk/btc';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../utils';
+import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from './env';
 
 export interface SporeTransferParams {
   sporeRgbppLockArgs: Hex;

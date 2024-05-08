@@ -1,4 +1,4 @@
-import { leapFromCkbToBtc } from 'examples-core';
+import { leapFromCkbToBtc } from '../core';
 
 // Use your real BTC UTXO information on the BTC Testnet
 leapFromCkbToBtc({

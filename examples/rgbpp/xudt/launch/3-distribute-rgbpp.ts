@@ -21,7 +21,7 @@ import {
   btcService,
   CKB_PRIVATE_KEY,
   ckbAddress,
-} from 'examples-core';
+} from '../../core';
 
 interface Params {
   rgbppLockArgsList: string[];

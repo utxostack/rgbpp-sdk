@@ -1,5 +1,5 @@
 import { buildRgbppLockArgs } from '@rgbpp-sdk/ckb';
-import { LeapToCkbParams, btcService, leapFromBtcToCkb } from 'examples-core';
+import { LeapToCkbParams, btcService, leapFromBtcToCkb } from '../core';
 
 const leapToCKB = async (params: LeapToCkbParams) => {
   const btcTxId = await leapFromBtcToCkb(params);

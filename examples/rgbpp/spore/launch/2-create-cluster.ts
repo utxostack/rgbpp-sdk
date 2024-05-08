@@ -8,7 +8,7 @@ import {
 } from '@rgbpp-sdk/ckb';
 import { sendRgbppUtxos, transactionToHex } from '@rgbpp-sdk/btc';
 import { BtcAssetsApiError } from '@rgbpp-sdk/service';
-import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from 'examples-core';
+import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../core';
 import { CLUSTER_DATA } from './0-cluster-info';
 
 const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: string }) => {

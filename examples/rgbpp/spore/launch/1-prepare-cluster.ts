@@ -10,7 +10,7 @@ import {
   genRgbppLockScript,
   getSecp256k1CellDep,
 } from '@rgbpp-sdk/ckb';
-import { ckbAddress, isMainnet, collector, CKB_PRIVATE_KEY } from 'examples-core';
+import { ckbAddress, isMainnet, collector, CKB_PRIVATE_KEY } from '../../core';
 import { CLUSTER_DATA } from './0-cluster-info';
 
 const prepareClusterCell = async ({ outIndex, btcTxId }: { outIndex: number; btcTxId: string }) => {

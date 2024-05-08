@@ -1,5 +1,5 @@
 import { buildRgbppLockArgs } from '@rgbpp-sdk/ckb';
-import { leapSporeToCkb, btcService, SporeLeapParams } from 'examples-core';
+import { leapSporeToCkb, btcService, SporeLeapParams } from '../core';
 
 const leapSpore = async (params: SporeLeapParams) => {
   const btcTxId = await leapSporeToCkb(params);

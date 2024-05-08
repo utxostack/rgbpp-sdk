@@ -2,8 +2,13 @@ import { AddressPrefix, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils
 import { DataSource, ECPair, ECPairInterface, NetworkType, bitcoin } from '@rgbpp-sdk/btc';
 import { Collector } from '@rgbpp-sdk/ckb';
 import { BtcAssetsApi } from '@rgbpp-sdk/service';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: __dirname + '/../.env' });
 
 export const isMainnet = process.env.IS_MAINNET === 'true' ? true : false;
+
+console.log('IS_MAINNET', process.env.IS_MAINNET);
 
 export const collector = new Collector({
   ckbNodeUrl: process.env.CKB_NODE_URL!,

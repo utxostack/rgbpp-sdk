@@ -15,11 +15,12 @@
     "@rgbpp-sdk/btc": "workspace:^",
     "@rgbpp-sdk/ckb": "workspace:^",
     "@rgbpp-sdk/service": "workspace:^",
-    "@spore-sdk/core": "^0.2.0-beta.6",
-    "examples-core": "workspace:^"
+    "@spore-sdk/core": "^0.2.0-beta.6"
   },
   "devDependencies": {
     "@types/node": "^20.11.28",
-    "typescript": "^5.4.2"
+    "typescript": "^5.4.2",
+    "dotenv": "^16.4.5",
+    "@types/dotenv": "^8.2.0"
   }
 }

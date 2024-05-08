@@ -19,7 +19,7 @@ import {
   calculateXudtTokenInfoCellCapacity,
   NoXudtLiveCellError,
 } from '@rgbpp-sdk/ckb';
-import { CKB_PRIVATE_KEY, ckbAddress, collector, isMainnet } from '../utils';
+import { CKB_PRIVATE_KEY, ckbAddress, collector, isMainnet } from './env';
 
 export interface IssueResult {
   txHash: string;

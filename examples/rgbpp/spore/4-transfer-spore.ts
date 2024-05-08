@@ -1,5 +1,5 @@
 import { buildRgbppLockArgs } from '@rgbpp-sdk/ckb';
-import { SporeTransferParams, transferSporeOnBtc, btcService } from 'examples-core';
+import { SporeTransferParams, transferSporeOnBtc, btcService } from '../core';
 
 const transferSpore = async (params: SporeTransferParams) => {
   const btcTxId = await transferSporeOnBtc(params);

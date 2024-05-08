@@ -16,7 +16,7 @@ import {
   btcKeyPair,
   btcService,
   btcDataSource,
-} from '../utils';
+} from './env';
 import { sendRgbppUtxos } from '@rgbpp-sdk/btc';
 
 export interface LeapToBtcParams {
