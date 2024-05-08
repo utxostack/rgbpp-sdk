@@ -2,7 +2,7 @@ import { sendCkbTx, buildBtcTimeCellsSpentTx, getBtcTimeLockScript, signBtcTimeC
 import { CKB_PRIVATE_KEY, btcService, ckbAddress, collector, isMainnet } from 'examples-core';
 
 // Warning: Wait at least 6 BTC confirmation blocks to spend the BTC time cells after 4-btc-jump-ckb.ts
-const spendBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }) => {
+const unlockBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }) => {
   const btcTimeCells = await collector.getCells({
     lock: {
       ...getBtcTimeLockScript(false),
@@ -36,7 +36,7 @@ const spendBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }
 };
 
 // The btcTimeCellArgs is from the outputs[0].lock.args(BTC Time lock args) of the 4-btc-jump-ckb.ts CKB transaction
-spendBtcTimeCell({
+unlockBtcTimeCell({
   btcTimeCellArgs:
     '0x7f000000100000005b0000005f0000004b000000100000003000000031000000d23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac011600000000016c61f984f12d3c8a4f649e60acda5deda0b8837c060000001c95b9d726e4ab337d6a4572680598947954d7b6ff4f1e767e605eeeec49e7ed',
 });

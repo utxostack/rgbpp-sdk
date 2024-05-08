@@ -1,54 +1,9 @@
-import { buildRgbppLockArgs, getSporeTypeScript, Hex, genTransferSporeCkbVirtualTx } from '@rgbpp-sdk/ckb';
-import { sendRgbppUtxos } from '@rgbpp-sdk/btc';
-import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from 'examples-core';
+import { buildRgbppLockArgs } from '@rgbpp-sdk/ckb';
+import { SporeTransferParams, transferSporeOnBtc, btcService } from 'examples-core';
 
-const transferSpore = async ({
-  sporeRgbppLockArgs,
-  toBtcAddress,
-  sporeTypeArgs,
-}: {
-  sporeRgbppLockArgs: Hex;
-  toBtcAddress: string;
-  sporeTypeArgs: Hex;
-}) => {
-  // The spore type script is from 3-create-spore.ts, you can find it from the ckb tx spore output cell
-  const sporeTypeBytes = serializeScript({
-    ...getSporeTypeScript(isMainnet),
-    args: sporeTypeArgs,
-  });
-
-  const ckbVirtualTxResult = await genTransferSporeCkbVirtualTx({
-    collector,
-    sporeRgbppLockArgs,
-    sporeTypeBytes,
-    isMainnet,
-  });
-
-  const { commitment, ckbRawTx } = ckbVirtualTxResult;
-
-  // console.log(JSON.stringify(ckbRawTx))
-
-  // Send BTC tx
-  const psbt = await sendRgbppUtxos({
-    ckbVirtualTx: ckbRawTx,
-    commitment,
-    tos: [toBtcAddress],
-    ckbCollector: collector,
-    from: btcAddress!,
-    source: btcDataSource,
-    feeRate: 30,
-  });
-  psbt.signAllInputs(btcKeyPair);
-  psbt.finalizeAllInputs();
-
-  const btcTx = psbt.extractTransaction();
-  const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
-
-  console.log('BTC TxId: ', btcTxId);
-
+const transferSpore = async (params: SporeTransferParams) => {
+  const btcTxId = await transferSporeOnBtc(params);
   try {
-    await btcService.sendRgbppCkbTransaction({ btc_txid: btcTxId, ckb_virtual_result: ckbVirtualTxResult });
     const interval = setInterval(async () => {
       const { state, failedReason } = await btcService.getRgbppTransactionState(btcTxId);
       console.log('state', state);
