@@ -1,7 +1,7 @@
 {
   "name": "rgbpp-examples",
   "version": "0.1.0",
-  "description": "Examples used for RGBPP assets issuance, transfer, and jumping between BTC and CKB",
+  "description": "Examples used for RGBPP assets issuance, transfer, and leaping between BTC and CKB",
   "private": true,
   "type": "module",
   "scripts": {
@@ -16,7 +16,7 @@
     "@rgbpp-sdk/ckb": "workspace:^",
     "@rgbpp-sdk/service": "workspace:^",
     "@spore-sdk/core": "^0.2.0-beta.6",
-    "axios": "^1.6.8"
+    "examples-core": "workspace:^"
   },
   "devDependencies": {
     "@types/node": "^20.11.28",

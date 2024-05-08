@@ -1,36 +1,31 @@
-import { AddressPrefix, privateKeyToAddress, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
+import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import {
-  Collector,
   getSecp256k1CellDep,
   buildRgbppLockArgs,
   getSporeTypeScript,
   genLeapSporeFromCkbToBtcRawTx,
 } from '@rgbpp-sdk/ckb';
+import { isMainnet, collector, ckbAddress, CKB_PRIVATE_KEY } from 'examples-core';
 
-// CKB SECP256K1 private key
-const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
-
-const leapSporeFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; btcTxId: string }) => {
-  const collector = new Collector({
-    ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
-    ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
-  });
-  const isMainnet = false;
-  const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
-    prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
-  });
-  console.log('ckb address: ', address);
-
+const leapSporeFromCkbToBtc = async ({
+  outIndex,
+  btcTxId,
+  sporeTypeArgs,
+}: {
+  outIndex: number;
+  btcTxId: string;
+  sporeTypeArgs: string;
+}) => {
   const toRgbppLockArgs = buildRgbppLockArgs(outIndex, btcTxId);
 
   const sporeType: CKBComponents.Script = {
     ...getSporeTypeScript(isMainnet),
-    args: '0x42898ea77062256f46e8f1b861d526ae47810ecc51ab50477945d5fa90452706',
+    args: sporeTypeArgs,
   };
 
   const ckbRawTx = await genLeapSporeFromCkbToBtcRawTx({
     collector,
-    fromCkbAddress: address,
+    fromCkbAddress: ckbAddress,
     toRgbppLockArgs,
     sporeTypeBytes: serializeScript(sporeType),
     isMainnet,
@@ -43,7 +38,7 @@ const leapSporeFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; 
     witnesses: [emptyWitness, ...ckbRawTx.witnesses.slice(1)],
   };
 
-  const signedTx = collector.getCkb().signTransaction(CKB_TEST_PRIVATE_KEY)(unsignedTx);
+  const signedTx = collector.getCkb().signTransaction(CKB_PRIVATE_KEY)(unsignedTx);
 
   const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
   console.info(`RGB++ Spore has been jumped from CKB to BTC and tx hash is ${txHash}`);
@@ -53,4 +48,5 @@ const leapSporeFromCkbToBtc = async ({ outIndex, btcTxId }: { outIndex: number; 
 leapSporeFromCkbToBtc({
   outIndex: 1,
   btcTxId: '448897515cf07b4ca0cd38af9806399ede55775b4c760b274ed2322121ed185f',
+  sporeTypeArgs: '0x42898ea77062256f46e8f1b861d526ae47810ecc51ab50477945d5fa90452706',
 });

@@ -1,5 +1,4 @@
 import {
-  Collector,
   buildRgbppLockArgs,
   appendCkbTxWitnesses,
   updateCkbTxWithRealBtcTxId,
@@ -9,29 +8,19 @@ import {
   appendIssuerCellToSporesCreate,
   generateSporeCreateCoBuild,
 } from '@rgbpp-sdk/ckb';
-import {
-  DataSource,
-  ECPair,
-  bitcoin,
-  NetworkType,
-  sendRgbppUtxos,
-  transactionToHex,
-  utf8ToBuffer,
-} from '@rgbpp-sdk/btc';
-import { BtcAssetsApi, BtcAssetsApiError } from '@rgbpp-sdk/service';
+import { sendRgbppUtxos, transactionToHex, utf8ToBuffer } from '@rgbpp-sdk/btc';
+import { BtcAssetsApiError } from '@rgbpp-sdk/service';
 import { RawSporeData } from '@spore-sdk/core';
-import { AddressPrefix, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
-
-// CKB SECP256K1 private key
-const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
-// BTC SECP256K1 private key
-const BTC_TEST_PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000001';
-// API docs: https://btc-assets-api.testnet.mibao.pro/docs
-const BTC_ASSETS_API_URL = 'https://btc-assets-api.testnet.mibao.pro';
-// https://btc-assets-api.testnet.mibao.pro/docs/static/index.html#/Token/post_token_generate
-const BTC_ASSETS_TOKEN = '';
-
-const BTC_ASSETS_ORIGIN = 'https://btc-test.app';
+import {
+  isMainnet,
+  collector,
+  btcAddress,
+  btcDataSource,
+  btcKeyPair,
+  btcService,
+  CKB_PRIVATE_KEY,
+  ckbAddress,
+} from 'examples-core';
 
 interface Params {
   clusterRgbppLockArgs: Hex;
@@ -42,30 +31,6 @@ interface Params {
 }
 
 const createSpores = async ({ clusterRgbppLockArgs, receivers }: Params) => {
-  const collector = new Collector({
-    ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
-    ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
-  });
-  const isMainnet = false;
-
-  const ckbAddress = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
-    prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
-  });
-  console.log('ckb address: ', ckbAddress);
-
-  const network = isMainnet ? bitcoin.networks.bitcoin : bitcoin.networks.testnet;
-  const keyPair = ECPair.fromPrivateKey(Buffer.from(BTC_TEST_PRIVATE_KEY, 'hex'), { network });
-  const { address: btcAddress } = bitcoin.payments.p2wpkh({
-    pubkey: keyPair.publicKey,
-    network,
-  });
-
-  console.log('btc address: ', btcAddress);
-
-  const networkType = isMainnet ? NetworkType.MAINNET : NetworkType.TESTNET;
-  const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, BTC_ASSETS_ORIGIN);
-  const source = new DataSource(service, networkType);
-
   const ckbVirtualTxResult = await genCreateSporeCkbVirtualTx({
     collector,
     sporeDataList: receivers.map((receiver) => receiver.sporeData),
@@ -85,22 +50,22 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: Params) => {
     tos: btcTos,
     ckbCollector: collector,
     from: btcAddress!,
-    source,
+    source: btcDataSource,
     feeRate: 120,
   });
-  psbt.signAllInputs(keyPair);
+  psbt.signAllInputs(btcKeyPair);
   psbt.finalizeAllInputs();
 
   const btcTx = psbt.extractTransaction();
   const btcTxBytes = transactionToHex(btcTx, false);
-  const { txid: btcTxId } = await service.sendBtcTransaction(btcTx.toHex());
+  const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
 
   console.log('BTC TxId: ', btcTxId);
 
   const interval = setInterval(async () => {
     try {
       console.log('Waiting for BTC tx and proof to be ready');
-      const rgbppApiSpvProof = await service.getRgbppSpvProof(btcTxId, 0);
+      const rgbppApiSpvProof = await btcService.getRgbppSpvProof(btcTxId, 0);
       clearInterval(interval);
       // Update CKB transaction with the real BTC txId
       const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet });
@@ -128,7 +93,7 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: Params) => {
       // console.log('ckbTx: ', JSON.stringify(ckbTx));
 
       const signedTx = await appendIssuerCellToSporesCreate({
-        secp256k1PrivateKey: CKB_TEST_PRIVATE_KEY,
+        secp256k1PrivateKey: CKB_PRIVATE_KEY,
         issuerAddress: ckbAddress,
         ckbRawTx: ckbTx,
         collector,

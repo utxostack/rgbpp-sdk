@@ -1,5 +1,15 @@
-import { buildRgbppLockArgs, getSporeTypeScript, Hex, genLeapSporeFromBtcToCkbVirtualTx } from '@rgbpp-sdk/ckb';
-import { sendRgbppUtxos } from '@rgbpp-sdk/btc';
+import {
+  buildRgbppLockArgs,
+  appendCkbTxWitnesses,
+  updateCkbTxWithRealBtcTxId,
+  sendCkbTx,
+  getSporeTypeScript,
+  Hex,
+  generateSporeTransferCoBuild,
+  genLeapSporeFromBtcToCkbVirtualTx,
+} from '@rgbpp-sdk/ckb';
+import { sendRgbppUtxos, transactionToHex } from '@rgbpp-sdk/btc';
+import { BtcAssetsApiError } from '@rgbpp-sdk/service';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from 'examples-core';
 
@@ -26,7 +36,7 @@ const transferSpore = async ({
     isMainnet,
   });
 
-  const { commitment, ckbRawTx } = ckbVirtualTxResult;
+  const { commitment, ckbRawTx, sporeCell } = ckbVirtualTxResult;
 
   // console.log(JSON.stringify(ckbRawTx))
 
@@ -38,34 +48,44 @@ const transferSpore = async ({
     ckbCollector: collector,
     from: btcAddress!,
     source: btcDataSource,
-    feeRate: 30,
+    feeRate: 120,
   });
   psbt.signAllInputs(btcKeyPair);
   psbt.finalizeAllInputs();
 
   const btcTx = psbt.extractTransaction();
+  const btcTxBytes = transactionToHex(btcTx, false);
   const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
 
   console.log('BTC TxId: ', btcTxId);
 
-  try {
-    await btcService.sendRgbppCkbTransaction({ btc_txid: btcTxId, ckb_virtual_result: ckbVirtualTxResult });
-    const interval = setInterval(async () => {
-      const { state, failedReason } = await btcService.getRgbppTransactionState(btcTxId);
-      console.log('state', state);
-      if (state === 'completed' || state === 'failed') {
-        clearInterval(interval);
-        if (state === 'completed') {
-          const { txhash: txHash } = await btcService.getRgbppTransactionHash(btcTxId);
-          console.info(`Rgbpp spore has been leaped from BTC to CKB and the related CKB tx hash is ${txHash}`);
-        } else {
-          console.warn(`Rgbpp CKB transaction failed and the reason is ${failedReason} `);
-        }
+  const interval = setInterval(async () => {
+    try {
+      console.log('Waiting for BTC tx and proof to be ready');
+      const rgbppApiSpvProof = await btcService.getRgbppSpvProof(btcTxId, 0);
+      clearInterval(interval);
+      // Update CKB transaction with the real BTC txId
+      const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet });
+
+      const ckbTx = await appendCkbTxWitnesses({
+        ckbRawTx: newCkbRawTx,
+        btcTxBytes,
+        rgbppApiSpvProof,
+      });
+
+      // Replace cobuild witness with the final rgbpp lock script
+      ckbTx.witnesses[ckbTx.witnesses.length - 1] = generateSporeTransferCoBuild([sporeCell], ckbTx.outputs);
+
+      // console.log('ckbTx: ', JSON.stringify(ckbTx));
+
+      const txHash = await sendCkbTx({ collector, signedTx: ckbTx });
+      console.info(`RGB++ Spore has been leaped from BTC to CKB and tx hash is ${txHash}`);
+    } catch (error) {
+      if (!(error instanceof BtcAssetsApiError)) {
+        console.error(error);
       }
-    }, 30 * 1000);
-  } catch (error) {
-    console.error(error);
-  }
+    }
+  }, 30 * 1000);
 };
 
 // Use your real BTC UTXO information on the BTC Testnet

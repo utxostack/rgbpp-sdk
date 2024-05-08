@@ -1,35 +1,8 @@
-import { AddressPrefix, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
-import {
-  Collector,
-  sendCkbTx,
-  getBtcTimeLockScript,
-  buildSporeBtcTimeCellsSpentTx,
-  signBtcTimeCellSpentTx,
-} from '@rgbpp-sdk/ckb';
-import { BtcAssetsApi } from '@rgbpp-sdk/service';
-
-// CKB SECP256K1 private key
-const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
-// API docs: https://btc-assets-api.testnet.mibao.pro/docs
-const BTC_ASSETS_API_URL = 'https://btc-assets-api.testnet.mibao.pro';
-// https://btc-assets-api.testnet.mibao.pro/docs/static/index.html#/Token/post_token_generate
-const BTC_ASSETS_TOKEN = '';
-
-const BTC_ASSETS_ORIGIN = 'https://btc-test.app';
+import { sendCkbTx, getBtcTimeLockScript, buildSporeBtcTimeCellsSpentTx, signBtcTimeCellSpentTx } from '@rgbpp-sdk/ckb';
+import { CKB_PRIVATE_KEY, btcService, ckbAddress, collector, isMainnet } from 'examples-core';
 
 // Warning: Wait at least 6 BTC confirmation blocks to spend the BTC time cells after 4-btc-jump-ckb.ts
 const unlockSporeBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }) => {
-  const collector = new Collector({
-    ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
-    ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
-  });
-  const isMainnet = false;
-
-  const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
-    prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
-  });
-  console.log('ckb address: ', address);
-
   const btcTimeCells = await collector.getCells({
     lock: {
       ...getBtcTimeLockScript(false),
@@ -42,18 +15,16 @@ const unlockSporeBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: st
     throw new Error('No btc time cells found');
   }
 
-  const btcAssetsApi = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, BTC_ASSETS_ORIGIN);
-
   const ckbRawTx: CKBComponents.RawTransaction = await buildSporeBtcTimeCellsSpentTx({
     btcTimeCells,
-    btcAssetsApi,
+    btcAssetsApi: btcService,
     isMainnet,
   });
 
   const signedTx = await signBtcTimeCellSpentTx({
-    secp256k1PrivateKey: CKB_TEST_PRIVATE_KEY,
+    secp256k1PrivateKey: CKB_PRIVATE_KEY,
     collector,
-    masterCkbAddress: address,
+    masterCkbAddress: ckbAddress,
     ckbRawTx,
     isMainnet,
   });
