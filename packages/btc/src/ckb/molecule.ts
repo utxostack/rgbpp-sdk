@@ -1,4 +1,4 @@
-import { bytes, BytesLike, UnpackResult } from '@ckb-lumos/lumos/codec';
+import { bytes, BytesLike, UnpackResult } from '@ckb-lumos/codec';
 import { RGBPPLock } from '@rgbpp-sdk/ckb';
 import { ErrorCodes, TxBuildError } from '../error';
 import { remove0x } from '../utils';

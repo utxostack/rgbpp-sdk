@@ -1,11 +1,4 @@
 {
-  "ts-node": {
-    // these options are overrides used only by ts-node
-    // same as the --compilerOptions flag and the TS_NODE_COMPILER_OPTIONS environment variable
-    "compilerOptions": {
-      "module": "CommonJS"
-    }
-  },
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "target": "ES2015",
@@ -14,6 +7,7 @@
     "composite": false,
     "resolveJsonModule": true,
     "strictNullChecks": true,
+    "noEmit": true,
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,
@@ -25,8 +19,8 @@
     "noUnusedParameters": false,
     "preserveWatchOutput": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": true
   },
-  "include": ["local/**.ts", "queue/**/*.ts"],
+  "include": ["local/**/*.ts", "queue/**/*.ts"],
   "exclude": ["node_modules"]
 }

@@ -61,7 +61,7 @@ export const appendCkbTxWitnesses = async ({
   btcTxBytes,
   rgbppApiSpvProof,
 }: AppendWitnessesParams): Promise<CKBComponents.RawTransaction> => {
-  let rawTx = ckbRawTx;
+  const rawTx = ckbRawTx;
 
   const { spvClient, proof } = transformSpvProof(rgbppApiSpvProof);
   rawTx.cellDeps.push(buildSpvClientCellDep(spvClient));
@@ -79,6 +79,7 @@ export const appendCkbTxWitnesses = async ({
  * @param ckbRawTx CKB raw transaction
  * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
  * @param paymasterCell The paymaster cell whose type is IndexerCell is used to pay the extra output cell
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  */
 export const appendPaymasterCellAndSignCkbTx = async ({
   secp256k1PrivateKey,
@@ -86,8 +87,9 @@ export const appendPaymasterCellAndSignCkbTx = async ({
   sumInputsCapacity,
   paymasterCell,
   isMainnet,
+  ckbFeeRate,
 }: AppendPaymasterCellAndSignTxParams): Promise<CKBComponents.RawTransaction> => {
-  let rawTx = ckbRawTx as CKBComponents.RawTransactionToSign;
+  const rawTx = ckbRawTx as CKBComponents.RawTransactionToSign;
   const paymasterInput = { previousOutput: paymasterCell.outPoint, since: '0x0' };
   rawTx.inputs = [...rawTx.inputs, paymasterInput];
   const inputsCapacity = BigInt(sumInputsCapacity) + BigInt(paymasterCell.output.capacity);
@@ -109,11 +111,11 @@ export const appendPaymasterCellAndSignCkbTx = async ({
   rawTx.outputsData = [...rawTx.outputsData, '0x'];
 
   const txSize = getTransactionSize(rawTx) + SECP256K1_WITNESS_LOCK_SIZE;
-  const estimatedTxFee = calculateTransactionFee(txSize);
+  const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
   changeCapacity -= estimatedTxFee;
   rawTx.outputs[rawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
 
-  let keyMap = new Map<string, string>();
+  const keyMap = new Map<string, string>();
   keyMap.set(scriptToHash(paymasterCell.output.lock), secp256k1PrivateKey);
   keyMap.set(scriptToHash(getRgbppLockScript(isMainnet)), '');
 
@@ -159,15 +161,18 @@ export const updateCkbTxWithRealBtcTxId = ({
   btcTxId,
   isMainnet,
 }: UpdateCkbTxWithRealBtcTxIdParams): CKBComponents.RawTransaction => {
-  const outputs = ckbRawTx.outputs
-    .filter((output) => isRgbppLockOrBtcTimeLock(output.lock, isMainnet))
-    .map((output) => ({
-      ...output,
-      lock: {
-        ...output.lock,
-        args: replaceLockArgsWithRealBtcTxId(output.lock.args, btcTxId),
-      },
-    }));
+  const outputs = ckbRawTx.outputs.map((output) => {
+    if (isRgbppLockOrBtcTimeLock(output.lock, isMainnet)) {
+      return {
+        ...output,
+        lock: {
+          ...output.lock,
+          args: replaceLockArgsWithRealBtcTxId(output.lock.args, btcTxId),
+        },
+      };
+    }
+    return output;
+  });
   const newRawTx: CKBComponents.RawTransaction = {
     ...ckbRawTx,
     outputs,

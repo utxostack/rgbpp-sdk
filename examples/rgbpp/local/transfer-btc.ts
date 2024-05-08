@@ -1,4 +1,3 @@
-
 import { sendBtc, DataSource, NetworkType, bitcoin, ECPair } from '@rgbpp-sdk/btc';
 import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
@@ -41,8 +40,8 @@ const transferBtc = async () => {
 
   // Broadcast transaction
   const tx = psbt.extractTransaction();
-  const { txid: txId} = await service.sendBtcTransaction(tx.toHex());
+  const { txid: txId } = await service.sendBtcTransaction(tx.toHex());
   console.log('txId:', txId);
-}
+};
 
 transferBtc();

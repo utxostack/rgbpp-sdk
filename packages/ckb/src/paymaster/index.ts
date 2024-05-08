@@ -19,22 +19,20 @@ export const splitMultiCellsWithSecp256k1 = async ({
   });
   const masterLock = addressToScript(masterAddress);
 
-  const emptyCells = await collector.getCells({
+  let emptyCells = await collector.getCells({
     lock: masterLock,
   });
   if (!emptyCells || emptyCells.length === 0) {
     throw new NoLiveCellError('The address has no empty cells');
   }
+  emptyCells = emptyCells.filter((cell) => !cell.output.type);
 
   const cellCapacity = BigInt(capacityWithCKB) * CKB_UNIT;
   const needCapacity = cellCapacity * BigInt(cellAmount);
-  let txFee = MAX_FEE;
-  const { inputs, sumInputsCapacity } = collector.collectInputs(
-    emptyCells,
-    needCapacity,
-    txFee,
-    SECP256K1_MIN_CAPACITY,
-  );
+  const txFee = MAX_FEE;
+  const { inputs, sumInputsCapacity } = collector.collectInputs(emptyCells, needCapacity, txFee, {
+    minCapacity: SECP256K1_MIN_CAPACITY,
+  });
 
   const outputs: CKBComponents.CellOutput[] = new Array(cellAmount).fill({
     lock: addressToScript(receiverAddress),

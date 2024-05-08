@@ -3,7 +3,8 @@ export const MAX_FEE = BigInt(2000_0000);
 export const MIN_CAPACITY = BigInt(61) * BigInt(10000_0000);
 export const SECP256K1_WITNESS_LOCK_SIZE = 65;
 export const BTC_JUMP_CONFIRMATION_BLOCKS = 6;
-export const RGBPP_TX_WITNESS_MAX_SIZE = 3000;
+export const RGBPP_TX_WITNESS_MAX_SIZE = 5000;
+export const RGBPP_TX_INPUTS_MAX_LENGTH = 10;
 
 export const RGBPP_WITNESS_PLACEHOLDER = '0xFF';
 export const RGBPP_TX_ID_PLACEHOLDER = '0000000000000000000000000000000000000000000000000000000000000000';
@@ -58,6 +59,48 @@ const TestnetInfo = {
   XUDTTypeDep: {
     outPoint: {
       txHash: '0xbf6fb538763efec2a70a6a3dcb7242787087e1030c4e7d86585bc63a9d337f5f',
+      index: '0x0',
+    },
+    depType: 'code',
+  } as CKBComponents.CellDep,
+
+  UniqueTypeScript: {
+    codeHash: '0x8e341bcfec6393dcd41e635733ff2dca00a6af546949f70c57a706c0f344df8b',
+    hashType: 'type',
+    args: '',
+  } as CKBComponents.Script,
+
+  UniqueTypeDep: {
+    outPoint: {
+      txHash: '0xff91b063c78ed06f10a1ed436122bd7d671f9a72ef5f5fa28d05252c17cf4cef',
+      index: '0x0',
+    },
+    depType: 'code',
+  } as CKBComponents.CellDep,
+
+  ClusterTypeScript: {
+    codeHash: '0x0bbe768b519d8ea7b96d58f1182eb7e6ef96c541fbd9526975077ee09f049058',
+    hashType: 'data1',
+    args: '',
+  } as CKBComponents.Script,
+
+  ClusterTypeDep: {
+    outPoint: {
+      txHash: '0xcebb174d6e300e26074aea2f5dbd7f694bb4fe3de52b6dfe205e54f90164510a',
+      index: '0x0',
+    },
+    depType: 'code',
+  } as CKBComponents.CellDep,
+
+  SporeTypeScript: {
+    codeHash: '0x685a60219309029d01310311dba953d67029170ca4848a4ff638e57002130a0d',
+    hashType: 'data1',
+    args: '',
+  } as CKBComponents.Script,
+
+  SporeTypeDep: {
+    outPoint: {
+      txHash: '0x5e8d2a517d50fd4bb4d01737a7952a1f1d35c8afc77240695bb569cd7d9d5a1f',
       index: '0x0',
     },
     depType: 'code',
@@ -118,7 +161,55 @@ const MainnetInfo = {
     },
     depType: 'code',
   } as CKBComponents.CellDep,
+
+  UniqueTypeScript: {
+    codeHash: '0x2c8c11c985da60b0a330c61a85507416d6382c130ba67f0c47ab071e00aec628',
+    hashType: 'data1',
+    args: '',
+  } as CKBComponents.Script,
+
+  UniqueTypeDep: {
+    outPoint: {
+      txHash: '0x67524c01c0cb5492e499c7c7e406f2f9d823e162d6b0cf432eacde0c9808c2ad',
+      index: '0x0',
+    },
+    depType: 'code',
+  } as CKBComponents.CellDep,
+
+  ClusterTypeScript: {
+    codeHash: '0x7366a61534fa7c7e6225ecc0d828ea3b5366adec2b58206f2ee84995fe030075',
+    hashType: 'data1',
+    args: '',
+  } as CKBComponents.Script,
+
+  ClusterTypeDep: {
+    outPoint: {
+      txHash: '0xe464b7fb9311c5e2820e61c99afc615d6b98bdefbe318c34868c010cbd0dc938',
+      index: '0x0',
+    },
+    depType: 'code',
+  } as CKBComponents.CellDep,
+
+  SporeTypeScript: {
+    codeHash: '0x4a4dce1df3dffff7f8b2cd7dff7303df3b6150c9788cb75dcf6747247132b9f5',
+    hashType: 'data1',
+    args: '',
+  } as CKBComponents.Script,
+
+  SporeTypeDep: {
+    outPoint: {
+      txHash: '0x96b198fb5ddbd1eed57ed667068f1f1e55d07907b4c0dbd38675a69ea1b69824',
+      index: '0x0',
+    },
+    depType: 'code',
+  } as CKBComponents.CellDep,
 };
+
+export const UNLOCKABLE_LOCK_SCRIPT = {
+  codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+  hashType: 'data',
+  args: '0x',
+} as CKBComponents.Script;
 
 export const getSecp256k1CellDep = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.Secp256k1LockDep : TestnetInfo.Secp256k1LockDep;
@@ -142,3 +233,18 @@ export const getBtcTimeLockDep = (isMainnet: boolean) =>
 
 export const getBtcTimeLockConfigDep = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.BtcTimeLockConfigDep : TestnetInfo.BtcTimeLockConfigDep;
+
+export const getUniqueTypeScript = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.UniqueTypeScript : TestnetInfo.UniqueTypeScript;
+export const getUniqueTypeDep = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.UniqueTypeDep : TestnetInfo.UniqueTypeDep;
+
+export const getClusterTypeScript = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.ClusterTypeScript : TestnetInfo.ClusterTypeScript;
+export const getClusterTypeDep = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.ClusterTypeDep : TestnetInfo.ClusterTypeDep;
+
+export const getSporeTypeScript = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.SporeTypeScript : TestnetInfo.SporeTypeScript;
+export const getSporeTypeDep = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.SporeTypeDep : TestnetInfo.SporeTypeDep;

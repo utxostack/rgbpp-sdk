@@ -3,6 +3,7 @@
 name: Release Snapshots
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -54,6 +55,8 @@ jobs:
 
       - name: Version packages
         run: npx changeset version --snapshot snap
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to npm (ignore GitHub)
         id: changesets

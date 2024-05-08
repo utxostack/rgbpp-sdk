@@ -9,16 +9,21 @@
     },
     "build": {
       "outputs": ["lib/**", "dist/**", ".next/**", "!.next/cache/**"],
-      "dependsOn": ["^build"],
+      "dependsOn": ["clean", "^build"],
       "cache": false
     },
     "test": {
       "outputs": ["coverage/**"],
-      "dependsOn": ["^build"],
+      "dependsOn": ["build"],
       "cache": false
     },
+    "lint": {
+      "cache": false,
+      "dependsOn": ["^lint"]
+    },
     "lint:fix": {
-      "cache": false
+      "cache": false,
+      "dependsOn": ["^lint:fix"]
     },
     "clean": {
       "cache": false

@@ -4,8 +4,8 @@
   "scripts": {
     "test": "vitest",
     "build": "tsc -p tsconfig.build.json",
-    "lint": "prettier --check '{src,tests}/**/*.{js,jsx,ts,tsx}'",
-    "lint:fix": "prettier --write '{src,tests}/**/*.{js,jsx,ts,tsx}'",
+    "lint": "tsc && eslint '{src,tests}/**/*.{js,ts}' && prettier --check '{src,tests}/**/*.{js,ts}'",
+    "lint:fix": "tsc && eslint --fix '{src,tests}/**/*.{js,ts}' && prettier --write '{src,tests}/**/*.{js,ts}'",
     "clean": "pnpm run clean:cache & pnpm run clean:build",
     "clean:build": "rimraf lib && pnpm run clean:buildinfo",
     "clean:buildinfo": "rimraf tsconfig.*tsbuildinfo",
@@ -16,10 +16,13 @@
     "lib"
   ],
   "dependencies": {
-    "@ckb-lumos/lumos": "0.22.0-next.5",
-    "@nervosnetwork/ckb-types": "^0.109.1"
+    "@ckb-lumos/codec": "0.22.2",
+    "@ckb-lumos/base": "0.22.2",
+    "@nervosnetwork/ckb-types": "^0.109.1",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.0",
     "vitest": "^1.4.0"
   },
   "publishConfig": {

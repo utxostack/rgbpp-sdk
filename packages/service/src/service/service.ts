@@ -1,4 +1,4 @@
-import { Cell } from '@ckb-lumos/lumos';
+import { Cell } from '@ckb-lumos/base';
 import { BtcAssetsApiBase } from './base';
 import {
   BtcApis,
@@ -13,14 +13,20 @@ import {
   BtcApiTransaction,
   BtcApiUtxo,
   BtcApiUtxoParams,
+  BtcApiTransactionParams,
+  BtcApiRecommendedFeeRates,
 } from '../types';
 import {
   RgbppApis,
   RgbppApiSpvProof,
+  RgbppApiPaymasterInfo,
   RgbppApiTransactionState,
   RgbppApiSendCkbTransactionPayload,
   RgbppApiCkbTransactionHash,
   RgbppApiAssetsByAddressParams,
+  RgbppApiRetryCkbTransactionPayload,
+  RgbppApiTransactionStateParams,
+  RgbppApiTransactionRetry,
 } from '../types';
 
 export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis {
@@ -56,6 +62,10 @@ export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis
     return this.request<BtcApiBlockTransactionIds>(`/bitcoin/v1/block/${blockHash}/txids`);
   }
 
+  getBtcRecommendedFeeRates() {
+    return this.request<BtcApiRecommendedFeeRates>(`/bitcoin/v1/fees/recommended`);
+  }
+
   getBtcBalance(address: string, params?: BtcApiBalanceParams) {
     return this.request<BtcApiBalance>(`/bitcoin/v1/address/${address}/balance`, {
       params,
@@ -68,8 +78,10 @@ export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis
     });
   }
 
-  getBtcTransactions(address: string) {
-    return this.request<BtcApiTransaction[]>(`/bitcoin/v1/address/${address}/txs`);
+  getBtcTransactions(address: string, params?: BtcApiTransactionParams) {
+    return this.request<BtcApiTransaction[]>(`/bitcoin/v1/address/${address}/txs`, {
+      params,
+    });
   }
 
   getBtcTransaction(txId: string) {
@@ -88,12 +100,18 @@ export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis
    * RGBPP APIs, under the /rgbpp/v1 prefix.
    */
 
+  getRgbppPaymasterInfo() {
+    return this.request<RgbppApiPaymasterInfo>('/rgbpp/v1/paymaster/info');
+  }
+
   getRgbppTransactionHash(btcTxId: string) {
     return this.request<RgbppApiCkbTransactionHash>(`/rgbpp/v1/transaction/${btcTxId}`);
   }
 
-  getRgbppTransactionState(btcTxId: string) {
-    return this.request<RgbppApiTransactionState>(`/rgbpp/v1/transaction/${btcTxId}/job`);
+  getRgbppTransactionState(btcTxId: string, params?: RgbppApiTransactionStateParams) {
+    return this.request<RgbppApiTransactionState>(`/rgbpp/v1/transaction/${btcTxId}/job`, {
+      params,
+    });
   }
 
   getRgbppAssetsByBtcTxId(btcTxId: string) {
@@ -119,8 +137,14 @@ export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis
     });
   }
 
-  sendRgbppCkbTransaction(payload: RgbppApiSendCkbTransactionPayload): Promise<RgbppApiTransactionState> {
+  sendRgbppCkbTransaction(payload: RgbppApiSendCkbTransactionPayload) {
     return this.post<RgbppApiTransactionState>('/rgbpp/v1/transaction/ckb-tx', {
+      body: JSON.stringify(payload),
+    });
+  }
+
+  retryRgbppCkbTransaction(payload: RgbppApiRetryCkbTransactionPayload) {
+    return this.post<RgbppApiTransactionRetry>('/rgbpp/v1/transaction/retry', {
       body: JSON.stringify(payload),
     });
   }

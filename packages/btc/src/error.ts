@@ -3,6 +3,7 @@ export enum ErrorCodes {
 
   MISSING_PUBKEY = 20,
   CANNOT_FIND_UTXO,
+  UNCONFIRMED_UTXO,
   INSUFFICIENT_UTXO,
   REFERENCED_UNPROVABLE_UTXO,
   UNSPENDABLE_OUTPUT,
@@ -13,6 +14,7 @@ export enum ErrorCodes {
   UNSUPPORTED_ADDRESS_TYPE,
   UNSUPPORTED_OP_RETURN_SCRIPT,
   INVALID_FEE_RATE,
+  PAYMASTER_MISMATCH,
 
   CKB_CANNOT_FIND_OUTPOINT = 40,
   CKB_INVALID_CELL_LOCK,
@@ -29,6 +31,7 @@ export const ErrorMessages = {
 
   [ErrorCodes.MISSING_PUBKEY]: 'Missing a pubkey that pairs with the address',
   [ErrorCodes.CANNOT_FIND_UTXO]: 'Cannot find the UTXO, it may not exist or is not live',
+  [ErrorCodes.UNCONFIRMED_UTXO]: 'Unconfirmed UTXO',
   [ErrorCodes.INSUFFICIENT_UTXO]: 'Insufficient UTXO to construct the transaction',
   [ErrorCodes.REFERENCED_UNPROVABLE_UTXO]: 'Cannot reference a UTXO that does not belongs to "from"',
   [ErrorCodes.DUPLICATED_UTXO]: 'Cannot reference the same UTXO twice',
@@ -39,6 +42,7 @@ export const ErrorMessages = {
   [ErrorCodes.UNSUPPORTED_ADDRESS_TYPE]: 'Unsupported address type',
   [ErrorCodes.UNSUPPORTED_OP_RETURN_SCRIPT]: 'Unsupported OP_RETURN script format',
   [ErrorCodes.INVALID_FEE_RATE]: 'Invalid fee rate provided or recommended',
+  [ErrorCodes.PAYMASTER_MISMATCH]: 'Paymaster mismatched',
 
   [ErrorCodes.CKB_CANNOT_FIND_OUTPOINT]: 'Cannot find CKB cell by OutPoint, it may not exist or is not live',
   [ErrorCodes.CKB_INVALID_CELL_LOCK]: 'Invalid CKB cell lock, it should be RgbppLock, RgbppTimeLock or null',

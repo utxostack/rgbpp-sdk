@@ -1,11 +1,11 @@
 import clone from 'lodash/cloneDeep';
 import { bitcoin } from '../bitcoin';
 import { DataSource } from '../query/source';
-import { addressToScriptPublicKeyHex, AddressType, getAddressType, isSupportedFromAddress } from '../address';
+import { ErrorCodes, TxBuildError } from '../error';
 import { NetworkType, RgbppBtcConfig } from '../preset/types';
-import { ErrorCodes, ErrorMessages, TxBuildError } from '../error';
-import { networkTypeToConfig } from '../preset/config';
+import { AddressType, addressToScriptPublicKeyHex, getAddressType, isSupportedFromAddress } from '../address';
 import { dataToOpReturnScriptPubkey, isOpReturnScriptPubkey } from './embed';
+import { networkTypeToConfig } from '../preset/config';
 import { Utxo, utxoToInput } from './utxo';
 import { FeeEstimator } from './fee';
 
@@ -45,13 +45,23 @@ export class TxBuilder {
   source: DataSource;
   config: RgbppBtcConfig;
   networkType: NetworkType;
+  onlyNonRgbppUtxos: boolean;
+  onlyConfirmedUtxos: boolean;
   minUtxoSatoshi: number;
   feeRate?: number;
 
-  constructor(props: { source: DataSource; minUtxoSatoshi?: number; feeRate?: number }) {
+  constructor(props: {
+    source: DataSource;
+    onlyNonRgbppUtxos?: boolean;
+    onlyConfirmedUtxos?: boolean;
+    minUtxoSatoshi?: number;
+    feeRate?: number;
+  }) {
     this.source = props.source;
     this.networkType = this.source.networkType;
     this.config = networkTypeToConfig(this.networkType);
+    this.onlyNonRgbppUtxos = props.onlyNonRgbppUtxos ?? true;
+    this.onlyConfirmedUtxos = props.onlyConfirmedUtxos ?? false;
     this.minUtxoSatoshi = props.minUtxoSatoshi ?? this.config.btcUtxoDustLimit;
     this.feeRate = props.feeRate;
   }
@@ -73,6 +83,18 @@ export class TxBuilder {
     utxos.forEach((utxo) => {
       this.addInput(utxo);
     });
+  }
+
+  async validateInputs() {
+    for (const input of this.inputs) {
+      const transactionConfirmed = await this.source.isTransactionConfirmed(input.data.hash);
+      if (!transactionConfirmed) {
+        throw TxBuildError.withComment(
+          ErrorCodes.UNCONFIRMED_UTXO,
+          `hash: ${input.data.hash}, index: ${input.data.index}`,
+        );
+      }
+    }
   }
 
   addOutput(output: InitOutput) {
@@ -127,28 +149,40 @@ export class TxBuilder {
     // The transaction is expected be confirmed within half an hour with the fee rate
     let averageFeeRate: number | undefined;
     if (!feeRate && !this.feeRate) {
-      averageFeeRate = await this.source.getAverageFeeRate();
+      const feeRates = await this.source.service.getBtcRecommendedFeeRates();
+      averageFeeRate = feeRates.fastestFee;
     }
 
     // Use the feeRate param if it is specified,
     // otherwise use the average fee rate from the DataSource
     const currentFeeRate = feeRate ?? this.feeRate ?? averageFeeRate!;
 
-    let currentFee: number = 0;
-    let previousFee: number = 0;
-    while (true) {
-      const { inputsNeeding, outputsNeeding } = this.summary();
-      if (outputsNeeding > 0) {
-        // If sum(inputs) > sum(outputs), return change while deducting fee
+    let currentFee = 0;
+    let previousFee = 0;
+    let isLoopedOnce = false;
+    let isFeeExpected = false;
+    while (!isFeeExpected) {
+      if (isLoopedOnce) {
+        previousFee = currentFee;
+        this.inputs = clone(originalInputs);
+        this.outputs = clone(originalOutputs);
+      }
+
+      const { needCollect, needReturn, inputsTotal } = this.summary();
+      const safeToProcess = inputsTotal > 0 || previousFee > 0;
+      const returnAmount = needReturn - previousFee;
+      if (safeToProcess && returnAmount > 0) {
+        // If sum(inputs) - sum(outputs) > fee, return change while deducting fee
         // Note, should not deduct fee from outputs while also returning change at the same time
-        const returnAmount = outputsNeeding - previousFee;
         await this.injectChange({
           address: changeAddress ?? address,
           amount: returnAmount,
-          publicKey,
+          fromAddress: address,
+          fromPublicKey: publicKey,
         });
       } else {
-        const targetAmount = inputsNeeding + previousFee;
+        const protectionAmount = safeToProcess ? 0 : 1;
+        const targetAmount = needCollect - needReturn + previousFee + protectionAmount;
         await this.injectSatoshi({
           address,
           publicKey,
@@ -160,13 +194,10 @@ export class TxBuilder {
 
       const addressType = getAddressType(address);
       currentFee = await this.calculateFee(addressType, currentFeeRate);
-      if ([-1, 0, 1].includes(currentFee - previousFee)) {
-        break;
+      isFeeExpected = [-1, 0, 1].includes(currentFee - previousFee);
+      if (!isLoopedOnce) {
+        isLoopedOnce = true;
       }
-
-      previousFee = currentFee;
-      this.inputs = clone(originalInputs);
-      this.outputs = clone(originalOutputs);
     }
 
     return {
@@ -202,7 +233,10 @@ export class TxBuilder {
       const { utxos, satoshi } = await this.source.collectSatoshi({
         address: props.address,
         targetAmount: _targetAmount,
+        allowInsufficient: true,
         minUtxoSatoshi: this.minUtxoSatoshi,
+        onlyNonRgbppUtxos: this.onlyNonRgbppUtxos,
+        onlyConfirmedUtxos: this.onlyConfirmedUtxos,
         excludeUtxos: this.inputs.map((row) => row.utxo),
       });
       utxos.forEach((utxo) => {
@@ -276,11 +310,15 @@ export class TxBuilder {
     // If not collected enough satoshi, throw error
     const insufficientBalance = collected < targetAmount;
     if (insufficientBalance) {
-      throw TxBuildError.withComment(ErrorCodes.INSUFFICIENT_UTXO, `expected: ${targetAmount}, actual: ${collected}`);
+      const recommendedDeposit = collected - targetAmount + this.minUtxoSatoshi;
+      throw TxBuildError.withComment(
+        ErrorCodes.INSUFFICIENT_UTXO,
+        `expected: ${targetAmount}, actual: ${collected}. You may wanna deposit more satoshi to prevent the error, for example: ${recommendedDeposit}`,
+      );
     }
     const insufficientForChange = changeAmount > 0 && changeAmount < this.minUtxoSatoshi;
     if (insufficientForChange) {
-      const shiftedExpectAmount = targetAmount + changeUtxoNeedAmount;
+      const shiftedExpectAmount = collected + changeUtxoNeedAmount;
       throw TxBuildError.withComment(
         ErrorCodes.INSUFFICIENT_UTXO,
         `expected: ${shiftedExpectAmount}, actual: ${collected}`,
@@ -291,9 +329,12 @@ export class TxBuilder {
     let changeIndex: number = -1;
     if (changeAmount > 0) {
       changeIndex = this.outputs.length;
-      this.addOutput({
-        address: props.changeAddress ?? props.address,
-        value: changeAmount,
+      const changeAddress = props.changeAddress ?? props.address;
+      await this.injectChange({
+        amount: changeAmount,
+        address: changeAddress,
+        fromAddress: props.address,
+        fromPublicKey: props.publicKey,
       });
     }
 
@@ -304,8 +345,8 @@ export class TxBuilder {
     };
   }
 
-  async injectChange(props: { amount: number; address: string; publicKey?: string }) {
-    const { address, publicKey, amount } = props;
+  async injectChange(props: { amount: number; address: string; fromAddress: string; fromPublicKey?: string }) {
+    const { address, fromAddress, fromPublicKey, amount } = props;
 
     for (let i = 0; i < this.outputs.length; i++) {
       const output = this.outputs[i];
@@ -322,9 +363,10 @@ export class TxBuilder {
 
     if (amount < this.minUtxoSatoshi) {
       const { collected } = await this.injectSatoshi({
-        address,
-        publicKey,
+        address: fromAddress,
+        publicKey: fromPublicKey,
         targetAmount: amount,
+        changeAddress: address,
         injectCollected: true,
         deductFromOutputs: false,
       });
@@ -376,16 +418,19 @@ export class TxBuilder {
   }
 
   summary() {
-    const sumOfInputs = this.inputs.reduce((acc, input) => acc + input.utxo.value, 0);
-    const sumOfOutputs = this.outputs.reduce((acc, output) => acc + output.value, 0);
+    const inputsTotal = this.inputs.reduce((acc, input) => acc + input.utxo.value, 0);
+    const outputsTotal = this.outputs.reduce((acc, output) => acc + output.value, 0);
+
+    const inputsRemaining = inputsTotal - outputsTotal;
+    const outputsRemaining = outputsTotal - inputsTotal;
 
     return {
-      inputsTotal: sumOfInputs,
-      inputsRemaining: sumOfInputs - sumOfOutputs,
-      inputsNeeding: sumOfOutputs > sumOfInputs ? sumOfOutputs - sumOfInputs : 0,
-      outputsTotal: sumOfOutputs,
-      outputsRemaining: sumOfOutputs - sumOfInputs,
-      outputsNeeding: sumOfInputs > sumOfOutputs ? sumOfInputs - sumOfOutputs : 0,
+      inputsTotal,
+      outputsTotal,
+      inputsRemaining,
+      outputsRemaining,
+      needReturn: inputsRemaining > 0 ? inputsRemaining : 0,
+      needCollect: outputsRemaining > 0 ? outputsRemaining : 0,
     };
   }
 

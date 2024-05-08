@@ -1,10 +1,8 @@
-import { AddressPrefix, privateKeyToAddress, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { Collector, buildRgbppLockArgs, genBtcTransferCkbVirtualTx } from '@rgbpp-sdk/ckb';
-import { sendRgbppUtxos, DataSource, ECPair, bitcoin, NetworkType } from '@rgbpp-sdk/btc';
+import { Collector, buildRgbppLockArgs, getSporeTypeScript, Hex, genTransferSporeCkbVirtualTx } from '@rgbpp-sdk/ckb';
+import { DataSource, ECPair, bitcoin, NetworkType, sendRgbppUtxos } from '@rgbpp-sdk/btc';
 import { BtcAssetsApi } from '@rgbpp-sdk/service';
+import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 
-// CKB SECP256K1 private key
-const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
 // BTC SECP256K1 private key
 const BTC_TEST_PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000001';
 // API docs: https://btc-assets-api.testnet.mibao.pro/docs
@@ -12,24 +10,22 @@ const BTC_ASSETS_API_URL = 'https://btc-assets-api.testnet.mibao.pro';
 // https://btc-assets-api.testnet.mibao.pro/docs/static/index.html#/Token/post_token_generate
 const BTC_ASSETS_TOKEN = '';
 
-interface Params {
-  rgbppLockArgsList: string[];
+const BTC_ASSETS_ORIGIN = 'https://btc-test.app';
+
+const transferSpore = async ({
+  sporeRgbppLockArgs,
+  toBtcAddress,
+}: {
+  sporeRgbppLockArgs: Hex;
   toBtcAddress: string;
-  transferAmount: bigint;
-}
-const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmount }: Params) => {
+}) => {
   const collector = new Collector({
     ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
   });
   const isMainnet = false;
-  const ckbAddress = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
-    prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
-  });
-  console.log('ckb address: ', ckbAddress);
-  // const fromLock = addressToScript(ckbAddress);
 
-  const network = bitcoin.networks.testnet;
+  const network = isMainnet ? bitcoin.networks.bitcoin : bitcoin.networks.testnet;
   const keyPair = ECPair.fromPrivateKey(Buffer.from(BTC_TEST_PRIVATE_KEY, 'hex'), { network });
   const { address: btcAddress } = bitcoin.payments.p2wpkh({
     pubkey: keyPair.publicKey,
@@ -38,26 +34,26 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
 
   console.log('btc address: ', btcAddress);
 
-  const networkType = NetworkType.TESTNET;
-  const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, 'https://btc-test.app');
+  const networkType = isMainnet ? NetworkType.MAINNET : NetworkType.TESTNET;
+  const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, BTC_ASSETS_ORIGIN);
   const source = new DataSource(service, networkType);
 
-  const xudtType: CKBComponents.Script = {
-    codeHash: '0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb',
-    hashType: 'type',
-    args: '0x1ba116c119d1cfd98a53e9d1a615cf2af2bb87d95515c9d217d367054cfc696b',
-  };
+  // The spore type script is from 3-create-spore.ts, you can find it from the ckb tx spore output cell
+  const sporeTypeBytes = serializeScript({
+    ...getSporeTypeScript(isMainnet),
+    args: '0x205fe15af04e59d3ff1ff8e0b0a1e3bc201af406a38964760c24848ed6029b6b',
+  });
 
-  const ckbVirtualTxResult = await genBtcTransferCkbVirtualTx({
+  const ckbVirtualTxResult = await genTransferSporeCkbVirtualTx({
     collector,
-    rgbppLockArgsList,
-    xudtTypeBytes: serializeScript(xudtType),
-    transferAmount,
+    sporeRgbppLockArgs,
+    sporeTypeBytes,
     isMainnet,
-    noMergeOutputCells: true
   });
 
   const { commitment, ckbRawTx } = ckbVirtualTxResult;
+
+  // console.log(JSON.stringify(ckbRawTx))
 
   // Send BTC tx
   const psbt = await sendRgbppUtxos({
@@ -67,6 +63,7 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
     ckbCollector: collector,
     from: btcAddress!,
     source,
+    feeRate: 30,
   });
   psbt.signAllInputs(keyPair);
   psbt.finalizeAllInputs();
@@ -85,7 +82,7 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
         clearInterval(interval);
         if (state === 'completed') {
           const { txhash: txHash } = await service.getRgbppTransactionHash(btcTxId);
-          console.info(`Rgbpp asset has been transferred on BTC and the related CKB tx hash is ${txHash}`);
+          console.info(`Rgbpp spore has been transferred on BTC and the related CKB tx hash is ${txHash}`);
         } else {
           console.warn(`Rgbpp CKB transaction failed and the reason is ${failedReason} `);
         }
@@ -98,12 +95,8 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
 
 // Use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
-transferRgbppOnBtc({
-  rgbppLockArgsList: [
-    buildRgbppLockArgs(0, '4ff1855b64b309afa19a8b9be3d4da99dcb18b083b65d2d851662995c7d99e7a'),
-    buildRgbppLockArgs(1, '4ff1855b64b309afa19a8b9be3d4da99dcb18b083b65d2d851662995c7d99e7a'),
-  ],
-  toBtcAddress: 'tb1qvt7p9g6mw70sealdewtfp0sekquxuru6j3gwmt',
-  // the transferAmount will be ignored
-  transferAmount: BigInt(0),
+transferSpore({
+  // The spore rgbpp lock args is from 3-create-spore.ts
+  sporeRgbppLockArgs: buildRgbppLockArgs(2, 'd5868dbde4be5e49876b496449df10150c356843afb6f94b08f8d81f394bb350'),
+  toBtcAddress: 'tb1qhp9fh9qsfeyh0yhewgu27ndqhs5qlrqwau28m7',
 });

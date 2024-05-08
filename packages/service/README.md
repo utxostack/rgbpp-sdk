@@ -2,17 +2,23 @@
 
 ## About
 
-The `@rgbpp-sdk/service` package provides a wrapped class to interact with the BtcAssetsApi service. You can interact with the BtcAssetsApi service to query BTC blockchain information, balance, UTXOs, RGBPP cells, BTC/RGBPP transactions, and send BTC/RGBPP transactions.
+The `@rgbpp-sdk/service` package provides a wrapped class to interact with `Bitcoin/RGB++ Assets Service` (BtcAssetsApi). It offers various features for interacting with Bitcoin and RGB++ assets:
+
+- **Retrieve Blockchain Information** including Bitcoin chain info, blocks, headers, transactions, addresses, and RGB++ assets
+- **Handle transactions** by posting to `/bitcoin/v1/transaction` or `/rgbpp/v1/transaction/ckb-tx`
+- **Generate Bitcoin transaction Proof** via `/rgbpp/v1/btc-spv/proof` through [Bitcoin SPV Service on CKB](https://github.com/ckb-cell/ckb-bitcoin-spv-service)
+- Simplify RGB++ assets workflows with **RGB++ CKB transaction Queue** and cron jobs
+- More detailed API documentation can be found on [Testnet](https://btc-assets-api.testnet.mibao.pro/docs) and [Mainnet](https://api.rgbpp.io/docs)
 
 ## Installation
 
 ```bash
 # Install via npm:
-$ npm i @rgbpp-sdk/service
+$ npm i @rgbpp-sdk/service@snap
 # Install via yarn:
-$ yarn add @rgbpp-sdk/service
+$ yarn add @rgbpp-sdk/service@snap
 # Install via pnpm:
-$ pnpm add @rgbpp-sdk/service
+$ pnpm add @rgbpp-sdk/service@snap
 ```
 
 ## Get started
@@ -21,7 +27,7 @@ $ pnpm add @rgbpp-sdk/service
 
 The BtcAssetsApi is currently limited to verified apps only.
 If you're a developer and want to access the BtcAssetsApi service,
-please email us to request a JWT token for your app: cipher@cell.studio.
+please email us to request a JWT token for your app: f@cell.studio.
 
 In the email, you should provide us some information about your app:
 
@@ -79,6 +85,40 @@ console.log(res);
 
 All available APIs in the [BtcAssetsApi](#btcassetsapi-1) section.
 
+### Handling service errors
+
+You can identify the error by its `code` and `message`, or by its detailed `context`:
+
+```ts
+import { BtcAssetsApiError, ErrorCodes } from '@rgbpp-sdk/service';
+
+try {
+...
+} catch (e) {
+  if (e instanceof BtcAssetsApiError) {
+    // check error code
+    console.log(e.code === ErrorCodes.ASSETS_API_UNAUTHORIZED); // true
+    // print the whole error
+    console.log(JSON.stringify(e));
+    /*{
+      "message": "BtcAssetsAPI unauthorized, please check your token/origin: (401) Authorization token is invalid: The token header is not a valid base64url serialized JSON.",
+      "code": 2,
+      "context": {
+        "request": {
+          "url": "https://btc-assets-api.url/bitcoin/v1/info"
+        },
+        "response": {
+          "status": 401,
+            "data": {
+            "message": "Authorization token is invalid: The token header is not a valid base64url serialized JSON."
+          }
+        }
+      }
+    }*/
+  }
+}
+```
+
 ## Types
 
 ### BtcAssetsApi
@@ -125,9 +165,10 @@ interface BtcApis {
   getBtcBlockHeaderByHash(blockHash: string): Promise<BtcApiBlockHeader>;
   getBtcBlockHashByHeight(blockHeight: number): Promise<BtcApiBlockHash>;
   getBtcBlockTransactionIdsByHash(blockHash: number): Promise<BtcApiBlockTransactionIds>;
+  getBtcRecommendedFeeRates(): Promise<BtcApiRecommendedFeeRates>;
   getBtcBalance(address: string, params?: BtcApiBalanceParams): Promise<BtcApiBalance>;
   getBtcUtxos(address: string, params?: BtcApiUtxoParams): Promise<BtcApiUtxo[]>;
-  getBtcTransactions(address: string): Promise<BtcApiTransaction[]>;
+  getBtcTransactions(address: string, params?: BtcApiTransactionParams): Promise<BtcApiTransaction[]>;
   getBtcTransaction(txId: string): Promise<BtcApiTransaction>;
   sendBtcTransaction(txHex: string): Promise<BtcApiSentTransaction>;
 }
@@ -182,6 +223,7 @@ interface BtcApiBalance {
 }
 
 interface BtcApiUtxoParams {
+  only_confirmed?: boolean;
   min_satoshi?: number;
 }
 
@@ -199,6 +241,10 @@ interface BtcApiUtxo {
 
 interface BtcApiSentTransaction {
   txid: string;
+}
+
+export interface BtcApiTransactionParams {
+  after_txid?: string;
 }
 
 interface BtcApiTransaction {
@@ -244,16 +290,23 @@ interface BtcApiTransaction {
 
 ```typescript
 interface RgbppApis {
-  getRgbppTransactionHash(btcTxId: string): Promise<RgbppApiCkbTransactionHash | undefined>;
-  getRgbppTransactionState(btcTxId: string): Promise<RgbppApiTransactionState | undefined>;
+  getRgbppPaymasterInfo(): Promise<RgbppApiPaymasterInfo>;
+  getRgbppTransactionHash(btcTxId: string): Promise<RgbppApiCkbTransactionHash>;
+  getRgbppTransactionState(btcTxId: string): Promise<RgbppApiTransactionState>;
   getRgbppAssetsByBtcTxId(btcTxId: string): Promise<Cell[]>;
   getRgbppAssetsByBtcUtxo(btcTxId: string, vout: number): Promise<Cell[]>;
   getRgbppAssetsByBtcAddress(btcAddress: string, params?: RgbppApiAssetsByAddressParams): Promise<Cell[]>;
-  getRgbppSpvProof(btcTxId: string, confirmations: number): Promise<RgbppApiSpvProof | undefined>;
+  getRgbppSpvProof(btcTxId: string, confirmations: number): Promise<RgbppApiSpvProof>;
   sendRgbppCkbTransaction(payload: RgbppApiSendCkbTransactionPayload): Promise<RgbppApiTransactionState>;
+  retryRgbppCkbTransaction(payload: RgbppApiRetryCkbTransactionPayload): Promise<RgbppApiTransactionRetry>;
 }
 
 type RgbppTransactionState = 'completed' | 'failed' | 'delayed' | 'active' | 'waiting';
+
+interface RgbppApiPaymasterInfo {
+  btc_address: string;
+  fee: number;
+}
 
 interface RgbppApiCkbTransactionHash {
   txhash: string;
@@ -283,5 +336,14 @@ interface RgbppApiSendCkbTransactionPayload {
     sumInputsCapacity: string;
     commitment: string;
   };
+}
+
+interface RgbppApiRetryCkbTransactionPayload {
+  btc_txid: string;
+}
+
+interface RgbppApiTransactionRetry {
+  success: boolean;
+  state: RgbppTransactionState;
 }
 ```

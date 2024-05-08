@@ -28,6 +28,29 @@ export interface BtcTransferVirtualTxParams {
   isMainnet: boolean;
   // The noMergeOutputCells indicates whether the CKB outputs need to be merged. By default, the outputs will be merged.
   noMergeOutputCells?: boolean;
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+  witnessLockPlaceholderSize?: number;
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
+}
+
+export interface RgbppBtcAddressReceiver {
+  // The BTC address
+  toBtcAddress: string;
+  // The XUDT amount to be transferred
+  transferAmount: bigint;
+}
+
+export interface BtcBatchTransferVirtualTxParams {
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // The serialized hex string of the XUDT type script
+  xudtTypeBytes: Hex;
+  // The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
+  rgbppLockArgsList: Hex[];
+  // The rgbpp receiver list which include toRgbppLockArgs and transferAmount
+  rgbppReceivers: RgbppBtcAddressReceiver[];
+  isMainnet: boolean;
 }
 
 export interface RgbppCkbVirtualTx {
@@ -52,6 +75,17 @@ export interface BaseCkbVirtualTxResult {
 
 export interface BtcTransferVirtualTxResult extends BaseCkbVirtualTxResult {}
 
+export interface BtcBatchTransferVirtualTxResult extends BaseCkbVirtualTxResult {
+  rgbppChangeOutIndex: number;
+}
+
+export interface RgbppLaunchVirtualTxResult {
+  // CKB raw transaction
+  ckbRawTx: CKBComponents.RawTransaction;
+  // The rgbpp commitment to be inserted into BTC op_return
+  commitment: Hex;
+}
+
 export interface AppendWitnessesParams {
   // CKB raw transaction
   ckbRawTx: CKBComponents.RawTransaction;
@@ -71,6 +105,8 @@ export interface AppendPaymasterCellAndSignTxParams {
   // The paymaster cell to be inserted into CKB transaction to pay an extra output cell
   paymasterCell: IndexerCell;
   isMainnet: boolean;
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
 }
 
 export interface SendCkbTxParams {
@@ -105,6 +141,10 @@ export interface SignBtcTimeCellsTxParams {
   // The master CKB address to pay the time cells spent tx fee
   masterCkbAddress: Address;
   isMainnet: boolean;
+  // [u64; 2], filter cells by output capacity range, [inclusive, exclusive]
+  outputCapacityRange?: Hex[];
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
 }
 
 export interface CkbJumpBtcVirtualTxParams {
@@ -118,8 +158,10 @@ export interface CkbJumpBtcVirtualTxParams {
   toRgbppLockArgs: Hex;
   // The XUDT amount to be transferred
   transferAmount: bigint;
-  // The WitnessArgs.lock placeholder bytes array size and the default value is 3000(It can make most scenarios work properly)
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
   witnessLockPlaceholderSize?: number;
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
 }
 
 export interface UpdateCkbTxWithRealBtcTxIdParams {
@@ -137,4 +179,70 @@ export interface BtcTimeCellStatusParams {
   ckbAddress: Address;
   // The BTC transaction id
   btcTxId: Hex;
+}
+
+export interface RgbppLockArgsReceiver {
+  // The receiver rgbpp lock script args whose data structure is: out_index | bitcoin_tx_id
+  toRgbppLockArgs: Hex;
+  // The XUDT amount to be transferred
+  transferAmount: bigint;
+}
+
+export interface CkbBatchJumpBtcVirtualTxParams {
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // The serialized hex string of the XUDT type script
+  xudtTypeBytes: Hex;
+  // The from ckb address who will use his private key to sign the ckb tx
+  fromCkbAddress: Address;
+  // The rgbpp receiver list which include toRgbppLockArgs and transferAmount
+  rgbppReceivers: RgbppLockArgsReceiver[];
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+  witnessLockPlaceholderSize?: number;
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
+}
+
+export interface AppendIssuerCellToBtcBatchTransfer {
+  // The Secp256k1 private key of the issuer cells maintainer
+  secp256k1PrivateKey: Hex;
+  // The issuer ckb address
+  issuerAddress: Address;
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // CKB raw transaction
+  ckbRawTx: CKBComponents.RawTransaction;
+  // The sum capacity of the ckb inputs
+  sumInputsCapacity: Hex;
+  isMainnet: boolean;
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
+}
+
+/**
+ * @see {@link https://github.com/ckb-cell/unique-cell?tab=readme-ov-file#xudt-information} for the definition of xUDT information
+ */
+export interface RgbppTokenInfo {
+  // The number of decimals the RGBPP token uses
+  decimal: number;
+  // The name of the RGBPP token, and maximum number of characters is 255
+  name: string;
+  // The symbol of the RGBPP token, and maximum number of characters is 255
+  symbol: string;
+}
+
+export interface RgbppLaunchCkbVirtualTxParams {
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // The owner RGBPP lock args whose data structure is: out_index | bitcoin_tx_id
+  ownerRgbppLockArgs: Address;
+  // The total amount of RGBPP assets issued
+  launchAmount: bigint;
+  // The RGBPP token info https://github.com/ckb-cell/unique-cell?tab=readme-ov-file#xudt-information
+  rgbppTokenInfo: RgbppTokenInfo;
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+  witnessLockPlaceholderSize?: number;
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
+  isMainnet: boolean;
 }

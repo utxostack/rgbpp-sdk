@@ -18,22 +18,27 @@ export interface SendRgbppUtxosProps {
   ckbCollector: Collector;
   rgbppMinUtxoSatoshi?: number;
 
-  from: string;
   source: DataSource;
+  from: string;
+  feeRate?: number;
   fromPubkey?: string;
   changeAddress?: string;
   minUtxoSatoshi?: number;
-  feeRate?: number;
+  onlyConfirmedUtxos?: boolean;
 }
 
-export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise<{
+/**
+ * @deprecated Use createSendRgbppUtxosBuilder() API instead.
+ */
+export const sendRgbppUtxosBuilder = createSendRgbppUtxosBuilder;
+
+export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise<{
   builder: TxBuilder;
   feeRate: number;
   fee: number;
 }> {
   const btcInputs: Utxo[] = [];
   const btcOutputs: InitOutput[] = [];
-  let lastCkbTypeInputIndex = -1;
   let lastCkbTypeOutputIndex = -1;
 
   const ckbVirtualTx = props.ckbVirtualTx;
@@ -47,16 +52,6 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
     const ckbLiveCell = await props.ckbCollector.getLiveCell(ckbInput.previousOutput!);
     const isRgbppLock = isRgbppLockCell(ckbLiveCell.output, isCkbMainnet);
 
-    // If input.type !== null, input.lock must be RgbppLock or RgbppTimeLock
-    if (ckbLiveCell.output.type) {
-      if (!isRgbppLock) {
-        throw new TxBuildError(ErrorCodes.CKB_INVALID_CELL_LOCK);
-      }
-
-      // If input.type !== null，update lastTypeInput
-      lastCkbTypeInputIndex = i;
-    }
-
     // If input.lock == RgbppLock, add to inputs if:
     // 1. input.lock.args can be unpacked to RgbppLockArgs
     // 2. utxo can be found via the DataSource.getUtxo() API
@@ -64,7 +59,7 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
     // 4. utxo is not duplicated in the inputs
     if (isRgbppLock) {
       const args = unpackRgbppLockArgs(ckbLiveCell.output.lock.args);
-      const utxo = await props.source.getUtxo(args.btcTxid, args.outIndex);
+      const utxo = await props.source.getUtxo(args.btcTxid, args.outIndex, props.onlyConfirmedUtxos);
       if (!utxo) {
         throw TxBuildError.withComment(ErrorCodes.CANNOT_FIND_UTXO, `hash: ${args.btcTxid}, index: ${args.outIndex}`);
       }
@@ -129,51 +124,65 @@ export async function sendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise
 
   // Verify the provided commitment
   const calculatedCommitment = calculateCommitment({
-    inputs: [...ckbVirtualTx.inputs].slice(0, lastCkbTypeInputIndex + 1),
-    outputs: [...ckbVirtualTx.outputs].slice(0, lastCkbTypeOutputIndex + 1),
-    outputsData: [...ckbVirtualTx.outputsData].slice(0, lastCkbTypeOutputIndex + 1),
+    inputs: ckbVirtualTx.inputs,
+    outputs: ckbVirtualTx.outputs.slice(0, lastCkbTypeOutputIndex + 1),
+    outputsData: ckbVirtualTx.outputsData.slice(0, lastCkbTypeOutputIndex + 1),
   });
   if (props.commitment !== calculatedCommitment) {
     throw new TxBuildError(ErrorCodes.CKB_UNMATCHED_COMMITMENT);
   }
 
-  const mergedBtcOutputs = (() => {
-    const merged: InitOutput[] = [];
-
-    // Add commitment to the beginning of outputs
-    merged.push({
-      data: props.commitment,
-      fixed: true,
-      value: 0,
-    });
-
-    // Add outputs
-    merged.push(...btcOutputs);
-
-    // Add paymaster if provided
-    if (props.paymaster) {
-      merged.push({
-        ...props.paymaster,
-        fixed: true,
-      });
-    }
-
-    return merged;
-  })();
+  const mergedBtcOutputs = await getMergedBtcOutputs(btcOutputs, props);
 
   return await createSendUtxosBuilder({
     inputs: btcInputs,
     outputs: mergedBtcOutputs,
     from: props.from,
     source: props.source,
+    feeRate: props.feeRate,
     fromPubkey: props.fromPubkey,
     changeAddress: props.changeAddress,
     minUtxoSatoshi: props.minUtxoSatoshi,
-    feeRate: props.feeRate,
+    onlyConfirmedUtxos: props.onlyConfirmedUtxos,
   });
 }
 
+async function getMergedBtcOutputs(btcOutputs: InitOutput[], props: SendRgbppUtxosProps): Promise<InitOutput[]> {
+  const merged: InitOutput[] = [];
+
+  // Add commitment to the beginning of outputs
+  merged.push({
+    data: props.commitment,
+    fixed: true,
+    value: 0,
+  });
+
+  // Add outputs
+  merged.push(...btcOutputs);
+
+  // Check paymaster info
+  const defaultPaymaster = await props.source.getPaymasterOutput();
+  const isPaymasterUnmatched =
+    defaultPaymaster?.address !== props.paymaster?.address || defaultPaymaster?.value !== props.paymaster?.value;
+  if (defaultPaymaster && props.paymaster && isPaymasterUnmatched) {
+    throw new TxBuildError(ErrorCodes.PAYMASTER_MISMATCH);
+  }
+
+  // Add paymaster output
+  // TODO: can be more accurate if we compare the actual capacity of inputs & outputs
+  const paymaster = defaultPaymaster ?? props.paymaster;
+  const needPaymasterOutput = props.ckbVirtualTx.inputs.length < props.ckbVirtualTx.outputs.length;
+  if (paymaster && needPaymasterOutput) {
+    merged.push({
+      ...paymaster,
+      fixed: true,
+    });
+  }
+
+  return merged;
+}
+
 export async function sendRgbppUtxos(props: SendRgbppUtxosProps): Promise<bitcoin.Psbt> {
-  const { builder } = await sendRgbppUtxosBuilder(props);
+  const { builder } = await createSendRgbppUtxosBuilder(props);
   return builder.toPsbt();
 }

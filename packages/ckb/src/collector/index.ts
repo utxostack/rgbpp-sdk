@@ -1,12 +1,33 @@
 import axios from 'axios';
 import CKB from '@nervosnetwork/ckb-sdk-core';
 import { toCamelcase } from '../utils/case-parser';
-import { CollectResult, CollectUdtResult, IndexerCell } from '../types/collector';
+import { CollectConfig, CollectResult, CollectUdtResult, IndexerCell } from '../types/collector';
 import { MIN_CAPACITY } from '../constants';
 import { CapacityNotEnoughError, IndexerError, UdtAmountNotEnoughError } from '../error';
-import { leToU128 } from '../utils';
+import { isRgbppLockCellIgnoreChain, leToU128 } from '../utils';
+import { Hex } from '../types';
 
-const parseScript = (script: CKBComponents.Script) => ({
+interface IndexerScript {
+  code_hash: Hex;
+  hash_type: Hex;
+  args: Hex;
+}
+
+interface IndexerSearchKey {
+  script?: IndexerScript;
+  script_type?: 'lock' | 'type';
+  script_search_mode?: 'prefix' | 'exact';
+  filter?: {
+    script?: IndexerScript;
+    script_len_range?: Hex[];
+    output_data_len_range?: Hex[];
+    output_capacity_range?: Hex[];
+    block_range?: Hex[];
+  };
+  with_data?: boolean;
+}
+
+const parseScript = (script: CKBComponents.Script): IndexerScript => ({
   code_hash: script.codeHash,
   hash_type: script.hashType,
   args: script.args,
@@ -28,40 +49,41 @@ export class Collector {
   async getCells({
     lock,
     type,
-    isDataEmpty = true,
+    isDataMustBeEmpty = true,
+    outputCapacityRange,
   }: {
     lock?: CKBComponents.Script;
     type?: CKBComponents.Script;
-    isDataEmpty?: boolean;
-  }): Promise<IndexerCell[] | undefined> {
-    let param: any = {
-      script_search_mode: 'exact',
-    };
+    isDataMustBeEmpty?: boolean;
+    outputCapacityRange?: Hex[];
+  }): Promise<IndexerCell[]> {
+    let searchKey: IndexerSearchKey = {};
     if (lock) {
-      param = {
-        ...param,
+      searchKey = {
+        script_search_mode: 'exact',
         script: parseScript(lock),
         script_type: 'lock',
         filter: {
-          script: type ? parseScript(type) : null,
-          output_data_len_range: isDataEmpty && !type ? ['0x0', '0x1'] : null,
+          script: type ? parseScript(type) : undefined,
+          output_data_len_range: isDataMustBeEmpty && !type ? ['0x0', '0x1'] : undefined,
+          output_capacity_range: outputCapacityRange,
         },
       };
     } else if (type) {
-      param = {
-        ...param,
+      searchKey = {
+        script_search_mode: 'exact',
         script: parseScript(type),
         script_type: 'type',
       };
     }
-    let payload = {
+    const payload = {
       id: Math.floor(Math.random() * 100000),
       jsonrpc: '2.0',
       method: 'get_cells',
-      params: [param, 'asc', '0x3E8'],
+      params: [searchKey, 'asc', '0x3E8'],
     };
     const body = JSON.stringify(payload, null, '  ');
-    let response = (
+    const response = (
       await axios({
         method: 'post',
         url: this.ckbIndexerUrl,
@@ -74,23 +96,21 @@ export class Collector {
     ).data;
     if (response.error) {
       console.error(response.error);
-      throw new IndexerError('Get cells error');
+      throw new IndexerError('Get cells from indexer error');
     } else {
-      return toCamelcase(response.result.objects);
+      const res = toCamelcase<IndexerCell[]>(response.result.objects);
+      if (res === null) {
+        throw new IndexerError('The response of indexer RPC get_cells is invalid');
+      }
+      return res;
     }
   }
 
-  collectInputs(
-    liveCells: IndexerCell[],
-    needCapacity: bigint,
-    fee: bigint,
-    minCapacity?: bigint,
-    errMsg?: string,
-  ): CollectResult {
-    const changeCapacity = minCapacity ?? MIN_CAPACITY;
-    let inputs: CKBComponents.CellInput[] = [];
+  collectInputs(liveCells: IndexerCell[], needCapacity: bigint, fee: bigint, config?: CollectConfig): CollectResult {
+    const changeCapacity = config?.minCapacity ?? MIN_CAPACITY;
+    const inputs: CKBComponents.CellInput[] = [];
     let sumInputsCapacity = BigInt(0);
-    for (let cell of liveCells) {
+    for (const cell of liveCells) {
       inputs.push({
         previousOutput: {
           txHash: cell.outPoint.txHash,
@@ -99,30 +119,23 @@ export class Collector {
         since: '0x0',
       });
       sumInputsCapacity += BigInt(cell.output.capacity);
-      if (sumInputsCapacity >= needCapacity + changeCapacity + fee) {
+      if (sumInputsCapacity >= needCapacity + changeCapacity + fee && !config?.isMax) {
         break;
       }
     }
     if (sumInputsCapacity < needCapacity + changeCapacity + fee) {
-      const message = errMsg ?? 'Insufficient free CKB balance';
+      const message = config?.errMsg ?? 'Insufficient free CKB balance';
       throw new CapacityNotEnoughError(message);
     }
     return { inputs, sumInputsCapacity };
   }
 
-  collectUdtInputs({
-    liveCells,
-    needAmount,
-    isMax,
-  }: {
-    liveCells: IndexerCell[];
-    needAmount: bigint;
-    isMax?: boolean;
-  }): CollectUdtResult {
-    let inputs: CKBComponents.CellInput[] = [];
+  collectUdtInputs({ liveCells, needAmount }: { liveCells: IndexerCell[]; needAmount: bigint }): CollectUdtResult {
+    const inputs: CKBComponents.CellInput[] = [];
     let sumInputsCapacity = BigInt(0);
     let sumAmount = BigInt(0);
-    for (let cell of liveCells) {
+    const isRgbppLock = liveCells.length > 0 && isRgbppLockCellIgnoreChain(liveCells[0].output);
+    for (const cell of liveCells) {
       inputs.push({
         previousOutput: {
           txHash: cell.outPoint.txHash,
@@ -132,7 +145,7 @@ export class Collector {
       });
       sumInputsCapacity = sumInputsCapacity + BigInt(cell.output.capacity);
       sumAmount += leToU128(cell.outputData);
-      if (sumAmount >= needAmount && !isMax) {
+      if (sumAmount >= needAmount && !isRgbppLock) {
         break;
       }
     }

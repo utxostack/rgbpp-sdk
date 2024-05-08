@@ -1,9 +1,11 @@
 import { sha256 } from 'js-sha256';
-import { Hex, IndexerCell, RgbppCkbVirtualTx, SpvClientCellTxProof } from '../types';
-import { append0x, remove0x, reverseHex, u32ToLe, u32ToLeHex, utf8ToHex } from './hex';
+import { Hex, IndexerCell, RgbppCkbVirtualTx, RgbppTokenInfo, SpvClientCellTxProof } from '../types';
+import { append0x, remove0x, reverseHex, u32ToLe, u8ToHex, utf8ToHex } from './hex';
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
   RGBPP_TX_ID_PLACEHOLDER,
+  RGBPP_TX_INPUTS_MAX_LENGTH,
+  RGBPP_TX_WITNESS_MAX_SIZE,
   getBtcTimeLockScript,
   getRgbppLockScript,
 } from '../constants';
@@ -20,6 +22,13 @@ import { blockchain } from '@ckb-lumos/base';
 import { bytes } from '@ckb-lumos/codec';
 import { RgbppApiSpvProof } from '@rgbpp-sdk/service';
 import { toCamelcase } from './case-parser';
+import {
+  InputsOrOutputsLenError,
+  NoRgbppLiveCellError,
+  RgbppCkbTxInputsExceededError,
+  RgbppUtxoBindMultiTypeAssetsError,
+} from '../error';
+import { isScriptEqual, isUDTTypeSupported } from './ckb-tx';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
   return {
@@ -49,20 +58,30 @@ export const genBtcTimeLockScript = (toLock: CKBComponents.Script, isMainnet: bo
   } as CKBComponents.Script;
 };
 
+// The maximum length of inputs and outputs is 255, and the field type representing the length in the RGB++ protocol is Uint8
+const MAX_RGBPP_CELL_NUM = 255;
 // refer to https://github.com/ckb-cell/rgbpp/blob/0c090b039e8d026aad4336395b908af283a70ebf/contracts/rgbpp-lock/src/main.rs#L173-L211
 export const calculateCommitment = (rgbppVirtualTx: RgbppCkbVirtualTx | CKBComponents.RawTransaction): Hex => {
-  var hash = sha256.create();
+  const hash = sha256.create();
   hash.update(hexToBytes(utf8ToHex('RGB++')));
   const version = [0, 0];
   hash.update(version);
-  hash.update([rgbppVirtualTx.inputs.length, rgbppVirtualTx.outputs.length]);
 
-  for (const input of rgbppVirtualTx.inputs) {
+  const { inputs, outputs, outputsData } = rgbppVirtualTx;
+
+  if (inputs.length > MAX_RGBPP_CELL_NUM || outputs.length > MAX_RGBPP_CELL_NUM) {
+    throw new InputsOrOutputsLenError(
+      'The inputs or outputs length of RGB++ CKB virtual tx cannot be greater than 255',
+    );
+  }
+  hash.update([inputs.length, outputs.length]);
+
+  for (const input of inputs) {
     hash.update(hexToBytes(serializeOutPoint(input.previousOutput)));
   }
-  for (let index = 0; index < rgbppVirtualTx.outputs.length; index++) {
-    const output = rgbppVirtualTx.outputs[index];
-    const outputData = rgbppVirtualTx.outputsData[index];
+  for (let index = 0; index < outputs.length; index++) {
+    const output = outputs[index];
+    const outputData = outputsData[index];
     hash.update(hexToBytes(serializeOutput(output)));
 
     const outputDataLen = u32ToLe(remove0x(outputData).length / 2);
@@ -150,6 +169,10 @@ export const isRgbppLockCell = (cell: CKBComponents.CellOutput, isMainnet: boole
   return isRgbppLock;
 };
 
+export const isRgbppLockCellIgnoreChain = (cell: CKBComponents.CellOutput): boolean => {
+  return isRgbppLockCell(cell, true) || isRgbppLockCell(cell, false);
+};
+
 export const isBtcTimeLockCell = (cell: CKBComponents.CellOutput, isMainnet: boolean): boolean => {
   const btcTimeLock = getBtcTimeLockScript(isMainnet);
   const isBtcTimeLock = cell.lock.codeHash === btcTimeLock.codeHash && cell.lock.hashType === btcTimeLock.hashType;
@@ -166,4 +189,67 @@ export const buildSpvClientCellDep = (spvClient: CKBComponents.OutPoint) => {
     depType: 'code',
   };
   return cellDep;
+};
+
+/**
+ * Estimate the size of the witness based on the number of groups of lock args
+ * @param rgbppLockArgsList The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
+ */
+export const estimateWitnessSize = (rgbppLockArgsList: Hex[]): number => {
+  const rgbppLockArgsSet = new Set(rgbppLockArgsList);
+  const inputsGroupSize = rgbppLockArgsSet.size;
+  return RGBPP_TX_WITNESS_MAX_SIZE * inputsGroupSize;
+};
+
+/**
+ * Encode RGBPP token information into hex format
+ * @param tokenInfo RGBPP token information
+ * @returns hex string for cell data
+ */
+export const encodeRgbppTokenInfo = (tokenInfo: RgbppTokenInfo) => {
+  const decimal = u8ToHex(tokenInfo.decimal);
+  const name = remove0x(utf8ToHex(tokenInfo.name));
+  const nameSize = u8ToHex(name.length / 2);
+  const symbol = remove0x(utf8ToHex(tokenInfo.symbol));
+  const symbolSize = u8ToHex(symbol.length / 2);
+  return `0x${decimal}${nameSize}${name}${symbolSize}${symbol}`;
+};
+
+export const calculateRgbppTokenInfoSize = (tokenInfo: RgbppTokenInfo): bigint => {
+  const encodedTokenInfo = encodeRgbppTokenInfo(tokenInfo);
+  return BigInt(remove0x(encodedTokenInfo).length / 2);
+};
+
+export const throwErrorWhenTxInputsExceeded = (inputLen: number) => {
+  if (inputLen > RGBPP_TX_INPUTS_MAX_LENGTH) {
+    throw new RgbppCkbTxInputsExceededError(`Please ensure the tx inputs do not exceed ${RGBPP_TX_INPUTS_MAX_LENGTH}`);
+  }
+};
+
+// Check the validity of RGB++ cells and throw an exception if the conditions are not met to avoid building invalid CKB TX
+export const throwErrorWhenRgbppCellsInvalid = (
+  cells: IndexerCell[] | undefined,
+  xudtTypeBytes: Hex,
+  isMainnet: boolean,
+) => {
+  if (!cells || cells.length === 0) {
+    throw new NoRgbppLiveCellError('No rgbpp cells found with the rgbpp lock args');
+  }
+  const typeCells = cells.filter((cell) => !!cell.output.type);
+  if (typeCells.length === 0) {
+    throw new NoRgbppLiveCellError('No rgbpp cells found with the rgbpp lock args');
+  }
+  const isUDTTypeNotSupported = typeCells.some(
+    (cell) => cell.output.type && !isUDTTypeSupported(cell.output.type, isMainnet),
+  );
+  if (isUDTTypeNotSupported) {
+    throw new RgbppUtxoBindMultiTypeAssetsError(
+      'The BTC UTXO must not be bound to xUDT and other type cells at the same time',
+    );
+  }
+
+  const isTargetExist = typeCells.some((cell) => isScriptEqual(cell.output.type!, xudtTypeBytes));
+  if (!isTargetExist) {
+    throw new NoRgbppLiveCellError('No rgbpp cells found with the xudt type script and the rgbpp lock args');
+  }
 };

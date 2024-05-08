@@ -1,6 +1,7 @@
+import pickBy from 'lodash/pickBy';
 import { isDomain } from '../utils';
 import { BtcAssetsApiError, ErrorCodes } from '../error';
-import { BaseApis, BaseApiRequestOptions, BtcAssetsApiToken } from '../types';
+import { BaseApis, BaseApiRequestOptions, BtcAssetsApiToken, BtcAssetsApiContext, Json } from '../types';
 
 export class BtcAssetsApiBase implements BaseApis {
   public url: string;
@@ -31,10 +32,11 @@ export class BtcAssetsApiBase implements BaseApis {
       await this.init();
     }
 
-    const packedParams = params ? '?' + new URLSearchParams(params).toString() : '';
+    const packedParams = params ? '?' + new URLSearchParams(pickBy(params, (val) => val !== undefined)).toString() : '';
     const withOriginHeaders = this.origin ? { origin: this.origin } : void 0;
     const withAuthHeaders = requireToken && this.token ? { Authorization: `Bearer ${this.token}` } : void 0;
-    const res = await fetch(`${this.url}${route}${packedParams}`, {
+    const url = `${this.url}${route}${packedParams}`;
+    const res = await fetch(url, {
       method,
       headers: {
         ...withOriginHeaders,
@@ -45,7 +47,7 @@ export class BtcAssetsApiBase implements BaseApis {
     } as RequestInit);
 
     let text: string | undefined;
-    let json: Record<string, any> | undefined;
+    let json: Json | undefined;
     let ok: boolean = false;
     try {
       text = await res.text();
@@ -55,30 +57,44 @@ export class BtcAssetsApiBase implements BaseApis {
       // do nothing
     }
 
-    const status = res.status;
     let comment: string | undefined;
+    const status = res.status;
+    const context: BtcAssetsApiContext = {
+      request: {
+        url,
+        params,
+        body: tryParseBody(otherOptions.body),
+      },
+      response: {
+        status,
+        data: json ?? text,
+      },
+    };
 
     if (!json) {
       comment = text ? `(${status}) ${text}` : `${status}`;
     }
     if (json && !ok) {
-      const directError = typeof json?.error === 'string' ? json.error : void 0;
-      const codeMessageError = json.code && json.message ? `(${json.code}) ${json.message}` : void 0;
-      const wrappedInnerError = json?.error?.error ? `(${json.error.error.code}) ${json.error.error.message}` : void 0;
-      comment = codeMessageError ?? wrappedInnerError ?? directError ?? JSON.stringify(json);
+      const code = json.code ?? json.statusCode ?? json.error?.error?.code ?? res.status;
+      const message = json.message ?? (typeof json.error === 'string' ? json.error : json.error?.error?.message);
+      if (message) {
+        comment = code ? `(${code}) ${message}` : message;
+      } else {
+        comment = JSON.stringify(json);
+      }
     }
 
     if (status === 200 && !json) {
-      throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_RESPONSE_DECODE_ERROR, comment);
+      throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_RESPONSE_DECODE_ERROR, comment, context);
     }
     if (status === 401) {
-      throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_UNAUTHORIZED, comment);
+      throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_UNAUTHORIZED, comment, context);
     }
     if (status === 404 && !allow404) {
-      throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_RESOURCE_NOT_FOUND, comment);
+      throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_RESOURCE_NOT_FOUND, comment, context);
     }
     if (status !== 200 && status !== 404 && !allow404) {
-      throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_RESPONSE_ERROR, comment);
+      throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_RESPONSE_ERROR, comment, context);
     }
     if (status !== 200) {
       return void 0 as T;
@@ -120,5 +136,13 @@ export class BtcAssetsApiBase implements BaseApis {
 
     const token = await this.generateToken();
     this.token = token.token;
+  }
+}
+
+function tryParseBody(body: unknown): Record<string, unknown> | undefined {
+  try {
+    return typeof body === 'string' ? JSON.parse(body) : void 0;
+  } catch {
+    return void 0;
   }
 }

@@ -8,10 +8,11 @@ export interface SendUtxosProps {
   outputs: InitOutput[];
   source: DataSource;
   from: string;
+  feeRate?: number;
   fromPubkey?: string;
   changeAddress?: string;
   minUtxoSatoshi?: number;
-  feeRate?: number;
+  onlyConfirmedUtxos?: boolean;
 }
 
 export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
@@ -23,10 +24,15 @@ export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
     source: props.source,
     feeRate: props.feeRate,
     minUtxoSatoshi: props.minUtxoSatoshi,
+    onlyConfirmedUtxos: props.onlyConfirmedUtxos,
   });
 
   tx.addInputs(props.inputs);
   tx.addOutputs(props.outputs);
+
+  if (props.onlyConfirmedUtxos) {
+    await tx.validateInputs();
+  }
 
   const paid = await tx.payFee({
     address: props.from,

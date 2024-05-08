@@ -37,9 +37,9 @@ export const buildBtcTimeUnlockWitness = (btcTxProof: Hex): Hex => {
 };
 
 /**
- * Collect btc time cells and spend them to create xudt cells for the specific lock scripts in the btc time lock args
+ * Collect btc time cells and spend them to create xUDT cells for the specific lock scripts in the btc time lock args
  * The btc time lock args data structure is: lock_script | after | new_bitcoin_tx_id
- * @param btcTimeCellPairs The pairs of the BTC time cell and the related btc tx(which is in the BTC time cell lock args) index in the block
+ * @param btcTimeCells The BTC time cells of xUDT
  * @param btcAssetsApi BTC Assets Api
  * @param isMainnet
  */
@@ -114,6 +114,8 @@ export const buildBtcTimeCellsSpentTx = async ({
  * @param ckbRawTx The CKB raw transaction to be signed
  * @param collector The collector that collects CKB live cells and transactions
  * @param masterCkbAddress The master CKB address
+ * @param outputCapacityRange [u64; 2], filter cells by output capacity range, [inclusive, exclusive]
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  * @param isMainnet
  */
 export const signBtcTimeCellSpentTx = async ({
@@ -122,14 +124,18 @@ export const signBtcTimeCellSpentTx = async ({
   collector,
   masterCkbAddress,
   isMainnet,
+  outputCapacityRange,
+  ckbFeeRate,
 }: SignBtcTimeCellsTxParams): Promise<CKBComponents.RawTransaction> => {
   const masterLock = addressToScript(masterCkbAddress);
-  const emptyCells = await collector.getCells({
+  let emptyCells = await collector.getCells({
     lock: masterLock,
+    outputCapacityRange,
   });
   if (!emptyCells || emptyCells.length === 0) {
     throw new Error('No empty cell found');
   }
+  emptyCells = emptyCells.filter((cell) => !cell.output.type);
   const emptyInput: CKBComponents.CellInput = {
     previousOutput: emptyCells[0].outPoint,
     since: '0x0',
@@ -146,12 +152,12 @@ export const signBtcTimeCellSpentTx = async ({
   };
 
   const txSize = getTransactionSize(rawTx) + SECP256K1_WITNESS_LOCK_SIZE;
-  const estimatedTxFee = calculateTransactionFee(txSize);
+  const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
 
   const changeCapacity = BigInt(emptyCells[0].output.capacity) - estimatedTxFee;
   rawTx.outputs[0].capacity = append0x(changeCapacity.toString(16));
 
-  let keyMap = new Map<string, string>();
+  const keyMap = new Map<string, string>();
   keyMap.set(scriptToHash(masterLock), secp256k1PrivateKey);
   keyMap.set(scriptToHash(getBtcTimeLockScript(isMainnet)), '');
 
@@ -195,7 +201,7 @@ export const isBtcTimeCellsSpent = async ({
     ...getBtcTimeLockScript(isMainnet),
     args: genBtcTimeLockArgs(lock, btcTxId, BTC_JUMP_CONFIRMATION_BLOCKS),
   };
-  const btcTimeCells = await collector.getCells({ lock: btcTimeLock, isDataEmpty: false });
+  const btcTimeCells = await collector.getCells({ lock: btcTimeLock, isDataMustBeEmpty: false });
   const isSpent = !btcTimeCells || btcTimeCells.length === 0;
   return isSpent;
 };
