@@ -1,0 +1,29 @@
+{
+  "name": "examples-core",
+  "version": "0.1.0",
+  "description": "The core methods and utils of RGB++ and xUDT",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "format": "prettier --write '**/*.ts'",
+    "lint": "tsc && eslint . && prettier --check '**/*.ts'",
+    "lint:fix": "tsc && eslint --fix --ext .ts . && prettier --write '**/*.ts'"
+  },
+  "main": "lib",
+  "files": [
+    "lib"
+  ],
+  "types": "./lib/index.d.ts",
+  "dependencies": {
+    "@exact-realty/multipart-parser": "^1.0.13",
+    "@nervosnetwork/ckb-sdk-utils": "^0.109.1",
+    "@rgbpp-sdk/btc": "workspace:^",
+    "@rgbpp-sdk/ckb": "workspace:^",
+    "@rgbpp-sdk/service": "workspace:^",
+    "@spore-sdk/core": "^0.2.0-beta.6",
+    "axios": "^1.6.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.28",
+    "typescript": "^5.4.2"
+  }
+}
