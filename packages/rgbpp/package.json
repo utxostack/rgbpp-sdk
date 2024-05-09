@@ -11,6 +11,24 @@
     "clean:cache": "rimraf .turbo"
   },
   "main": "lib",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./btc": {
+      "types": "./lib/btc.d.ts",
+      "default": "./lib/btc.js"
+    },
+    "./ckb": {
+      "types": "./lib/ckb.d.ts",
+      "default": "./lib/ckb.js"
+    },
+    "./service": {
+      "types": "./lib/service.d.ts",
+      "default": "./lib/service.js"
+    }
+  },
   "files": [
     "lib"
   ],
