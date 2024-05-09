@@ -17,7 +17,7 @@ import {
   btcDataSource,
   btcKeyPair,
   btcService,
-} from '../../core';
+} from '../../utils';
 
 const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transferAmount }: RgbppTransferParams) => {
   const xudtType: CKBComponents.Script = {

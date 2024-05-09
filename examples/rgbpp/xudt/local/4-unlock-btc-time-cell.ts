@@ -1,5 +1,5 @@
 import { sendCkbTx, buildBtcTimeCellsSpentTx, getBtcTimeLockScript, signBtcTimeCellSpentTx } from '@rgbpp-sdk/ckb';
-import { CKB_PRIVATE_KEY, btcService, ckbAddress, collector, isMainnet } from '../core';
+import { CKB_PRIVATE_KEY, btcService, ckbAddress, collector, isMainnet } from '../../utils';
 
 // Warning: Wait at least 6 BTC confirmation blocks to spend the BTC time cells after 4-btc-jump-ckb.ts
 const unlockBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }) => {

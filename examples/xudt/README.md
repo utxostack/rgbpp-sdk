@@ -2,6 +2,31 @@
 
 The examples for xUDT issuance, mint and transfer on CKB
 
+### How to Start
+
+Copy the `.env.example` file to `.env`:
+
+```shell
+cd examples/xudt && cp .env.example .env
+```
+
+Update the configuration values:
+
+```yaml
+# Ture for CKB Mainnet and false for CKB Testnet, the default value is false
+IS_MAINNET=false
+
+# The CKB secp256k1 private key whose format is 32bytes hex string with 0x prefix
+CKB_SECP256K1_PRIVATE_KEY=0x-private-key
+
+# CKB node url which should be matched with IS_MAINNET
+CKB_NODE_URL=https://testnet.ckb.dev/rpc
+
+# CKB indexer url which should be matched with IS_MAINNET
+CKB_INDEXER_URL=https://testnet.ckb.dev/indexer
+
+```
+
 ### Issue xUDT on CKB
 
 ```shell

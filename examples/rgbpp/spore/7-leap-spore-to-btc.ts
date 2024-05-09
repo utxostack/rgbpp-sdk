@@ -5,7 +5,7 @@ import {
   getSporeTypeScript,
   genLeapSporeFromCkbToBtcRawTx,
 } from '@rgbpp-sdk/ckb';
-import { isMainnet, collector, ckbAddress, CKB_PRIVATE_KEY } from '../core';
+import { isMainnet, collector, ckbAddress, CKB_PRIVATE_KEY } from '../utils';
 
 const leapSporeFromCkbToBtc = async ({
   outIndex,

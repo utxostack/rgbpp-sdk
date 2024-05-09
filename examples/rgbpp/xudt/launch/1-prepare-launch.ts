@@ -13,7 +13,7 @@ import {
   getSecp256k1CellDep,
 } from '@rgbpp-sdk/ckb';
 import { RGBPP_TOKEN_INFO } from './0-rgbpp-token-info';
-import { CKB_PRIVATE_KEY, ckbAddress, collector, isMainnet } from '../../core';
+import { CKB_PRIVATE_KEY, ckbAddress, collector, isMainnet } from '../../utils';
 
 const prepareLaunchCell = async ({
   outIndex,

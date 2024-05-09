@@ -9,7 +9,7 @@ import {
 } from '@rgbpp-sdk/ckb';
 import { sendRgbppUtxos, transactionToHex } from '@rgbpp-sdk/btc';
 import { BtcAssetsApiError } from '@rgbpp-sdk/service';
-import { LeapToCkbParams, isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../core';
+import { LeapToCkbParams, isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../utils';
 
 const leapFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs, transferAmount }: LeapToCkbParams) => {
   const xudtType: CKBComponents.Script = {

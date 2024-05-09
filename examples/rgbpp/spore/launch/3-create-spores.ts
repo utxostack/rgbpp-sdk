@@ -20,7 +20,7 @@ import {
   btcService,
   CKB_PRIVATE_KEY,
   ckbAddress,
-} from '../../core';
+} from '../../utils';
 
 interface Params {
   clusterRgbppLockArgs: Hex;

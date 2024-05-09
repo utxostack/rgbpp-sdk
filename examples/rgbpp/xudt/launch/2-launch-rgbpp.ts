@@ -9,7 +9,7 @@ import {
 import { sendRgbppUtxos, transactionToHex } from '@rgbpp-sdk/btc';
 import { BtcAssetsApiError } from '@rgbpp-sdk/service';
 import { RGBPP_TOKEN_INFO } from './0-rgbpp-token-info';
-import { btcAddress, btcDataSource, btcKeyPair, btcService, collector, isMainnet } from '../../core';
+import { btcAddress, btcDataSource, btcKeyPair, btcService, collector, isMainnet } from '../../utils';
 
 interface Params {
   ownerRgbppLockArgs: string;

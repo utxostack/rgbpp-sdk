@@ -11,7 +11,7 @@ import {
 import { sendRgbppUtxos, transactionToHex } from '@rgbpp-sdk/btc';
 import { BtcAssetsApiError } from '@rgbpp-sdk/service';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from 'examples-core';
+import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../utils';
 
 const transferSpore = async ({
   sporeRgbppLockArgs,

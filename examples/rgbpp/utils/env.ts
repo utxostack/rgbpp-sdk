@@ -8,8 +8,6 @@ dotenv.config({ path: __dirname + '/../.env' });
 
 export const isMainnet = process.env.IS_MAINNET === 'true' ? true : false;
 
-console.log('IS_MAINNET', process.env.IS_MAINNET);
-
 export const collector = new Collector({
   ckbNodeUrl: process.env.CKB_NODE_URL!,
   ckbIndexerUrl: process.env.CKB_INDEXER_URL!,
