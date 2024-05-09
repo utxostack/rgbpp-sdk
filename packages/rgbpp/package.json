@@ -1,0 +1,26 @@
+{
+  "name": "rgbpp",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "tsc && eslint --ext .ts src/* && prettier --check 'src/*.ts'",
+    "lint:fix": "tsc && eslint --fix --ext .ts src/* && prettier --write 'src/*.ts'",
+    "clean": "pnpm run clean:cache & pnpm run clean:build",
+    "clean:build": "rimraf lib && pnpm run clean:buildinfo",
+    "clean:buildinfo": "rimraf tsconfig.*tsbuildinfo",
+    "clean:cache": "rimraf .turbo"
+  },
+  "main": "lib",
+  "files": [
+    "lib"
+  ],
+  "types": "./lib/index.d.ts",
+  "dependencies": {
+    "@rgbpp-sdk/btc": "workspace",
+    "@rgbpp-sdk/ckb": "workspace",
+    "@rgbpp-sdk/service": "workspace"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

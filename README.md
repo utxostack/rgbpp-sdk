@@ -4,6 +4,7 @@ This repository offers utilities for Bitcoin and RGB++ asset integration.
 
 ### Packages in this repository
 
+- [rgbpp-sdk](./packages/rgbpp): A root package to integrate of common functions from the RGB++ SDK sub-packages(btc/ckb/service).
 - [@rgbpp-sdk/btc](./packages/btc): Bitcoin part of the SDK
 - [@rgbpp-sdk/ckb](./packages/ckb): Nervos CKB part of the SDK
 - [@rgbpp-sdk/service](./packages/service): A wrapped class to interact with `Bitcoin/RGB++ Assets Service`
