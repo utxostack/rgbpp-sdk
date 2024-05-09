@@ -1,7 +1,7 @@
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { getXudtTypeScript, genBtcTransferCkbVirtualTx, genBtcJumpCkbVirtualTx } from '@rgbpp-sdk/ckb';
+import { getXudtTypeScript } from '@rgbpp-sdk/ckb';
+import { genBtcTransferCkbVirtualTx, genBtcJumpCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
 import { isMainnet, collector, btcAddress, btcKeyPair, btcService, btcDataSource } from './env';
-import { sendRgbppUtxos } from '@rgbpp-sdk/btc';
 
 export interface RgbppTransferParams {
   rgbppLockArgsList: string[];

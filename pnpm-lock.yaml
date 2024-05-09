@@ -154,6 +154,9 @@ importers:
       '@spore-sdk/core':
         specifier: ^0.2.0-beta.6
         version: 0.2.0-beta.6(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
+      rgbpp:
+        specifier: workspace:^
+        version: link:../../packages/rgbpp
     devDependencies:
       '@types/dotenv':
         specifier: ^8.2.0

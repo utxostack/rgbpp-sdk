@@ -12,10 +12,11 @@
   "dependencies": {
     "@exact-realty/multipart-parser": "^1.0.13",
     "@nervosnetwork/ckb-sdk-utils": "^0.109.1",
-    "@rgbpp-sdk/btc": "workspace:^",
-    "@rgbpp-sdk/ckb": "workspace:^",
+    "@spore-sdk/core": "^0.2.0-beta.6",
+    "rgbpp": "workspace:^",
     "@rgbpp-sdk/service": "workspace:^",
-    "@spore-sdk/core": "^0.2.0-beta.6"
+    "@rgbpp-sdk/ckb": "workspace:^",
+    "@rgbpp-sdk/btc": "workspace:^"
   },
   "devDependencies": {
     "@types/node": "^20.11.28",

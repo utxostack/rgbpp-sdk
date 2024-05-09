@@ -1,14 +1,12 @@
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
+import { genBtcTransferCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
 import {
   appendCkbTxWitnesses,
   buildRgbppLockArgs,
-  genBtcTransferCkbVirtualTx,
   sendCkbTx,
   getXudtTypeScript,
   updateCkbTxWithRealBtcTxId,
 } from '@rgbpp-sdk/ckb';
-import { transactionToHex, sendRgbppUtxos } from '@rgbpp-sdk/btc';
-import { BtcAssetsApiError } from '@rgbpp-sdk/service';
 import {
   RgbppTransferParams,
   isMainnet,
@@ -18,6 +16,8 @@ import {
   btcKeyPair,
   btcService,
 } from '../../utils';
+import { transactionToHex } from '@rgbpp-sdk/btc';
+import { BtcAssetsApiError } from '@rgbpp-sdk/service';
 
 const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transferAmount }: RgbppTransferParams) => {
   const xudtType: CKBComponents.Script = {

@@ -1,16 +1,5 @@
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import {
-  RgbppBtcAddressReceiver,
-  appendCkbTxWitnesses,
-  appendIssuerCellToBtcBatchTransfer,
-  buildRgbppLockArgs,
-  genBtcBatchTransferCkbVirtualTx,
-  getXudtTypeScript,
-  sendCkbTx,
-  updateCkbTxWithRealBtcTxId,
-} from '@rgbpp-sdk/ckb';
-import { sendRgbppUtxos, transactionToHex } from '@rgbpp-sdk/btc';
-import { BtcAssetsApiError } from '@rgbpp-sdk/service';
+import { BtcAssetsApiError, genBtcBatchTransferCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
 import { RGBPP_TOKEN_INFO } from './0-rgbpp-token-info';
 import {
   isMainnet,
@@ -22,6 +11,16 @@ import {
   CKB_PRIVATE_KEY,
   ckbAddress,
 } from '../../utils';
+import {
+  RgbppBtcAddressReceiver,
+  appendCkbTxWitnesses,
+  appendIssuerCellToBtcBatchTransfer,
+  buildRgbppLockArgs,
+  getXudtTypeScript,
+  sendCkbTx,
+  updateCkbTxWithRealBtcTxId,
+} from '@rgbpp-sdk/ckb';
+import { transactionToHex } from '@rgbpp-sdk/btc';
 
 interface Params {
   rgbppLockArgsList: string[];

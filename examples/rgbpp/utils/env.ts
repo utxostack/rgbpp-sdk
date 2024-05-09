@@ -1,8 +1,8 @@
 import { AddressPrefix, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
-import { DataSource, ECPair, ECPairInterface, NetworkType, bitcoin } from '@rgbpp-sdk/btc';
-import { Collector } from '@rgbpp-sdk/ckb';
-import { BtcAssetsApi } from '@rgbpp-sdk/service';
+import { DataSource, BtcAssetsApi } from 'rgbpp';
+import { ECPair, ECPairInterface, bitcoin, NetworkType } from '@rgbpp-sdk/btc';
 import dotenv from 'dotenv';
+import { Collector } from '@rgbpp-sdk/ckb';
 
 dotenv.config({ path: __dirname + '/../.env' });
 

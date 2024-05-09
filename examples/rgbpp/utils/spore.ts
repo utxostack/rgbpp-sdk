@@ -1,10 +1,5 @@
-import {
-  getSporeTypeScript,
-  Hex,
-  genTransferSporeCkbVirtualTx,
-  genLeapSporeFromBtcToCkbVirtualTx,
-} from '@rgbpp-sdk/ckb';
-import { sendRgbppUtxos } from '@rgbpp-sdk/btc';
+import { genTransferSporeCkbVirtualTx, genLeapSporeFromBtcToCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
+import { getSporeTypeScript, Hex } from '@rgbpp-sdk/ckb';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from './env';
 
