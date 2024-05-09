@@ -1,3 +1,6 @@
+/**
+ * ckb
+ */
 export {
   genCreateClusterCkbVirtualTx,
   genCreateSporeCkbVirtualTx,
@@ -31,5 +34,21 @@ export type {
   SporeVirtualTxResult,
 } from '@rgbpp-sdk/ckb';
 
+/**
+ * service
+ */
 export { BtcAssetsApi } from '@rgbpp-sdk/service';
-export { sendBtc, sendUtxos, sendRgbppUtxos } from '@rgbpp-sdk/btc';
+
+/**
+ * btc
+ */
+export {
+  DataSource,
+  sendBtc,
+  sendUtxos,
+  sendRgbppUtxos,
+  createSendBtcBuilder,
+  createSendUtxosBuilder,
+  createSendRgbppUtxosBuilder,
+} from '@rgbpp-sdk/btc';
+export type { NetworkType, AddressType, SendBtcProps, SendUtxosProps, SendRgbppUtxosProps } from '@rgbpp-sdk/btc';
