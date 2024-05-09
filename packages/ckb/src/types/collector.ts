@@ -24,7 +24,6 @@ export interface CollectUdtResult extends CollectResult {
 }
 
 export interface CollectConfig {
-  isMax?: boolean;
   minCapacity?: bigint;
   errMsg?: string;
 }

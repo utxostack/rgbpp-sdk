@@ -57,7 +57,7 @@ export const genRgbppLaunchCkbVirtualTx = async ({
   const infoCellCapacity = calculateRgbppTokenInfoCellCapacity(rgbppTokenInfo, isMainnet);
 
   const txFee = MAX_FEE;
-  const { inputs, sumInputsCapacity } = collector.collectInputs(emptyCells, infoCellCapacity, txFee, { isMax: true });
+  const { inputs, sumInputsCapacity } = collector.collectInputs(emptyCells, infoCellCapacity, txFee);
 
   let rgbppCellCapacity = sumInputsCapacity - infoCellCapacity;
   const outputs: CKBComponents.CellOutput[] = [
