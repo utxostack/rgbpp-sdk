@@ -18,9 +18,9 @@ export const ckbAddress = privateKeyToAddress(CKB_PRIVATE_KEY, {
 });
 
 export const BTC_PRIVATE_KEY = process.env.BTC_PRIVATE_KEY!;
-export const BTC_ASSETS_API_URL = process.env.BTC_ASSETS_API_URL!;
-export const BTC_ASSETS_TOKEN = process.env.BTC_ASSETS_TOKEN!;
-export const BTC_ASSETS_ORIGIN = process.env.BTC_ASSETS_ORIGIN!;
+export const BTC_SERVICE_URL = process.env.VITE_BTC_SERVICE_URL!;
+export const BTC_SERVICE_TOKEN = process.env.VITE_BTC_SERVICE_TOKEN!;
+export const BTC_SERVICE_ORIGIN = process.env.VITE_BTC_SERVICE_ORIGIN!;
 
 const network = isMainnet ? bitcoin.networks.bitcoin : bitcoin.networks.testnet;
 export const btcKeyPair: ECPairInterface = ECPair.fromPrivateKey(Buffer.from(BTC_PRIVATE_KEY, 'hex'), { network });
@@ -30,5 +30,5 @@ export const { address: btcAddress } = bitcoin.payments.p2wpkh({
 });
 
 const networkType = isMainnet ? NetworkType.MAINNET : NetworkType.TESTNET;
-export const btcService = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, BTC_ASSETS_ORIGIN);
+export const btcService = BtcAssetsApi.fromToken(BTC_SERVICE_URL, BTC_SERVICE_TOKEN, BTC_SERVICE_ORIGIN);
 export const btcDataSource = new DataSource(btcService, networkType);
