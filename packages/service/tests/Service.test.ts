@@ -11,15 +11,15 @@ describe(
   () => {
     const btcAddress = 'tb1qm06rvrq8jyyckzc5v709u7qpthel9j4d9f7nh3';
     const service = BtcAssetsApi.fromToken(
-      process.env.VITE_SERVICE_URL!,
-      process.env.VITE_SERVICE_TOKEN!,
-      process.env.VITE_SERVICE_ORIGIN!,
+      process.env.VITE_BTC_SERVICE_URL!,
+      process.env.VITE_BTC_SERVICE_TOKEN!,
+      process.env.VITE_BTC_SERVICE_ORIGIN!,
     );
 
     describe('Initiation and token generation', () => {
       it('Generate a valid token', async () => {
         const serviceWithApp = new BtcAssetsApi({
-          url: process.env.VITE_SERVICE_URL!,
+          url: process.env.VITE_BTC_SERVICE_URL!,
           app: 'btc-test-app',
           domain: 'btc-test.app',
           origin: 'https://btc-test.app',
@@ -36,14 +36,14 @@ describe(
         expect(
           () =>
             new BtcAssetsApi({
-              url: process.env.VITE_SERVICE_URL!,
+              url: process.env.VITE_BTC_SERVICE_URL!,
               domain: 'https://btc-test.app',
             }),
         ).toThrow(`${ErrorMessages[ErrorCodes.ASSETS_API_INVALID_PARAM]}: domain`);
       });
       it('Try generate token without the "app" param', async () => {
         const serviceWithoutApp = new BtcAssetsApi({
-          url: process.env.VITE_SERVICE_URL!,
+          url: process.env.VITE_BTC_SERVICE_URL!,
           domain: 'btc-test.app',
         });
 
