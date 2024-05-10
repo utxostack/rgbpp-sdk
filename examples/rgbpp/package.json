@@ -10,10 +10,8 @@
     "lint:fix": "tsc && eslint --fix --ext .js,.ts . && prettier --write '**/*.{js,ts}'"
   },
   "dependencies": {
-    "@exact-realty/multipart-parser": "^1.0.13",
     "@nervosnetwork/ckb-sdk-utils": "^0.109.1",
-    "@spore-sdk/core": "^0.2.0-beta.6",
-    "rgbpp": "0.1.0"
+    "rgbpp": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.11.28",

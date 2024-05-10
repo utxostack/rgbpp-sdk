@@ -78,10 +78,10 @@ npx ts-node xudt/1-ckb-leap-btc.ts
 npx ts-node xudt/2-btc-transfer.ts 
 ```
 
-#### 3. Leap RGB++ xUDT from BTC to CKB
+#### 3. Leap RGB++ xUDT from BTC to CKB with Queue Service
 
 ```shell
-npx ts-node xudt/3-btc-jump-ckb.ts 
+npx ts-node xudt/3-btc-leap-ckb.ts 
 ```
 
 #### 4. Unlock xUDT BTC time cells on CKB
@@ -90,7 +90,7 @@ A cron job in RGB++ Queue service will construct a transaction unlocking the mat
 
 However, you can still manually unlock the spore BTC time cell through the following command
 
-Warning: Wait at least 6 BTC confirmation blocks to unlock the BTC time cells after 3-btc-jump-ckb.ts
+Warning: Wait at least 6 BTC confirmation blocks to unlock the BTC time cells after 3-btc-leap-ckb.ts
 
 ```shell
 npx ts-node xudt/launch/4-unlock-btc-time.ts 

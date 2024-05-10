@@ -136,17 +136,11 @@ importers:
 
   examples/rgbpp:
     dependencies:
-      '@exact-realty/multipart-parser':
-        specifier: ^1.0.13
-        version: 1.0.13
       '@nervosnetwork/ckb-sdk-utils':
         specifier: ^0.109.1
         version: 0.109.1
-      '@spore-sdk/core':
-        specifier: ^0.2.0-beta.6
-        version: 0.2.0-beta.6(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
       rgbpp:
-        specifier: 0.1.0
+        specifier: workspace:*
         version: link:../../packages/rgbpp
     devDependencies:
       '@types/dotenv':

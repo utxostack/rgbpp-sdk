@@ -1,5 +1,4 @@
 import { BtcAssetsApiError, genCreateSporeCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
-import { RawSporeData } from '@spore-sdk/core';
 import {
   isMainnet,
   collector,
@@ -18,6 +17,7 @@ import {
   generateSporeCreateCoBuild,
   sendCkbTx,
   updateCkbTxWithRealBtcTxId,
+  RawSporeData,
 } from 'rgbpp/ckb';
 import { transactionToHex, utf8ToBuffer } from 'rgbpp/btc';
 
