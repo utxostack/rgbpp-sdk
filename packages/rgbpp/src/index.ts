@@ -37,7 +37,7 @@ export type {
 /**
  * service
  */
-export { BtcAssetsApi } from '@rgbpp-sdk/service';
+export { BtcAssetsApi, BtcAssetsApiError } from '@rgbpp-sdk/service';
 
 /**
  * btc
