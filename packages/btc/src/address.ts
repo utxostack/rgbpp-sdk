@@ -28,7 +28,7 @@ export function isSupportedFromAddress(address: string) {
  */
 export function publicKeyToPayment(publicKey: string, addressType: AddressType, networkType: NetworkType) {
   if (!publicKey) {
-    return void 0;
+    return undefined;
   }
 
   const network = networkTypeToNetwork(networkType);
@@ -64,7 +64,7 @@ export function publicKeyToPayment(publicKey: string, addressType: AddressType, 
     });
   }
 
-  return void 0;
+  return undefined;
 }
 
 /**
@@ -147,7 +147,7 @@ export function decodeAddress(address: string): {
           addressType = AddressType.P2TR;
         }
       }
-      if (networkType !== void 0 && addressType !== void 0) {
+      if (networkType !== undefined && addressType !== undefined) {
         return {
           networkType,
           addressType,
@@ -182,7 +182,7 @@ export function decodeAddress(address: string): {
         addressType = AddressType.P2SH_P2WPKH;
       }
 
-      if (networkType !== void 0 && addressType !== void 0) {
+      if (networkType !== undefined && addressType !== undefined) {
         return {
           networkType,
           addressType,

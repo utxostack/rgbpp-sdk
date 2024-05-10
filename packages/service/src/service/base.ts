@@ -33,8 +33,8 @@ export class BtcAssetsApiBase implements BaseApis {
     }
 
     const packedParams = params ? '?' + new URLSearchParams(pickBy(params, (val) => val !== undefined)).toString() : '';
-    const withOriginHeaders = this.origin ? { origin: this.origin } : void 0;
-    const withAuthHeaders = requireToken && this.token ? { Authorization: `Bearer ${this.token}` } : void 0;
+    const withOriginHeaders = this.origin ? { origin: this.origin } : undefined;
+    const withAuthHeaders = requireToken && this.token ? { Authorization: `Bearer ${this.token}` } : undefined;
     const url = `${this.url}${route}${packedParams}`;
     const res = await fetch(url, {
       method,
@@ -97,7 +97,7 @@ export class BtcAssetsApiBase implements BaseApis {
       throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_RESPONSE_ERROR, comment, context);
     }
     if (status !== 200) {
-      return void 0 as T;
+      return undefined as T;
     }
 
     return json! as T;
@@ -141,8 +141,8 @@ export class BtcAssetsApiBase implements BaseApis {
 
 function tryParseBody(body: unknown): Record<string, unknown> | undefined {
   try {
-    return typeof body === 'string' ? JSON.parse(body) : void 0;
+    return typeof body === 'string' ? JSON.parse(body) : undefined;
   } catch {
-    return void 0;
+    return undefined;
   }
 }

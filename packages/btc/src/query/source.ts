@@ -35,14 +35,14 @@ export class DataSource {
     const txId = remove0x(hash);
     const tx = await this.service.getBtcTransaction(txId);
     if (!tx) {
-      return void 0;
+      return undefined;
     }
     if (requireConfirmed && !tx.status.confirmed) {
       throw TxBuildError.withComment(ErrorCodes.UNCONFIRMED_UTXO, `hash: ${hash}, index: ${index}`);
     }
     const vout = tx.vout[index];
     if (!vout) {
-      return void 0;
+      return undefined;
     }
 
     const scriptBuffer = Buffer.from(vout.scriptpubkey, 'hex');
