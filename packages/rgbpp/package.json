@@ -34,9 +34,9 @@
   ],
   "types": "./lib/index.d.ts",
   "dependencies": {
-    "@rgbpp-sdk/btc": "workspace",
-    "@rgbpp-sdk/ckb": "workspace",
-    "@rgbpp-sdk/service": "workspace"
+    "@rgbpp-sdk/btc": "workspace:*",
+    "@rgbpp-sdk/ckb": "workspace:*",
+    "@rgbpp-sdk/service": "workspace:*"
   },
   "publishConfig": {
     "access": "public"
