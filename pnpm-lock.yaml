@@ -248,6 +248,18 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0(@types/node@20.12.2)
 
+  packages/rgbpp:
+    dependencies:
+      '@rgbpp-sdk/btc':
+        specifier: workspace:*
+        version: link:../btc
+      '@rgbpp-sdk/ckb':
+        specifier: workspace:*
+        version: link:../ckb
+      '@rgbpp-sdk/service':
+        specifier: workspace:*
+        version: link:../service
+
   packages/service:
     dependencies:
       '@ckb-lumos/base':
