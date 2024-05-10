@@ -251,13 +251,13 @@ importers:
   packages/rgbpp:
     dependencies:
       '@rgbpp-sdk/btc':
-        specifier: workspace
+        specifier: workspace:*
         version: link:../btc
       '@rgbpp-sdk/ckb':
-        specifier: workspace
+        specifier: workspace:*
         version: link:../ckb
       '@rgbpp-sdk/service':
-        specifier: workspace
+        specifier: workspace:*
         version: link:../service
 
   packages/service:
