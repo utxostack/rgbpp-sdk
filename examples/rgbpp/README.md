@@ -51,17 +51,17 @@ BTC_ASSETS_ORIGIN=https://btc-test.app;
 ### 1. Prepare Launch
 
 ```shell
-npx ts-node example/rgbpp/xudt/launch/1-prepare-launch.ts
+npx ts-node xudt/launch/1-prepare-launch.ts
 ```
 ### 2. Launch RGB++ xUDT on BTC
 
 ```shell
-npx ts-node example/rgbpp/xudt/launch/2-launch-rgbpp.ts
+npx ts-node xudt/launch/2-launch-rgbpp.ts
 ```
 ### 3. Distribute RGB++ xUDT on BTC
 
 ```shell
-npx ts-node example/rgbpp/xudt/launch/3-distribute-rgbpp.ts
+npx ts-node xudt/launch/3-distribute-rgbpp.ts
 ```
 
 ### RGB++ xUDT Transfer and Leap
@@ -69,19 +69,19 @@ npx ts-node example/rgbpp/xudt/launch/3-distribute-rgbpp.ts
 #### 1. Leap xUDT from CKB to BTC
 
 ```shell
-npx ts-node examples/rgbpp/xudt/1-ckb-leap-btc.ts 
+npx ts-node xudt/1-ckb-leap-btc.ts 
 ```
 
 #### 2. Transfer RGB++ xUDT on BTC with Queue Service
 
 ```shell
-npx ts-node examples/rgbpp/xudt/2-btc-transfer.ts 
+npx ts-node xudt/2-btc-transfer.ts 
 ```
 
 #### 3. Leap RGB++ xUDT from BTC to CKB
 
 ```shell
-npx ts-node examples/rgbpp/xudt/3-btc-jump-ckb.ts 
+npx ts-node xudt/3-btc-jump-ckb.ts 
 ```
 
 #### 4. Unlock xUDT BTC time cells on CKB
@@ -93,25 +93,25 @@ However, you can still manually unlock the spore BTC time cell through the follo
 Warning: Wait at least 6 BTC confirmation blocks to unlock the BTC time cells after 3-btc-jump-ckb.ts
 
 ```shell
-npx ts-node examples/rgbpp/xudt/launch/4-unlock-btc-time.ts 
+npx ts-node xudt/launch/4-unlock-btc-time.ts 
 ```
 
 ## RGB++ Spore Examples
 
-### Launch Spores on BTC
+### RGB++ Spores Launch on BTC
 
 #### 1. Create RGB++ Cluster Cell
 
 ```shell
-npx ts-node examples/rgbpp/spore/launch/1-prepare-cluster.ts
+npx ts-node spore/launch/1-prepare-cluster.ts
 
-npx ts-node examples/rgbpp/spore/launch/2-create-cluster.ts
+npx ts-node spore/launch/2-create-cluster.ts
 ```
 
 #### 2. Create RGB++ Spores with Cluster on BTC
 
 ```shell
-npx ts-node examples/rgbpp/spore/launch/3-create-spores.ts
+npx ts-node spore/launch/3-create-spores.ts
 ```
 
 ### Transfer and Leap Spore
@@ -119,13 +119,13 @@ npx ts-node examples/rgbpp/spore/launch/3-create-spores.ts
 #### 1. Transfer RGB++ Spore on BTC with Queue Service
 
 ```shell
-npx ts-node examples/rgbpp/spore/4-transfer-spore.ts
+npx ts-node spore/4-transfer-spore.ts
 ```
 
 #### 2. Leap RGB++ Spore from BTC to CKB
 
 ```shell
-npx ts-node examples/rgbpp/spore/5-leap-spore-to-ckb.ts
+npx ts-node spore/5-leap-spore-to-ckb.ts
 ```
 
 #### 3. Unlock Spore BTC time cells on CKB
@@ -137,13 +137,13 @@ However, you can still manually unlock the spore BTC time cell through the follo
 **Warning: Wait at least 6 BTC confirmation blocks to unlock the BTC time cells after 5-leap-spore-to-ckb.ts**
 
 ```shell
-npx ts-node examples/rgbpp/spore/6-unlock-btc-time-cell.ts
+npx ts-node spore/6-unlock-btc-time-cell.ts
 ```
 
 #### 4. Leap Spore from CKB to BTC
 
 ```shell
-npx ts-node examples/rgbpp/spore/7-leap-spore-to-btc.ts
+npx ts-node spore/7-leap-spore-to-btc.ts
 ```
 
 ## What you must know about BTC transaction id

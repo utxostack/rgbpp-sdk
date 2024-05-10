@@ -7,21 +7,20 @@ import {
   Hex,
   generateSporeTransferCoBuild,
   genTransferSporeCkbVirtualTx,
-} from '@rgbpp-sdk/ckb';
-import { sendRgbppUtxos, transactionToHex } from '@rgbpp-sdk/btc';
-import { BtcAssetsApiError } from '@rgbpp-sdk/service';
+} from 'rgbpp/ckb';
+import { sendRgbppUtxos, transactionToHex } from 'rgbpp/btc';
+import { BtcAssetsApiError } from 'rgbpp';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../utils';
+import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../env';
 
-const transferSpore = async ({
-  sporeRgbppLockArgs,
-  toBtcAddress,
-  sporeTypeArgs,
-}: {
+interface SporeTransferParams {
   sporeRgbppLockArgs: Hex;
   toBtcAddress: string;
-  sporeTypeArgs: string;
-}) => {
+  sporeTypeArgs: Hex;
+}
+
+// Warning: It is not recommended for developers to use local examples unless you understand the entire process of RGB++ transactions.
+const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }: SporeTransferParams) => {
   // The spore type script is from 3-create-spore.ts, you can find it from the ckb tx spore output cells
   const sporeTypeBytes = serializeScript({
     ...getSporeTypeScript(isMainnet),

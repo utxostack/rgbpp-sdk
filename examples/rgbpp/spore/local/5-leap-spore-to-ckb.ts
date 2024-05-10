@@ -7,21 +7,20 @@ import {
   Hex,
   generateSporeTransferCoBuild,
   genLeapSporeFromBtcToCkbVirtualTx,
-} from '@rgbpp-sdk/ckb';
-import { sendRgbppUtxos, transactionToHex } from '@rgbpp-sdk/btc';
-import { BtcAssetsApiError } from '@rgbpp-sdk/service';
+} from 'rgbpp/ckb';
+import { sendRgbppUtxos, transactionToHex } from 'rgbpp/btc';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../utils';
+import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../env';
+import { BtcAssetsApiError } from 'rgbpp';
 
-const transferSpore = async ({
-  sporeRgbppLockArgs,
-  toCkbAddress,
-  sporeTypeArgs,
-}: {
+interface SporeLeapParams {
   sporeRgbppLockArgs: Hex;
   toCkbAddress: string;
   sporeTypeArgs: Hex;
-}) => {
+}
+
+// Warning: It is not recommended for developers to use local examples unless you understand the entire process of RGB++ transactions.
+const leapSpore = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTypeArgs }: SporeLeapParams) => {
   // The spore type script is from 3-create-spore.ts, you can find it from the ckb tx spore output cells
   const sporeTypeBytes = serializeScript({
     ...getSporeTypeScript(isMainnet),
@@ -90,7 +89,7 @@ const transferSpore = async ({
 
 // Use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
-transferSpore({
+leapSpore({
   // The spore rgbpp lock args is from 3-create-spore.ts
   sporeRgbppLockArgs: buildRgbppLockArgs(3, 'd8a31796fbd42c546f6b22014b9b82b16586ce1df81b0e7ca9a552cdc492a0af'),
   toCkbAddress: 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq0e4xk4rmg5jdkn8aams492a7jlg73ue0gc0ddfj',

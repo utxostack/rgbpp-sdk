@@ -10,7 +10,7 @@ import {
   btcService,
   CKB_PRIVATE_KEY,
   ckbAddress,
-} from '../../utils';
+} from '../../env';
 import {
   RgbppBtcAddressReceiver,
   appendCkbTxWitnesses,
@@ -19,8 +19,8 @@ import {
   getXudtTypeScript,
   sendCkbTx,
   updateCkbTxWithRealBtcTxId,
-} from '@rgbpp-sdk/ckb';
-import { transactionToHex } from '@rgbpp-sdk/btc';
+} from 'rgbpp/ckb';
+import { transactionToHex } from 'rgbpp/btc';
 
 interface Params {
   rgbppLockArgsList: string[];

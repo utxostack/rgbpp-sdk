@@ -1,14 +1,14 @@
 import { BtcAssetsApiError, genCreateClusterCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
-import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../utils';
+import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../env';
 import { CLUSTER_DATA } from './0-cluster-info';
-import { transactionToHex } from '@rgbpp-sdk/btc';
+import { transactionToHex } from 'rgbpp/btc';
 import {
   appendCkbTxWitnesses,
   buildRgbppLockArgs,
   generateClusterCreateCoBuild,
   sendCkbTx,
   updateCkbTxWithRealBtcTxId,
-} from '@rgbpp-sdk/ckb';
+} from 'rgbpp/ckb';
 
 const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: string }) => {
   const ckbVirtualTxResult = await genCreateClusterCkbVirtualTx({

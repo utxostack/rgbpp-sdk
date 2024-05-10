@@ -142,15 +142,6 @@ importers:
       '@nervosnetwork/ckb-sdk-utils':
         specifier: ^0.109.1
         version: 0.109.1
-      '@rgbpp-sdk/btc':
-        specifier: workspace:^
-        version: link:../../packages/btc
-      '@rgbpp-sdk/ckb':
-        specifier: workspace:^
-        version: link:../../packages/ckb
-      '@rgbpp-sdk/service':
-        specifier: workspace:^
-        version: link:../../packages/service
       '@spore-sdk/core':
         specifier: ^0.2.0-beta.6
         version: 0.2.0-beta.6(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
@@ -176,9 +167,9 @@ importers:
       '@nervosnetwork/ckb-sdk-utils':
         specifier: ^0.109.1
         version: 0.109.1
-      '@rgbpp-sdk/ckb':
+      rgbpp:
         specifier: workspace:^
-        version: link:../../packages/ckb
+        version: link:../../packages/rgbpp
     devDependencies:
       '@types/dotenv':
         specifier: ^8.2.0

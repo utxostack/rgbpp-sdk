@@ -5,10 +5,10 @@ import {
   appendCkbTxWitnesses,
   updateCkbTxWithRealBtcTxId,
   sendCkbTx,
-} from '@rgbpp-sdk/ckb';
+} from 'rgbpp/ckb';
 import { RGBPP_TOKEN_INFO } from './0-rgbpp-token-info';
-import { btcAddress, btcDataSource, btcKeyPair, btcService, collector, isMainnet } from '../../utils';
-import { transactionToHex } from '@rgbpp-sdk/btc';
+import { btcAddress, btcDataSource, btcKeyPair, btcService, collector, isMainnet } from '../../env';
+import { transactionToHex } from 'rgbpp/btc';
 
 interface Params {
   ownerRgbppLockArgs: string;

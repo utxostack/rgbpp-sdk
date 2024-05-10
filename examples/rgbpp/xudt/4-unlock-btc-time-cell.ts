@@ -1,6 +1,6 @@
 import { buildBtcTimeCellsSpentTx, signBtcTimeCellSpentTx } from 'rgbpp';
-import { sendCkbTx, getBtcTimeLockScript } from '@rgbpp-sdk/ckb';
-import { CKB_PRIVATE_KEY, btcService, ckbAddress, collector, isMainnet } from '../../utils';
+import { sendCkbTx, getBtcTimeLockScript } from 'rgbpp/ckb';
+import { CKB_PRIVATE_KEY, btcService, ckbAddress, collector, isMainnet } from '../env';
 
 // Warning: Wait at least 6 BTC confirmation blocks to spend the BTC time cells after 4-btc-jump-ckb.ts
 const unlockBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }) => {
@@ -29,8 +29,6 @@ const unlockBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string 
     ckbRawTx,
     isMainnet,
   });
-
-  console.log(JSON.stringify(signedTx));
 
   const txHash = await sendCkbTx({ collector, signedTx });
   console.info(`BTC time cell has been spent and tx hash is ${txHash}`);

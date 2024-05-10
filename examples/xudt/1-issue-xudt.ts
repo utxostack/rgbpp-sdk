@@ -17,7 +17,7 @@ import {
   calculateTransactionFee,
   generateUniqueTypeArgs,
   calculateXudtTokenInfoCellCapacity,
-} from '@rgbpp-sdk/ckb';
+} from 'rgbpp/ckb';
 import { CKB_PRIVATE_KEY, ckbAddress, collector, isMainnet } from './env';
 
 /**

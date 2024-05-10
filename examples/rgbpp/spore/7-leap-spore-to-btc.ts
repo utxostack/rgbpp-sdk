@@ -1,7 +1,7 @@
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { genLeapSporeFromCkbToBtcRawTx } from 'rgbpp';
-import { isMainnet, collector, ckbAddress, CKB_PRIVATE_KEY } from '../utils';
-import { buildRgbppLockArgs, getSecp256k1CellDep, getSporeTypeScript } from '@rgbpp-sdk/ckb';
+import { isMainnet, collector, ckbAddress, CKB_PRIVATE_KEY } from '../env';
+import { buildRgbppLockArgs, getSecp256k1CellDep, getSporeTypeScript } from 'rgbpp/ckb';
 
 const leapSporeFromCkbToBtc = async ({
   outIndex,

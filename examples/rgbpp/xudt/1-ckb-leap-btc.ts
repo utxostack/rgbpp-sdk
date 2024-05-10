@@ -1,7 +1,7 @@
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { genCkbJumpBtcVirtualTx } from 'rgbpp';
-import { getSecp256k1CellDep, buildRgbppLockArgs, getXudtTypeScript } from '@rgbpp-sdk/ckb';
-import { CKB_PRIVATE_KEY, isMainnet, collector, ckbAddress } from '../utils';
+import { getSecp256k1CellDep, buildRgbppLockArgs, getXudtTypeScript } from 'rgbpp/ckb';
+import { CKB_PRIVATE_KEY, isMainnet, collector, ckbAddress } from '../env';
 
 interface LeapToBtcParams {
   outIndex: number;

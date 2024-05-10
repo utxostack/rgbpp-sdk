@@ -1,24 +1,23 @@
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { genBtcTransferCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
+import { genBtcTransferCkbVirtualTx, sendRgbppUtxos, BtcAssetsApiError } from 'rgbpp';
 import {
   appendCkbTxWitnesses,
   buildRgbppLockArgs,
   sendCkbTx,
   getXudtTypeScript,
   updateCkbTxWithRealBtcTxId,
-} from '@rgbpp-sdk/ckb';
-import {
-  RgbppTransferParams,
-  isMainnet,
-  collector,
-  btcAddress,
-  btcDataSource,
-  btcKeyPair,
-  btcService,
-} from '../../utils';
-import { transactionToHex } from '@rgbpp-sdk/btc';
-import { BtcAssetsApiError } from '@rgbpp-sdk/service';
+} from 'rgbpp/ckb';
+import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../env';
+import { transactionToHex } from 'rgbpp/btc';
 
+interface RgbppTransferParams {
+  rgbppLockArgsList: string[];
+  toBtcAddress: string;
+  xudtTypeArgs: string;
+  transferAmount: bigint;
+}
+
+// Warning: It is not recommended for developers to use local examples unless you understand the entire process of RGB++ transactions.
 const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transferAmount }: RgbppTransferParams) => {
   const xudtType: CKBComponents.Script = {
     ...getXudtTypeScript(isMainnet),

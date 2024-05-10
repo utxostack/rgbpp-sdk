@@ -1,5 +1,5 @@
 import { AddressPrefix, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
-import { Collector } from '@rgbpp-sdk/ckb';
+import { Collector } from 'rgbpp/ckb';
 import dotenv from 'dotenv';
 
 dotenv.config({ path: __dirname + '/.env' });

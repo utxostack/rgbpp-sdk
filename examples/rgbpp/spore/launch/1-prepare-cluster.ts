@@ -9,8 +9,8 @@ import {
   calculateTransactionFee,
   genRgbppLockScript,
   getSecp256k1CellDep,
-} from '@rgbpp-sdk/ckb';
-import { ckbAddress, isMainnet, collector, CKB_PRIVATE_KEY } from '../../utils';
+} from 'rgbpp/ckb';
+import { ckbAddress, isMainnet, collector, CKB_PRIVATE_KEY } from '../../env';
 import { CLUSTER_DATA } from './0-cluster-info';
 
 const prepareClusterCell = async ({ outIndex, btcTxId }: { outIndex: number; btcTxId: string }) => {

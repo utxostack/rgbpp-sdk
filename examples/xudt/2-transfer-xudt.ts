@@ -13,7 +13,7 @@ import {
   SECP256K1_WITNESS_LOCK_SIZE,
   calculateTransactionFee,
   NoXudtLiveCellError,
-} from '@rgbpp-sdk/ckb';
+} from 'rgbpp/ckb';
 import { CKB_PRIVATE_KEY, ckbAddress, collector, isMainnet } from './env';
 
 interface XudtTransferParams {

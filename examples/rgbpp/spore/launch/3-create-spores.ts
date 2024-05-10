@@ -9,7 +9,7 @@ import {
   btcService,
   CKB_PRIVATE_KEY,
   ckbAddress,
-} from '../../utils';
+} from '../../env';
 import {
   Hex,
   appendCkbTxWitnesses,
@@ -18,10 +18,10 @@ import {
   generateSporeCreateCoBuild,
   sendCkbTx,
   updateCkbTxWithRealBtcTxId,
-} from '@rgbpp-sdk/ckb';
-import { transactionToHex, utf8ToBuffer } from '@rgbpp-sdk/btc';
+} from 'rgbpp/ckb';
+import { transactionToHex, utf8ToBuffer } from 'rgbpp/btc';
 
-interface Params {
+interface SporeCreateParams {
   clusterRgbppLockArgs: Hex;
   receivers: {
     toBtcAddress: string;
@@ -29,7 +29,7 @@ interface Params {
   }[];
 }
 
-const createSpores = async ({ clusterRgbppLockArgs, receivers }: Params) => {
+const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreateParams) => {
   const ckbVirtualTxResult = await genCreateSporeCkbVirtualTx({
     collector,
     sporeDataList: receivers.map((receiver) => receiver.sporeData),

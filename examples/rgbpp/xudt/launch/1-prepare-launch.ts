@@ -11,9 +11,9 @@ import {
   calculateTransactionFee,
   genRgbppLockScript,
   getSecp256k1CellDep,
-} from '@rgbpp-sdk/ckb';
+} from 'rgbpp/ckb';
 import { RGBPP_TOKEN_INFO } from './0-rgbpp-token-info';
-import { CKB_PRIVATE_KEY, ckbAddress, collector, isMainnet } from '../../utils';
+import { CKB_PRIVATE_KEY, ckbAddress, collector, isMainnet } from '../../env';
 
 const prepareLaunchCell = async ({
   outIndex,

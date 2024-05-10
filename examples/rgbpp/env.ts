@@ -1,10 +1,10 @@
 import { AddressPrefix, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
 import { DataSource, BtcAssetsApi } from 'rgbpp';
-import { ECPair, ECPairInterface, bitcoin, NetworkType } from '@rgbpp-sdk/btc';
+import { ECPair, ECPairInterface, bitcoin, NetworkType } from 'rgbpp/btc';
 import dotenv from 'dotenv';
-import { Collector } from '@rgbpp-sdk/ckb';
+import { Collector } from 'rgbpp/ckb';
 
-dotenv.config({ path: __dirname + '/../.env' });
+dotenv.config({ path: __dirname + '/.env' });
 
 export const isMainnet = process.env.IS_MAINNET === 'true' ? true : false;
 

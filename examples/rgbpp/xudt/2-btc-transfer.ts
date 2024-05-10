@@ -1,8 +1,49 @@
-import { buildRgbppLockArgs } from '@rgbpp-sdk/ckb';
-import { RgbppTransferParams, btcService, transferRgbppOnBtc } from '../utils';
+import { buildRgbppLockArgs, getXudtTypeScript } from 'rgbpp/ckb';
+import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
+import { genBtcTransferCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
+import { isMainnet, collector, btcAddress, btcKeyPair, btcService, btcDataSource } from '../env';
 
-const transfer = async (params: RgbppTransferParams) => {
-  const btcTxId = await transferRgbppOnBtc(params);
+interface RgbppTransferParams {
+  rgbppLockArgsList: string[];
+  toBtcAddress: string;
+  xudtTypeArgs: string;
+  transferAmount: bigint;
+}
+
+const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transferAmount }: RgbppTransferParams) => {
+  const xudtType: CKBComponents.Script = {
+    ...getXudtTypeScript(isMainnet),
+    args: xudtTypeArgs,
+  };
+
+  const ckbVirtualTxResult = await genBtcTransferCkbVirtualTx({
+    collector,
+    rgbppLockArgsList,
+    xudtTypeBytes: serializeScript(xudtType),
+    transferAmount,
+    isMainnet,
+  });
+
+  const { commitment, ckbRawTx } = ckbVirtualTxResult;
+
+  // Send BTC tx
+  const psbt = await sendRgbppUtxos({
+    ckbVirtualTx: ckbRawTx,
+    commitment,
+    tos: [toBtcAddress],
+    ckbCollector: collector,
+    from: btcAddress!,
+    source: btcDataSource,
+  });
+  psbt.signAllInputs(btcKeyPair);
+  psbt.finalizeAllInputs();
+
+  const btcTx = psbt.extractTransaction();
+  const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
+
+  console.log('BTC TxId: ', btcTxId);
+
+  await btcService.sendRgbppCkbTransaction({ btc_txid: btcTxId, ckb_virtual_result: ckbVirtualTxResult });
 
   try {
     const interval = setInterval(async () => {
