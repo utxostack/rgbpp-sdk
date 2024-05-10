@@ -1,1 +1,1 @@
-export * from '@rgbpp-sdk/service';
+export * from '@rgbpp-sdk/ckb';

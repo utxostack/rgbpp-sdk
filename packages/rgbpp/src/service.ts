@@ -1,1 +1,1 @@
-export * from '@rgbpp-sdk/btc';
+export * from '@rgbpp-sdk/service';
