@@ -3,10 +3,7 @@
 - xUDT directory: The examples for RGB++ UDT issuance, transfer, and leap
 - Spore directory: The examples for RGB++ Spore creation, transfer and leap
 
-
-## RGB++ xUDT Examples with Queue Service
-
-### How to Start
+## How to Start
 
 Copy the `.env.example` file to `.env`:
 
@@ -46,34 +43,64 @@ BTC_ASSETS_TOKEN=;
 BTC_ASSETS_ORIGIN=https://btc-test.app;
 ```
 
-### Leap xUDT from CKB to BTC
+
+## RGB++ xUDT Examples
+
+### RGB++ xUDT Launch on BTC
+
+### 1. Prepare Launch
+
+```shell
+npx ts-node example/rgbpp/xudt/launch/1-prepare-launch.ts
+```
+### 2. Launch RGB++ xUDT on BTC
+
+```shell
+npx ts-node example/rgbpp/xudt/launch/2-launch-rgbpp.ts
+```
+### 3. Distribute RGB++ xUDT on BTC
+
+```shell
+npx ts-node example/rgbpp/xudt/launch/3-distribute-rgbpp.ts
+```
+
+### RGB++ xUDT Transfer and Leap
+
+#### 1. Leap xUDT from CKB to BTC
 
 ```shell
 npx ts-node examples/rgbpp/xudt/1-ckb-leap-btc.ts 
 ```
 
-### Transfer RGB++ xUDT on BTC
+#### 2. Transfer RGB++ xUDT on BTC with Queue Service
 
 ```shell
 npx ts-node examples/rgbpp/xudt/2-btc-transfer.ts 
 ```
 
-### Leap RGB++ xUDT from BTC to CKB
+#### 3. Leap RGB++ xUDT from BTC to CKB
 
 ```shell
 npx ts-node examples/rgbpp/xudt/3-btc-jump-ckb.ts 
 ```
 
-### Unlock xUDT BTC time cells on CKB
+#### 4. Unlock xUDT BTC time cells on CKB
 
 A cron job in RGB++ Queue service will construct a transaction unlocking the mature BTC time cells to the their `target_ckb_address`.
 
+However, you can still manually unlock the spore BTC time cell through the following command
+
+Warning: Wait at least 6 BTC confirmation blocks to unlock the BTC time cells after 3-btc-jump-ckb.ts
+
+```shell
+npx ts-node examples/rgbpp/xudt/launch/4-unlock-btc-time.ts 
+```
 
 ## RGB++ Spore Examples
 
-**You can use RGB++ Queue service to complete spore transfer and leap, and the examples can be found in `examples/rgbpp/spore/queue`**
+### Launch Spores on BTC
 
-### Create RGB++ Cluster Cell
+#### 1. Create RGB++ Cluster Cell
 
 ```shell
 npx ts-node examples/rgbpp/spore/launch/1-prepare-cluster.ts
@@ -81,25 +108,27 @@ npx ts-node examples/rgbpp/spore/launch/1-prepare-cluster.ts
 npx ts-node examples/rgbpp/spore/launch/2-create-cluster.ts
 ```
 
-### Create RGB++ Spores with Cluster on BTC
+#### 2. Create RGB++ Spores with Cluster on BTC
 
 ```shell
 npx ts-node examples/rgbpp/spore/launch/3-create-spores.ts
 ```
 
-### Transfer RGB++ Spore on BTC with Queue Service
+### Transfer and Leap Spore
+
+#### 1. Transfer RGB++ Spore on BTC with Queue Service
 
 ```shell
 npx ts-node examples/rgbpp/spore/4-transfer-spore.ts
 ```
 
-### Leap RGB++ Spore from BTC to CKB
+#### 2. Leap RGB++ Spore from BTC to CKB
 
 ```shell
 npx ts-node examples/rgbpp/spore/5-leap-spore-to-ckb.ts
 ```
 
-### Unlock Spore BTC time cells on CKB
+#### 3. Unlock Spore BTC time cells on CKB
 
 A cron job in RGB++ Queue service will construct a transaction unlocking the mature BTC time cells to the their `target_ckb_address`.
 
@@ -111,7 +140,7 @@ However, you can still manually unlock the spore BTC time cell through the follo
 npx ts-node examples/rgbpp/spore/6-unlock-btc-time-cell.ts
 ```
 
-### Leap Spore from CKB to BTC
+#### 4. Leap Spore from CKB to BTC
 
 ```shell
 npx ts-node examples/rgbpp/spore/7-leap-spore-to-btc.ts

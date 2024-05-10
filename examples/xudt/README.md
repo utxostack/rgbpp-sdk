@@ -2,7 +2,7 @@
 
 The examples for xUDT issuance, mint and transfer on CKB
 
-### How to Start
+## How to Start
 
 Copy the `.env.example` file to `.env`:
 
