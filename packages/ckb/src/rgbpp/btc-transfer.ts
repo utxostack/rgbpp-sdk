@@ -23,6 +23,7 @@ import {
   compareInputs,
   estimateWitnessSize,
   genRgbppLockScript,
+  isRgbppCapacitySufficientForChange,
   throwErrorWhenRgbppCellsInvalid,
   throwErrorWhenTxInputsExceeded,
 } from '../utils/rgbpp';
@@ -96,6 +97,7 @@ export const genBtcTransferCkbVirtualTx = async ({
   let sumInputsCapacity = BigInt(0);
   const outputs: CKBComponents.CellOutput[] = [];
   const outputsData: Hex[] = [];
+  let needPaymasterCell = false;
 
   // The non-target RGBPP outputs correspond to the RGBPP inputs one-to-one, and the outputs are still bound to the sender’s BTC UTXOs
   const handleNonTargetRgbppCells = (targetRgbppOutputLen: number) => {
@@ -142,9 +144,9 @@ export const genBtcTransferCkbVirtualTx = async ({
 
     const rgbppCellCapacity = calculateRgbppCellCapacity(xudtType);
 
-    const needChange = collectResult.sumAmount > transferAmount;
+    const needRgbppChange = collectResult.sumAmount > transferAmount;
     // To simplify, when the xUDT does not need change, all the capacity of the inputs will be given to the receiver
-    const receiverOutputCapacity = needChange ? BigInt(rgbppTargetCells[0].output.capacity) : sumInputsCapacity;
+    const receiverOutputCapacity = needRgbppChange ? BigInt(rgbppTargetCells[0].output.capacity) : sumInputsCapacity;
     // The Vouts[0] for OP_RETURN and Vouts[1] for target transfer RGBPP assets
     outputs.push({
       lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
@@ -153,9 +155,11 @@ export const genBtcTransferCkbVirtualTx = async ({
     });
     outputsData.push(append0x(u128ToLe(transferAmount)));
 
-    if (needChange) {
-      // When the number of sender's inputs is greater than 1, the sender needs to recover the excess capacity.
-      const udtChangeCapacity = inputs.length > 1 ? sumInputsCapacity - receiverOutputCapacity : rgbppCellCapacity;
+    if (needRgbppChange) {
+      const isCapacitySufficient = isRgbppCapacitySufficientForChange(sumInputsCapacity, receiverOutputCapacity);
+      needPaymasterCell = !isCapacitySufficient;
+      // When the capacity of inputs is enough for the outputs, the sender needs to recover the excess capacity.
+      const udtChangeCapacity = isCapacitySufficient ? sumInputsCapacity - receiverOutputCapacity : rgbppCellCapacity;
       // The Vouts[2] for target change RGBPP assets
       outputs.push({
         lock: genRgbppLockScript(buildPreLockArgs(2), isMainnet),
@@ -169,7 +173,6 @@ export const genBtcTransferCkbVirtualTx = async ({
   }
 
   const cellDeps = [getRgbppLockDep(isMainnet), getXudtDep(isMainnet), getRgbppLockConfigDep(isMainnet)];
-  const needPaymasterCell = inputs.length < outputs.length;
   if (needPaymasterCell) {
     cellDeps.push(getSecp256k1CellDep(isMainnet));
   }
