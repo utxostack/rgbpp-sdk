@@ -255,6 +255,9 @@ export const throwErrorWhenRgbppCellsInvalid = (
   }
 };
 
+/**
+ * Check if the tx's unoccupied capacity is enough to create a new rgbpp-cell as a UDT change cell
+ */
 export const isRgbppCapacitySufficientForChange = (
   sumUdtInputsCapacity: bigint,
   receiverOutputCapacity: bigint,
