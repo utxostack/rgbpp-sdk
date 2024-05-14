@@ -1,0 +1,51 @@
+# Test the functionality of the rgbpp-sdk packages.
+
+name: integrationTest
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout rgbpp-sdk
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - uses: pnpm/action-setup@v3
+        name: Install -g pnpm
+        with:
+          version: 8
+          run_install: false
+
+      - name: Install dependencies
+        run: pnpm i
+
+      - name: Build packages
+        run: pnpm run build:packages
+
+      - name: Install dependencies
+        run: pnpm i
+
+      - name: Run tests
+        run: |
+          npx ts-node integrationTest/rgbppTest/shared/prepare-utxo.ts &&
+          npx ts-node integrationTest/rgbppTest/xudt/issuexudt/1-issue-xudt.ts &&
+          npx ts-node integrationTest/rgbppTest/xudt/1-ckb-leap-btc.ts &&
+          npx ts-node integrationTest/rgbppTest/xudt/2-btc-transfer.ts &&
+          npx ts-node integrationTest/rgbppTest/xudt/3-btc-leap-ckb.ts
+        env:
+          VITE_SERVICE_URL: ${{ secrets.VITE_SERVICE_URL }}
+          VITE_SERVICE_TOKEN: ${{ secrets.VITE_SERVICE_TOKEN }}
+          VITE_SERVICE_ORIGIN: ${{ secrets.VITE_SERVICE_ORIGIN }}
+          INTEGRATION_CKB_PRIVATE_KEY: ${{ secrets.INTEGRATION_CKB_PRIVATE_KEY }}
+          INTEGRATION_BTC_PRIVATE_KEY: ${{ secrets.INTEGRATION_BTC_PRIVATE_KEY }}
