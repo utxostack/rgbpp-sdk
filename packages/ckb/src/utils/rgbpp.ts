@@ -3,6 +3,7 @@ import { Hex, IndexerCell, RgbppCkbVirtualTx, RgbppTokenInfo, SpvClientCellTxPro
 import { append0x, remove0x, reverseHex, u32ToLe, u8ToHex, utf8ToHex } from './hex';
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
+  CKB_UNIT,
   RGBPP_TX_ID_PLACEHOLDER,
   RGBPP_TX_INPUTS_MAX_LENGTH,
   RGBPP_TX_WITNESS_MAX_SIZE,
@@ -28,7 +29,7 @@ import {
   RgbppCkbTxInputsExceededError,
   RgbppUtxoBindMultiTypeAssetsError,
 } from '../error';
-import { isScriptEqual, isUDTTypeSupported } from './ckb-tx';
+import { calculateRgbppCellCapacity, isScriptEqual, isUDTTypeSupported } from './ckb-tx';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
   return {
@@ -252,4 +253,15 @@ export const throwErrorWhenRgbppCellsInvalid = (
   if (!isTargetExist) {
     throw new NoRgbppLiveCellError('No rgbpp cells found with the xudt type script and the rgbpp lock args');
   }
+};
+
+/**
+ * Check if the tx's unoccupied capacity is enough to create a new rgbpp-cell as a UDT change cell
+ */
+export const isRgbppCapacitySufficientForChange = (
+  sumUdtInputsCapacity: bigint,
+  receiverOutputCapacity: bigint,
+): boolean => {
+  const rgbppOccupiedCapacity = calculateRgbppCellCapacity() - CKB_UNIT;
+  return sumUdtInputsCapacity > receiverOutputCapacity + rgbppOccupiedCapacity;
 };

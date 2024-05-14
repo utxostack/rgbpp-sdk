@@ -20,6 +20,7 @@ import {
   genBtcTimeLockScript,
   genRgbppLockScript,
   throwErrorWhenRgbppCellsInvalid,
+  isRgbppCapacitySufficientForChange,
 } from '../utils/rgbpp';
 import { Hex, IndexerCell } from '../types';
 import {
@@ -95,9 +96,10 @@ export const genBtcJumpCkbVirtualTx = async ({
     throw new Error('The lock script size of the to ckb address is too large');
   }
 
-  const needChange = sumAmount > transferAmount;
+  let needPaymasterCell = false;
+  const needRgbppChange = sumAmount > transferAmount;
   // To simplify, when the xUDT does not need change, all the capacity of the inputs will be given to the receiver
-  const receiverOutputCapacity = needChange ? BigInt(rgbppTargetCells[0].output.capacity) : sumInputsCapacity;
+  const receiverOutputCapacity = needRgbppChange ? BigInt(rgbppTargetCells[0].output.capacity) : sumInputsCapacity;
   // The BTC time cell does not need to be bound to the BTC UTXO
   const outputs: CKBComponents.CellOutput[] = [
     {
@@ -108,9 +110,11 @@ export const genBtcJumpCkbVirtualTx = async ({
   ];
   const outputsData = [append0x(u128ToLe(transferAmount))];
 
-  if (needChange) {
-    // When the number of sender's inputs is greater than 1, the sender needs to recover the excess capacity.
-    const udtChangeCapacity = inputs.length > 1 ? sumInputsCapacity - receiverOutputCapacity : rgbppCellCapacity;
+  if (needRgbppChange) {
+    const isCapacitySufficient = isRgbppCapacitySufficientForChange(sumInputsCapacity, receiverOutputCapacity);
+    needPaymasterCell = !isCapacitySufficient;
+    // When the capacity of inputs is enough for the outputs, the sender needs to recover the excess capacity.
+    const udtChangeCapacity = isCapacitySufficient ? sumInputsCapacity - receiverOutputCapacity : rgbppCellCapacity;
     outputs.push({
       // The Vouts[0] for OP_RETURN and Vouts[1] for RGBPP assets, BTC time cells don't need btc tx out_index
       lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
@@ -136,7 +140,6 @@ export const genBtcJumpCkbVirtualTx = async ({
   }
 
   const cellDeps = [getRgbppLockDep(isMainnet), getXudtDep(isMainnet), getRgbppLockConfigDep(isMainnet)];
-  const needPaymasterCell = inputs.length < outputs.length;
   if (needPaymasterCell) {
     cellDeps.push(getSecp256k1CellDep(isMainnet));
   }

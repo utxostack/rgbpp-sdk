@@ -10,9 +10,12 @@ import {
   isLockArgsSizeExceeded,
   isScriptEqual,
   isTypeAssetSupported,
+  checkCkbTxInputsCapacitySufficient,
 } from './ckb-tx';
-import { utf8ToHex } from '.';
 import { hexToBytes } from '@nervosnetwork/ckb-sdk-utils';
+import { Collector } from '../collector';
+import { NoLiveCellError } from '../error';
+import { utf8ToHex } from './hex';
 
 describe('ckb tx utils', () => {
   it('calculateTransactionFee', () => {
@@ -167,5 +170,124 @@ describe('ckb tx utils', () => {
         '0x123456',
       ),
     );
+  });
+
+  it('checkCkbTxInputsCapacitySufficient', { timeout: 20000 }, async () => {
+    const collector = new Collector({
+      ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
+      ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
+    });
+    const ckbTxWithDeadCell: CKBComponents.RawTransaction = {
+      cellDeps: [],
+      headerDeps: [],
+      inputs: [
+        {
+          previousOutput: {
+            index: '0x1',
+            txHash: '0x1a6d2b18faed84293b81ada9d00600a3cdb637fa43a5cfa20eb63934757352ea',
+          },
+          since: '0x0',
+        },
+      ],
+      outputs: [
+        {
+          capacity: '0x5e9f53e00',
+          lock: {
+            args: '0x01000000850cf65f93ed86e53044e94049ae76115ab25a4897de9247f947d390dcf4a4fc',
+            codeHash: '0x61ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248',
+            hashType: 'type',
+          },
+          type: {
+            args: '0x6b6a9580fc2aceb920c63adea27a667acfc180f67cf875b36f31b42546ac4920',
+            codeHash: '0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb',
+            hashType: 'type',
+          },
+        },
+      ],
+      outputsData: ['0x00743ba40b0000000000000000000000'],
+      version: '0x0',
+      witnesses: [],
+    };
+    try {
+      await checkCkbTxInputsCapacitySufficient(ckbTxWithDeadCell, collector);
+    } catch (error) {
+      if (error instanceof NoLiveCellError) {
+        expect(102).toBe(error.code);
+        expect('The cell with the specific out point is dead').toBe(error.message);
+      }
+    }
+
+    const invalidCkbTx: CKBComponents.RawTransaction = {
+      cellDeps: [],
+      headerDeps: [],
+      inputs: [
+        {
+          previousOutput: {
+            index: '0x0',
+            txHash: '0xeb6ea53459efc83755e4ede6ff54b7698913379e678c6018e1eac87241f964f2',
+          },
+          since: '0x0',
+        },
+        {
+          previousOutput: {
+            index: '0x0',
+            txHash: '0x80314ab559ddc7b2f9e523f968b2d930b1a7b53f690091e6666570b46f54b804',
+          },
+          since: '0x0',
+        },
+      ],
+      outputs: [
+        {
+          capacity: '0x65e9f53e00',
+          lock: {
+            args: '0x01000000850cf65f93ed86e53044e94049ae76115ab25a4897de9247f947d390dcf4a4fc',
+            codeHash: '0x61ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248',
+            hashType: 'type',
+          },
+          type: {
+            args: '0x6b6a9580fc2aceb920c63adea27a667acfc180f67cf875b36f31b42546ac4920',
+            codeHash: '0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb',
+            hashType: 'type',
+          },
+        },
+      ],
+      outputsData: ['0x00743ba40b0000000000000000000000'],
+      version: '0x0',
+      witnesses: [],
+    };
+    expect(false).toBe(await checkCkbTxInputsCapacitySufficient(invalidCkbTx, collector));
+
+    const ckbTx: CKBComponents.RawTransaction = {
+      cellDeps: [],
+      headerDeps: [],
+      inputs: [
+        {
+          previousOutput: {
+            index: '0x0',
+            txHash: '0xeb6ea53459efc83755e4ede6ff54b7698913379e678c6018e1eac87241f964f2',
+          },
+          since: '0x0',
+        },
+      ],
+      outputs: [
+        {
+          capacity: '0x5e9f53e00',
+          lock: {
+            args: '0x01000000850cf65f93ed86e53044e94049ae76115ab25a4897de9247f947d390dcf4a4fc',
+            codeHash: '0x61ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248',
+            hashType: 'type',
+          },
+          type: {
+            args: '0x6b6a9580fc2aceb920c63adea27a667acfc180f67cf875b36f31b42546ac4920',
+            codeHash: '0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb',
+            hashType: 'type',
+          },
+        },
+      ],
+      outputsData: ['0x00743ba40b0000000000000000000000'],
+      version: '0x0',
+      witnesses: [],
+    };
+    expect(true).toBe(await checkCkbTxInputsCapacitySufficient(ckbTx, collector));
   });
 });
