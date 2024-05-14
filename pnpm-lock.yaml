@@ -156,7 +156,7 @@ importers:
         specifier: ^5.4.2
         version: 5.4.2
 
-  examples/xudt:
+  examples/xudt-on-ckb:
     dependencies:
       '@nervosnetwork/ckb-sdk-utils':
         specifier: ^0.109.1

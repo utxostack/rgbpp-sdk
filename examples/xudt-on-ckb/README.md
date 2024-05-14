@@ -13,7 +13,7 @@ cd examples/xudt && cp .env.example .env
 Update the configuration values:
 
 ```yaml
-# Ture for CKB Mainnet and false for CKB Testnet, the default value is false
+# True for CKB Mainnet and false for CKB Testnet, the default value is false
 IS_MAINNET=false
 
 # The CKB secp256k1 private key whose format is 32bytes hex string with 0x prefix

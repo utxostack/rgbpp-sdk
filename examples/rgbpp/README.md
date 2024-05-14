@@ -14,7 +14,7 @@ cd examples/rgbpp && cp .env.example .env
 Update the configuration values:
 
 ```yaml
-# Ture for CKB and BTC Mainnet and false for CKB and BTC Testnet, the default value is false
+# True for CKB and BTC Mainnet and false for CKB and BTC Testnet, the default value is false
 IS_MAINNET=false
 
 # CKB Variables
@@ -37,6 +37,7 @@ BTC_PRIVATE_KEY=private-key
 VITE_BTC_SERVICE_URL=https://btc-assets-api.testnet.mibao.pro;
 
 # The BTC assets api token which should be matched with IS_MAINNET
+# To get an access token, please refer to https://github.com/ckb-cell/rgbpp-sdk/tree/develop/packages/service#get-an-access-token
 VITE_BTC_SERVICE_TOKEN=;
 
 # The BTC assets api origin which should be matched with IS_MAINNET
@@ -48,17 +49,17 @@ VITE_BTC_SERVICE_ORIGIN=https://btc-test.app;
 
 ### RGB++ xUDT Launch on BTC
 
-### 1. Prepare Launch
+#### 1. Prepare Launch
 
 ```shell
 npx ts-node xudt/launch/1-prepare-launch.ts
 ```
-### 2. Launch RGB++ xUDT on BTC
+#### 2. Launch RGB++ xUDT on BTC
 
 ```shell
 npx ts-node xudt/launch/2-launch-rgbpp.ts
 ```
-### 3. Distribute RGB++ xUDT on BTC
+#### 3. Distribute RGB++ xUDT on BTC
 
 ```shell
 npx ts-node xudt/launch/3-distribute-rgbpp.ts
@@ -93,7 +94,7 @@ However, you can still manually unlock the spore BTC time cell through the follo
 Warning: Wait at least 6 BTC confirmation blocks to unlock the BTC time cells after 3-btc-leap-ckb.ts
 
 ```shell
-npx ts-node xudt/launch/4-unlock-btc-time.ts 
+npx ts-node xudt/4-unlock-btc-time.ts 
 ```
 
 ## RGB++ Spore Examples

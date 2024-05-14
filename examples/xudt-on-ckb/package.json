@@ -1,5 +1,5 @@
 {
-  "name": "xudt-examples",
+  "name": "xudt-on-ckb-examples",
   "version": "0.1.0",
   "description": "Examples used for xUDT on CKB assets issuance and transfer",
   "private": true,
