@@ -32,15 +32,14 @@ export class BtcAssetsApiBase implements BaseApis {
       await this.init();
     }
 
-    const packedParams = params ? '?' + new URLSearchParams(pickBy(params, (val) => val !== undefined)).toString() : '';
-    const withOriginHeaders = this.origin ? { origin: this.origin } : undefined;
-    const withAuthHeaders = requireToken && this.token ? { Authorization: `Bearer ${this.token}` } : undefined;
+    const pickedParams = pickBy(params, (val) => val !== undefined);
+    const packedParams = params ? '?' + new URLSearchParams(pickedParams).toString() : '';
     const url = `${this.url}${route}${packedParams}`;
     const res = await fetch(url, {
       method,
       headers: {
-        ...withOriginHeaders,
-        ...withAuthHeaders,
+        authorization: this.token ? `Bearer ${this.token}` : undefined,
+        origin: this.origin,
         ...headers,
       },
       ...otherOptions,
