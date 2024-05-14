@@ -96,7 +96,7 @@ export class BtcAssetsApiBase implements BaseApis {
     if (status !== 200 && status !== 404 && !allow404) {
       throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_RESPONSE_ERROR, comment, context);
     }
-    if (status !== 200) {
+    if (status === 404 && allow404) {
       return undefined as T;
     }
 
