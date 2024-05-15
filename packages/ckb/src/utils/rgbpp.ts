@@ -240,6 +240,7 @@ export const throwErrorWhenRgbppCellsInvalid = (
   if (typeCells.length === 0) {
     throw new NoRgbppLiveCellError('No rgbpp cells found with the rgbpp lock args');
   }
+
   const isUDTTypeNotSupported = typeCells.some(
     (cell) => cell.output.type && !isUDTTypeSupported(cell.output.type, isMainnet),
   );

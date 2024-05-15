@@ -29,14 +29,22 @@ export const isUDTTypeSupported = (type: CKBComponents.Script, isMainnet: boolea
   return xudtType === typeAsset;
 };
 
-export const isClusterSporeTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
+export const isSporeTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
   const sporeType = serializeScript(getSporeTypeScript(isMainnet));
   const typeAsset = serializeScript({
     ...type,
     args: '',
   });
+  return sporeType === typeAsset;
+};
+
+export const isClusterSporeTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
+  const typeAsset = serializeScript({
+    ...type,
+    args: '',
+  });
   const clusterType = serializeScript(getClusterTypeScript(isMainnet));
-  return sporeType === typeAsset || clusterType === typeAsset;
+  return isSporeTypeSupported(type, isMainnet) || clusterType === typeAsset;
 };
 
 export const isTypeAssetSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
