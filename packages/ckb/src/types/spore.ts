@@ -51,7 +51,7 @@ export interface SporeCreateVirtualTxResult {
   clusterCell: IndexerCell;
 }
 
-export interface BuildAppendingIssuerCellToSporeCreateTx {
+export interface BuildAppendingIssuerCellTxParams {
   // The issuer ckb address
   issuerAddress: Address;
   // The collector that collects CKB live cells and transactions

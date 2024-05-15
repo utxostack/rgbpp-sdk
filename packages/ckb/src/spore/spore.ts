@@ -9,7 +9,7 @@ import {
 import { buildPreLockArgs, calculateCommitment, genRgbppLockScript } from '../utils/rgbpp';
 import {
   AppendIssuerCellToSporeCreate,
-  BuildAppendingIssuerCellToSporeCreateTx,
+  BuildAppendingIssuerCellTxParams,
   CreateSporeCkbVirtualTxParams,
   Hex,
   SporeCreateVirtualTxResult,
@@ -170,7 +170,7 @@ export const buildAppendingIssuerCellToSporesCreateTx = async ({
   sumInputsCapacity,
   witnessLockPlaceholderSize = SECP256K1_WITNESS_LOCK_SIZE,
   ckbFeeRate,
-}: BuildAppendingIssuerCellToSporeCreateTx): Promise<CKBComponents.RawTransactionToSign> => {
+}: BuildAppendingIssuerCellTxParams): Promise<CKBComponents.RawTransactionToSign> => {
   const isMainnet = issuerAddress.startsWith('ckb');
   const rawTx = ckbRawTx as CKBComponents.RawTransactionToSign;
 
