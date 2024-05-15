@@ -272,7 +272,7 @@ export const genTransferSporeCkbVirtualTx = async ({
   };
   const sporeCells = await collector.getCells({ lock: sporeRgbppLock, isDataMustBeEmpty: false });
 
-  throwErrorWhenSporeCellsInvalid(sporeCells, sporeTypeBytes);
+  throwErrorWhenSporeCellsInvalid(sporeCells, sporeTypeBytes, isMainnet);
 
   const sporeCell = sporeCells![0];
 

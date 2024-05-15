@@ -117,7 +117,7 @@ describe('spore utils', () => {
     });
 
     try {
-      throwErrorWhenSporeCellsInvalid([], sporeTypeBytes);
+      throwErrorWhenSporeCellsInvalid([], sporeTypeBytes, false);
     } catch (error) {
       if (error instanceof NoRgbppLiveCellError) {
         expect(104).toBe(error.code);
@@ -172,11 +172,44 @@ describe('spore utils', () => {
       },
     ];
     try {
-      throwErrorWhenSporeCellsInvalid(multiSporeCells, sporeTypeBytes);
+      throwErrorWhenSporeCellsInvalid(multiSporeCells, sporeTypeBytes, false);
     } catch (error) {
       if (error instanceof RgbppUtxoBindMultiTypeAssetsError) {
         expect(110).toBe(error.code);
         expect('The BTC UTXO must not be bound to multiple CKB cells').toBe(error.message);
+      }
+    }
+
+    const noSupportedSporeCell: IndexerCell[] = [
+      {
+        blockNumber: '0x0',
+        outPoint: {
+          txHash: '0xf2bfcd0ec5f7b2a33577168b7a647e71cc81a731560a7ad23b1c31fc08bbe1bb',
+          index: '0x1',
+        },
+        output: {
+          capacity: '0x460913c00',
+          lock: {
+            args: '0x0200000050b34b391fd8f8084bf9b6af4368350c1510df4964496b87495ebee4bd8d86d5',
+            codeHash: '0x61ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248',
+            hashType: 'type',
+          },
+          type: {
+            args: '0xf2bfcd0ec5f7b2a33577168b7a647e71cc81a731560a7ad23b1c31fc08bbe1bb',
+            codeHash: '0xf2bfcd0ec5f7b2a33577168b7a647e71cc81a731560a7ad23b1c31fc08bbe1bb',
+            hashType: 'data1',
+          },
+        },
+        outputData: '0x2d000000100000001e0000002d0000000a000000746578742f706c61696e0b00000046697273742053706f7265',
+        txIndex: '0x0',
+      },
+    ];
+    try {
+      throwErrorWhenSporeCellsInvalid(noSupportedSporeCell, sporeTypeBytes, false);
+    } catch (error) {
+      if (error instanceof RgbppSporeTypeMismatchError) {
+        expect(111).toBe(error.code);
+        expect('The cell type is not the supported spore type script').toBe(error.message);
       }
     }
 
@@ -205,7 +238,7 @@ describe('spore utils', () => {
       },
     ];
     try {
-      throwErrorWhenSporeCellsInvalid(noTargetCells, sporeTypeBytes);
+      throwErrorWhenSporeCellsInvalid(noTargetCells, sporeTypeBytes, false);
     } catch (error) {
       if (error instanceof RgbppSporeTypeMismatchError) {
         expect(111).toBe(error.code);
