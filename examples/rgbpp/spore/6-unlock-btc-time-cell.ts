@@ -2,7 +2,7 @@ import { buildSporeBtcTimeCellsSpentTx, signBtcTimeCellSpentTx } from 'rgbpp';
 import { CKB_PRIVATE_KEY, btcService, ckbAddress, collector, isMainnet } from '../env';
 import { sendCkbTx, getBtcTimeLockScript } from 'rgbpp/ckb';
 
-// Warning: Wait at least 6 BTC confirmation blocks to spend the BTC time cells after 4-btc-jump-ckb.ts
+// Warning: Wait at least 6 BTC confirmation blocks to spend the BTC time cells after 5-leap-spore-to-ckb.ts
 const unlockSporeBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }) => {
   const btcTimeCells = await collector.getCells({
     lock: {
