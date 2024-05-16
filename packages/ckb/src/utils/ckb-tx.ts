@@ -51,6 +51,9 @@ export const isTypeAssetSupported = (type: CKBComponents.Script, isMainnet: bool
   return isUDTTypeSupported(type, isMainnet) || isClusterSporeTypeSupported(type, isMainnet);
 };
 
+const CELL_CAPACITY_SIZE = 8;
+const UDT_CELL_DATA_SIZE = 16;
+
 // The BTC_TIME_CELL_INCREASED_SIZE is related to the specific lock script.
 // We assume that the maximum length of lock script args is 26 bytes. If it exceeds, an error will be thrown.
 const LOCK_ARGS_HEX_MAX_SIZE = 26 * 2;
@@ -71,7 +74,8 @@ const RGBPP_LOCK_SIZE = 32 + 1 + 36;
 export const calculateRgbppCellCapacity = (xudtType?: CKBComponents.Script): bigint => {
   const typeArgsSize = xudtType ? remove0x(xudtType.args).length / 2 : 32;
   const udtTypeSize = 33 + typeArgsSize;
-  const cellSize = RGBPP_LOCK_SIZE + udtTypeSize + 8 + 16 + BTC_TIME_CELL_INCREASED_SIZE;
+  const cellSize =
+    RGBPP_LOCK_SIZE + udtTypeSize + CELL_CAPACITY_SIZE + UDT_CELL_DATA_SIZE + BTC_TIME_CELL_INCREASED_SIZE;
   return BigInt(cellSize + 1) * CKB_UNIT;
 };
 
@@ -82,7 +86,9 @@ const DEFAULT_UDT_ARGS_SIZE = 32;
 export const calculateUdtCellCapacity = (lock: CKBComponents.Script, udtType?: CKBComponents.Script): bigint => {
   const lockArgsSize = remove0x(lock.args).length / 2;
   const typeArgsSize = udtType ? remove0x(udtType.args).length / 2 : DEFAULT_UDT_ARGS_SIZE;
-  const cellSize = 33 + lockArgsSize + 33 + typeArgsSize + 8 + 16;
+  const lockSize = 33 + lockArgsSize;
+  const typeSize = 33 + typeArgsSize;
+  const cellSize = lockSize + typeSize + CELL_CAPACITY_SIZE + UDT_CELL_DATA_SIZE;
   return BigInt(cellSize + 1) * CKB_UNIT;
 };
 
@@ -91,7 +97,7 @@ export const calculateXudtTokenInfoCellCapacity = (tokenInfo: RgbppTokenInfo, lo
   const lockSize = remove0x(lock.args).length / 2 + 33;
   const cellDataSize = remove0x(encodeRgbppTokenInfo(tokenInfo)).length / 2;
   const uniqueTypeSize = 32 + 1 + 20;
-  const cellSize = lockSize + uniqueTypeSize + 8 + cellDataSize;
+  const cellSize = lockSize + uniqueTypeSize + CELL_CAPACITY_SIZE + cellDataSize;
   return BigInt(cellSize) * CKB_UNIT;
 };
 
@@ -101,7 +107,7 @@ export const calculateRgbppTokenInfoCellCapacity = (tokenInfo: RgbppTokenInfo, i
   const lockSize = remove0x(btcTimeLock.args).length / 2 + 33;
   const cellDataSize = remove0x(encodeRgbppTokenInfo(tokenInfo)).length / 2;
   const typeSize = 32 + 1 + 20;
-  const cellSize = lockSize + typeSize + 8 + cellDataSize;
+  const cellSize = lockSize + typeSize + CELL_CAPACITY_SIZE + cellDataSize;
   return BigInt(cellSize) * CKB_UNIT;
 };
 
@@ -119,7 +125,7 @@ export const generateUniqueTypeArgs = (firstInput: CKBComponents.CellInput, firs
 export const calculateRgbppClusterCellCapacity = (clusterData: RawClusterData): bigint => {
   const clusterDataSize = packRawClusterData(clusterData).length;
   const clusterTypeSize = 32 + 1 + 32;
-  const cellSize = RGBPP_LOCK_SIZE + clusterTypeSize + 8 + clusterDataSize;
+  const cellSize = RGBPP_LOCK_SIZE + clusterTypeSize + CELL_CAPACITY_SIZE + clusterDataSize;
   return BigInt(cellSize + 1) * CKB_UNIT;
 };
 
@@ -135,7 +141,7 @@ export const calculateRgbppClusterCellCapacity = (clusterData: RawClusterData): 
 export const calculateRgbppSporeCellCapacity = (sporeData: SporeDataProps): bigint => {
   const sporeDataSize = packRawSporeData(sporeData).length;
   const sporeTypeSize = 32 + 1 + 32;
-  const cellSize = RGBPP_LOCK_SIZE + sporeTypeSize + 8 + sporeDataSize + BTC_TIME_CELL_INCREASED_SIZE;
+  const cellSize = RGBPP_LOCK_SIZE + sporeTypeSize + CELL_CAPACITY_SIZE + sporeDataSize + BTC_TIME_CELL_INCREASED_SIZE;
   return BigInt(cellSize + 1) * CKB_UNIT;
 };
 
