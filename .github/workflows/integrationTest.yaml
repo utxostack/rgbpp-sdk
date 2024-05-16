@@ -44,8 +44,8 @@ jobs:
           npx ts-node integrationTest/rgbppTest/xudt/2-btc-transfer.ts &&
           npx ts-node integrationTest/rgbppTest/xudt/3-btc-leap-ckb.ts
         env:
-          VITE_SERVICE_URL: ${{ secrets.VITE_SERVICE_URL }}
-          VITE_SERVICE_TOKEN: ${{ secrets.VITE_SERVICE_TOKEN }}
-          VITE_SERVICE_ORIGIN: ${{ secrets.VITE_SERVICE_ORIGIN }}
+          VITE_SERVICE_URL: ${{ secrets.SERVICE_URL }}
+          VITE_SERVICE_TOKEN: ${{ secrets.SERVICE_TOKEN }}
+          VITE_SERVICE_ORIGIN: ${{ secrets.SERVICE_ORIGIN }}
           INTEGRATION_CKB_PRIVATE_KEY: ${{ secrets.INTEGRATION_CKB_PRIVATE_KEY }}
           INTEGRATION_BTC_PRIVATE_KEY: ${{ secrets.INTEGRATION_BTC_PRIVATE_KEY }}
