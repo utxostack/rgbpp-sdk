@@ -9,6 +9,7 @@ import {
 import { buildPreLockArgs, calculateCommitment, genRgbppLockScript } from '../utils/rgbpp';
 import {
   AppendIssuerCellToSporeCreate,
+  BuildAppendingIssuerCellTxParams,
   CreateSporeCkbVirtualTxParams,
   Hex,
   SporeCreateVirtualTxResult,
@@ -56,8 +57,6 @@ import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
  * @param collector The collector that collects CKB live cells and transactions
  * @param clusterRgbppLockArgs The cluster rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param sporeDataList The spore's data list, including name and description.
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
- * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  */
 export const genCreateSporeCkbVirtualTx = async ({
   collector,
@@ -155,27 +154,26 @@ export const genCreateSporeCkbVirtualTx = async ({
   };
 };
 
+const CELL_DEP_SIZE = 32 + 4 + 1;
+
 /**
- * Append paymaster cell to the ckb transaction inputs and sign the transaction with paymaster cell's secp256k1 private key
- * @param secp256k1PrivateKey The Secp256k1 private key of the paymaster cells maintainer
+ * Append paymaster cell to the ckb transaction inputs and build the raw tx to be signed for spores creation
  * @param issuerAddress The issuer ckb address
  * @param collector The collector that collects CKB live cells and transactions
  * @param ckbRawTx CKB raw transaction
  * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
+ * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 65
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  */
-export const appendIssuerCellToSporesCreate = async ({
-  secp256k1PrivateKey,
+export const buildAppendingIssuerCellToSporesCreateTx = async ({
   issuerAddress,
   collector,
   ckbRawTx,
   sumInputsCapacity,
-  isMainnet,
+  witnessLockPlaceholderSize = SECP256K1_WITNESS_LOCK_SIZE,
   ckbFeeRate,
-}: AppendIssuerCellToSporeCreate): Promise<CKBComponents.RawTransaction> => {
+}: BuildAppendingIssuerCellTxParams): Promise<CKBComponents.RawTransactionToSign> => {
   const rawTx = ckbRawTx as CKBComponents.RawTransactionToSign;
-
-  const rgbppInputsLength = rawTx.inputs.length;
 
   const sumOutputsCapacity: bigint = rawTx.outputs
     .map((output) => BigInt(output.capacity))
@@ -205,12 +203,44 @@ export const appendIssuerCellToSporesCreate = async ({
   rawTx.outputs = [...rawTx.outputs, changeOutput];
   rawTx.outputsData = [...rawTx.outputsData, '0x'];
 
-  rawTx.cellDeps = [...rawTx.cellDeps, getSecp256k1CellDep(isMainnet)];
-
-  const txSize = getTransactionSize(rawTx) + SECP256K1_WITNESS_LOCK_SIZE;
+  const txSize = getTransactionSize(rawTx) + witnessLockPlaceholderSize + CELL_DEP_SIZE;
   const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
   changeCapacity -= estimatedTxFee;
   rawTx.outputs[rawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
+
+  return rawTx;
+};
+
+/**
+ * Append paymaster cell to the ckb transaction inputs and sign the transaction with paymaster cell's secp256k1 private key
+ * @param secp256k1PrivateKey The Secp256k1 private key of the paymaster cells maintainer
+ * @param issuerAddress The issuer ckb address
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param ckbRawTx CKB raw transaction
+ * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ */
+export const appendIssuerCellToSporesCreate = async ({
+  secp256k1PrivateKey,
+  issuerAddress,
+  collector,
+  ckbRawTx,
+  sumInputsCapacity,
+  isMainnet,
+  ckbFeeRate,
+}: AppendIssuerCellToSporeCreate): Promise<CKBComponents.RawTransaction> => {
+  const rawTx = await buildAppendingIssuerCellToSporesCreateTx({
+    issuerAddress,
+    collector,
+    ckbRawTx,
+    sumInputsCapacity,
+    ckbFeeRate,
+  });
+
+  rawTx.cellDeps = [...rawTx.cellDeps, getSecp256k1CellDep(isMainnet)];
+
+  const rgbppInputsLength = ckbRawTx.inputs.length;
+  const issuerLock = addressToScript(issuerAddress);
 
   const keyMap = new Map<string, string>();
   keyMap.set(scriptToHash(issuerLock), secp256k1PrivateKey);
