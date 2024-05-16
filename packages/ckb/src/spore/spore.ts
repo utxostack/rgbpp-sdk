@@ -154,6 +154,8 @@ export const genCreateSporeCkbVirtualTx = async ({
   };
 };
 
+const CELL_DEP_SIZE = 32 + 4 + 1;
+
 /**
  * Append paymaster cell to the ckb transaction inputs and build the raw tx to be signed for spores creation
  * @param issuerAddress The issuer ckb address
@@ -171,7 +173,6 @@ export const buildAppendingIssuerCellToSporesCreateTx = async ({
   witnessLockPlaceholderSize = SECP256K1_WITNESS_LOCK_SIZE,
   ckbFeeRate,
 }: BuildAppendingIssuerCellTxParams): Promise<CKBComponents.RawTransactionToSign> => {
-  const isMainnet = issuerAddress.startsWith('ckb');
   const rawTx = ckbRawTx as CKBComponents.RawTransactionToSign;
 
   const sumOutputsCapacity: bigint = rawTx.outputs
@@ -202,11 +203,7 @@ export const buildAppendingIssuerCellToSporesCreateTx = async ({
   rawTx.outputs = [...rawTx.outputs, changeOutput];
   rawTx.outputsData = [...rawTx.outputsData, '0x'];
 
-  if (witnessLockPlaceholderSize === SECP256K1_WITNESS_LOCK_SIZE) {
-    rawTx.cellDeps = [...rawTx.cellDeps, getSecp256k1CellDep(isMainnet)];
-  }
-
-  const txSize = getTransactionSize(rawTx) + witnessLockPlaceholderSize;
+  const txSize = getTransactionSize(rawTx) + witnessLockPlaceholderSize + CELL_DEP_SIZE;
   const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
   changeCapacity -= estimatedTxFee;
   rawTx.outputs[rawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
@@ -239,6 +236,8 @@ export const appendIssuerCellToSporesCreate = async ({
     sumInputsCapacity,
     ckbFeeRate,
   });
+
+  rawTx.cellDeps = [...rawTx.cellDeps, getSecp256k1CellDep(isMainnet)];
 
   const rgbppInputsLength = ckbRawTx.inputs.length;
   const issuerLock = addressToScript(issuerAddress);
