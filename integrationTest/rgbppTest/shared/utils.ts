@@ -7,7 +7,7 @@ export async function getFastestFeeRate() {
   // const { service } = getDeployVariables();
 
   const fees = await btcService.getBtcRecommendedFeeRates();
-  return Math.ceil(fees.fastestFee * 10);
+  return Math.ceil(fees.fastestFee * 3);
 }
 
 export async function writeStepLog(step: string, data: string | object) {

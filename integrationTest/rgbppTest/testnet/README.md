@@ -1,0 +1,1 @@
+execute logs for testnet
