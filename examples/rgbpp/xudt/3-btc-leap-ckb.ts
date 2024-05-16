@@ -1,25 +1,27 @@
-import { buildRgbppLockArgs } from 'rgbpp/ckb';
-import { genTransferSporeCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
-import { getSporeTypeScript, Hex } from 'rgbpp/ckb';
+import { buildRgbppLockArgs, getXudtTypeScript } from 'rgbpp/ckb';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../env';
+import { genBtcJumpCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
+import { isMainnet, collector, btcAddress, btcKeyPair, btcService, btcDataSource } from '../env';
 
-interface SporeTransferParams {
-  sporeRgbppLockArgs: Hex;
-  toBtcAddress: string;
-  sporeTypeArgs: Hex;
+interface LeapToCkbParams {
+  rgbppLockArgsList: string[];
+  toCkbAddress: string;
+  xudtTypeArgs: string;
+  transferAmount: bigint;
 }
 
-const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }: SporeTransferParams) => {
-  const sporeTypeBytes = serializeScript({
-    ...getSporeTypeScript(isMainnet),
-    args: sporeTypeArgs,
-  });
+const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs, transferAmount }: LeapToCkbParams) => {
+  const xudtType: CKBComponents.Script = {
+    ...getXudtTypeScript(isMainnet),
+    args: xudtTypeArgs,
+  };
 
-  const ckbVirtualTxResult = await genTransferSporeCkbVirtualTx({
+  const ckbVirtualTxResult = await genBtcJumpCkbVirtualTx({
     collector,
-    sporeRgbppLockArgs,
-    sporeTypeBytes,
+    rgbppLockArgsList,
+    xudtTypeBytes: serializeScript(xudtType),
+    transferAmount,
+    toCkbAddress,
     isMainnet,
   });
 
@@ -29,11 +31,10 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
-    tos: [toBtcAddress],
+    tos: [btcAddress!],
     ckbCollector: collector,
     from: btcAddress!,
     source: btcDataSource,
-    feeRate: 30,
   });
   psbt.signAllInputs(btcKeyPair);
   psbt.finalizeAllInputs();
@@ -53,7 +54,7 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }
         clearInterval(interval);
         if (state === 'completed') {
           const { txhash: txHash } = await btcService.getRgbppTransactionHash(btcTxId);
-          console.info(`Rgbpp spore has been transferred on BTC and the related CKB tx hash is ${txHash}`);
+          console.info(`Rgbpp asset has been jumped from BTC to CKB and the related CKB tx hash is ${txHash}`);
         } else {
           console.warn(`Rgbpp CKB transaction failed and the reason is ${failedReason} `);
         }
@@ -64,10 +65,10 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }
   }
 };
 
-// Use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
-transferSpore({
-  sporeRgbppLockArgs: buildRgbppLockArgs(2, 'd5868dbde4be5e49876b496449df10150c356843afb6f94b08f8d81f394bb350'),
-  toBtcAddress: 'tb1qhp9fh9qsfeyh0yhewgu27ndqhs5qlrqwau28m7',
-  sporeTypeArgs: '0x42898ea77062256f46e8f1b861d526ae47810ecc51ab50477945d5fa90452706',
+leapFromBtcToCKB({
+  rgbppLockArgsList: [buildRgbppLockArgs(1, '6edd4b9327506fab09fb9a0f5e5f35136a6a94bd4c9dd79af04921618fa6c800')],
+  toCkbAddress: 'ckt1qrfrwcdnvssswdwpn3s9v8fp87emat306ctjwsm3nmlkjg8qyza2cqgqq9kxr7vy7yknezj0vj0xptx6thk6pwyr0sxamv6q',
+  xudtTypeArgs: '0x1ba116c119d1cfd98a53e9d1a615cf2af2bb87d95515c9d217d367054cfc696b',
+  transferAmount: BigInt(800_0000_0000),
 });

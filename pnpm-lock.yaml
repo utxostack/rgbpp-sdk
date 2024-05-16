@@ -136,34 +136,41 @@ importers:
 
   examples/rgbpp:
     dependencies:
-      '@exact-realty/multipart-parser':
-        specifier: ^1.0.13
-        version: 1.0.13
       '@nervosnetwork/ckb-sdk-utils':
         specifier: ^0.109.1
         version: 0.109.1
-      '@rgbpp-sdk/btc':
-        specifier: workspace:^
-        version: link:../../packages/btc
-      '@rgbpp-sdk/ckb':
-        specifier: workspace:^
-        version: link:../../packages/ckb
-      '@rgbpp-sdk/service':
-        specifier: workspace:^
-        version: link:../../packages/service
-      '@spore-sdk/core':
-        specifier: ^0.2.0-beta.6
-        version: 0.2.0-beta.6(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
-      axios:
-        specifier: ^1.6.8
-        version: 1.6.8
+      rgbpp:
+        specifier: workspace:*
+        version: link:../../packages/rgbpp
     devDependencies:
+      '@types/dotenv':
+        specifier: ^8.2.0
+        version: 8.2.0
       '@types/node':
         specifier: ^20.11.28
         version: 20.11.28
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.4.5
       typescript:
         specifier: ^5.4.2
         version: 5.4.2
+
+  examples/xudt-on-ckb:
+    dependencies:
+      '@nervosnetwork/ckb-sdk-utils':
+        specifier: ^0.109.1
+        version: 0.109.1
+      rgbpp:
+        specifier: 0.1.0
+        version: link:../../packages/rgbpp
+    devDependencies:
+      '@types/dotenv':
+        specifier: ^8.2.0
+        version: 8.2.0
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.4.5
 
   packages/btc:
     dependencies:
@@ -1699,6 +1706,13 @@ packages:
     resolution: {integrity: sha512-VvMETBojHvhX4f+ocYTySQlXMZfxKV3Jyb7iCWlWaC+exbedkv6Iv2bZZqI736qXjVguH6IH7bzwMBMfTT+zuQ==}
     dev: false
 
+  /@types/dotenv@8.2.0:
+    resolution: {integrity: sha512-ylSC9GhfRH7m1EUXBXofhgx4lUWmFeQDINW5oLuS+gxWdfUeW4zJdeVTYVkexEW+e2VUvlZR2kGnGGipAWR7kw==}
+    deprecated: This is a stub types definition. dotenv provides its own type definitions, so you do not need this installed.
+    dependencies:
+      dotenv: 16.4.5
+    dev: true
+
   /@types/estree@1.0.5:
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
     dev: true
@@ -2983,6 +2997,11 @@ packages:
   /domain-browser@4.23.0:
     resolution: {integrity: sha512-ArzcM/II1wCCujdCNyQjXrAFwS4mrLh4C7DZWlaI8mdh7h3BfKdNd3bKXITfl2PT9FtfQqaGvhi1vPRQPimjGA==}
     engines: {node: '>=10'}
+    dev: true
+
+  /dotenv@16.4.5:
+    resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
+    engines: {node: '>=12'}
     dev: true
 
   /dotenv@8.6.0:

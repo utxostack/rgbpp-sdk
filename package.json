@@ -12,7 +12,7 @@
     "lint:packages": "turbo run lint --filter=./{packages,examples}/*",
     "format": "prettier --write '{packages,apps,examples}/**/*.{js,jsx,ts,tsx}'",
     "clean": "turbo run clean",
-    "clean:packages": "turbo run clean --filter=./packags/*",
+    "clean:packages": "turbo run clean --filter=./packages/*",
     "clean:dependencies": "pnpm clean:sub-dependencies && rimraf node_modules",
     "clean:sub-dependencies": "rimraf packages/**/node_modules apps/**/node_modules",
     "release:packages": "pnpm run clean:packages && pnpm run build:packages && changeset publish"

@@ -1,6 +1,5 @@
-import { AddressPrefix, addressToScript, getTransactionSize, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
+import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 import {
-  Collector,
   MAX_FEE,
   NoLiveCellError,
   SECP256K1_WITNESS_LOCK_SIZE,
@@ -10,23 +9,13 @@ import {
   calculateTransactionFee,
   genRgbppLockScript,
   getSecp256k1CellDep,
-} from '@rgbpp-sdk/ckb';
+} from 'rgbpp/ckb';
+import { ckbAddress, isMainnet, collector, CKB_PRIVATE_KEY } from '../../env';
 import { CLUSTER_DATA } from './0-cluster-info';
 
-// CKB SECP256K1 private key
-const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
-
 const prepareClusterCell = async ({ outIndex, btcTxId }: { outIndex: number; btcTxId: string }) => {
-  const collector = new Collector({
-    ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
-    ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
-  });
-  const isMainnet = false;
-  const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
-    prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
-  });
-  const masterLock = addressToScript(address);
-  console.log('ckb address: ', address);
+  const masterLock = addressToScript(ckbAddress);
+  console.log('ckb address: ', ckbAddress);
 
   // The capacity required to launch cells is determined by the token info cell capacity, and transaction fee.
   const clusterCellCapacity = calculateRgbppClusterCellCapacity(CLUSTER_DATA);
@@ -75,7 +64,7 @@ const prepareClusterCell = async ({ outIndex, btcTxId }: { outIndex: number; btc
   changeCapacity -= estimatedTxFee;
   unsignedTx.outputs[unsignedTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
 
-  const signedTx = collector.getCkb().signTransaction(CKB_TEST_PRIVATE_KEY)(unsignedTx);
+  const signedTx = collector.getCkb().signTransaction(CKB_PRIVATE_KEY)(unsignedTx);
   const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
 
   console.info(`Cluster cell has been prepared and the tx hash ${txHash}`);

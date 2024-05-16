@@ -1,54 +1,27 @@
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
+import { genBtcTransferCkbVirtualTx, sendRgbppUtxos, BtcAssetsApiError } from 'rgbpp';
 import {
-  Collector,
   appendCkbTxWitnesses,
   buildRgbppLockArgs,
-  genBtcTransferCkbVirtualTx,
   sendCkbTx,
   getXudtTypeScript,
   updateCkbTxWithRealBtcTxId,
-} from '@rgbpp-sdk/ckb';
-import { transactionToHex, sendRgbppUtxos, DataSource, ECPair, bitcoin, NetworkType } from '@rgbpp-sdk/btc';
-import { BtcAssetsApi, BtcAssetsApiError } from '@rgbpp-sdk/service';
+} from 'rgbpp/ckb';
+import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../env';
+import { transactionToHex } from 'rgbpp/btc';
 
-// BTC SECP256K1 private key
-const BTC_TEST_PRIVATE_KEY = '0000000000000000000000000000000000000000000000000000000000000001';
-// API docs: https://btc-assets-api.testnet.mibao.pro/docs
-const BTC_ASSETS_API_URL = 'https://btc-assets-api.testnet.mibao.pro';
-// https://btc-assets-api.testnet.mibao.pro/docs/static/index.html#/Token/post_token_generate
-const BTC_ASSETS_TOKEN = '';
-
-const BTC_ASSETS_ORIGIN = 'https://btc-test.app';
-
-interface Params {
+interface RgbppTransferParams {
   rgbppLockArgsList: string[];
   toBtcAddress: string;
+  xudtTypeArgs: string;
   transferAmount: bigint;
 }
-const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmount }: Params) => {
-  const collector = new Collector({
-    ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
-    ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
-  });
-  const isMainnet = false;
 
-  const network = isMainnet ? bitcoin.networks.bitcoin : bitcoin.networks.testnet;
-  const keyPair = ECPair.fromPrivateKey(Buffer.from(BTC_TEST_PRIVATE_KEY, 'hex'), { network });
-  const { address: btcAddress } = bitcoin.payments.p2wpkh({
-    pubkey: keyPair.publicKey,
-    network,
-  });
-
-  console.log('btc address: ', btcAddress);
-
-  const networkType = isMainnet ? NetworkType.MAINNET : NetworkType.TESTNET;
-  const service = BtcAssetsApi.fromToken(BTC_ASSETS_API_URL, BTC_ASSETS_TOKEN, BTC_ASSETS_ORIGIN);
-  const source = new DataSource(service, networkType);
-
-  // Warning: Please replace with your real xUDT type script here
+// Warning: It is not recommended for developers to use local examples unless you understand the entire process of RGB++ transactions.
+const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transferAmount }: RgbppTransferParams) => {
   const xudtType: CKBComponents.Script = {
     ...getXudtTypeScript(isMainnet),
-    args: '0x1ba116c119d1cfd98a53e9d1a615cf2af2bb87d95515c9d217d367054cfc696b',
+    args: xudtTypeArgs,
   };
 
   const ckbVirtualTxResult = await genBtcTransferCkbVirtualTx({
@@ -68,15 +41,15 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
     tos: [toBtcAddress],
     ckbCollector: collector,
     from: btcAddress!,
-    source,
+    source: btcDataSource,
   });
-  psbt.signAllInputs(keyPair);
+  psbt.signAllInputs(btcKeyPair);
   psbt.finalizeAllInputs();
 
   const btcTx = psbt.extractTransaction();
   // Remove the witness from BTC tx for RGBPP unlock
   const btcTxBytes = transactionToHex(btcTx, false);
-  const { txid: btcTxId } = await service.sendBtcTransaction(btcTx.toHex());
+  const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
 
   console.log('BTC TxId: ', btcTxId);
 
@@ -84,7 +57,7 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
   const interval = setInterval(async () => {
     try {
       console.log('Waiting for BTC tx and proof to be ready');
-      const rgbppApiSpvProof = await service.getRgbppSpvProof(btcTxId, 0);
+      const rgbppApiSpvProof = await btcService.getRgbppSpvProof(btcTxId, 0);
       clearInterval(interval);
       // Update CKB transaction with the real BTC txId
       const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet });
@@ -106,9 +79,9 @@ const transferRgbppOnBtc = async ({ rgbppLockArgsList, toBtcAddress, transferAmo
 
 // Use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
-transferRgbppOnBtc({
+transfer({
   rgbppLockArgsList: [buildRgbppLockArgs(1, '70b250e2a3cc7a33b47f7a4e94e41e1ee2501ce73b393d824db1dd4c872c5348')],
   toBtcAddress: 'tb1qvt7p9g6mw70sealdewtfp0sekquxuru6j3gwmt',
-  // To simplify, keep the transferAmount the same as 2-ckb-jump-btc
+  xudtTypeArgs: '0x1ba116c119d1cfd98a53e9d1a615cf2af2bb87d95515c9d217d367054cfc696b',
   transferAmount: BigInt(800_0000_0000),
 });

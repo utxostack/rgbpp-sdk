@@ -1,0 +1,20 @@
+{
+  "name": "xudt-on-ckb-examples",
+  "version": "0.1.0",
+  "description": "Examples used for xUDT on CKB assets issuance and transfer",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "format": "prettier --write '**/*.ts'",
+    "lint": "tsc && eslint . && prettier --check '**/*.ts'",
+    "lint:fix": "tsc && eslint --fix --ext .ts . && prettier --write '**/*.ts'"
+  },
+  "dependencies": {
+    "@nervosnetwork/ckb-sdk-utils": "^0.109.1",
+    "rgbpp": "0.1.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5",
+    "@types/dotenv": "^8.2.0"
+  }
+}

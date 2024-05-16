@@ -1,7 +1,7 @@
-import { AddressPrefix, addressToScript, getTransactionSize, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
+import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 import {
   getSecp256k1CellDep,
-  Collector,
+  RgbppTokenInfo,
   NoLiveCellError,
   calculateUdtCellCapacity,
   MAX_FEE,
@@ -13,13 +13,10 @@ import {
   SECP256K1_WITNESS_LOCK_SIZE,
   calculateTransactionFee,
   NoXudtLiveCellError,
-} from '@rgbpp-sdk/ckb';
-import { XUDT_TOKEN_INFO } from './0-token-info';
+} from 'rgbpp/ckb';
+import { CKB_PRIVATE_KEY, ckbAddress, collector, isMainnet } from './env';
 
-// CKB SECP256K1 private key
-const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
-
-interface TransferParams {
+interface XudtTransferParams {
   xudtType: CKBComponents.Script;
   receivers: {
     toAddress: string;
@@ -29,21 +26,11 @@ interface TransferParams {
 
 /**
  * transferXudt can be used to mint xUDT assets or transfer xUDT assets.
- * @param: xudtType The xUDT type script that comes from 1-issue-xudt
- * @param: receivers The receiver includes toAddress and transferAmount
+ * @param xudtType The xUDT type script that comes from 1-issue-xudt
+ * @param receivers The receiver includes toAddress and transferAmount
  */
-const transferXudt = async ({ xudtType, receivers }: TransferParams) => {
-  const collector = new Collector({
-    ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
-    ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
-  });
-  const isMainnet = false;
-  const fromAddress = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
-    prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
-  });
-  console.log('ckb address: ', fromAddress);
-
-  const fromLock = addressToScript(fromAddress);
+const transferXudt = async ({ xudtType, receivers }: XudtTransferParams) => {
+  const fromLock = addressToScript(ckbAddress);
 
   const xudtCells = await collector.getCells({
     lock: fromLock,
@@ -137,10 +124,16 @@ const transferXudt = async ({ xudtType, receivers }: TransferParams) => {
     unsignedTx.outputs[unsignedTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
   }
 
-  const signedTx = collector.getCkb().signTransaction(CKB_TEST_PRIVATE_KEY)(unsignedTx);
+  const signedTx = collector.getCkb().signTransaction(CKB_PRIVATE_KEY)(unsignedTx);
   const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
 
   console.info(`xUDT asset has been minted or transferred and tx hash is ${txHash}`);
+};
+
+const XUDT_TOKEN_INFO: RgbppTokenInfo = {
+  decimal: 8,
+  name: 'XUDT Test Token',
+  symbol: 'XTT',
 };
 
 transferXudt({
