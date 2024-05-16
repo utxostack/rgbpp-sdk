@@ -49,7 +49,7 @@ const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transfe
 
     writeStepLog('2', {
       txid: btcTxId,
-      index: 0,
+      index: 1,
     });
 
     await btcService.sendRgbppCkbTransaction({ btc_txid: btcTxId, ckb_virtual_result: ckbVirtualTxResult });
