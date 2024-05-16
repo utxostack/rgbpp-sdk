@@ -6,7 +6,10 @@ function App() {
   async function send() {
     const networkType = NetworkType.TESTNET;
 
-    const service = BtcAssetsApi.fromToken(import.meta.env.VITE_SERVICE_URL!, import.meta.env.VITE_SERVICE_TOKEN!);
+    const service = BtcAssetsApi.fromToken(
+      import.meta.env.VITE_BTC_SERVICE_URL!,
+      import.meta.env.VITE_BTC_SERVICE_TOKEN!,
+    );
     const source = new DataSource(service, networkType);
 
     const psbt = await sendBtc({

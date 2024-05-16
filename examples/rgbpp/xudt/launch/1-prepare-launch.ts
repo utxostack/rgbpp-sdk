@@ -1,6 +1,5 @@
-import { AddressPrefix, addressToScript, getTransactionSize, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
+import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 import {
-  Collector,
   MAX_FEE,
   NoLiveCellError,
   RgbppTokenInfo,
@@ -12,11 +11,9 @@ import {
   calculateTransactionFee,
   genRgbppLockScript,
   getSecp256k1CellDep,
-} from '@rgbpp-sdk/ckb';
+} from 'rgbpp/ckb';
 import { RGBPP_TOKEN_INFO } from './0-rgbpp-token-info';
-
-// CKB SECP256K1 private key
-const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
+import { CKB_PRIVATE_KEY, ckbAddress, collector, isMainnet } from '../../env';
 
 const prepareLaunchCell = async ({
   outIndex,
@@ -27,16 +24,8 @@ const prepareLaunchCell = async ({
   btcTxId: string;
   rgbppTokenInfo: RgbppTokenInfo;
 }) => {
-  const collector = new Collector({
-    ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
-    ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
-  });
-  const isMainnet = false;
-  const address = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
-    prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
-  });
-  const masterLock = addressToScript(address);
-  console.log('ckb address: ', address);
+  const masterLock = addressToScript(ckbAddress);
+  console.log('ckb address: ', ckbAddress);
 
   // The capacity required to launch cells is determined by the token info cell capacity, and transaction fee.
   const launchCellCapacity =
@@ -86,7 +75,7 @@ const prepareLaunchCell = async ({
   changeCapacity -= estimatedTxFee;
   unsignedTx.outputs[unsignedTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
 
-  const signedTx = collector.getCkb().signTransaction(CKB_TEST_PRIVATE_KEY)(unsignedTx);
+  const signedTx = collector.getCkb().signTransaction(CKB_PRIVATE_KEY)(unsignedTx);
   const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
 
   console.info(`Launch cell has been created and the tx hash ${txHash}`);

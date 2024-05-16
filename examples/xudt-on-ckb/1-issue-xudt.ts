@@ -1,13 +1,7 @@
-import {
-  AddressPrefix,
-  addressToScript,
-  getTransactionSize,
-  privateKeyToAddress,
-  scriptToHash,
-} from '@nervosnetwork/ckb-sdk-utils';
+import { addressToScript, getTransactionSize, scriptToHash } from '@nervosnetwork/ckb-sdk-utils';
 import {
   getSecp256k1CellDep,
-  Collector,
+  RgbppTokenInfo,
   NoLiveCellError,
   calculateUdtCellCapacity,
   MAX_FEE,
@@ -22,29 +16,17 @@ import {
   SECP256K1_WITNESS_LOCK_SIZE,
   calculateTransactionFee,
   generateUniqueTypeArgs,
-} from '@rgbpp-sdk/ckb';
-import { calculateXudtTokenInfoCellCapacity } from '@rgbpp-sdk/ckb/src/utils';
-import { XUDT_TOKEN_INFO } from './0-token-info';
-
-// CKB SECP256K1 private key
-const CKB_TEST_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001';
+  calculateXudtTokenInfoCellCapacity,
+} from 'rgbpp/ckb';
+import { CKB_PRIVATE_KEY, ckbAddress, collector, isMainnet } from './env';
 
 /**
  * issueXudt can be used to issue xUDT assets with unique cell as token info cell.
- * @param: xudtTotalAmount The xudtTotalAmount specifies the total amount of asset issuance
+ * @param xudtTotalAmount The xudtTotalAmount specifies the total amount of asset issuance
+ * @param tokenInfo The xUDT token info which includes decimal, name and symbol
  */
-const issueXudt = async ({ xudtTotalAmount }: { xudtTotalAmount: bigint }) => {
-  const collector = new Collector({
-    ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
-    ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
-  });
-  const isMainnet = false;
-  const issueAddress = privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
-    prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
-  });
-  console.log('ckb address: ', issueAddress);
-
-  const issueLock = addressToScript(issueAddress);
+const issueXudt = async ({ xudtTotalAmount, tokenInfo }: { xudtTotalAmount: bigint; tokenInfo: RgbppTokenInfo }) => {
+  const issueLock = addressToScript(ckbAddress);
 
   let emptyCells = await collector.getCells({
     lock: issueLock,
@@ -55,7 +37,7 @@ const issueXudt = async ({ xudtTotalAmount }: { xudtTotalAmount: bigint }) => {
   emptyCells = emptyCells.filter((cell) => !cell.output.type);
 
   const xudtCapacity = calculateUdtCellCapacity(issueLock);
-  const xudtInfoCapacity = calculateXudtTokenInfoCellCapacity(XUDT_TOKEN_INFO, issueLock);
+  const xudtInfoCapacity = calculateXudtTokenInfoCellCapacity(tokenInfo, issueLock);
 
   const txFee = MAX_FEE;
   const { inputs, sumInputsCapacity } = collector.collectInputs(emptyCells, xudtCapacity + xudtInfoCapacity, txFee, {
@@ -89,8 +71,8 @@ const issueXudt = async ({ xudtTotalAmount }: { xudtTotalAmount: bigint }) => {
       capacity: append0x(changeCapacity.toString(16)),
     },
   ];
-  const totalAmount = xudtTotalAmount * BigInt(10 ** XUDT_TOKEN_INFO.decimal);
-  const outputsData = [append0x(u128ToLe(totalAmount)), encodeRgbppTokenInfo(XUDT_TOKEN_INFO), '0x'];
+  const totalAmount = xudtTotalAmount * BigInt(10 ** tokenInfo.decimal);
+  const outputsData = [append0x(u128ToLe(totalAmount)), encodeRgbppTokenInfo(tokenInfo), '0x'];
 
   const emptyWitness = { lock: '', inputType: '', outputType: '' };
   const witnesses = inputs.map((_, index) => (index === 0 ? emptyWitness : '0x'));
@@ -114,10 +96,16 @@ const issueXudt = async ({ xudtTotalAmount }: { xudtTotalAmount: bigint }) => {
     unsignedTx.outputs[unsignedTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
   }
 
-  const signedTx = collector.getCkb().signTransaction(CKB_TEST_PRIVATE_KEY)(unsignedTx);
+  const signedTx = collector.getCkb().signTransaction(CKB_PRIVATE_KEY)(unsignedTx);
   const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
 
-  console.info(`xUDT asset has been issued and tx hash is ${txHash}`);
+  console.info(`xUDT asset on CKB has been issued and tx hash is ${txHash}`);
 };
 
-issueXudt({ xudtTotalAmount: BigInt(2100_0000) });
+const XUDT_TOKEN_INFO: RgbppTokenInfo = {
+  decimal: 8,
+  name: 'XUDT Test Token',
+  symbol: 'XTT',
+};
+
+issueXudt({ xudtTotalAmount: BigInt(2100_0000), tokenInfo: XUDT_TOKEN_INFO });

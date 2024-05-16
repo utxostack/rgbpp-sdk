@@ -7,8 +7,8 @@ export default function Home() {
     const networkType = NetworkType.TESTNET;
 
     const service = BtcAssetsApi.fromToken(
-      process.env.NEXT_PUBLIC_SERVICE_URL!,
-      process.env.NEXT_PUBLIC_SERVICE_TOKEN!,
+      process.env.NEXT_PUBLIC_BTC_SERVICE_URL!,
+      process.env.NEXT_PUBLIC_BTC_SERVICE_TOKEN!,
     );
     const source = new DataSource(service, networkType);
 

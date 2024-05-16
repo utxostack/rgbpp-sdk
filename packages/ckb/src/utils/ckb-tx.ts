@@ -11,6 +11,8 @@ import {
 import { Hex, RgbppTokenInfo } from '../types';
 import { PERSONAL, blake2b, hexToBytes, serializeInput, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { encodeRgbppTokenInfo, genBtcTimeLockScript } from './rgbpp';
+import { Collector } from '../collector';
+import { NoLiveCellError } from '../error';
 
 export const calculateTransactionFee = (txSize: number, feeRate?: bigint): bigint => {
   const rate = feeRate ?? BigInt(1100);
@@ -27,14 +29,22 @@ export const isUDTTypeSupported = (type: CKBComponents.Script, isMainnet: boolea
   return xudtType === typeAsset;
 };
 
-export const isClusterSporeTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
+export const isSporeTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
   const sporeType = serializeScript(getSporeTypeScript(isMainnet));
   const typeAsset = serializeScript({
     ...type,
     args: '',
   });
+  return sporeType === typeAsset;
+};
+
+export const isClusterSporeTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
+  const typeAsset = serializeScript({
+    ...type,
+    args: '',
+  });
   const clusterType = serializeScript(getClusterTypeScript(isMainnet));
-  return sporeType === typeAsset || clusterType === typeAsset;
+  return isSporeTypeSupported(type, isMainnet) || clusterType === typeAsset;
 };
 
 export const isTypeAssetSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
@@ -138,4 +148,28 @@ export const isScriptEqual = (s1: Hex | CKBComponents.Script, s2: Hex | CKBCompo
   const temp1 = typeof s1 === 'string' ? remove0x(s1) : remove0x(serializeScript(s1));
   const temp2 = typeof s2 === 'string' ? remove0x(s2) : remove0x(serializeScript(s2));
   return temp1 === temp2;
+};
+
+/**
+ * Check whether the capacity of inputs is sufficient for outputs
+ * @param ckbTx CKB raw transaction
+ * @param collector The collector that collects CKB live cells and transactions
+ * @returns When the capacity of inputs is sufficient for outputs, return true, otherwise return false
+ */
+export const checkCkbTxInputsCapacitySufficient = async (
+  ckbTx: CKBComponents.RawTransaction,
+  collector: Collector,
+): Promise<boolean> => {
+  let sumInputsCapacity = BigInt(0);
+  for await (const input of ckbTx.inputs) {
+    const liveCell = await collector.getLiveCell(input.previousOutput!);
+    if (!liveCell) {
+      throw new NoLiveCellError('The cell with the specific out point is dead');
+    }
+    sumInputsCapacity += BigInt(liveCell.output.capacity);
+  }
+  const sumOutputsCapacity = ckbTx.outputs
+    .map((output) => BigInt(output.capacity))
+    .reduce((prev, current) => prev + current, BigInt(0));
+  return sumInputsCapacity > sumOutputsCapacity;
 };

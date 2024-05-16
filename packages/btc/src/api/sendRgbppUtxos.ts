@@ -1,4 +1,5 @@
-import { Collector, isRgbppLockCell, isBtcTimeLockCell, calculateCommitment } from '@rgbpp-sdk/ckb';
+import { Collector, checkCkbTxInputsCapacitySufficient } from '@rgbpp-sdk/ckb';
+import { isRgbppLockCell, isBtcTimeLockCell, calculateCommitment } from '@rgbpp-sdk/ckb';
 import { bitcoin } from '../bitcoin';
 import { Utxo } from '../transaction/utxo';
 import { DataSource } from '../query/source';
@@ -165,14 +166,16 @@ async function getMergedBtcOutputs(btcOutputs: InitOutput[], props: SendRgbppUtx
   const isPaymasterUnmatched =
     defaultPaymaster?.address !== props.paymaster?.address || defaultPaymaster?.value !== props.paymaster?.value;
   if (defaultPaymaster && props.paymaster && isPaymasterUnmatched) {
-    throw new TxBuildError(ErrorCodes.PAYMASTER_MISMATCH);
+    throw TxBuildError.withComment(
+      ErrorCodes.PAYMASTER_MISMATCH,
+      `expected: ${defaultPaymaster}, actual: ${props.paymaster}`,
+    );
   }
 
-  // Add paymaster output
-  // TODO: can be more accurate if we compare the actual capacity of inputs & outputs
+  // Add paymaster output, only if paymaster address exists and needed
   const paymaster = defaultPaymaster ?? props.paymaster;
-  const needPaymasterOutput = props.ckbVirtualTx.inputs.length < props.ckbVirtualTx.outputs.length;
-  if (paymaster && needPaymasterOutput) {
+  const isCkbTxCapacitySufficient = await checkCkbTxInputsCapacitySufficient(props.ckbVirtualTx, props.ckbCollector);
+  if (paymaster && !isCkbTxCapacitySufficient) {
     merged.push({
       ...paymaster,
       fixed: true,

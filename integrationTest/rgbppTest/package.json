@@ -1,5 +1,5 @@
 {
-  "name": "rgbpp-examples",
+  "name": "rgbpp-test",
   "version": "0.1.0",
   "description": "Examples used for RGBPP assets issuance, transfer, and leaping between BTC and CKB",
   "private": true,

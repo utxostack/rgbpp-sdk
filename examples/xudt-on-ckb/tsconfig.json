@@ -21,6 +21,5 @@
     "skipLibCheck": true,
     "strict": true
   },
-  "include": ["queue/**/*.ts", "xudt/**/*.ts"],
   "exclude": ["node_modules"]
 }

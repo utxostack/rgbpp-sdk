@@ -6,9 +6,9 @@ export const config = networkTypeToConfig(networkType);
 export const network = config.network;
 
 export const service = BtcAssetsApi.fromToken(
-  process.env.VITE_SERVICE_URL!,
-  process.env.VITE_SERVICE_TOKEN!,
-  process.env.VITE_SERVICE_ORIGIN!,
+  process.env.VITE_BTC_SERVICE_URL!,
+  process.env.VITE_BTC_SERVICE_TOKEN!,
+  process.env.VITE_BTC_SERVICE_ORIGIN!,
 );
 
 export const source = new DataSource(service, networkType);

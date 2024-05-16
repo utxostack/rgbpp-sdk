@@ -37,7 +37,7 @@ export class BtcAssetsApiError extends Error {
 
   static withComment(code: ErrorCodes, comment?: string, context?: BtcAssetsApiContext): BtcAssetsApiError {
     const prefixMessage = ErrorMessages[code] ?? ErrorMessages[ErrorCodes.UNKNOWN];
-    const message = comment ? `${prefixMessage}: ${comment}` : void 0;
+    const message = comment ? `${prefixMessage}: ${comment}` : undefined;
     return new BtcAssetsApiError({ code, message, context });
   }
 }
