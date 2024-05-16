@@ -107,7 +107,7 @@ distributeRgbppAssetOnBtc({
   xudtTypeArgs: '0x4c1ecf2f14edae73b76ccf115ecfa40ba68ee315c96bd4fcfd771c2fb4c69e8f',
   receivers: [
     {
-      toBtcAddress: 'bc1p0ey32x7dwhlx569rh0l5qaxetsfnpvezanrezahelr0t02ytyegssdel0h',
+      toBtcAddress: 'tb1qvt7p9g6mw70sealdewtfp0sekquxuru6j3gwmt',
       transferAmount: BigInt(1000) * BigInt(10 ** RGBPP_TOKEN_INFO.decimal),
     },
   ],
