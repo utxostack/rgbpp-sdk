@@ -44,6 +44,8 @@ export { BtcAssetsApi, BtcAssetsApiError } from '@rgbpp-sdk/service';
  */
 export {
   DataSource,
+  NetworkType,
+  AddressType,
   sendBtc,
   sendUtxos,
   sendRgbppUtxos,
@@ -51,4 +53,4 @@ export {
   createSendUtxosBuilder,
   createSendRgbppUtxosBuilder,
 } from '@rgbpp-sdk/btc';
-export type { NetworkType, AddressType, SendBtcProps, SendUtxosProps, SendRgbppUtxosProps } from '@rgbpp-sdk/btc';
+export type { SendBtcProps, SendUtxosProps, SendRgbppUtxosProps } from '@rgbpp-sdk/btc';
