@@ -58,7 +58,13 @@ This repository offers utilities for Bitcoin and RGB++ asset integration.
 
 ### Notes
 
-- The RGB++ CKB transaction Queue is designed to streamline the transaction workflow. Developers have the option to implement its features by themselves without limitation.
+- `Bitcoin/RGB++ Assets Service` is designed to streamline the transaction workflow. Developers have the option to implement its features by themselves without limitation.
+
+
+## FAQ
+
+### How to get an access token of Bitcoin/RGB++ Assets Service?
+See [Generate a JSON Web Token (JWT) for Bitcoin/RGB++ Assets Service](./packages/service/README.md#get-an-access-token)
 
 
 ## License
