@@ -42,7 +42,7 @@ please email us at f@cell.studio to request a mainnet JWT token.
 In the email, please provide the following information about your app:
 
 - `name`: Your app name, e.g. "rgbpp-app"
-- `domain`: Your app domain, e.g. "rgbpp.app" (without protocol prefix)
+- `domain`: Your app domain, e.g. "rgbpp.app" (without protocol prefix and port suffix)
 
 
 ### Initialize the service
