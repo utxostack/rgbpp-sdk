@@ -164,13 +164,13 @@ describe(
         expect(txs.length).toBeGreaterThan(0);
 
         const filteredTxs = await service.getBtcTransactions(btcAddress, {
-          after_txid: txs[0].txid,
+          after_txid: txs[txs.length - 2].txid,
         });
         expect(Array.isArray(filteredTxs)).toBe(true);
 
         if (txs.length > 1) {
           expect(txs.length).toBeGreaterThan(0);
-          expect(filteredTxs[0].txid).toEqual(txs[1].txid);
+          expect(filteredTxs[0].txid).toEqual(txs[txs.length - 1].txid);
         } else {
           expect(filteredTxs).toHaveLength(0);
         }
