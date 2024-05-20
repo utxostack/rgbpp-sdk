@@ -92,6 +92,12 @@ describe(
         expect(filteredBalance.satoshi).toEqual(0);
         expect(filteredBalance.dust_satoshi).toEqual(originalBalance.satoshi + originalBalance.dust_satoshi);
       });
+      it('getBtcBalance() with no_cache', async () => {
+        const res = await service.getBtcBalance(btcAddress, {
+          no_cache: true,
+        });
+        expect(res.address).toEqual(btcAddress);
+      });
       it('getBtcUtxos()', async () => {
         const res = await service.getBtcUtxos(btcAddress);
         expect(Array.isArray(res)).toBe(true);
@@ -130,6 +136,12 @@ describe(
         for (const utxo of confirmedUtxos) {
           expect(utxo.status.confirmed).toBe(true);
         }
+      });
+      it('getBtcUtxos() with no_cache', async () => {
+        const utxos = await service.getBtcUtxos(btcAddress, {
+          no_cache: true,
+        });
+        expect(Array.isArray(utxos)).toBe(true);
       });
       it('getBtcTransactions()', async () => {
         const res = await service.getBtcTransactions(btcAddress);
@@ -247,6 +259,13 @@ describe(
         for (const cell of res) {
           expectCell(cell);
         }
+      });
+      it('getRgbppAssetsByBtcAddress() with no_cache', async () => {
+        const res = await service.getRgbppAssetsByBtcAddress(rgbppBtcAddress, {
+          no_cache: true,
+        });
+        expect(res).toBeDefined();
+        expect(res.length).toBeGreaterThan(0);
       });
       it('getRgbppSpvProof()', async () => {
         const res = await service.getRgbppSpvProof(rgbppBtcTxId, 6);
