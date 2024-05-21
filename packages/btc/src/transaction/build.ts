@@ -136,14 +136,19 @@ export class TxBuilder {
     publicKey?: string;
     changeAddress?: string;
     deductFromOutputs?: boolean;
+    noUtxosCache?: boolean;
     feeRate?: number;
   }): Promise<{
     fee: number;
     feeRate: number;
   }> {
-    const { address, publicKey, feeRate, changeAddress, deductFromOutputs } = props;
+    const { address, publicKey, feeRate, changeAddress, deductFromOutputs, noUtxosCache } = props;
     const originalInputs = clone(this.inputs);
     const originalOutputs = clone(this.outputs);
+
+    // Create a cache key to prevent querying the Utxo[] too often
+    // TODO: consider provide an option to disable the cache
+    const cacheKey = `${Date.now()}`;
 
     // Fill a default recommended fee rate if props.feeRate is not provided
     let defaultFeeRate: number | undefined;
@@ -177,6 +182,8 @@ export class TxBuilder {
           amount: returnAmount,
           fromAddress: address,
           fromPublicKey: publicKey,
+          noUtxosCache,
+          cacheKey,
         });
       } else {
         // If the inputs have insufficient satoshi, a satoshi collection is required.
@@ -189,6 +196,8 @@ export class TxBuilder {
           targetAmount,
           changeAddress,
           deductFromOutputs,
+          noUtxosCache,
+          cacheKey,
         });
       }
 
@@ -203,6 +212,9 @@ export class TxBuilder {
       }
     }
 
+    // Clear cache for the Utxo[] list
+    this.source.cache.cleanUtxos(cacheKey);
+
     return {
       fee: currentFee,
       feeRate: currentFeeRate,
@@ -216,6 +228,8 @@ export class TxBuilder {
     changeAddress?: string;
     injectCollected?: boolean;
     deductFromOutputs?: boolean;
+    noUtxosCache?: boolean;
+    cacheKey?: string;
   }) {
     if (!isSupportedFromAddress(props.address)) {
       throw TxBuildError.withComment(ErrorCodes.UNSUPPORTED_ADDRESS_TYPE, props.address);
@@ -237,6 +251,8 @@ export class TxBuilder {
         address: props.address,
         targetAmount: _targetAmount,
         allowInsufficient: true,
+        cacheKey: props.cacheKey,
+        noUtxosCache: props.noUtxosCache,
         minUtxoSatoshi: this.minUtxoSatoshi,
         onlyNonRgbppUtxos: this.onlyNonRgbppUtxos,
         onlyConfirmedUtxos: this.onlyConfirmedUtxos,
@@ -356,8 +372,15 @@ export class TxBuilder {
     };
   }
 
-  async injectChange(props: { amount: number; address: string; fromAddress: string; fromPublicKey?: string }) {
-    const { address, fromAddress, fromPublicKey, amount } = props;
+  async injectChange(props: {
+    amount: number;
+    address: string;
+    fromAddress: string;
+    fromPublicKey?: string;
+    noUtxosCache?: boolean;
+    cacheKey?: string;
+  }) {
+    const { address, fromAddress, fromPublicKey, amount, noUtxosCache, cacheKey } = props;
 
     // If any (output.fixed != true) is found in the outputs (search in ASC order),
     // return the change value to the first matched output.
@@ -389,6 +412,8 @@ export class TxBuilder {
         changeAddress: address,
         injectCollected: true,
         deductFromOutputs: false,
+        noUtxosCache,
+        cacheKey,
       });
       if (collected < amount) {
         throw TxBuildError.withComment(ErrorCodes.INSUFFICIENT_UTXO, `expected: ${amount}, actual: ${collected}`);
