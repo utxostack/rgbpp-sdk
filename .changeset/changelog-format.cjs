@@ -108,7 +108,7 @@ const changelogFunctions = {
       return '';
     }
 
-    const commits = Promise.all(
+    const commits = await Promise.all(
       changesets.map(async (cs) => {
         if (cs.commit) {
           let { links } = await getInfo({
