@@ -4,6 +4,7 @@ import { ErrorCodes, TxBuildError } from '../error';
 import { InitOutput, TxBuilder } from '../transaction/build';
 import { isOpReturnScriptPubkey } from '../transaction/embed';
 import { networkTypeToNetwork } from '../preset/network';
+import { networkTypeToConfig } from '../preset/config';
 import { createSendUtxosBuilder } from './sendUtxos';
 import { isP2trScript } from '../script';
 import { bitcoin } from '../bitcoin';
@@ -14,12 +15,14 @@ export interface SendRbfProps {
   source: DataSource;
   feeRate?: number;
   fromPubkey?: string;
-  changeIndex?: number;
   changeAddress?: string;
   minUtxoSatoshi?: number;
   onlyConfirmedUtxos?: boolean;
   requireValidOutputsValue?: boolean;
   requireGreaterFeeAndRate?: boolean;
+
+  // WARNING: this prop will edit the outputs[changeIndex] from the original transaction
+  changeIndex?: number;
 
   // EXPERIMENTAL: the below props are unstable and can be altered at any time
   inputsPubkey?: Record<string, string>; // Record<address, pubkey>
@@ -100,8 +103,12 @@ export async function createSendRbfBuilder(props: SendRbfProps): Promise<{
       changeAddress = changeOutputAddress;
     }
 
-    changeOutput.fixed = false;
+    const config = networkTypeToConfig(props.source.networkType);
+    const minUtxoSatoshi = props.minUtxoSatoshi ?? config.btcUtxoDustLimit;
+    changeOutput.minUtxoSatoshi = minUtxoSatoshi;
+    changeOutput.value = minUtxoSatoshi;
     changeOutput.protected = true;
+    changeOutput.fixed = false;
   }
 
   // Fee rate
@@ -114,7 +121,7 @@ export async function createSendRbfBuilder(props: SendRbfProps): Promise<{
 
   // The RBF transaction should offer a higher fee rate
   const previousInsValue = inputs.reduce((sum, input) => sum + input.value, 0);
-  const previousOutsValue = outputs.reduce((sum, output) => sum + output.value, 0);
+  const previousOutsValue = previousTx.outs.reduce((sum, output) => sum + output.value, 0);
   const previousFee = previousInsValue - previousOutsValue;
   const previousFeeRate = previousFee / previousTx.virtualSize();
   if (requireGreaterFeeAndRate && feeRate !== undefined && feeRate < previousFeeRate) {
