@@ -36,7 +36,7 @@ export async function createSendRbfBuilder(props: SendRbfProps): Promise<{
   // Rebuild inputs
   const inputs: Utxo[] = [];
   for (const input of previousTx.ins) {
-    const hash = input.hash.reverse().toString('hex');
+    const hash = Buffer.from(input.hash).reverse().toString('hex');
     const utxo = await props.source.getUtxo(hash, input.index);
     if (!utxo) {
       throw TxBuildError.withComment(ErrorCodes.CANNOT_FIND_UTXO, `hash: ${hash}, index: ${input.index}`);
