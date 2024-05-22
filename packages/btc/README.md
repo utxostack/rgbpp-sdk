@@ -305,6 +305,7 @@ interface SendUtxosProps {
   changeAddress?: string;
   minUtxoSatoshi?: number;
   onlyConfirmedUtxos?: boolean;
+  excludeUtxos?: BaseOutput[];
 }
 ```
 
@@ -386,27 +387,27 @@ type InitOutput = TxAddressOutput | TxDataOutput | TxScriptOutput;
 #### TxAddressOutput / TxDataOutput / TxScriptOutput
 
 ```typescript
-interface TxAddressOutput extends BaseOutput {
+interface TxAddressOutput extends TxBaseOutput {
   address: string;
 }
 ```
 
 ```typescript
-interface TxDataOutput extends BaseOutput {
+interface TxDataOutput extends TxBaseOutput {
   data: Buffer | string;
 }
 ```
 
 ```typescript
-interface TxScriptOutput extends BaseOutput {
+interface TxScriptOutput extends TxBaseOutput {
   script: Buffer;
 }
 ```
 
-#### BaseOutput
+#### TxBaseOutput
 
 ```typescript
-interface BaseOutput {
+interface TxBaseOutput {
   value: number;
   fixed?: boolean;
   protected?: boolean;
@@ -431,10 +432,7 @@ interface DataSource {
     onlyConfirmedUtxos?: boolean;
     noAssetsApiCache?: boolean;
     internalCacheKey?: string;
-    excludeUtxos?: {
-      txid: string;
-      vout: number;
-    }[];
+    excludeUtxos?: BaseOutput[];
   }): Promise<{
     utxos: Utxo[];
     satoshi: number;
@@ -456,16 +454,23 @@ interface FeesRecommended {
 
 ### Basic
 
-#### Utxo / Output
+#### BaseOutput / Output / Utxo
 
 ```typescript
-interface Output {
+interface BaseOutput {
   txid: string;
   vout: number;
+}
+```
+
+```typescript
+interface Output extends BaseOutput {
   value: number;
   scriptPk: string;
 }
+```
 
+```typescript
 interface Utxo extends Output {
   addressType: AddressType;
   address: string;

@@ -1,4 +1,4 @@
-import { Utxo } from '../transaction/utxo';
+import { BaseOutput, Utxo } from '../transaction/utxo';
 import { DataSource } from '../query/source';
 import { ErrorCodes, TxBuildError } from '../error';
 import { InitOutput, TxBuilder } from '../transaction/build';
@@ -124,10 +124,18 @@ export async function createSendRbfBuilder(props: SendRbfProps): Promise<{
     );
   }
 
+  // Exclude the previous transaction's outputs during the collection
+  const previousTxId = previousTx.getId();
+  const excludeUtxos: BaseOutput[] = previousTx.outs.map((_, index) => ({
+    txid: previousTxId,
+    vout: index,
+  }));
+
   // Build RBF transaction
   const res = await createSendUtxosBuilder({
     inputs,
     outputs,
+    excludeUtxos,
     changeAddress,
     from: props.from,
     source: props.source,

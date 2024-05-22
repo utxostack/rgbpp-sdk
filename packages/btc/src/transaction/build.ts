@@ -6,7 +6,7 @@ import { NetworkType, RgbppBtcConfig } from '../preset/types';
 import { AddressType, addressToScriptPublicKeyHex, getAddressType, isSupportedFromAddress } from '../address';
 import { dataToOpReturnScriptPubkey, isOpReturnScriptPubkey } from './embed';
 import { networkTypeToConfig } from '../preset/config';
-import { Utxo, utxoToInput } from './utxo';
+import { BaseOutput, Utxo, utxoToInput } from './utxo';
 import { FeeEstimator } from './fee';
 
 export interface TxInput {
@@ -20,21 +20,21 @@ export interface TxInput {
 }
 
 export type TxOutput = TxAddressOutput | TxScriptOutput;
-export interface BaseOutput {
+export interface TxBaseOutput {
   value: number;
   fixed?: boolean;
   protected?: boolean;
   minUtxoSatoshi?: number;
 }
-export interface TxAddressOutput extends BaseOutput {
+export interface TxAddressOutput extends TxBaseOutput {
   address: string;
 }
-export interface TxScriptOutput extends BaseOutput {
+export interface TxScriptOutput extends TxBaseOutput {
   script: Buffer;
 }
 
 export type InitOutput = TxAddressOutput | TxDataOutput | TxScriptOutput;
-export interface TxDataOutput extends BaseOutput {
+export interface TxDataOutput extends TxBaseOutput {
   data: Buffer | string;
 }
 
@@ -136,12 +136,13 @@ export class TxBuilder {
     publicKey?: string;
     changeAddress?: string;
     deductFromOutputs?: boolean;
+    excludeUtxos?: BaseOutput[];
     feeRate?: number;
   }): Promise<{
     fee: number;
     feeRate: number;
   }> {
-    const { address, publicKey, feeRate, changeAddress, deductFromOutputs } = props;
+    const { address, publicKey, feeRate, changeAddress, deductFromOutputs, excludeUtxos } = props;
     const originalInputs = clone(this.inputs);
     const originalOutputs = clone(this.outputs);
 
@@ -182,6 +183,7 @@ export class TxBuilder {
           fromAddress: address,
           fromPublicKey: publicKey,
           internalCacheKey,
+          excludeUtxos,
         });
       } else {
         // If the inputs have insufficient satoshi, a satoshi collection is required.
@@ -195,6 +197,7 @@ export class TxBuilder {
           changeAddress,
           deductFromOutputs,
           internalCacheKey,
+          excludeUtxos,
         });
       }
 
@@ -226,12 +229,14 @@ export class TxBuilder {
     injectCollected?: boolean;
     deductFromOutputs?: boolean;
     internalCacheKey?: string;
+    excludeUtxos?: BaseOutput[];
   }) {
     if (!isSupportedFromAddress(props.address)) {
       throw TxBuildError.withComment(ErrorCodes.UNSUPPORTED_ADDRESS_TYPE, props.address);
     }
 
     const targetAmount = props.targetAmount;
+    const excludeUtxos = props.excludeUtxos ?? [];
     const injectCollected = props.injectCollected ?? false;
     const deductFromOutputs = props.deductFromOutputs ?? true;
 
@@ -256,7 +261,7 @@ export class TxBuilder {
         minUtxoSatoshi: this.minUtxoSatoshi,
         onlyNonRgbppUtxos: this.onlyNonRgbppUtxos,
         onlyConfirmedUtxos: this.onlyConfirmedUtxos,
-        excludeUtxos: this.inputs.map((row) => row.utxo),
+        excludeUtxos: [...this.inputs.map((v) => v.utxo), ...excludeUtxos],
       });
       utxos.forEach((utxo) => {
         this.addInput({
@@ -378,8 +383,9 @@ export class TxBuilder {
     fromAddress: string;
     fromPublicKey?: string;
     internalCacheKey?: string;
+    excludeUtxos?: BaseOutput[];
   }) {
-    const { address, fromAddress, fromPublicKey, amount, internalCacheKey } = props;
+    const { address, fromAddress, fromPublicKey, amount, internalCacheKey, excludeUtxos, internalCacheKey } = props;
 
     // If any (output.fixed != true) is found in the outputs (search in ASC order),
     // return the change value to the first matched output.
@@ -412,6 +418,7 @@ export class TxBuilder {
         injectCollected: true,
         deductFromOutputs: false,
         internalCacheKey,
+        excludeUtxos,
       });
       if (collected < amount) {
         throw TxBuildError.withComment(ErrorCodes.INSUFFICIENT_UTXO, `expected: ${amount}, actual: ${collected}`);

@@ -1,6 +1,6 @@
 import { bitcoin } from '../bitcoin';
-import { Utxo } from '../transaction/utxo';
 import { DataSource } from '../query/source';
+import { BaseOutput, Utxo } from '../transaction/utxo';
 import { TxBuilder, InitOutput } from '../transaction/build';
 
 export interface SendUtxosProps {
@@ -13,6 +13,7 @@ export interface SendUtxosProps {
   changeAddress?: string;
   minUtxoSatoshi?: number;
   onlyConfirmedUtxos?: boolean;
+  excludeUtxos?: BaseOutput[];
 }
 
 export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
@@ -38,6 +39,7 @@ export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
     address: props.from,
     publicKey: props.fromPubkey,
     changeAddress: props.changeAddress,
+    excludeUtxos: props.excludeUtxos,
   });
 
   return {
