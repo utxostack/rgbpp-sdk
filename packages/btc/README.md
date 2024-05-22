@@ -241,7 +241,7 @@ const psbt = await sendRbf({
   txHex: 'your_original_transaction_hex',
   from: account.address,
   feeRate: 40, // the feeRate should be greater than the feeRate of the original transaction
-  changeIndex: 1, // optional, return change to outputs[changeIndex], will return a new output if not specified
+  changeIndex: 1, // optional, return change to outputs[changeIndex], will create a new output if not specified
   changeAddress: 'address_to_return_change', // optional, where should the change satoshi be returned to
   requireValidOutputsValue: false, // optional, default to false, require each output's value to be >= minUtxoSatoshi
   requireGreaterFeeAndRate: true, // optional, default to true, require the fee rate&amount to be greater than the original transction
@@ -262,8 +262,9 @@ declare function sendBtc(props: SendBtcProps): Promise<bitcoin.Psbt>;
 ```typescript
 declare function createSendBtcBuilder(props: SendBtcProps): Promise<{
   builder: TxBuilder;
-  feeRate: number;
   fee: number;
+  feeRate: number;
+  changeIndex: number;
 }>;
 ```
 
@@ -306,6 +307,7 @@ interface SendUtxosProps {
   changeAddress?: string;
   minUtxoSatoshi?: number;
   onlyConfirmedUtxos?: boolean;
+  skipInputsValidation?: boolean;
   excludeUtxos?: BaseOutput[];
 }
 ```
@@ -359,7 +361,7 @@ declare function createSendRbfBuilder(props: SendRbfProps): Promise<{
   fee: number;
   feeRate: number;
   changeIndex: number;
-}>
+}>;
 ```
 
 ```typescript
