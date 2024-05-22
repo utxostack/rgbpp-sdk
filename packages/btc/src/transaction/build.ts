@@ -145,17 +145,15 @@ export class TxBuilder {
     const originalInputs = clone(this.inputs);
     const originalOutputs = clone(this.outputs);
 
-    // Fetch the latest average fee rate if feeRate param is not provided
-    // The transaction is expected be confirmed within half an hour with the fee rate
-    let averageFeeRate: number | undefined;
+    // Fill a default recommended fee rate if props.feeRate is not provided
+    let defaultFeeRate: number | undefined;
     if (!feeRate && !this.feeRate) {
       const feeRates = await this.source.service.getBtcRecommendedFeeRates();
-      averageFeeRate = feeRates.fastestFee;
+      defaultFeeRate = feeRates.fastestFee;
     }
 
-    // Use the feeRate param if it is specified,
-    // otherwise use the average fee rate from the DataSource
-    const currentFeeRate = feeRate ?? this.feeRate ?? averageFeeRate!;
+    // Use props.feeRate if it's specified
+    const currentFeeRate = feeRate ?? this.feeRate ?? defaultFeeRate!;
 
     let currentFee = 0;
     let previousFee = 0;
@@ -172,8 +170,8 @@ export class TxBuilder {
       const safeToProcess = inputsTotal > 0 || previousFee > 0;
       const returnAmount = needReturn - previousFee;
       if (safeToProcess && returnAmount > 0) {
-        // If sum(inputs) - sum(outputs) > fee, return change while deducting fee
-        // Note, should not deduct fee from outputs while also returning change at the same time
+        // If sum(inputs) - sum(outputs) > fee, return (change - fee) to a non-fixed output or to a new output.
+        // Note when returning change to a new output, another satoshi collection may be needed.
         await this.injectChange({
           address: changeAddress ?? address,
           amount: returnAmount,
@@ -181,6 +179,8 @@ export class TxBuilder {
           fromPublicKey: publicKey,
         });
       } else {
+        // If the inputs have insufficient satoshi, a satoshi collection is required.
+        // For protection, at least collect 1 satoshi if the inputs are empty or the fee hasn't been calculated.
         const protectionAmount = safeToProcess ? 0 : 1;
         const targetAmount = needCollect - needReturn + previousFee + protectionAmount;
         await this.injectSatoshi({
@@ -192,8 +192,11 @@ export class TxBuilder {
         });
       }
 
+      // Calculate network fee
       const addressType = getAddressType(address);
       currentFee = await this.calculateFee(addressType, currentFeeRate);
+
+      // If (fee = previousFee ±1), the fee is considered acceptable/expected.
       isFeeExpected = [-1, 0, 1].includes(currentFee - previousFee);
       if (!isLoopedOnce) {
         isLoopedOnce = true;
@@ -218,18 +221,18 @@ export class TxBuilder {
       throw TxBuildError.withComment(ErrorCodes.UNSUPPORTED_ADDRESS_TYPE, props.address);
     }
 
+    const targetAmount = props.targetAmount;
     const injectCollected = props.injectCollected ?? false;
     const deductFromOutputs = props.deductFromOutputs ?? true;
 
     let collected = 0;
     let changeAmount = 0;
-    let targetAmount = props.targetAmount;
 
-    const _collect = async (_targetAmount: number, stack?: boolean) => {
-      if (stack) {
-        targetAmount += _targetAmount;
-      }
-
+    /**
+     * Collect from the "from" address via DataSource.
+     * Will update the value of inputs/collected/changeAmount.
+     */
+    const _collect = async (_targetAmount: number) => {
       const { utxos, satoshi } = await this.source.collectSatoshi({
         address: props.address,
         targetAmount: _targetAmount,
@@ -249,6 +252,11 @@ export class TxBuilder {
       collected += satoshi;
       _updateChangeAmount();
     };
+    /**
+     * Update changeAmount depends on injectedCollected:
+     * - true: If targetAmount=1000, collected=2000, changeAmount=2000+1000=3000
+     * - false: If targetAmount=1000, collected=2000, changeAmount=2000-1000=1000
+     */
     const _updateChangeAmount = () => {
       if (injectCollected) {
         changeAmount = collected + targetAmount;
@@ -257,7 +265,7 @@ export class TxBuilder {
       }
     };
 
-    // Collect from outputs
+    // 1. Collect from the non-fixed outputs
     if (deductFromOutputs) {
       for (let i = 0; i < this.outputs.length; i++) {
         const output = this.outputs[i];
@@ -268,21 +276,20 @@ export class TxBuilder {
           break;
         }
 
-        // If output.protected is true, do not destroy the output
-        // Only collect the satoshi from (output.value - minUtxoSatoshi)
         const minUtxoSatoshi = output.minUtxoSatoshi ?? this.minUtxoSatoshi;
         const freeAmount = output.value - minUtxoSatoshi;
         const remain = targetAmount - collected;
         if (output.protected) {
-          // freeAmount=100, remain=50, collectAmount=50
-          // freeAmount=100, remain=150, collectAmount=100
+          // If output.protected=true:
+          // - Only deduct free satoshi from the output
+          // - Won't destroy the output, at least keep (output.value = minUtxoSatoshi)
           const collectAmount = Math.min(freeAmount, remain);
           output.value -= collectAmount;
           collected += collectAmount;
         } else {
-          // output.value=200, freeAmount=100, remain=50, collectAmount=50
-          // output.value=200, freeAmount=100, remain=150, collectAmount=100
-          // output.value=100, freeAmount=0, remain=150, collectAmount=100
+          // If output.protected=false:
+          // - If (target collect amount > output.value), deduct all output.value
+          // - Destroy the output if all value is deducted
           const collectAmount = output.value > remain ? Math.min(freeAmount, remain) : output.value;
           output.value -= collectAmount;
           collected += collectAmount;
@@ -295,19 +302,21 @@ export class TxBuilder {
       }
     }
 
-    // Collect target amount of satoshi from DataSource
+    // 2. Collect from the "from" address
     if (collected < targetAmount) {
       await _collect(targetAmount - collected);
     }
 
-    // If 0 < change amount < minUtxoSatoshi, collect one more time
+    // 3. Collect from "from" one more time if:
+    // - Need to create an output to return change (changeAmount > 0)
+    // - The change is insufficient for a non-dust output (changeAmount < minUtxoSatoshi)
     const needForChange = changeAmount > 0 && changeAmount < this.minUtxoSatoshi;
     const changeUtxoNeedAmount = needForChange ? this.minUtxoSatoshi - changeAmount : 0;
     if (needForChange) {
       await _collect(changeUtxoNeedAmount);
     }
 
-    // If not collected enough satoshi, throw error
+    // 4. If not collected enough satoshi, throw an error
     const insufficientBalance = collected < targetAmount;
     if (insufficientBalance) {
       const recommendedDeposit = targetAmount - collected + this.minUtxoSatoshi;
@@ -325,7 +334,9 @@ export class TxBuilder {
       );
     }
 
-    // Return change
+    // 5. Return change:
+    // - If changeAmount=0, no need to create a change output, and the changeIndex=-1
+    // - If changeAmount>0, return change to an output or create a change output
     let changeIndex: number = -1;
     if (changeAmount > 0) {
       changeIndex = this.outputs.length;
@@ -348,6 +359,8 @@ export class TxBuilder {
   async injectChange(props: { amount: number; address: string; fromAddress: string; fromPublicKey?: string }) {
     const { address, fromAddress, fromPublicKey, amount } = props;
 
+    // If any (output.fixed != true) is found in the outputs (search in ASC order),
+    // return the change value to the first matched output.
     for (let i = 0; i < this.outputs.length; i++) {
       const output = this.outputs[i];
       if (output.fixed) {
@@ -362,6 +375,13 @@ export class TxBuilder {
     }
 
     if (amount < this.minUtxoSatoshi) {
+      // If the change is not enough to create a non-dust output, try collect more.
+      // - injectCollected=true, expect to put all (collected + amount) of satoshi as change
+      // - deductFromOutputs=false, do not collect satoshi from the outputs
+      // An example:
+      // 1. Expected to return change of 500 satoshi, amount=500
+      // 2. Collected 2000 satoshi from the "fromAddress", collected=2000
+      // 3. Create a change output and return (collected + amount), output.value=2000+500=2500
       const { collected } = await this.injectSatoshi({
         address: fromAddress,
         publicKey: fromPublicKey,
