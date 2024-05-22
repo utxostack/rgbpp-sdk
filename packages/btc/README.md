@@ -289,8 +289,9 @@ declare function sendUtxos(props: SendUtxosProps): Promise<bitcoin.Psbt>;
 ```typescript
 declare function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
   builder: TxBuilder;
-  feeRate: number;
   fee: number;
+  feeRate: number;
+  changeIndex: number;
 }>;
 ```
 
@@ -318,8 +319,9 @@ declare function sendRgbppUtxos(props: SendRgbppUtxosProps): Promise<bitcoin.Psb
 ```typescript
 declare function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise<{
   builder: TxBuilder;
-  feeRate: number;
   fee: number;
+  feeRate: number;
+  changeIndex: number;
 }>;
 ```
 
@@ -354,8 +356,9 @@ declare function sendRbf(props: SendRbfProps): Promise<bitcoin.Psbt>;
 ```typescript
 declare function createSendRbfBuilder(props: SendRbfProps): Promise<{
   builder: TxBuilder;
-  feeRate: number;
   fee: number;
+  feeRate: number;
+  changeIndex: number;
 }>
 ```
 

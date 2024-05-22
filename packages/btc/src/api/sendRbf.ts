@@ -15,14 +15,12 @@ export interface SendRbfProps {
   source: DataSource;
   feeRate?: number;
   fromPubkey?: string;
+  changeIndex?: number;
   changeAddress?: string;
   minUtxoSatoshi?: number;
   onlyConfirmedUtxos?: boolean;
   requireValidOutputsValue?: boolean;
   requireGreaterFeeAndRate?: boolean;
-
-  // WARNING: this prop will edit the outputs[changeIndex] from the original transaction
-  changeIndex?: number;
 
   // EXPERIMENTAL: the below props are unstable and can be altered at any time
   inputsPubkey?: Record<string, string>; // Record<address, pubkey>
@@ -30,8 +28,9 @@ export interface SendRbfProps {
 
 export async function createSendRbfBuilder(props: SendRbfProps): Promise<{
   builder: TxBuilder;
-  feeRate: number;
   fee: number;
+  feeRate: number;
+  changeIndex: number;
 }> {
   const previousTx = bitcoin.Transaction.fromHex(props.txHex);
   const network = networkTypeToNetwork(props.source.networkType);

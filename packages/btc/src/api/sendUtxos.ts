@@ -18,8 +18,9 @@ export interface SendUtxosProps {
 
 export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
   builder: TxBuilder;
-  feeRate: number;
   fee: number;
+  feeRate: number;
+  changeIndex: number;
 }> {
   const tx = new TxBuilder({
     source: props.source,
@@ -46,6 +47,7 @@ export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
     builder: tx,
     fee: paid.fee,
     feeRate: paid.feeRate,
+    changeIndex: paid.changeIndex,
   };
 }
 

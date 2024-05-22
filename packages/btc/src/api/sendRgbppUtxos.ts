@@ -35,8 +35,9 @@ export const sendRgbppUtxosBuilder = createSendRgbppUtxosBuilder;
 
 export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise<{
   builder: TxBuilder;
-  feeRate: number;
   fee: number;
+  feeRate: number;
+  changeIndex: number;
 }> {
   const btcInputs: Utxo[] = [];
   const btcOutputs: InitOutput[] = [];
