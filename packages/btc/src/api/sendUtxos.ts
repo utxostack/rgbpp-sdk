@@ -13,6 +13,7 @@ export interface SendUtxosProps {
   changeAddress?: string;
   minUtxoSatoshi?: number;
   onlyConfirmedUtxos?: boolean;
+  skipInputsValidation?: boolean;
   excludeUtxos?: BaseOutput[];
 }
 
@@ -32,7 +33,7 @@ export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
   tx.addInputs(props.inputs);
   tx.addOutputs(props.outputs);
 
-  if (props.onlyConfirmedUtxos) {
+  if (props.onlyConfirmedUtxos && !props.skipInputsValidation) {
     await tx.validateInputs();
   }
 
