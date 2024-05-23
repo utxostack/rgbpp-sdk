@@ -122,8 +122,9 @@ export async function createSendRbfBuilder(props: SendRbfProps): Promise<{
   const previousInsValue = inputs.reduce((sum, input) => sum + input.value, 0);
   const previousOutsValue = previousTx.outs.reduce((sum, output) => sum + output.value, 0);
   const previousFee = previousInsValue - previousOutsValue;
-  const previousFeeRate = previousFee / previousTx.virtualSize();
-  if (requireGreaterFeeAndRate && feeRate !== undefined && feeRate < previousFeeRate) {
+  const previousFeeRate = Math.floor(previousFee / previousTx.virtualSize());
+  console.log(previousFeeRate, feeRate);
+  if (requireGreaterFeeAndRate && feeRate !== undefined && feeRate <= previousFeeRate) {
     throw TxBuildError.withComment(
       ErrorCodes.INVALID_FEE_RATE,
       `RBF should offer a higher fee rate, previous: ${previousFeeRate}, current: ${feeRate}`,
@@ -152,7 +153,7 @@ export async function createSendRbfBuilder(props: SendRbfProps): Promise<{
   });
 
   // The RBF transaction should offer a higher fee amount
-  if (requireGreaterFeeAndRate && res.fee < previousFee) {
+  if (requireGreaterFeeAndRate && res.fee <= previousFee) {
     throw TxBuildError.withComment(
       ErrorCodes.INVALID_FEE_RATE,
       `RBF should offer a higher fee amount, previous: ${previousFee}, current: ${res.fee}`,
