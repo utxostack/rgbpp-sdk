@@ -1,6 +1,6 @@
 {
   "name": "rgbpp",
-  "version": "0.1.0",
+  "version": "0.0.0-snap-20240523141535",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "lint": "tsc && eslint --ext .ts src/* && prettier --check 'src/*.ts'",
