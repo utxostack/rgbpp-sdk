@@ -35,7 +35,7 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
     sporeDataList: receivers.map((receiver) => receiver.sporeData),
     clusterRgbppLockArgs,
     isMainnet,
-    ckbFeeRate: BigInt(5000),
+    ckbFeeRate: BigInt(2000),
   });
 
   const { commitment, ckbRawTx, sumInputsCapacity, clusterCell } = ckbVirtualTxResult;
@@ -68,7 +68,7 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
       clearInterval(interval);
       // Update CKB transaction with the real BTC txId
       const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet });
-      console.log('The new cluster cell lock script args: ', newCkbRawTx.outputs[0].lock.args);
+      console.log('The new cluster rgbpp lock args: ', newCkbRawTx.outputs[0].lock.args);
 
       const ckbTx = await appendCkbTxWitnesses({
         ckbRawTx: newCkbRawTx,
@@ -113,7 +113,9 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
 // Use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 createSpores({
-  // The cluster rgbpp lock args is from 2-create-cluster.ts
+  // The cluster cell will be spent and the new cluster cell will be created in each spore creation tx,
+  // so the cluster rgbpp lock args should be updated after each spore creation tx is completed.
+  // The first cluster rgbpp lock args is from 2-create-cluster.ts and the new cluster rgbpp lock args can be found from the log in the line 71 of this file
   clusterRgbppLockArgs: buildRgbppLockArgs(1, '96bccaadd3c8f59b2411e3d64ae4c1743532415f953fc4f9741a5fd7a0a34483'),
   receivers: [
     {
