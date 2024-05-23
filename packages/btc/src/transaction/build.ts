@@ -136,13 +136,12 @@ export class TxBuilder {
     publicKey?: string;
     changeAddress?: string;
     deductFromOutputs?: boolean;
-    noUtxosCache?: boolean;
     feeRate?: number;
   }): Promise<{
     fee: number;
     feeRate: number;
   }> {
-    const { address, publicKey, feeRate, changeAddress, deductFromOutputs, noUtxosCache } = props;
+    const { address, publicKey, feeRate, changeAddress, deductFromOutputs } = props;
     const originalInputs = clone(this.inputs);
     const originalOutputs = clone(this.outputs);
 
@@ -182,7 +181,6 @@ export class TxBuilder {
           amount: returnAmount,
           fromAddress: address,
           fromPublicKey: publicKey,
-          noUtxosCache,
           cacheKey,
         });
       } else {
@@ -196,7 +194,6 @@ export class TxBuilder {
           targetAmount,
           changeAddress,
           deductFromOutputs,
-          noUtxosCache,
           cacheKey,
         });
       }
@@ -228,7 +225,6 @@ export class TxBuilder {
     changeAddress?: string;
     injectCollected?: boolean;
     deductFromOutputs?: boolean;
-    noUtxosCache?: boolean;
     cacheKey?: string;
   }) {
     if (!isSupportedFromAddress(props.address)) {
@@ -251,8 +247,8 @@ export class TxBuilder {
         address: props.address,
         targetAmount: _targetAmount,
         allowInsufficient: true,
+        noUtxosCache: true,
         cacheKey: props.cacheKey,
-        noUtxosCache: props.noUtxosCache,
         minUtxoSatoshi: this.minUtxoSatoshi,
         onlyNonRgbppUtxos: this.onlyNonRgbppUtxos,
         onlyConfirmedUtxos: this.onlyConfirmedUtxos,
@@ -377,10 +373,9 @@ export class TxBuilder {
     address: string;
     fromAddress: string;
     fromPublicKey?: string;
-    noUtxosCache?: boolean;
     cacheKey?: string;
   }) {
-    const { address, fromAddress, fromPublicKey, amount, noUtxosCache, cacheKey } = props;
+    const { address, fromAddress, fromPublicKey, amount, cacheKey } = props;
 
     // If any (output.fixed != true) is found in the outputs (search in ASC order),
     // return the change value to the first matched output.
@@ -412,7 +407,6 @@ export class TxBuilder {
         changeAddress: address,
         injectCollected: true,
         deductFromOutputs: false,
-        noUtxosCache,
         cacheKey,
       });
       if (collected < amount) {
