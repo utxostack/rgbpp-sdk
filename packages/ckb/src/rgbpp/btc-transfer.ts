@@ -292,7 +292,17 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
     getRgbppLockConfigDep(isMainnet),
     getSecp256k1CellDep(isMainnet),
   ];
-  const witnesses: Hex[] = inputs.map((_, index) => (index === 0 ? RGBPP_WITNESS_PLACEHOLDER : '0x'));
+
+  const witnesses: Hex[] = [];
+  const lockArgsSet: Set<string> = new Set();
+  for (const cell of rgbppCells) {
+    if (lockArgsSet.has(cell.output.lock.args)) {
+      witnesses.push('0x');
+    } else {
+      lockArgsSet.add(cell.output.lock.args);
+      witnesses.push(RGBPP_WITNESS_PLACEHOLDER);
+    }
+  }
 
   const ckbRawTx: CKBComponents.RawTransaction = {
     version: '0x0',
