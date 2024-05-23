@@ -229,6 +229,8 @@ export const appendIssuerCellToSporesCreate = async ({
   isMainnet,
   ckbFeeRate,
 }: AppendIssuerCellToSporeCreate): Promise<CKBComponents.RawTransaction> => {
+  const rgbppInputsLength = ckbRawTx.inputs.length;
+
   const rawTx = await buildAppendingIssuerCellToSporesCreateTx({
     issuerAddress,
     collector,
@@ -239,7 +241,6 @@ export const appendIssuerCellToSporesCreate = async ({
 
   rawTx.cellDeps = [...rawTx.cellDeps, getSecp256k1CellDep(isMainnet)];
 
-  const rgbppInputsLength = ckbRawTx.inputs.length;
   const issuerLock = addressToScript(issuerAddress);
 
   const keyMap = new Map<string, string>();
