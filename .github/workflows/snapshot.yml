@@ -6,7 +6,6 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
       - develop
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
@@ -47,21 +46,14 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      - name: Clear cache
-        run: pnpm run clean:packages
-
       - name: Build packages
         run: pnpm run build:packages
-
-      - name: Version packages
-        run: npx changeset version --snapshot snap
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to npm (ignore GitHub)
         id: changesets
         uses: changesets/action@v1
         with:
+          version: npx changeset version --snapshot snap
           publish: npx changeset publish --snapshot --tag snap
           createGithubReleases: false
         env:
