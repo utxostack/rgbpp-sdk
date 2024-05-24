@@ -1,5 +1,5 @@
 import { BtcTimeCellsParams, RgbppCkbVirtualTx } from '../types/rgbpp';
-import { append0x, calculateTransactionFee, fetchRgbppAndConfigCellDeps } from '../utils';
+import { append0x, calculateTransactionFee } from '../utils';
 import {
   btcTxIdFromBtcTimeLockArgs,
   buildSpvClientCellDep,

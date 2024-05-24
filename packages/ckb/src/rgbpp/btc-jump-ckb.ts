@@ -6,8 +6,7 @@ import {
   calculateRgbppCellCapacity,
   calculateTransactionFee,
   deduplicateList,
-  fetchRgbppAndConfigCellDeps,
-  fetchXudtCellDep,
+  fetchTypeIdCellDeps,
   isLockArgsSizeExceeded,
   isScriptEqual,
   isUDTTypeSupported,
@@ -135,10 +134,7 @@ export const genBtcJumpCkbVirtualTx = async ({
     outputsData.push(otherRgbppCell.outputData);
   }
 
-  const cellDeps = [
-    ...(await fetchRgbppAndConfigCellDeps(isMainnet)),
-    await fetchXudtCellDep(isMainnet),
-  ];
+  const cellDeps = await fetchTypeIdCellDeps(isMainnet, { rgbpp: true, xudt: true });
   if (needPaymasterCell) {
     cellDeps.push(getSecp256k1CellDep(isMainnet));
   }
