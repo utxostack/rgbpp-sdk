@@ -137,6 +137,9 @@ export class Collector {
     let sumAmount = BigInt(0);
     const isRgbppLock = liveCells.length > 0 && isRgbppLockCellIgnoreChain(liveCells[0].output);
     for (const cell of liveCells) {
+      if (cell.outputData === '0x') {
+        continue;
+      }
       inputs.push({
         previousOutput: {
           txHash: cell.outPoint.txHash,
