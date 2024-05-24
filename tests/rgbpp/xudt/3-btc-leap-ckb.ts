@@ -76,5 +76,5 @@ leapFromBtcToCKB({
   rgbppLockArgsList: [buildRgbppLockArgs(readStepLog('2').index, readStepLog('2').txid)],
   toCkbAddress: 'ckt1qrfrwcdnvssswdwpn3s9v8fp87emat306ctjwsm3nmlkjg8qyza2cqgqq9kxr7vy7yknezj0vj0xptx6thk6pwyr0sxamv6q',
   xudtTypeArgs: readStepLog('1').args,
-  transferAmount: BigInt(800_0000_0000),
+  transferAmount: BigInt(300_0000_0000),
 });

@@ -3,7 +3,6 @@ import { getFastestFeeRate, writeStepLog } from './utils';
 import { BtcAssetsApiError } from 'rgbpp/service';
 import { btcAddress, btcDataSource, btcKeyPair, btcService } from '../env';
 
-
 const prepareUtxo = async () => {
   const feeRate = await getFastestFeeRate();
   console.log('feeRate = ', feeRate);
@@ -20,7 +19,7 @@ const prepareUtxo = async () => {
       },
     ],
     feeRate: feeRate,
-    source :btcDataSource,
+    source: btcDataSource,
   });
 
   // Sign & finalize inputs
@@ -55,4 +54,4 @@ const prepareUtxo = async () => {
   }, 20 * 1000);
 };
 
-prepareUtxo()
+prepareUtxo();

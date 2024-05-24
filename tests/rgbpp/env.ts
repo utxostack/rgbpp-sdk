@@ -6,7 +6,7 @@ import { Collector } from 'rgbpp/ckb';
 
 dotenv.config({ path: __dirname + '/.env' });
 
-export const isMainnet = false
+export const isMainnet = false;
 
 export const collector = new Collector({
   ckbNodeUrl: 'https://testnet.ckb.dev/rpc',

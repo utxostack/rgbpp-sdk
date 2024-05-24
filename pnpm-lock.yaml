@@ -175,31 +175,6 @@ importers:
         specifier: ^16.4.5
         version: 16.4.5
 
-  integrationTest/rgbppTest:
-    dependencies:
-      '@nervosnetwork/ckb-sdk-utils':
-        specifier: ^0.109.1
-        version: 0.109.1
-      rgbpp:
-        specifier: workspace:*
-        version: link:../../packages/rgbpp
-      zx:
-        specifier: ^8.0.2
-        version: 8.1.0
-    devDependencies:
-      '@types/dotenv':
-        specifier: ^8.2.0
-        version: 8.2.0
-      '@types/node':
-        specifier: ^20.11.28
-        version: 20.12.2
-      dotenv:
-        specifier: ^16.4.5
-        version: 16.4.5
-      typescript:
-        specifier: ^5.4.2
-        version: 5.4.3
-
   packages/btc:
     dependencies:
       '@bitcoinerlab/secp256k1':
@@ -316,6 +291,31 @@ importers:
       vitest:
         specifier: ^1.4.0
         version: 1.4.0(@types/node@20.12.12)
+
+  tests/rgbpp:
+    dependencies:
+      '@nervosnetwork/ckb-sdk-utils':
+        specifier: ^0.109.1
+        version: 0.109.1
+      rgbpp:
+        specifier: workspace:*
+        version: link:../../packages/rgbpp
+      zx:
+        specifier: ^8.0.2
+        version: 8.1.0
+    devDependencies:
+      '@types/dotenv':
+        specifier: ^8.2.0
+        version: 8.2.0
+      '@types/node':
+        specifier: ^20.11.28
+        version: 20.12.12
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.4.5
+      typescript:
+        specifier: ^5.4.2
+        version: 5.4.3
 
 packages:
 
@@ -1792,12 +1792,6 @@ packages:
     requiresBuild: true
     dependencies:
       undici-types: 5.26.5
-
-  /@types/node@20.12.2:
-    resolution: {integrity: sha512-zQ0NYO87hyN6Xrclcqp7f8ZbXNbRfoGWNcMvHTPQp9UUrwI0mI7XBz+cu7/W6/VClYo2g63B0cjull/srU7LgQ==}
-    dependencies:
-      undici-types: 5.26.5
-    dev: true
 
   /@types/normalize-package-data@2.4.4:
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}

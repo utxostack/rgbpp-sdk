@@ -72,7 +72,7 @@ const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transfe
     } catch (error) {
       console.error(error);
     }
-  })
+  });
 };
 
 // Use your real BTC UTXO information on the BTC Testnet
@@ -81,5 +81,5 @@ transfer({
   rgbppLockArgsList: [buildRgbppLockArgs(readStepLog('0').index, readStepLog('0').txid)],
   toBtcAddress: 'tb1qtt2vh9q8xam35xxsy35ec6majad8lz8fep8w04',
   xudtTypeArgs: readStepLog('1').args,
-  transferAmount: BigInt(800_0000_0000),
+  transferAmount: BigInt(500_0000_0000),
 });

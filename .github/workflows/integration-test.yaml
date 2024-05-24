@@ -1,4 +1,4 @@
-# Test the functionality of the rgbpp-sdk packages.
+# Test the entire process of RGBPP to ensure the proper functioning of the rgbpp-sdk package.
 
 name: integrationTest
 
@@ -36,13 +36,9 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      - name: Run tests
-        run: |
-          npx ts-node integrationTest/rgbppTest/shared/prepare-utxo.ts &&
-          npx ts-node integrationTest/rgbppTest/xudt/issuexudt/1-issue-xudt.ts &&
-          npx ts-node integrationTest/rgbppTest/xudt/1-ckb-leap-btc.ts &&
-          npx ts-node integrationTest/rgbppTest/xudt/2-btc-transfer.ts &&
-          npx ts-node integrationTest/rgbppTest/xudt/3-btc-leap-ckb.ts
+      - name: Run integration:xudt script
+        working-directory: ./tests/rgbpp
+        run: pnpm run integration:xudt
         env:
           VITE_SERVICE_URL: ${{ secrets.SERVICE_URL }}
           VITE_SERVICE_TOKEN: ${{ secrets.SERVICE_TOKEN }}
