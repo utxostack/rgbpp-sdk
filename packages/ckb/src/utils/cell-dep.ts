@@ -25,7 +25,7 @@ const fetchCellDepsJson = async () => {
     const response = await axios.get(GITHUB_CELL_DEPS_JSON_URL);
     return response.data as CellDepsObject;
   } catch (error) {
-    console.error('Error fetching cell deps:', error);
+    // console.error('Error fetching cell deps:', error);
   }
 };
 
