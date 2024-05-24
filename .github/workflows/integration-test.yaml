@@ -1,6 +1,6 @@
 # Test the entire process of RGBPP to ensure the proper functioning of the rgbpp-sdk package.
 
-name: integrationTest
+name: Integration Tests
 
 on:
   workflow_dispatch:
@@ -32,9 +32,6 @@ jobs:
 
       - name: Build packages
         run: pnpm run build:packages
-
-      - name: Install dependencies
-        run: pnpm i
 
       - name: Run integration:xudt script
         working-directory: ./tests/rgbpp

@@ -59,7 +59,7 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
           if (state === 'completed') {
             const { txhash: txHash } = await btcService.getRgbppTransactionHash(btcTxId);
             console.info(`Rgbpp asset has been jumped from BTC to CKB and the related CKB tx hash is ${txHash}`);
-            console.info(`explorer: https://explorer.nervos.org/transaction/${txHash}`);
+            console.info(`explorer: https://pudge.explorer.nervos.org/transaction/${txHash}`);
           } else {
             console.warn(`Rgbpp CKB transaction failed and the reason is ${failedReason} `);
           }
