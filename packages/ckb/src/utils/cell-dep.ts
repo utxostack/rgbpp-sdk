@@ -56,6 +56,12 @@ export const fetchTypeIdCellDeps = async (
   }
   let cellDeps: CKBComponents.CellDep[] = [];
   if (selected.rgbpp) {
+    // RGB++ config cell is deployed together with the RGB++ lock contract
+    //
+    // contract_deployment_transaction:
+    //   - output(index=0, data=rgbpp_code)
+    //   - output(index=1, data=rgbpp_config)
+    //
     cellDeps = [
       ...cellDeps,
       rgbppLockDep,
@@ -70,6 +76,12 @@ export const fetchTypeIdCellDeps = async (
   }
 
   if (selected.btcTime) {
+    // BTC Time config cell is deployed together with the BTC Time lock contract
+    //
+    // contract_deployment_transaction:
+    //   - output(index=0, data=rgbpp_code)
+    //   - output(index=1, data=rgbpp_config)
+    //
     cellDeps = [
       ...cellDeps,
       btcTimeDep,
