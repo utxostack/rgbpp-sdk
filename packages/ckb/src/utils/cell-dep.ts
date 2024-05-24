@@ -29,110 +29,67 @@ const fetchCellDepsJson = async () => {
   }
 };
 
-export const fetchRgbppAndConfigCellDeps = async (isMainnet: boolean): Promise<CKBComponents.CellDep[]> => {
+export interface CellDepsSelected {
+  rgbpp?: boolean;
+  btcTime?: boolean;
+  xudt?: boolean;
+  unique?: boolean;
+}
+
+export const fetchTypeIdCellDeps = async (
+  isMainnet: boolean,
+  selected: CellDepsSelected,
+): Promise<CKBComponents.CellDep[]> => {
   let rgbppLockDep = getRgbppLockDep(isMainnet);
-  const cellDepsObj = await fetchCellDepsJson();
-  if (cellDepsObj) {
-    rgbppLockDep = isMainnet ? cellDepsObj.rgbpp.mainnet : cellDepsObj.rgbpp.testnet;
-  }
-  return [
-    rgbppLockDep,
-    {
-      ...rgbppLockDep,
-      outPoint: {
-        ...rgbppLockDep.outPoint,
-        index: '0x1',
-      },
-    },
-  ] as CKBComponents.CellDep[];
-};
-
-export const fetchBtcTimeAndConfigCellDeps = async (isMainnet: boolean): Promise<CKBComponents.CellDep[]> => {
-  let btcTimeCellDep = getBtcTimeLockDep(isMainnet);
-  const cellDepsObj = await fetchCellDepsJson();
-  if (cellDepsObj) {
-    btcTimeCellDep = isMainnet ? cellDepsObj.btcTime.mainnet : cellDepsObj.btcTime.testnet;
-  }
-  return [
-    btcTimeCellDep,
-    {
-      ...btcTimeCellDep,
-      outPoint: {
-        ...btcTimeCellDep.outPoint,
-        index: '0x1',
-      },
-    },
-  ] as CKBComponents.CellDep[];
-};
-
-export const fetchUniqueCellDep = async (isMainnet: boolean): Promise<CKBComponents.CellDep> => {
+  let btcTimeDep = getBtcTimeLockDep(isMainnet);
+  let xudtDep = getXudtDep(isMainnet);
   let uniqueDep = getUniqueTypeDep(isMainnet);
-  if (isMainnet) {
-    // The mainnet deployment type of unique type script is data hash
-    return uniqueDep;
-  }
-  const cellDepsObj = await fetchCellDepsJson();
-  if (cellDepsObj) {
-    uniqueDep = cellDepsObj.unique.testnet;
-  }
-  return uniqueDep;
-};
 
-export const fetchXudtCellDep = async (isMainnet: boolean): Promise<CKBComponents.CellDep> => {
-  let xudtDep = getXudtDep(isMainnet);
-  if (isMainnet) {
-    // The mainnet deployment type of xudt type script is data hash
-    return xudtDep;
-  }
-  const cellDepsObj = await fetchCellDepsJson();
-  if (cellDepsObj) {
-    xudtDep = cellDepsObj.xudt.testnet;
-  }
-  return xudtDep;
-};
-
-export const fetchRgbppXudtCellDeps = async (isMainnet: boolean): Promise<CKBComponents.CellDep[]> => {
-  let rgbppLockDep = getRgbppLockDep(isMainnet);
-  let xudtDep = getXudtDep(isMainnet);
   const cellDepsObj = await fetchCellDepsJson();
   if (cellDepsObj) {
     rgbppLockDep = isMainnet ? cellDepsObj.rgbpp.mainnet : cellDepsObj.rgbpp.testnet;
+    btcTimeDep = isMainnet ? cellDepsObj.btcTime.mainnet : cellDepsObj.btcTime.testnet;
     if (!isMainnet) {
       xudtDep = cellDepsObj.xudt.testnet;
+      uniqueDep = cellDepsObj.unique.testnet;
     }
   }
-  return [
-    rgbppLockDep,
-    {
-      ...rgbppLockDep,
-      outPoint: {
-        ...rgbppLockDep.outPoint,
-        index: '0x1',
+  let cellDeps: CKBComponents.CellDep[] = [];
+  if (selected.rgbpp) {
+    cellDeps = [
+      ...cellDeps,
+      rgbppLockDep,
+      {
+        ...rgbppLockDep,
+        outPoint: {
+          ...rgbppLockDep.outPoint,
+          index: '0x1',
+        },
       },
-    },
-    xudtDep,
-  ] as CKBComponents.CellDep[];
-};
+    ] as CKBComponents.CellDep[];
+  }
 
-export const fetchBtcTimeXudtCellDeps = async (isMainnet: boolean): Promise<CKBComponents.CellDep[]> => {
-  let btcTimeCellDep = getBtcTimeLockDep(isMainnet);
-  let xudtDep = getXudtDep(isMainnet);
-  const cellDepsObj = await fetchCellDepsJson();
-  if (cellDepsObj) {
-    btcTimeCellDep = isMainnet ? cellDepsObj.btcTime.mainnet : cellDepsObj.btcTime.testnet;
-    if (!isMainnet) {
-      xudtDep = cellDepsObj.xudt.testnet;
-    }
-  }
-  return [
-    btcTimeCellDep,
-    {
-      ...btcTimeCellDep,
-      outPoint: {
-        ...btcTimeCellDep.outPoint,
-        index: '0x1',
+  if (selected.btcTime) {
+    cellDeps = [
+      ...cellDeps,
+      btcTimeDep,
+      {
+        ...btcTimeDep,
+        outPoint: {
+          ...btcTimeDep.outPoint,
+          index: '0x1',
+        },
       },
-    },
-    xudtDep,
-  ] as CKBComponents.CellDep[];
+    ] as CKBComponents.CellDep[];
+  }
+
+  if (selected.xudt) {
+    cellDeps = [...cellDeps, xudtDep] as CKBComponents.CellDep[];
+  }
+
+  if (selected.unique) {
+    cellDeps = [...cellDeps, uniqueDep] as CKBComponents.CellDep[];
+  }
+
+  return cellDeps;
 };
