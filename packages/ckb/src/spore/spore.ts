@@ -4,7 +4,7 @@ import {
   append0x,
   calculateRgbppSporeCellCapacity,
   calculateTransactionFee,
-  fetchRgbppAndConfigCellDeps,
+  fetchTypeIdCellDeps,
   isClusterSporeTypeSupported,
 } from '../utils';
 import { buildPreLockArgs, calculateCommitment, genRgbppLockScript } from '../utils/rgbpp';
@@ -116,7 +116,7 @@ export const genCreateSporeCkbVirtualTx = async ({
   ];
   const outputsData: Hex[] = [clusterCell.outputData, ...sporeOutputsData];
   const cellDeps = [
-    ...(await fetchRgbppAndConfigCellDeps(isMainnet)),
+    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true })),
     getClusterTypeDep(isMainnet),
     getSporeTypeDep(isMainnet),
     clusterCellDep,
@@ -320,7 +320,7 @@ export const genTransferSporeCkbVirtualTx = async ({
     },
   ];
   const outputsData: Hex[] = [sporeCell.outputData];
-  const cellDeps = [...(await fetchRgbppAndConfigCellDeps(isMainnet)), getSporeTypeDep(isMainnet)];
+  const cellDeps = [...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true })), getSporeTypeDep(isMainnet)];
   const sporeCoBuild = generateSporeTransferCoBuild([sporeCell], outputs);
   const witnesses = [RGBPP_WITNESS_PLACEHOLDER, sporeCoBuild];
 

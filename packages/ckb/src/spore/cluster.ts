@@ -60,7 +60,7 @@ export const genCreateClusterCkbVirtualTx = async ({
     },
   ];
   const outputsData: Hex[] = [bytesToHex(packRawClusterData(clusterData))];
-  const cellDeps = [...(await fetchTypeIdCellDeps(isMainnet, {rgbpp: true})), getClusterTypeDep(isMainnet)];
+  const cellDeps = [...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true })), getClusterTypeDep(isMainnet)];
   const sporeCoBuild = generateClusterCreateCoBuild(outputs[0], outputsData[0]);
   const witnesses = [RGBPP_WITNESS_PLACEHOLDER, sporeCoBuild];
 
