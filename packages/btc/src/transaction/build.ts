@@ -145,9 +145,9 @@ export class TxBuilder {
     const originalInputs = clone(this.inputs);
     const originalOutputs = clone(this.outputs);
 
-    // Create a cache key to prevent querying the Utxo[] too often
+    // Create a cache key to enable the internal caching, prevent querying the Utxo[] too often
     // TODO: consider provide an option to disable the cache
-    const cacheKey = `${Date.now()}`;
+    const internalCacheKey = `${Date.now()}`;
 
     // Fill a default recommended fee rate if props.feeRate is not provided
     let defaultFeeRate: number | undefined;
@@ -181,7 +181,7 @@ export class TxBuilder {
           amount: returnAmount,
           fromAddress: address,
           fromPublicKey: publicKey,
-          cacheKey,
+          internalCacheKey,
         });
       } else {
         // If the inputs have insufficient satoshi, a satoshi collection is required.
@@ -194,7 +194,7 @@ export class TxBuilder {
           targetAmount,
           changeAddress,
           deductFromOutputs,
-          cacheKey,
+          internalCacheKey,
         });
       }
 
@@ -210,7 +210,7 @@ export class TxBuilder {
     }
 
     // Clear cache for the Utxo[] list
-    this.source.cache.cleanUtxos(cacheKey);
+    this.source.cache.cleanUtxos(internalCacheKey);
 
     return {
       fee: currentFee,
@@ -225,7 +225,7 @@ export class TxBuilder {
     changeAddress?: string;
     injectCollected?: boolean;
     deductFromOutputs?: boolean;
-    cacheKey?: string;
+    internalCacheKey?: string;
   }) {
     if (!isSupportedFromAddress(props.address)) {
       throw TxBuildError.withComment(ErrorCodes.UNSUPPORTED_ADDRESS_TYPE, props.address);
@@ -241,14 +241,18 @@ export class TxBuilder {
     /**
      * Collect from the "from" address via DataSource.
      * Will update the value of inputs/collected/changeAmount.
+     *
+     * The API has two layers of data caching:
+     * - noAssetsApiCache: BtcAssetsApi cache, can be disabled if the set to true
+     * - internalCacheKey: Internal cache, enabled if the key is provided
      */
     const _collect = async (_targetAmount: number) => {
       const { utxos, satoshi } = await this.source.collectSatoshi({
         address: props.address,
         targetAmount: _targetAmount,
         allowInsufficient: true,
-        noUtxosCache: true,
-        cacheKey: props.cacheKey,
+        noAssetsApiCache: true,
+        internalCacheKey: props.internalCacheKey,
         minUtxoSatoshi: this.minUtxoSatoshi,
         onlyNonRgbppUtxos: this.onlyNonRgbppUtxos,
         onlyConfirmedUtxos: this.onlyConfirmedUtxos,
@@ -373,9 +377,9 @@ export class TxBuilder {
     address: string;
     fromAddress: string;
     fromPublicKey?: string;
-    cacheKey?: string;
+    internalCacheKey?: string;
   }) {
-    const { address, fromAddress, fromPublicKey, amount, cacheKey } = props;
+    const { address, fromAddress, fromPublicKey, amount, internalCacheKey } = props;
 
     // If any (output.fixed != true) is found in the outputs (search in ASC order),
     // return the change value to the first matched output.
@@ -407,7 +411,7 @@ export class TxBuilder {
         changeAddress: address,
         injectCollected: true,
         deductFromOutputs: false,
-        cacheKey,
+        internalCacheKey,
       });
       if (collected < amount) {
         throw TxBuildError.withComment(ErrorCodes.INSUFFICIENT_UTXO, `expected: ${amount}, actual: ${collected}`);

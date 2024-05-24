@@ -105,8 +105,8 @@ export class DataSource {
     allowInsufficient?: boolean;
     onlyNonRgbppUtxos?: boolean;
     onlyConfirmedUtxos?: boolean;
-    noUtxosCache?: boolean;
-    cacheKey?: string;
+    noAssetsApiCache?: boolean;
+    internalCacheKey?: string;
     excludeUtxos?: {
       txid: string;
       vout: number;
@@ -122,19 +122,19 @@ export class DataSource {
       minUtxoSatoshi,
       onlyConfirmedUtxos,
       onlyNonRgbppUtxos,
-      noUtxosCache,
-      cacheKey,
+      noAssetsApiCache,
+      internalCacheKey,
       allowInsufficient = false,
       excludeUtxos = [],
     } = props;
 
     const utxos = await this.cache.optionalCacheUtxos({
-      key: cacheKey,
+      key: internalCacheKey,
       getter: () =>
         this.getUtxos(address, {
           only_confirmed: onlyConfirmedUtxos,
           min_satoshi: minUtxoSatoshi,
-          no_cache: noUtxosCache,
+          no_cache: noAssetsApiCache,
         }),
     });
 
