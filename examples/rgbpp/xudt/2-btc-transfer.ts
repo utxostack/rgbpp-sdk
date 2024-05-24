@@ -2,6 +2,7 @@ import { buildRgbppLockArgs, getXudtTypeScript } from 'rgbpp/ckb';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { genBtcTransferCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
 import { isMainnet, collector, btcAddress, btcKeyPair, btcService, btcDataSource } from '../env';
+import { saveCkbVirtualTxResult } from '../shared/utils';
 
 interface RgbppTransferParams {
   rgbppLockArgsList: string[];
@@ -23,6 +24,9 @@ const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transfe
     transferAmount,
     isMainnet,
   });
+
+  // Save ckbVirtualTxResult
+  saveCkbVirtualTxResult(ckbVirtualTxResult, '2-btc-transfer');
 
   const { commitment, ckbRawTx } = ckbVirtualTxResult;
 

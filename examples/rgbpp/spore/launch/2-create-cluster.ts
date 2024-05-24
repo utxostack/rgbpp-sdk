@@ -9,6 +9,7 @@ import {
   sendCkbTx,
   updateCkbTxWithRealBtcTxId,
 } from 'rgbpp/ckb';
+import { saveCkbVirtualTxResult } from '../../shared/utils';
 
 const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: string }) => {
   const ckbVirtualTxResult = await genCreateClusterCkbVirtualTx({
@@ -18,6 +19,9 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
     isMainnet,
     ckbFeeRate: BigInt(2000),
   });
+
+  // Save ckbVirtualTxResult
+  saveCkbVirtualTxResult(ckbVirtualTxResult, '2-create-cluster');
 
   const { commitment, ckbRawTx, clusterId } = ckbVirtualTxResult;
 

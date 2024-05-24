@@ -21,6 +21,7 @@ import {
   updateCkbTxWithRealBtcTxId,
 } from 'rgbpp/ckb';
 import { transactionToHex } from 'rgbpp/btc';
+import { saveCkbVirtualTxResult } from '../../shared/utils';
 
 interface Params {
   rgbppLockArgsList: string[];
@@ -42,6 +43,9 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers, xudtTyp
     rgbppReceivers: receivers,
     isMainnet,
   });
+
+  // Save ckbVirtualTxResult
+  saveCkbVirtualTxResult(ckbVirtualTxResult, '3-distribute-rgbpp');
 
   const { commitment, ckbRawTx, sumInputsCapacity, rgbppChangeOutIndex } = ckbVirtualTxResult;
 

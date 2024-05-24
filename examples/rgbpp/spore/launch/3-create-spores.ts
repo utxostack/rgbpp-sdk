@@ -20,6 +20,7 @@ import {
   RawSporeData,
 } from 'rgbpp/ckb';
 import { transactionToHex, utf8ToBuffer } from 'rgbpp/btc';
+import { saveCkbVirtualTxResult } from '../../shared/utils';
 
 interface SporeCreateParams {
   clusterRgbppLockArgs: Hex;
@@ -37,6 +38,9 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
     isMainnet,
     ckbFeeRate: BigInt(2000),
   });
+
+  // Save ckbVirtualTxResult
+  saveCkbVirtualTxResult(ckbVirtualTxResult, '3-create-spores');
 
   const { commitment, ckbRawTx, sumInputsCapacity, clusterCell } = ckbVirtualTxResult;
 

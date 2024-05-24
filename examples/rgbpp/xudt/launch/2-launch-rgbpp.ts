@@ -9,6 +9,7 @@ import {
 import { RGBPP_TOKEN_INFO } from './0-rgbpp-token-info';
 import { btcAddress, btcDataSource, btcKeyPair, btcService, collector, isMainnet } from '../../env';
 import { transactionToHex } from 'rgbpp/btc';
+import { saveCkbVirtualTxResult } from '../../shared/utils';
 
 interface Params {
   ownerRgbppLockArgs: string;
@@ -23,6 +24,9 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
     launchAmount,
     isMainnet,
   });
+
+  // Save ckbVirtualTxResult
+  saveCkbVirtualTxResult(ckbVirtualTxResult, '2-launch-rgbpp');
 
   const { commitment, ckbRawTx } = ckbVirtualTxResult;
 
