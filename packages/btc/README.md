@@ -372,6 +372,8 @@ interface DataSource {
     allowInsufficient?: boolean;
     onlyNonRgbppUtxos?: boolean;
     onlyConfirmedUtxos?: boolean;
+    noAssetsApiCache?: boolean;
+    internalCacheKey?: string;
     excludeUtxos?: {
       txid: string;
       vout: number;

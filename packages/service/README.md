@@ -223,6 +223,7 @@ interface BtcApiBlockTransactionIds {
 
 interface BtcApiBalanceParams {
   min_satoshi?: number;
+  no_cache?: boolean;
 }
 
 interface BtcApiBalance {
@@ -236,6 +237,7 @@ interface BtcApiBalance {
 interface BtcApiUtxoParams {
   only_confirmed?: boolean;
   min_satoshi?: number;
+  no_cache?: boolean;
 }
 
 interface BtcApiUtxo {
@@ -329,6 +331,7 @@ interface RgbppApiTransactionState {
 
 interface RgbppApiAssetsByAddressParams {
   type_script?: string;
+  no_cache?: boolean;
 }
 
 interface RgbppApiSpvProof {
