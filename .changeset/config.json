@@ -1,11 +1,11 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
-  "changelog": ["@changesets/changelog-github", { "repo": "ckb-cell/rgbpp-sdk" }],
+  "changelog": ["./changelog-format.cjs", { "repo": "ckb-cell/rgbpp-sdk" }],
   "commit": false,
   "fixed": [["@rgbpp-sdk/*", "rgbpp"]],
   "linked": [],
   "access": "public",
-  "baseBranch": "main",
+  "baseBranch": "origin/main",
   "updateInternalDependencies": "patch",
   "ignore": []
 }

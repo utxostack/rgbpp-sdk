@@ -16,7 +16,7 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
     rgbppLockArgs: ownerRgbppLockArgs,
     clusterData: CLUSTER_DATA,
     isMainnet,
-    ckbFeeRate: BigInt(5000),
+    ckbFeeRate: BigInt(2000),
   });
 
   const { commitment, ckbRawTx, clusterId } = ckbVirtualTxResult;
@@ -49,6 +49,9 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
       clearInterval(interval);
       // Update CKB transaction with the real BTC txId
       const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet });
+
+      console.log('The cluster rgbpp lock args: ', newCkbRawTx.outputs[0].lock.args);
+
       const ckbTx = await appendCkbTxWitnesses({
         ckbRawTx: newCkbRawTx,
         btcTxBytes,

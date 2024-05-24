@@ -97,7 +97,6 @@ const transferXudt = async ({ xudtType, receivers }: XudtTransferParams) => {
 
   outputs.push({
     lock: fromLock,
-    type: xudtType,
     capacity: append0x(changeCapacity.toString(16)),
   });
   outputsData.push('0x');

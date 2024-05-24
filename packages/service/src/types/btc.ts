@@ -58,6 +58,7 @@ export interface BtcApiRecommendedFeeRates {
 
 export interface BtcApiBalanceParams {
   min_satoshi?: number;
+  no_cache?: boolean;
 }
 export interface BtcApiBalance {
   address: string;
@@ -70,6 +71,7 @@ export interface BtcApiBalance {
 export interface BtcApiUtxoParams {
   only_confirmed?: boolean;
   min_satoshi?: number;
+  no_cache?: boolean;
 }
 export interface BtcApiUtxo {
   txid: string;
