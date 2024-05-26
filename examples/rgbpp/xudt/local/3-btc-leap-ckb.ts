@@ -9,6 +9,7 @@ import {
 } from 'rgbpp/ckb';
 import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../env';
 import { transactionToHex } from 'rgbpp/btc';
+import { saveCkbVirtualTxResult } from '../../shared/utils';
 
 interface LeapToCkbParams {
   rgbppLockArgsList: string[];
@@ -32,6 +33,9 @@ const leapFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
     toCkbAddress,
     isMainnet,
   });
+
+  // Save ckbVirtualTxResult
+  saveCkbVirtualTxResult(ckbVirtualTxResult, '3-btc-leap-ckb-local');
 
   const { commitment, ckbRawTx } = ckbVirtualTxResult;
 

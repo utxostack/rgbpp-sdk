@@ -2,6 +2,7 @@ import { buildRgbppLockArgs, getXudtTypeScript } from 'rgbpp/ckb';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { genBtcJumpCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
 import { isMainnet, collector, btcAddress, btcKeyPair, btcService, btcDataSource } from '../env';
+import { saveCkbVirtualTxResult } from '../shared/utils';
 
 interface LeapToCkbParams {
   rgbppLockArgsList: string[];
@@ -24,6 +25,9 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
     toCkbAddress,
     isMainnet,
   });
+
+  // Save ckbVirtualTxResult
+  saveCkbVirtualTxResult(ckbVirtualTxResult, '3-btc-leap-ckb');
 
   const { commitment, ckbRawTx } = ckbVirtualTxResult;
 

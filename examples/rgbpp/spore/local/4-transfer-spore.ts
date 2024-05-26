@@ -12,6 +12,7 @@ import { sendRgbppUtxos, transactionToHex } from 'rgbpp/btc';
 import { BtcAssetsApiError } from 'rgbpp';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../env';
+import { saveCkbVirtualTxResult } from '../../shared/utils';
 
 interface SporeTransferParams {
   sporeRgbppLockArgs: Hex;
@@ -34,6 +35,9 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }
     isMainnet,
     ckbFeeRate: BigInt(5000),
   });
+
+  // Save ckbVirtualTxResult
+  saveCkbVirtualTxResult(ckbVirtualTxResult, '4-transfer-spore-local');
 
   const { commitment, ckbRawTx, sporeCell } = ckbVirtualTxResult;
 

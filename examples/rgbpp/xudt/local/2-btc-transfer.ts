@@ -9,6 +9,7 @@ import {
 } from 'rgbpp/ckb';
 import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../env';
 import { transactionToHex } from 'rgbpp/btc';
+import { saveCkbVirtualTxResult } from '../../shared/utils';
 
 interface RgbppTransferParams {
   rgbppLockArgsList: string[];
@@ -31,6 +32,9 @@ const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transfe
     transferAmount,
     isMainnet,
   });
+
+  // Save ckbVirtualTxResult
+  saveCkbVirtualTxResult(ckbVirtualTxResult, '2-btc-transfer-local');
 
   const { commitment, ckbRawTx } = ckbVirtualTxResult;
 
