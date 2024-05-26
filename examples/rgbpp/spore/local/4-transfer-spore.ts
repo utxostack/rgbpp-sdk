@@ -37,7 +37,7 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }
   });
 
   // Save ckbVirtualTxResult
-  saveCkbVirtualTxResult(ckbVirtualTxResult, '4-transfer-spore');
+  saveCkbVirtualTxResult(ckbVirtualTxResult, '4-transfer-spore-local');
 
   const { commitment, ckbRawTx, sporeCell } = ckbVirtualTxResult;
 

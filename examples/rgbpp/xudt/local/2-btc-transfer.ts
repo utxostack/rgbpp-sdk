@@ -34,7 +34,7 @@ const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transfe
   });
 
   // Save ckbVirtualTxResult
-  saveCkbVirtualTxResult(ckbVirtualTxResult, '2-btc-transfer');
+  saveCkbVirtualTxResult(ckbVirtualTxResult, '2-btc-transfer-local');
 
   const { commitment, ckbRawTx } = ckbVirtualTxResult;
 

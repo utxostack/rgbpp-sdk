@@ -1,16 +1,30 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import {
+  BaseCkbVirtualTxResult,
+  SporeVirtualTxResult,
+  SporeCreateVirtualTxResult,
+  SporeTransferVirtualTxResult,
+} from 'rgbpp/ckb';
 
 /**
  * Save ckbVirtualTxResult to a log file
  * @param ckbVirtualTxResult - The ckbVirtualTxResult to save
  * @param exampleName - Example name used to distinguish different log files
  */
-export const saveCkbVirtualTxResult = (ckbVirtualTxResult: unknown, exampleName: string) => {
+
+export type CkbVirtualTxResultType =
+  | BaseCkbVirtualTxResult
+  | SporeVirtualTxResult
+  | SporeCreateVirtualTxResult
+  | SporeTransferVirtualTxResult;
+
+export const saveCkbVirtualTxResult = (ckbVirtualTxResult: CkbVirtualTxResultType, exampleName: string) => {
   try {
     // Define log file path
     const logDir = path.resolve(__dirname, '../logs');
-    const logFilePath = path.join(logDir, `${exampleName}-ckbVirtualTxResult.log`);
+    const timestamp = new Date().toISOString().replace(/:/g, '-'); // Replace colons with hyphens
+    const logFilePath = path.join(logDir, `${exampleName}-${timestamp}-ckbVirtualTxResult.log`);
 
     // Ensure the log directory exists
     if (!fs.existsSync(logDir)) {

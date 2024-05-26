@@ -37,7 +37,7 @@ const leapSpore = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTypeArgs }: Sp
   });
 
   // Save ckbVirtualTxResult
-  saveCkbVirtualTxResult(ckbVirtualTxResult, '5-leap-spore-to-ckb');
+  saveCkbVirtualTxResult(ckbVirtualTxResult, '5-leap-spore-to-ckb-local');
 
   const { commitment, ckbRawTx, sporeCell } = ckbVirtualTxResult;
 

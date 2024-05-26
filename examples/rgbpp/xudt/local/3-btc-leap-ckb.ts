@@ -35,7 +35,7 @@ const leapFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
   });
 
   // Save ckbVirtualTxResult
-  saveCkbVirtualTxResult(ckbVirtualTxResult, '3-btc-leap-ckb');
+  saveCkbVirtualTxResult(ckbVirtualTxResult, '3-btc-leap-ckb-local');
 
   const { commitment, ckbRawTx } = ckbVirtualTxResult;
 
