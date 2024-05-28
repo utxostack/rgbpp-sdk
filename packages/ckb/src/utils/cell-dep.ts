@@ -20,9 +20,14 @@ interface CellDepsObject {
 const GITHUB_CELL_DEPS_JSON_URL =
   'https://raw.githubusercontent.com/ckb-cell/typeid-contract-cell-deps/main/deployment/cell-deps.json';
 
+const CDN_GITHUB_CELL_DEPS_JSON_URL =
+  'https://cdn.jsdelivr.net/gh/ckb-cell/typeid-contract-cell-deps@main/deployment/cell-deps.json';
+
+const request = (url: string) => axios.get(url, { timeout: 2000 });
+
 const fetchCellDepsJson = async () => {
   try {
-    const response = await axios.get(GITHUB_CELL_DEPS_JSON_URL);
+    const response = await Promise.any([request(GITHUB_CELL_DEPS_JSON_URL), request(CDN_GITHUB_CELL_DEPS_JSON_URL)]);
     return response.data as CellDepsObject;
   } catch (error) {
     // console.error('Error fetching cell deps:', error);
