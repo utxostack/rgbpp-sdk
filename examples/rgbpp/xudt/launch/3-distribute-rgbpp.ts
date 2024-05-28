@@ -47,7 +47,7 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers, xudtTyp
   // Save ckbVirtualTxResult
   saveCkbVirtualTxResult(ckbVirtualTxResult, '3-distribute-rgbpp');
 
-  const { commitment, ckbRawTx, sumInputsCapacity, rgbppChangeOutIndex } = ckbVirtualTxResult;
+  const { commitment, ckbRawTx, sumInputsCapacity, rgbppChangeOutIndex, needPaymasterCell } = ckbVirtualTxResult;
 
   // The first output utxo is OP_RETURN
   // Rgbpp change utxo position depends on the number of distributions, if 50 addresses are distributed, then the change utxo position is 51
@@ -58,6 +58,7 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers, xudtTyp
     ckbVirtualTx: ckbRawTx,
     commitment,
     tos: receivers.map((receiver) => receiver.toBtcAddress),
+    needPaymaster: needPaymasterCell,
     ckbCollector: collector,
     from: btcAddress!,
     source: btcDataSource,

@@ -42,7 +42,7 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
   // Save ckbVirtualTxResult
   saveCkbVirtualTxResult(ckbVirtualTxResult, '3-create-spores');
 
-  const { commitment, ckbRawTx, sumInputsCapacity, clusterCell } = ckbVirtualTxResult;
+  const { commitment, ckbRawTx, sumInputsCapacity, clusterCell, needPaymasterCell } = ckbVirtualTxResult;
 
   // Send BTC tx
   // The first btc address is the owner of the cluster cell and the rest btc addresses are spore receivers
@@ -51,6 +51,7 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
     ckbVirtualTx: ckbRawTx,
     commitment,
     tos: btcTos,
+    needPaymaster: needPaymasterCell,
     ckbCollector: collector,
     from: btcAddress!,
     source: btcDataSource,
