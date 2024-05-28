@@ -92,5 +92,6 @@ export const genCreateClusterCkbVirtualTx = async ({
     ckbRawTx,
     commitment,
     clusterId,
+    needPaymasterCell: false,
   };
 };

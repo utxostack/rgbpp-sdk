@@ -22,6 +22,8 @@ export interface SporeVirtualTxResult {
   ckbRawTx: CKBComponents.RawTransaction;
   // The rgbpp commitment to be inserted into BTC op_return
   commitment: Hex;
+  // The needPaymasterCell indicates whether a paymaster cell is required
+  needPaymasterCell: boolean;
   // The ID of the cluster to be assigned to the spore. The cluster's ID is equivalent to the type script args of the cluster
   clusterId?: Hex;
 }
@@ -49,6 +51,8 @@ export interface SporeCreateVirtualTxResult {
   sumInputsCapacity: Hex;
   // The cluster cell from ckb-indexer
   clusterCell: IndexerCell;
+  // The needPaymasterCell indicates whether a paymaster cell is required
+  needPaymasterCell: boolean;
 }
 
 export interface BuildAppendingIssuerCellTxParams {
