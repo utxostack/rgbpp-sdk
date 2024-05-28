@@ -84,6 +84,8 @@ export interface RgbppLaunchVirtualTxResult {
   ckbRawTx: CKBComponents.RawTransaction;
   // The rgbpp commitment to be inserted into BTC op_return
   commitment: Hex;
+  // The needPaymasterCell indicates whether a paymaster cell is required
+  needPaymasterCell: boolean;
 }
 
 export interface AppendWitnessesParams {
