@@ -26,6 +26,7 @@ export interface SendRgbppUtxosProps {
   changeAddress?: string;
   minUtxoSatoshi?: number;
   onlyConfirmedUtxos?: boolean;
+  allowUnprovableUtxos?: boolean;
   excludeUtxos?: BaseOutput[];
 }
 
@@ -66,7 +67,7 @@ export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): P
       if (!utxo) {
         throw TxBuildError.withComment(ErrorCodes.CANNOT_FIND_UTXO, `hash: ${args.btcTxid}, index: ${args.outIndex}`);
       }
-      if (utxo.address !== props.from) {
+      if (!props.allowUnprovableUtxos && utxo.address !== props.from) {
         throw TxBuildError.withComment(
           ErrorCodes.REFERENCED_UNPROVABLE_UTXO,
           `hash: ${args.btcTxid}, index: ${args.outIndex}`,
