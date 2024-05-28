@@ -151,6 +151,7 @@ export const genCreateSporeCkbVirtualTx = async ({
     commitment,
     sumInputsCapacity,
     clusterCell,
+    needPaymasterCell: false,
   };
 };
 

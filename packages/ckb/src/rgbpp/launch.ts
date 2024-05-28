@@ -114,5 +114,6 @@ export const genRgbppLaunchCkbVirtualTx = async ({
   return {
     ckbRawTx,
     commitment,
+    needPaymasterCell: false,
   };
 };

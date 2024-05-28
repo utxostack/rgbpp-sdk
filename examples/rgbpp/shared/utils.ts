@@ -5,6 +5,7 @@ import {
   SporeVirtualTxResult,
   SporeCreateVirtualTxResult,
   SporeTransferVirtualTxResult,
+  RgbppLaunchVirtualTxResult,
 } from 'rgbpp/ckb';
 
 /**
@@ -15,6 +16,7 @@ import {
 
 export type CkbVirtualTxResultType =
   | BaseCkbVirtualTxResult
+  | RgbppLaunchVirtualTxResult
   | SporeVirtualTxResult
   | SporeCreateVirtualTxResult
   | SporeTransferVirtualTxResult;

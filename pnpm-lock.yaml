@@ -166,7 +166,7 @@ importers:
         version: 0.109.1
       rgbpp:
         specifier: 0.1.0
-        version: link:../../packages/rgbpp
+        version: 0.1.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
     devDependencies:
       '@types/dotenv':
         specifier: ^8.2.0
@@ -1498,6 +1498,52 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@rgbpp-sdk/btc@0.1.0(@ckb-lumos/lumos@0.22.0-next.5):
+    resolution: {integrity: sha512-9talyTo3bhHpbLmPNXakMJ7J4NplVKhYYVXBf44z8vEbqi37iFLxYJf+vPrLk5UzXkI9XH5Grx6ty3mrp/jBug==}
+    dependencies:
+      '@bitcoinerlab/secp256k1': 1.1.1
+      '@ckb-lumos/codec': 0.22.2
+      '@nervosnetwork/ckb-types': 0.109.1
+      '@rgbpp-sdk/ckb': 0.1.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
+      '@rgbpp-sdk/service': 0.1.0
+      bip32: 4.0.0
+      bitcoinjs-lib: 6.1.5
+      ecpair: 2.1.0
+      lodash: 4.17.21
+    transitivePeerDependencies:
+      - '@ckb-lumos/lumos'
+      - debug
+    dev: false
+
+  /@rgbpp-sdk/ckb@0.1.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21):
+    resolution: {integrity: sha512-C+wBxf9VxBD/YhbjxKDExHfbV8QoT0yjjXnHoMoMmadalIwEhzM6a3vnJc++PA8Iv5RslAPlmnncvZfe/yrFVw==}
+    dependencies:
+      '@ckb-lumos/base': 0.22.2
+      '@ckb-lumos/codec': 0.22.2
+      '@exact-realty/multipart-parser': 1.0.13
+      '@nervosnetwork/ckb-sdk-core': 0.109.1
+      '@nervosnetwork/ckb-sdk-utils': 0.109.1
+      '@nervosnetwork/ckb-types': 0.109.1
+      '@rgbpp-sdk/service': 0.1.0
+      '@spore-sdk/core': 0.2.0-beta.6(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
+      axios: 1.6.8
+      camelcase-keys: 7.0.2
+      js-sha256: 0.11.0
+    transitivePeerDependencies:
+      - '@ckb-lumos/lumos'
+      - debug
+      - lodash
+    dev: false
+
+  /@rgbpp-sdk/service@0.1.0:
+    resolution: {integrity: sha512-POOjjBeSkqTfddclvxVCAeCd/gXXFyo0kXHsZxjOVwybgWKDOTVBxpTKv3AfEYIHcYiQgI52MuCdPLbCgpTp3g==}
+    dependencies:
+      '@ckb-lumos/base': 0.22.2
+      '@ckb-lumos/codec': 0.22.2
+      '@nervosnetwork/ckb-types': 0.109.1
+      lodash: 4.17.21
+    dev: false
 
   /@rollup/plugin-inject@5.0.5:
     resolution: {integrity: sha512-2+DEJbNBoPROPkgTDNe8/1YXWcqxbN5DTjASVIOx8HS+pITXushyNiBV56RB08zuptzz8gT3YfkqriTBVycepg==}
@@ -5170,6 +5216,18 @@ packages:
   /rfdc@1.3.1:
     resolution: {integrity: sha512-r5a3l5HzYlIC68TpmYKlxWjmOP6wiPJ1vWv2HeLhNsRZMrCkxeqxiHlQ21oXmQ4F3SiryXBHhAD7JZqvOJjFmg==}
     dev: true
+
+  /rgbpp@0.1.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21):
+    resolution: {integrity: sha512-bZtLDnXBoOwmUiabnJyndi2Q1z2Xm4GlJ7rpRaLatolsuzoWM3w1e6i+EUaCgqwYjvBk+qHZzdm4vUBAtKlArA==}
+    dependencies:
+      '@rgbpp-sdk/btc': 0.1.0(@ckb-lumos/lumos@0.22.0-next.5)
+      '@rgbpp-sdk/ckb': 0.1.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
+      '@rgbpp-sdk/service': 0.1.0
+    transitivePeerDependencies:
+      - '@ckb-lumos/lumos'
+      - debug
+      - lodash
+    dev: false
 
   /rimraf@3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
