@@ -15,6 +15,7 @@ export interface SendRgbppUtxosProps {
   commitment: string;
   tos?: string[];
   paymaster?: TxAddressOutput;
+  needPaymaster?: boolean;
 
   ckbCollector: Collector;
   rgbppMinUtxoSatoshi?: number;
@@ -174,8 +175,14 @@ async function getMergedBtcOutputs(btcOutputs: InitOutput[], props: SendRgbppUtx
 
   // Add paymaster output, only if paymaster address exists and needed
   const paymaster = defaultPaymaster ?? props.paymaster;
-  const isCkbTxCapacitySufficient = await checkCkbTxInputsCapacitySufficient(props.ckbVirtualTx, props.ckbCollector);
-  if (paymaster && !isCkbTxCapacitySufficient) {
+  const isNeedPaymasterOutput = await (async () => {
+    if (props.needPaymaster !== undefined) {
+      return props.needPaymaster;
+    }
+    const isInputsSufficient = await checkCkbTxInputsCapacitySufficient(props.ckbVirtualTx, props.ckbCollector);
+    return !isInputsSufficient;
+  })();
+  if (paymaster && isNeedPaymasterOutput) {
     merged.push({
       ...paymaster,
       fixed: true,
