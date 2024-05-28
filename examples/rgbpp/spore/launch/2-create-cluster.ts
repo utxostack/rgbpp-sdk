@@ -23,7 +23,7 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
   // Save ckbVirtualTxResult
   saveCkbVirtualTxResult(ckbVirtualTxResult, '2-create-cluster');
 
-  const { commitment, ckbRawTx, clusterId } = ckbVirtualTxResult;
+  const { commitment, ckbRawTx, clusterId, needPaymasterCell } = ckbVirtualTxResult;
 
   console.log('clusterId: ', clusterId);
 
@@ -32,6 +32,7 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
     ckbVirtualTx: ckbRawTx,
     commitment,
     tos: [btcAddress!],
+    needPaymaster: needPaymasterCell,
     ckbCollector: collector,
     from: btcAddress!,
     source: btcDataSource,
