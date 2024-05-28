@@ -1,6 +1,6 @@
 {
   "name": "@rgbpp-sdk/ckb",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "scripts": {
     "test": "vitest",
     "build": "tsc -p tsconfig.build.json",

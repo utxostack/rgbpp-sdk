@@ -1,25 +1,22 @@
 {
   "name": "rgbpp-examples",
   "version": "0.1.0",
-  "description": "Examples used for RGBPP assets issuance, transfer, and jumping between BTC and CKB",
+  "description": "Examples used for RGBPP assets issuance, transfer, and leaping between BTC and CKB",
   "private": true,
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "format": "prettier --write '**/*.{js,ts}'",
     "lint": "tsc && eslint . && prettier --check '**/*.{js,ts}'",
     "lint:fix": "tsc && eslint --fix --ext .js,.ts . && prettier --write '**/*.{js,ts}'"
   },
   "dependencies": {
-    "@exact-realty/multipart-parser": "^1.0.13",
     "@nervosnetwork/ckb-sdk-utils": "^0.109.1",
-    "@rgbpp-sdk/btc": "workspace:^",
-    "@rgbpp-sdk/ckb": "workspace:^",
-    "@rgbpp-sdk/service": "workspace:^",
-    "@spore-sdk/core": "^0.2.0-beta.6",
-    "axios": "^1.6.8"
+    "rgbpp": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.11.28",
-    "typescript": "^5.4.2"
+    "typescript": "^5.4.2",
+    "dotenv": "^16.4.5",
+    "@types/dotenv": "^8.2.0"
   }
 }

@@ -52,6 +52,6 @@ jobs:
       - name: Run tests for packages
         run: pnpm run test:packages
         env:
-          VITE_SERVICE_URL: ${{ secrets.SERVICE_URL }}
-          VITE_SERVICE_TOKEN: ${{ secrets.SERVICE_TOKEN }}
-          VITE_SERVICE_ORIGIN: ${{ secrets.SERVICE_ORIGIN }}
+          VITE_BTC_SERVICE_URL: ${{ secrets.SERVICE_URL }}
+          VITE_BTC_SERVICE_TOKEN: ${{ secrets.SERVICE_TOKEN }}
+          VITE_BTC_SERVICE_ORIGIN: ${{ secrets.SERVICE_ORIGIN }}

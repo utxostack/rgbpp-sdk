@@ -12,7 +12,7 @@ import {
 import { u64ToLe } from './hex';
 import { Hex, IndexerCell, SporesCreateCobuildParams } from '../types';
 import { NoRgbppLiveCellError, RgbppSporeTypeMismatchError, RgbppUtxoBindMultiTypeAssetsError } from '../error';
-import { isScriptEqual } from './ckb-tx';
+import { isScriptEqual, isSporeTypeSupported } from './ckb-tx';
 
 // Generate type id for cluster id
 export const generateClusterId = (firstInput: CKBComponents.CellInput, firstOutputIndex: number) => {
@@ -101,7 +101,11 @@ export const generateSporeTransferCoBuild = (
 };
 
 // Check the validity of RGB++ spore cells and throw an exception if the conditions are not met to avoid building invalid CKB TX
-export const throwErrorWhenSporeCellsInvalid = (sporeCells: IndexerCell[] | undefined, sporeTypeBytes: Hex) => {
+export const throwErrorWhenSporeCellsInvalid = (
+  sporeCells: IndexerCell[] | undefined,
+  sporeTypeBytes: Hex,
+  isMainnet: boolean,
+) => {
   if (!sporeCells || sporeCells.length === 0) {
     throw new NoRgbppLiveCellError('No spore rgbpp cells found with the spore rgbpp lock args');
   }
@@ -112,6 +116,10 @@ export const throwErrorWhenSporeCellsInvalid = (sporeCells: IndexerCell[] | unde
 
   if (!sporeCell.output.type) {
     throw new RgbppSporeTypeMismatchError('The cell with the rgbpp lock args has no spore asset');
+  }
+
+  if (!isSporeTypeSupported(sporeCell.output.type, isMainnet)) {
+    throw new RgbppSporeTypeMismatchError('The cell type is not the supported spore type script');
   }
 
   if (!isScriptEqual(sporeCell.output.type, sporeTypeBytes)) {

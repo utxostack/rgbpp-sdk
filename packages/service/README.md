@@ -10,6 +10,9 @@ The `@rgbpp-sdk/service` package provides a wrapped class to interact with `Bitc
 - Simplify RGB++ assets workflows with **RGB++ CKB transaction Queue** and cron jobs
 - More detailed API documentation can be found on [Testnet](https://btc-assets-api.testnet.mibao.pro/docs) and [Mainnet](https://api.rgbpp.io/docs)
 
+> [!NOTE]
+> `Bitcoin/RGB++ Assets Service` is designed to streamline the transaction workflow. Developers have the option to implement its features by themselves without limitation.
+
 ## Installation
 
 ```bash
@@ -25,14 +28,22 @@ $ pnpm add @rgbpp-sdk/service
 
 ### Get an access token
 
-The BtcAssetsApi is currently limited to verified apps only.
-If you're a developer and want to access the BtcAssetsApi service,
-please email us to request a JWT token for your app: f@cell.studio.
+#### Testnet
 
-In the email, you should provide us some information about your app:
+You can get a testnet access token through the [/token/generate](https://btc-assets-api.testnet.mibao.pro/docs/static/index.html#/Token/post_token_generate) API directly.
+
+#### Mainnet
+
+The mainnet BtcAssetsApi is currently limited to verified apps only.
+
+When your app development is ready on testnet, and requires a mainnet access token,
+please email us at f@cell.studio to request a mainnet JWT token.
+
+In the email, please provide the following information about your app:
 
 - `name`: Your app name, e.g. "rgbpp-app"
-- `domain`: Your app domain, e.g. "rgbpp.app" (without protocol)
+- `domain`: Your app domain, e.g. "rgbpp.app" (without protocol prefix and port suffix)
+
 
 ### Initialize the service
 
@@ -83,7 +94,7 @@ console.log(res);
 // }
 ```
 
-All available APIs in the [BtcAssetsApi](#btcassetsapi-1) section.
+All available APIs in the [BtcAssetsApi](#types) section.
 
 ### Handling service errors
 
@@ -212,6 +223,7 @@ interface BtcApiBlockTransactionIds {
 
 interface BtcApiBalanceParams {
   min_satoshi?: number;
+  no_cache?: boolean;
 }
 
 interface BtcApiBalance {
@@ -225,6 +237,7 @@ interface BtcApiBalance {
 interface BtcApiUtxoParams {
   only_confirmed?: boolean;
   min_satoshi?: number;
+  no_cache?: boolean;
 }
 
 interface BtcApiUtxo {
@@ -318,6 +331,7 @@ interface RgbppApiTransactionState {
 
 interface RgbppApiAssetsByAddressParams {
   type_script?: string;
+  no_cache?: boolean;
 }
 
 interface RgbppApiSpvProof {

@@ -1,0 +1,24 @@
+{
+  "name": "rgbpp-integration-tests",
+  "version": "0.1.0",
+  "description": "Test the entire process of RGBPP to ensure the proper functioning of the rgbpp-sdk package.",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "format": "prettier --write '**/*.{js,ts}'",
+    "lint": "tsc && eslint . && prettier --check '**/*.{js,ts}'",
+    "lint:fix": "tsc && eslint --fix --ext .js,.ts . && prettier --write '**/*.{js,ts}'",
+    "integration:xudt": "npx ts-node shared/prepare-utxo.ts && npx ts-node xudt/xudt-on-ckb/1-issue-xudt.ts && npx ts-node xudt/1-ckb-leap-btc.ts && npx ts-node xudt/2-btc-transfer.ts && npx ts-node xudt/3-btc-leap-ckb.ts"
+  },
+  "dependencies": {
+    "@nervosnetwork/ckb-sdk-utils": "^0.109.1",
+    "rgbpp": "workspace:*",
+    "zx": "^8.0.2"
+ },
+  "devDependencies": {
+    "@types/node": "^20.11.28",
+    "typescript": "^5.4.2",
+    "dotenv": "^16.4.5",
+    "@types/dotenv": "^8.2.0"
+  }
+}

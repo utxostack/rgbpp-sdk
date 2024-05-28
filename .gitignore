@@ -30,6 +30,7 @@
 .env.development.local
 .env.production.local
 .env.test.local
+.env
 **/.npmrc
 
 # logs
@@ -40,3 +41,4 @@ yarn-error.log*
 devbox.json
 devbox.lock
 .envrc
+

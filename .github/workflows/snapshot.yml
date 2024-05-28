@@ -6,7 +6,6 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
       - develop
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
@@ -47,22 +46,28 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      - name: Clear cache
-        run: pnpm run clean:packages
-
       - name: Build packages
         run: pnpm run build:packages
 
-      - name: Version packages
+      - name: Add snapshot changeset (ensure at least has a changeset)
+        run: |
+          cat << EOF > ".changeset/snap-release-changeset.md"
+            ---
+            "@rgbpp-sdk/btc": patch
+            ---
+            Add temp changeset for snapshot releases
+          EOF
+
+      - name: Version packages to "0.0.0-snap-{timestamp}"
         run: npx changeset version --snapshot snap
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish to npm (ignore GitHub)
+      - name: Publish to npm
         id: changesets
         uses: changesets/action@v1
         with:
-          publish: npx changeset publish --snapshot --tag snap
+          publish: npx changeset publish --no-git-tag --snapshot --tag snap
           createGithubReleases: false
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

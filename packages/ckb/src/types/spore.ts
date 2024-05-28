@@ -51,6 +51,21 @@ export interface SporeCreateVirtualTxResult {
   clusterCell: IndexerCell;
 }
 
+export interface BuildAppendingIssuerCellTxParams {
+  // The issuer ckb address
+  issuerAddress: Address;
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // CKB raw transaction
+  ckbRawTx: CKBComponents.RawTransaction;
+  // The sum capacity of the ckb inputs
+  sumInputsCapacity: Hex;
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+  witnessLockPlaceholderSize?: number;
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
+}
+
 export interface AppendIssuerCellToSporeCreate {
   // The Secp256k1 private key of the issuer cells maintainer
   secp256k1PrivateKey: Hex;

@@ -110,6 +110,7 @@ export class Collector {
     const changeCapacity = config?.minCapacity ?? MIN_CAPACITY;
     const inputs: CKBComponents.CellInput[] = [];
     let sumInputsCapacity = BigInt(0);
+    const isRgbppLock = liveCells.length > 0 && isRgbppLockCellIgnoreChain(liveCells[0].output);
     for (const cell of liveCells) {
       inputs.push({
         previousOutput: {
@@ -119,7 +120,7 @@ export class Collector {
         since: '0x0',
       });
       sumInputsCapacity += BigInt(cell.output.capacity);
-      if (sumInputsCapacity >= needCapacity + changeCapacity + fee && !config?.isMax) {
+      if (sumInputsCapacity >= needCapacity + changeCapacity + fee && !isRgbppLock) {
         break;
       }
     }
@@ -136,6 +137,9 @@ export class Collector {
     let sumAmount = BigInt(0);
     const isRgbppLock = liveCells.length > 0 && isRgbppLockCellIgnoreChain(liveCells[0].output);
     for (const cell of liveCells) {
+      if (cell.outputData === '0x') {
+        continue;
+      }
       inputs.push({
         previousOutput: {
           txHash: cell.outPoint.txHash,

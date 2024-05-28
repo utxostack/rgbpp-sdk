@@ -11,6 +11,8 @@ import {
 import { Hex, RgbppTokenInfo } from '../types';
 import { PERSONAL, blake2b, hexToBytes, serializeInput, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { encodeRgbppTokenInfo, genBtcTimeLockScript } from './rgbpp';
+import { Collector } from '../collector';
+import { NoLiveCellError } from '../error';
 
 export const calculateTransactionFee = (txSize: number, feeRate?: bigint): bigint => {
   const rate = feeRate ?? BigInt(1100);
@@ -27,19 +29,30 @@ export const isUDTTypeSupported = (type: CKBComponents.Script, isMainnet: boolea
   return xudtType === typeAsset;
 };
 
-export const isClusterSporeTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
+export const isSporeTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
   const sporeType = serializeScript(getSporeTypeScript(isMainnet));
   const typeAsset = serializeScript({
     ...type,
     args: '',
   });
+  return sporeType === typeAsset;
+};
+
+export const isClusterSporeTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
+  const typeAsset = serializeScript({
+    ...type,
+    args: '',
+  });
   const clusterType = serializeScript(getClusterTypeScript(isMainnet));
-  return sporeType === typeAsset || clusterType === typeAsset;
+  return isSporeTypeSupported(type, isMainnet) || clusterType === typeAsset;
 };
 
 export const isTypeAssetSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
   return isUDTTypeSupported(type, isMainnet) || isClusterSporeTypeSupported(type, isMainnet);
 };
+
+const CELL_CAPACITY_SIZE = 8;
+const UDT_CELL_DATA_SIZE = 16;
 
 // The BTC_TIME_CELL_INCREASED_SIZE is related to the specific lock script.
 // We assume that the maximum length of lock script args is 26 bytes. If it exceeds, an error will be thrown.
@@ -61,7 +74,8 @@ const RGBPP_LOCK_SIZE = 32 + 1 + 36;
 export const calculateRgbppCellCapacity = (xudtType?: CKBComponents.Script): bigint => {
   const typeArgsSize = xudtType ? remove0x(xudtType.args).length / 2 : 32;
   const udtTypeSize = 33 + typeArgsSize;
-  const cellSize = RGBPP_LOCK_SIZE + udtTypeSize + 8 + 16 + BTC_TIME_CELL_INCREASED_SIZE;
+  const cellSize =
+    RGBPP_LOCK_SIZE + udtTypeSize + CELL_CAPACITY_SIZE + UDT_CELL_DATA_SIZE + BTC_TIME_CELL_INCREASED_SIZE;
   return BigInt(cellSize + 1) * CKB_UNIT;
 };
 
@@ -72,7 +86,9 @@ const DEFAULT_UDT_ARGS_SIZE = 32;
 export const calculateUdtCellCapacity = (lock: CKBComponents.Script, udtType?: CKBComponents.Script): bigint => {
   const lockArgsSize = remove0x(lock.args).length / 2;
   const typeArgsSize = udtType ? remove0x(udtType.args).length / 2 : DEFAULT_UDT_ARGS_SIZE;
-  const cellSize = 33 + lockArgsSize + 33 + typeArgsSize + 8 + 16;
+  const lockSize = 33 + lockArgsSize;
+  const typeSize = 33 + typeArgsSize;
+  const cellSize = lockSize + typeSize + CELL_CAPACITY_SIZE + UDT_CELL_DATA_SIZE;
   return BigInt(cellSize + 1) * CKB_UNIT;
 };
 
@@ -81,7 +97,7 @@ export const calculateXudtTokenInfoCellCapacity = (tokenInfo: RgbppTokenInfo, lo
   const lockSize = remove0x(lock.args).length / 2 + 33;
   const cellDataSize = remove0x(encodeRgbppTokenInfo(tokenInfo)).length / 2;
   const uniqueTypeSize = 32 + 1 + 20;
-  const cellSize = lockSize + uniqueTypeSize + 8 + cellDataSize;
+  const cellSize = lockSize + uniqueTypeSize + CELL_CAPACITY_SIZE + cellDataSize;
   return BigInt(cellSize) * CKB_UNIT;
 };
 
@@ -91,7 +107,7 @@ export const calculateRgbppTokenInfoCellCapacity = (tokenInfo: RgbppTokenInfo, i
   const lockSize = remove0x(btcTimeLock.args).length / 2 + 33;
   const cellDataSize = remove0x(encodeRgbppTokenInfo(tokenInfo)).length / 2;
   const typeSize = 32 + 1 + 20;
-  const cellSize = lockSize + typeSize + 8 + cellDataSize;
+  const cellSize = lockSize + typeSize + CELL_CAPACITY_SIZE + cellDataSize;
   return BigInt(cellSize) * CKB_UNIT;
 };
 
@@ -109,7 +125,7 @@ export const generateUniqueTypeArgs = (firstInput: CKBComponents.CellInput, firs
 export const calculateRgbppClusterCellCapacity = (clusterData: RawClusterData): bigint => {
   const clusterDataSize = packRawClusterData(clusterData).length;
   const clusterTypeSize = 32 + 1 + 32;
-  const cellSize = RGBPP_LOCK_SIZE + clusterTypeSize + 8 + clusterDataSize;
+  const cellSize = RGBPP_LOCK_SIZE + clusterTypeSize + CELL_CAPACITY_SIZE + clusterDataSize;
   return BigInt(cellSize + 1) * CKB_UNIT;
 };
 
@@ -125,7 +141,7 @@ export const calculateRgbppClusterCellCapacity = (clusterData: RawClusterData): 
 export const calculateRgbppSporeCellCapacity = (sporeData: SporeDataProps): bigint => {
   const sporeDataSize = packRawSporeData(sporeData).length;
   const sporeTypeSize = 32 + 1 + 32;
-  const cellSize = RGBPP_LOCK_SIZE + sporeTypeSize + 8 + sporeDataSize + BTC_TIME_CELL_INCREASED_SIZE;
+  const cellSize = RGBPP_LOCK_SIZE + sporeTypeSize + CELL_CAPACITY_SIZE + sporeDataSize + BTC_TIME_CELL_INCREASED_SIZE;
   return BigInt(cellSize + 1) * CKB_UNIT;
 };
 
@@ -138,4 +154,28 @@ export const isScriptEqual = (s1: Hex | CKBComponents.Script, s2: Hex | CKBCompo
   const temp1 = typeof s1 === 'string' ? remove0x(s1) : remove0x(serializeScript(s1));
   const temp2 = typeof s2 === 'string' ? remove0x(s2) : remove0x(serializeScript(s2));
   return temp1 === temp2;
+};
+
+/**
+ * Check whether the capacity of inputs is sufficient for outputs
+ * @param ckbTx CKB raw transaction
+ * @param collector The collector that collects CKB live cells and transactions
+ * @returns When the capacity of inputs is sufficient for outputs, return true, otherwise return false
+ */
+export const checkCkbTxInputsCapacitySufficient = async (
+  ckbTx: CKBComponents.RawTransaction,
+  collector: Collector,
+): Promise<boolean> => {
+  let sumInputsCapacity = BigInt(0);
+  for await (const input of ckbTx.inputs) {
+    const liveCell = await collector.getLiveCell(input.previousOutput!);
+    if (!liveCell) {
+      throw new NoLiveCellError('The cell with the specific out point is dead');
+    }
+    sumInputsCapacity += BigInt(liveCell.output.capacity);
+  }
+  const sumOutputsCapacity = ckbTx.outputs
+    .map((output) => BigInt(output.capacity))
+    .reduce((prev, current) => prev + current, BigInt(0));
+  return sumInputsCapacity > sumOutputsCapacity;
 };

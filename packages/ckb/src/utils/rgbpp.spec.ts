@@ -16,6 +16,7 @@ import {
   transformSpvProof,
   throwErrorWhenTxInputsExceeded,
   throwErrorWhenRgbppCellsInvalid,
+  isRgbppCapacitySufficientForChange,
 } from './rgbpp';
 import { getXudtTypeScript } from '../constants';
 import { IndexerCell, RgbppCkbVirtualTx } from '../types';
@@ -375,5 +376,17 @@ describe('rgbpp tests', () => {
         expect('No rgbpp cells found with the xudt type script and the rgbpp lock args').toBe(error.message);
       }
     }
+  });
+
+  it('isRgbppCapacityEnoughForChange', () => {
+    expect(false).toBe(
+      isRgbppCapacitySufficientForChange(BigInt(500) * BigInt(10000_0000), BigInt(254) * BigInt(10000_0000)),
+    );
+    expect(false).toBe(
+      isRgbppCapacitySufficientForChange(BigInt(507) * BigInt(10000_0000), BigInt(254) * BigInt(10000_0000)),
+    );
+    expect(true).toBe(
+      isRgbppCapacitySufficientForChange(BigInt(508) * BigInt(10000_0000), BigInt(254) * BigInt(10000_0000)),
+    );
   });
 });

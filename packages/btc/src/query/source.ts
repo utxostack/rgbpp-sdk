@@ -6,14 +6,17 @@ import { TxAddressOutput } from '../transaction/build';
 import { isOpReturnScriptPubkey } from '../transaction/embed';
 import { addressToScriptPublicKeyHex, getAddressType } from '../address';
 import { remove0x } from '../utils';
+import { DataCache } from './cache';
 
 export class DataSource {
+  public cache: DataCache;
   public service: BtcAssetsApi;
   public networkType: NetworkType;
 
   constructor(service: BtcAssetsApi, networkType: NetworkType) {
     this.service = service;
     this.networkType = networkType;
+    this.cache = new DataCache();
   }
 
   // Query a UTXO from the service.
@@ -35,14 +38,14 @@ export class DataSource {
     const txId = remove0x(hash);
     const tx = await this.service.getBtcTransaction(txId);
     if (!tx) {
-      return void 0;
+      return undefined;
     }
     if (requireConfirmed && !tx.status.confirmed) {
       throw TxBuildError.withComment(ErrorCodes.UNCONFIRMED_UTXO, `hash: ${hash}, index: ${index}`);
     }
     const vout = tx.vout[index];
     if (!vout) {
-      return void 0;
+      return undefined;
     }
 
     const scriptBuffer = Buffer.from(vout.scriptpubkey, 'hex');
@@ -102,6 +105,8 @@ export class DataSource {
     allowInsufficient?: boolean;
     onlyNonRgbppUtxos?: boolean;
     onlyConfirmedUtxos?: boolean;
+    noAssetsApiCache?: boolean;
+    internalCacheKey?: string;
     excludeUtxos?: {
       txid: string;
       vout: number;
@@ -117,12 +122,20 @@ export class DataSource {
       minUtxoSatoshi,
       onlyConfirmedUtxos,
       onlyNonRgbppUtxos,
+      noAssetsApiCache,
+      internalCacheKey,
       allowInsufficient = false,
       excludeUtxos = [],
     } = props;
-    const utxos = await this.getUtxos(address, {
-      only_confirmed: onlyConfirmedUtxos,
-      min_satoshi: minUtxoSatoshi,
+
+    const utxos = await this.cache.optionalCacheUtxos({
+      key: internalCacheKey,
+      getter: () =>
+        this.getUtxos(address, {
+          only_confirmed: onlyConfirmedUtxos,
+          min_satoshi: minUtxoSatoshi,
+          no_cache: noAssetsApiCache,
+        }),
     });
 
     const collected = [];
@@ -140,8 +153,14 @@ export class DataSource {
         }
       }
       if (onlyNonRgbppUtxos) {
-        const ckbRgbppAssets = await this.service.getRgbppAssetsByBtcUtxo(utxo.txid, utxo.vout);
-        if (ckbRgbppAssets && ckbRgbppAssets.length > 0) {
+        const hasRgbppAssets = await this.cache.optionalCacheHasRgbppAssets({
+          key: `${utxo.txid}:${utxo.vout}`,
+          getter: async () => {
+            const ckbRgbppAssets = await this.service.getRgbppAssetsByBtcUtxo(utxo.txid, utxo.vout);
+            return Array.isArray(ckbRgbppAssets) && ckbRgbppAssets.length > 0;
+          },
+        });
+        if (hasRgbppAssets) {
           continue;
         }
       }

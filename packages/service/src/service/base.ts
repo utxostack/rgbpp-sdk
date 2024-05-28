@@ -32,15 +32,14 @@ export class BtcAssetsApiBase implements BaseApis {
       await this.init();
     }
 
-    const packedParams = params ? '?' + new URLSearchParams(pickBy(params, (val) => val !== undefined)).toString() : '';
-    const withOriginHeaders = this.origin ? { origin: this.origin } : void 0;
-    const withAuthHeaders = requireToken && this.token ? { Authorization: `Bearer ${this.token}` } : void 0;
+    const pickedParams = pickBy(params, (val) => val !== undefined);
+    const packedParams = params ? '?' + new URLSearchParams(pickedParams).toString() : '';
     const url = `${this.url}${route}${packedParams}`;
     const res = await fetch(url, {
       method,
       headers: {
-        ...withOriginHeaders,
-        ...withAuthHeaders,
+        authorization: this.token ? `Bearer ${this.token}` : undefined,
+        origin: this.origin,
         ...headers,
       },
       ...otherOptions,
@@ -96,8 +95,8 @@ export class BtcAssetsApiBase implements BaseApis {
     if (status !== 200 && status !== 404 && !allow404) {
       throw BtcAssetsApiError.withComment(ErrorCodes.ASSETS_API_RESPONSE_ERROR, comment, context);
     }
-    if (status !== 200) {
-      return void 0 as T;
+    if (status === 404 && allow404) {
+      return undefined as T;
     }
 
     return json! as T;
@@ -141,8 +140,8 @@ export class BtcAssetsApiBase implements BaseApis {
 
 function tryParseBody(body: unknown): Record<string, unknown> | undefined {
   try {
-    return typeof body === 'string' ? JSON.parse(body) : void 0;
+    return typeof body === 'string' ? JSON.parse(body) : undefined;
   } catch {
-    return void 0;
+    return undefined;
   }
 }

@@ -44,6 +44,7 @@ export interface RgbppApiTransactionState {
 
 export interface RgbppApiAssetsByAddressParams {
   type_script?: string;
+  no_cache?: boolean;
 }
 
 export interface RgbppApiSpvProof {
