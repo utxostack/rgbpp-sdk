@@ -1,7 +1,7 @@
 import { Collector, checkCkbTxInputsCapacitySufficient } from '@rgbpp-sdk/ckb';
 import { isRgbppLockCell, isBtcTimeLockCell, calculateCommitment } from '@rgbpp-sdk/ckb';
 import { bitcoin } from '../bitcoin';
-import { Utxo } from '../transaction/utxo';
+import { BaseOutput, Utxo } from '../transaction/utxo';
 import { DataSource } from '../query/source';
 import { NetworkType } from '../preset/types';
 import { ErrorCodes, TxBuildError } from '../error';
@@ -26,6 +26,7 @@ export interface SendRgbppUtxosProps {
   changeAddress?: string;
   minUtxoSatoshi?: number;
   onlyConfirmedUtxos?: boolean;
+  excludeUtxos?: BaseOutput[];
 }
 
 /**
@@ -146,6 +147,7 @@ export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): P
     changeAddress: props.changeAddress,
     minUtxoSatoshi: props.minUtxoSatoshi,
     onlyConfirmedUtxos: props.onlyConfirmedUtxos,
+    excludeUtxos: props.excludeUtxos,
   });
 }
 
