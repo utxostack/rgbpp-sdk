@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - develop
+      - temp/cli-dep
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
