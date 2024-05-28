@@ -8,6 +8,7 @@ export * from './bitcoin';
 export * from './address';
 export * from './script';
 
+export * from './ckb/molecule';
 export * from './query/source';
 
 export * from './transaction/build';
