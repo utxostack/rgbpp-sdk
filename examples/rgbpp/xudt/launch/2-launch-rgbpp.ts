@@ -28,7 +28,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
   // Save ckbVirtualTxResult
   saveCkbVirtualTxResult(ckbVirtualTxResult, '2-launch-rgbpp');
 
-  const { commitment, ckbRawTx } = ckbVirtualTxResult;
+  const { commitment, ckbRawTx, needPaymasterCell } = ckbVirtualTxResult;
 
   console.log('RGB++ Asset type script args: ', ckbRawTx.outputs[0].type?.args);
 
@@ -37,6 +37,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
     ckbVirtualTx: ckbRawTx,
     commitment,
     tos: [btcAddress!],
+    needPaymaster: needPaymasterCell,
     ckbCollector: collector,
     from: btcAddress!,
     source: btcDataSource,

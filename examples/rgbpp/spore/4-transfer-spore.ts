@@ -27,13 +27,14 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }
   // Save ckbVirtualTxResult
   saveCkbVirtualTxResult(ckbVirtualTxResult, '4-transfer-spore');
 
-  const { commitment, ckbRawTx } = ckbVirtualTxResult;
+  const { commitment, ckbRawTx, needPaymasterCell } = ckbVirtualTxResult;
 
   // Send BTC tx
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
     tos: [toBtcAddress],
+    needPaymaster: needPaymasterCell,
     ckbCollector: collector,
     from: btcAddress!,
     source: btcDataSource,

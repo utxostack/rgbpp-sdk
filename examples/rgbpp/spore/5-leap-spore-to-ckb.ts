@@ -28,13 +28,14 @@ const leapSporeFromBtcToCkb = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTy
   // Save ckbVirtualTxResult
   saveCkbVirtualTxResult(ckbVirtualTxResult, '5-leap-spore-to-ckb');
 
-  const { commitment, ckbRawTx } = ckbVirtualTxResult;
+  const { commitment, ckbRawTx, needPaymasterCell } = ckbVirtualTxResult;
 
   // Send BTC tx
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
     tos: [btcAddress!],
+    needPaymaster: needPaymasterCell,
     ckbCollector: collector,
     from: btcAddress!,
     source: btcDataSource,

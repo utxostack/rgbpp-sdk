@@ -39,7 +39,7 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }
   // Save ckbVirtualTxResult
   saveCkbVirtualTxResult(ckbVirtualTxResult, '4-transfer-spore-local');
 
-  const { commitment, ckbRawTx, sporeCell } = ckbVirtualTxResult;
+  const { commitment, ckbRawTx, sporeCell, needPaymasterCell } = ckbVirtualTxResult;
 
   // console.log(JSON.stringify(ckbRawTx))
 
@@ -48,6 +48,7 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }
     ckbVirtualTx: ckbRawTx,
     commitment,
     tos: [toBtcAddress],
+    needPaymaster: needPaymasterCell,
     ckbCollector: collector,
     from: btcAddress!,
     source: btcDataSource,
