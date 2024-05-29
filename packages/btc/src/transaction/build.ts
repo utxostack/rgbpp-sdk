@@ -6,6 +6,7 @@ import { NetworkType, RgbppBtcConfig } from '../preset/types';
 import { AddressType, addressToScriptPublicKeyHex, getAddressType, isSupportedFromAddress } from '../address';
 import { dataToOpReturnScriptPubkey, isOpReturnScriptPubkey } from './embed';
 import { networkTypeToConfig } from '../preset/config';
+import { limitPromiseBatchSize } from '../utils';
 import { Utxo, utxoToInput } from './utxo';
 import { FeeEstimator } from './fee';
 
@@ -86,15 +87,19 @@ export class TxBuilder {
   }
 
   async validateInputs() {
-    for (const input of this.inputs) {
-      const transactionConfirmed = await this.source.isTransactionConfirmed(input.data.hash);
-      if (!transactionConfirmed) {
-        throw TxBuildError.withComment(
-          ErrorCodes.UNCONFIRMED_UTXO,
-          `hash: ${input.data.hash}, index: ${input.data.index}`,
-        );
-      }
-    }
+    await Promise.all(
+      this.inputs.map(async (input) => {
+        return limitPromiseBatchSize(async () => {
+          const transactionConfirmed = await this.source.isTransactionConfirmed(input.data.hash);
+          if (!transactionConfirmed) {
+            throw TxBuildError.withComment(
+              ErrorCodes.UNCONFIRMED_UTXO,
+              `hash: ${input.data.hash}, index: ${input.data.index}`,
+            );
+          }
+        });
+      }),
+    );
   }
 
   addOutput(output: InitOutput) {
