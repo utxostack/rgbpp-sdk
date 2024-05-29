@@ -30,6 +30,7 @@ interface SporeCreateParams {
   }[];
 }
 
+// Warning: Before runing this file for the first time, please run 2-prepare-cluster.ts
 const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreateParams) => {
   const ckbVirtualTxResult = await genCreateSporeCkbVirtualTx({
     collector,
@@ -115,7 +116,7 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
   }, 30 * 1000);
 };
 
-// Use your real BTC UTXO information on the BTC Testnet
+// Please use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 createSpores({
   // The cluster cell will be spent and the new cluster cell will be created in each spore creation tx,

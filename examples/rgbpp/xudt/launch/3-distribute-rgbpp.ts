@@ -28,6 +28,8 @@ interface Params {
   receivers: RgbppBtcAddressReceiver[];
   xudtTypeArgs: string;
 }
+
+// Warning: Before runing this file for the first time, please run 2-launch-rgbpp.ts
 const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers, xudtTypeArgs }: Params) => {
   // Warning: Please replace with your real xUDT type script here
   const xudtType: CKBComponents.Script = {
@@ -104,11 +106,12 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers, xudtTyp
   }, 20 * 1000);
 };
 
-// Use your real BTC UTXO information on the BTC Testnet
+// Please use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 distributeRgbppAssetOnBtc({
   // Warning: If rgbpp assets are distributed continuously, then the position of the current rgbpp asset utxo depends on the position of the previous change utxo distributed
   rgbppLockArgsList: [buildRgbppLockArgs(2, '012bfee9c1e8a6e9e272b63ff54d5138efe910cc7aac413221cb3634ea176866')],
+  // The xudtTypeArgs comes from the logs "RGB++ Asset type script args" of 2-launch-rgbpp.ts
   xudtTypeArgs: '0x4c1ecf2f14edae73b76ccf115ecfa40ba68ee315c96bd4fcfd771c2fb4c69e8f',
   receivers: [
     {

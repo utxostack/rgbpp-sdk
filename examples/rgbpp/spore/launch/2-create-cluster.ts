@@ -11,6 +11,7 @@ import {
 } from 'rgbpp/ckb';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
 
+// Warning: Before runing this file, please run 1-prepare-cluster.ts
 const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: string }) => {
   const ckbVirtualTxResult = await genCreateClusterCkbVirtualTx({
     collector,
@@ -80,7 +81,7 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
   }, 30 * 1000);
 };
 
-// Use your real BTC UTXO information on the BTC Testnet
+// Please use your real BTC UTXO information on the BTC Testnet which should be same as the 1-prepare-cluster.ts
 // rgbppLockArgs: outIndexU32 + btcTxId
 createCluster({
   ownerRgbppLockArgs: buildRgbppLockArgs(3, 'aee4e8e3aa95e9e9ab1f0520714031d92d3263262099dcc7f7d64e62fa2fcb44'),

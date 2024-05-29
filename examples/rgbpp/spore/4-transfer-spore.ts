@@ -69,10 +69,11 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }
   }
 };
 
-// Use your real BTC UTXO information on the BTC Testnet
+// Please use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 transferSpore({
   sporeRgbppLockArgs: buildRgbppLockArgs(2, 'd5868dbde4be5e49876b496449df10150c356843afb6f94b08f8d81f394bb350'),
   toBtcAddress: 'tb1qhp9fh9qsfeyh0yhewgu27ndqhs5qlrqwau28m7',
+  // Please use your own RGB++ spore asset's sporeTypeArgs
   sporeTypeArgs: '0x42898ea77062256f46e8f1b861d526ae47810ecc51ab50477945d5fa90452706',
 });

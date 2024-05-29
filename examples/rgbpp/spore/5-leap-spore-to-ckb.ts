@@ -70,10 +70,11 @@ const leapSporeFromBtcToCkb = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTy
   }
 };
 
-// Use your real BTC UTXO information on the BTC Testnet
+// Please use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 leapSporeFromBtcToCkb({
   sporeRgbppLockArgs: buildRgbppLockArgs(3, 'd8a31796fbd42c546f6b22014b9b82b16586ce1df81b0e7ca9a552cdc492a0af'),
   toCkbAddress: 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq0e4xk4rmg5jdkn8aams492a7jlg73ue0gc0ddfj',
+  // Please use your own RGB++ spore asset's sporeTypeArgs
   sporeTypeArgs: '0x42898ea77062256f46e8f1b861d526ae47810ecc51ab50477945d5fa90452706',
 });
