@@ -3,6 +3,8 @@
 - xUDT directory: The examples for RGB++ UDT issuance, transfer, and leap
 - Spore directory: The examples for RGB++ Spore creation, transfer and leap
 
+**Warning: All the parameters of the examples should be repalced with your own, including BTC private key, CKB private key, BTC Service origin, BTC Service token, BTC UTXO, xUDT type args, Spore type args, etc. Please confirm whether the parameters are correct according to the code comments**
+
 ## How to Start
 
 ### Install dependencies and build packages
@@ -50,7 +52,6 @@ VITE_BTC_SERVICE_TOKEN=;
 # The BTC assets api origin which should be matched with IS_MAINNET
 VITE_BTC_SERVICE_ORIGIN=https://btc-test.app;
 ```
-
 
 ## RGB++ xUDT Examples
 
