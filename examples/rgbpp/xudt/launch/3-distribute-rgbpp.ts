@@ -1,16 +1,7 @@
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { BtcAssetsApiError, genBtcBatchTransferCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
 import { RGBPP_TOKEN_INFO } from './0-rgbpp-token-info';
-import {
-  isMainnet,
-  collector,
-  btcAddress,
-  btcDataSource,
-  btcKeyPair,
-  btcService,
-  CKB_PRIVATE_KEY,
-  ckbAddress,
-} from '../../env';
+import { isMainnet, collector, btcDataSource, btcService, CKB_PRIVATE_KEY, ckbAddress, btcAccount } from '../../env';
 import {
   RgbppBtcAddressReceiver,
   appendCkbTxWitnesses,
@@ -20,8 +11,8 @@ import {
   sendCkbTx,
   updateCkbTxWithRealBtcTxId,
 } from 'rgbpp/ckb';
-import { transactionToHex } from 'rgbpp/btc';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
+import { signAndSendPsbt } from '../../shared/btc-account';
 
 interface Params {
   rgbppLockArgsList: string[];
@@ -62,16 +53,12 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers, xudtTyp
     tos: receivers.map((receiver) => receiver.toBtcAddress),
     needPaymaster: needPaymasterCell,
     ckbCollector: collector,
-    from: btcAddress!,
+    from: btcAccount.from,
+    fromPubkey: btcAccount.fromPubkey,
     source: btcDataSource,
   });
-  psbt.signAllInputs(btcKeyPair);
-  psbt.finalizeAllInputs();
 
-  const btcTx = psbt.extractTransaction();
-  const btcTxBytes = transactionToHex(btcTx, false);
-  const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
-
+  const { txId: btcTxId, txHexRaw: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
   console.log('BTC TxId: ', btcTxId);
 
   const interval = setInterval(async () => {

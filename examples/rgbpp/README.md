@@ -45,15 +45,18 @@ CKB_INDEXER_URL=https://testnet.ckb.dev/indexer
 # Read more about P2WPKH in BIP141: https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki#p2wpkh
 BTC_PRIVATE_KEY=private-key
 
+# The BTC address type to use, available options: P2WPKH or P2TR
+BTC_ADDRESS_TYPE=P2WPKH
+
 # The BTC assets api url which should be matched with IS_MAINNET
-VITE_BTC_SERVICE_URL=https://btc-assets-api.testnet.mibao.pro;
+VITE_BTC_SERVICE_URL=https://btc-assets-api.testnet.mibao.pro
 
 # The BTC assets api token which should be matched with IS_MAINNET
 # To get an access token, please refer to https://github.com/ckb-cell/rgbpp-sdk/tree/develop/packages/service#get-an-access-token
-VITE_BTC_SERVICE_TOKEN=;
+VITE_BTC_SERVICE_TOKEN=
 
 # The BTC assets api origin which should be matched with IS_MAINNET
-VITE_BTC_SERVICE_ORIGIN=https://btc-test.app;
+VITE_BTC_SERVICE_ORIGIN=https://btc-test.app
 ```
 
 ## RGB++ xUDT Examples

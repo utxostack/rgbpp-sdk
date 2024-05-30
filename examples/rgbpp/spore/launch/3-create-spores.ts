@@ -1,14 +1,5 @@
 import { BtcAssetsApiError, genCreateSporeCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
-import {
-  isMainnet,
-  collector,
-  btcAddress,
-  btcDataSource,
-  btcKeyPair,
-  btcService,
-  CKB_PRIVATE_KEY,
-  ckbAddress,
-} from '../../env';
+import { isMainnet, collector, btcDataSource, btcService, CKB_PRIVATE_KEY, ckbAddress, btcAccount } from '../../env';
 import {
   Hex,
   appendCkbTxWitnesses,
@@ -19,8 +10,9 @@ import {
   updateCkbTxWithRealBtcTxId,
   RawSporeData,
 } from 'rgbpp/ckb';
-import { transactionToHex, utf8ToBuffer } from 'rgbpp/btc';
+import { utf8ToBuffer } from 'rgbpp/btc';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
+import { signAndSendPsbt } from '../../shared/btc-account';
 
 interface SporeCreateParams {
   clusterRgbppLockArgs: Hex;
@@ -47,24 +39,20 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
 
   // Send BTC tx
   // The first btc address is the owner of the cluster cell and the rest btc addresses are spore receivers
-  const btcTos = [btcAddress!, ...receivers.map((receiver) => receiver.toBtcAddress)];
+  const btcTos = [btcAccount.from, ...receivers.map((receiver) => receiver.toBtcAddress)];
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
     tos: btcTos,
     needPaymaster: needPaymasterCell,
     ckbCollector: collector,
-    from: btcAddress!,
+    from: btcAccount.from,
+    fromPubkey: btcAccount.fromPubkey,
     source: btcDataSource,
     feeRate: 120,
   });
-  psbt.signAllInputs(btcKeyPair);
-  psbt.finalizeAllInputs();
 
-  const btcTx = psbt.extractTransaction();
-  const btcTxBytes = transactionToHex(btcTx, false);
-  const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
-
+  const { txId: btcTxId, txHexRaw: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
   console.log('BTC TxId: ', btcTxId);
 
   const interval = setInterval(async () => {
