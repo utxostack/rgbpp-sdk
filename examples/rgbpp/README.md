@@ -41,6 +41,8 @@ CKB_INDEXER_URL=https://testnet.ckb.dev/indexer
 # BTC Variables
 
 # The BTC private key whose format is 32bytes hex string without 0x prefix
+# The Native Segwit P2WPKH address will be generated with the BTC private key
+# Read more about P2WPKH in BIP141: https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki#p2wpkh
 BTC_PRIVATE_KEY=private-key
 
 # The BTC assets api url which should be matched with IS_MAINNET

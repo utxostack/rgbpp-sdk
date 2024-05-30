@@ -24,6 +24,8 @@ export const BTC_SERVICE_ORIGIN = process.env.VITE_BTC_SERVICE_ORIGIN!;
 
 const network = isMainnet ? bitcoin.networks.bitcoin : bitcoin.networks.testnet;
 export const btcKeyPair: ECPairInterface = ECPair.fromPrivateKey(Buffer.from(BTC_PRIVATE_KEY, 'hex'), { network });
+// The Native Segwit P2WPKH address will be generated with the BTC private key
+// Read more about P2WPKH in BIP141: https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki#p2wpkh
 export const { address: btcAddress } = bitcoin.payments.p2wpkh({
   pubkey: btcKeyPair.publicKey,
   network,
