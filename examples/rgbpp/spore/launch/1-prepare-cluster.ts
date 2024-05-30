@@ -70,6 +70,7 @@ const prepareClusterCell = async ({ outIndex, btcTxId }: { outIndex: number; btc
   console.info(`Cluster cell has been prepared and the tx hash ${txHash}`);
 };
 
+// Please use your real BTC UTXO information on the BTC Testnet
 prepareClusterCell({
   outIndex: 3,
   btcTxId: 'aee4e8e3aa95e9e9ab1f0520714031d92d3263262099dcc7f7d64e62fa2fcb44',

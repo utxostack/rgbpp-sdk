@@ -68,11 +68,12 @@ const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transfe
   }
 };
 
-// Use your real BTC UTXO information on the BTC Testnet
+// Please use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 transfer({
   rgbppLockArgsList: [buildRgbppLockArgs(1, '64252b582aea1249ed969a20385fae48bba35bf1ab9b3df3b0fcddc754ccf592')],
   toBtcAddress: 'tb1qvt7p9g6mw70sealdewtfp0sekquxuru6j3gwmt',
+  // Please use your own RGB++ xudt asset's xudtTypeArgs
   xudtTypeArgs: '0x1ba116c119d1cfd98a53e9d1a615cf2af2bb87d95515c9d217d367054cfc696b',
   transferAmount: BigInt(800_0000_0000),
 });

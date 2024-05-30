@@ -3,7 +3,17 @@
 - xUDT directory: The examples for RGB++ UDT issuance, transfer, and leap
 - Spore directory: The examples for RGB++ Spore creation, transfer and leap
 
+> [!TIP]
+> All the parameters of the examples should be repalced with your own, including BTC private key, CKB private key, BTC Service origin, BTC Service token, BTC UTXO, xUDT type args, Spore type args, etc. Please confirm whether the parameters are correct according to the code comments
+
 ## How to Start
+
+### Install dependencies and build packages
+
+```
+pnpm install && pnpm build:packages
+```
+### Update .env
 
 Copy the `.env.example` file to `.env`:
 
@@ -31,6 +41,8 @@ CKB_INDEXER_URL=https://testnet.ckb.dev/indexer
 # BTC Variables
 
 # The BTC private key whose format is 32bytes hex string without 0x prefix
+# The Native Segwit P2WPKH address will be generated with the BTC private key
+# Read more about P2WPKH in BIP141: https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki#p2wpkh
 BTC_PRIVATE_KEY=private-key
 
 # The BTC assets api url which should be matched with IS_MAINNET
@@ -43,7 +55,6 @@ VITE_BTC_SERVICE_TOKEN=;
 # The BTC assets api origin which should be matched with IS_MAINNET
 VITE_BTC_SERVICE_ORIGIN=https://btc-test.app;
 ```
-
 
 ## RGB++ xUDT Examples
 
