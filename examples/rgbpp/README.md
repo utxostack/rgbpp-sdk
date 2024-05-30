@@ -5,6 +5,13 @@
 
 ## How to Start
 
+### Install dependencies and build packages
+
+```
+pnpm install && pnpm build:packages
+```
+### Update .env
+
 Copy the `.env.example` file to `.env`:
 
 ```shell
