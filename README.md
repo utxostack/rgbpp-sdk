@@ -66,6 +66,8 @@ This repository offers utilities for Bitcoin and RGB++ asset integration.
 ### How to get an access token of Bitcoin/RGB++ Assets Service?
 See [Generate a JSON Web Token (JWT) for Bitcoin/RGB++ Assets Service](./packages/service/README.md#get-an-access-token)
 
+### Where is the error code description for the RgbppLockScript?
+See [RGB++ Lock Script Error Codes](https://github.com/nervosnetwork/ckb-script-error-codes/blob/main/by-type-hash/bc6c568a1a0d0a09f6844dc9d74ddb4343c32143ff25f727c59edf4fb72d6936.md)
 
 ## License
 
