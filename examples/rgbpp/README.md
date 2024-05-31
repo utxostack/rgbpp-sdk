@@ -62,15 +62,29 @@ VITE_BTC_SERVICE_ORIGIN=https://btc-test.app;
 
 #### 1. Prepare Launch
 
+> [!TIP]
+> Please make sure the CKB private key in the .env is correct
+
 ```shell
+# Create a CKB empty rgbpp lock cell to launch RGB++ xUDT assets later
 npx ts-node xudt/launch/1-prepare-launch.ts
 ```
 #### 2. Launch RGB++ xUDT on BTC
 
+> [!TIP]
+> Please make sure the `1-prepare-launch.ts` has been run and the corresponding CKB transaction has been committed
+
 ```shell
 npx ts-node xudt/launch/2-launch-rgbpp.ts
 ```
+
+When the command is executed successfully, the **RGB++ Asset type script args** will appear in the output log
+
 #### 3. Distribute RGB++ xUDT on BTC
+
+> [!TIP]
+> Please make sure the `2-launch-rgbpp.ts` has been run and the corresponding BTC and CKB transactions have been committed
+> The **RGB++ Asset type script args** in the above should be set to the `xudtTypeArgs`
 
 ```shell
 npx ts-node xudt/launch/3-distribute-rgbpp.ts
@@ -114,13 +128,25 @@ npx ts-node xudt/4-unlock-btc-time.ts
 
 #### 1. Create RGB++ Cluster Cell
 
+> [!TIP]
+> Please make sure all the variables in the .env are correct
+> The BTC UTXO of `1-prepare-cluster.ts` and `2-create-cluster.ts` should be same
+
 ```shell
+# Create a CKB empty rgbpp lock cell to create cluster later
 npx ts-node spore/launch/1-prepare-cluster.ts
 
+# Create a cluster cell with rgbpp lock
 npx ts-node spore/launch/2-create-cluster.ts
 ```
 
+When the commands are executed successfully, the **clusterId** and **cluster rgbpp lock args** will appear in the output log
+
 #### 2. Create RGB++ Spores with Cluster on BTC
+
+> [!TIP]
+> Please make sure the `2-create-cluster.ts` has been run and the corresponding BTC and CKB transactions have been committed
+> The **clusterId** in the above should be set to the `clusterId` and the **cluster rgbpp lock args** should be set to the `clusterRgbppLockArgs`
 
 ```shell
 npx ts-node spore/launch/3-create-spores.ts
@@ -157,6 +183,13 @@ npx ts-node spore/6-unlock-btc-time-cell.ts
 ```shell
 npx ts-node spore/7-leap-spore-to-btc.ts
 ```
+
+## FAQ
+
+If you have any questions, please refer to the FAQ first.
+
+See [RGBPP FAQ](https://github.com/ckb-cell/rgbpp-sdk/wiki/RGBPP--FAQ)
+
 
 ## What you must know about BTC transaction id
 
