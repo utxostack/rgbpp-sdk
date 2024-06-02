@@ -4,6 +4,7 @@ import {
   append0x,
   calculateRgbppTokenInfoCellCapacity,
   calculateTransactionFee,
+  fetchTypeIdCellDeps,
   generateUniqueTypeArgs,
   u128ToLe,
 } from '../utils';
@@ -19,13 +20,9 @@ import {
   MAX_FEE,
   RGBPP_TX_WITNESS_MAX_SIZE,
   RGBPP_WITNESS_PLACEHOLDER,
-  getRgbppLockDep,
-  getXudtDep,
   getXudtTypeScript,
   getUniqueTypeScript,
-  getUniqueTypeDep,
   UNLOCKABLE_LOCK_SCRIPT,
-  getRgbppLockConfigDep,
 } from '../constants';
 import { getTransactionSize, scriptToHash } from '@nervosnetwork/ckb-sdk-utils';
 
@@ -80,12 +77,7 @@ export const genRgbppLaunchCkbVirtualTx = async ({
   ];
 
   const outputsData = [append0x(u128ToLe(launchAmount)), encodeRgbppTokenInfo(rgbppTokenInfo)];
-  const cellDeps = [
-    getRgbppLockDep(isMainnet),
-    getRgbppLockConfigDep(isMainnet),
-    getXudtDep(isMainnet),
-    getUniqueTypeDep(isMainnet),
-  ];
+  const cellDeps = await fetchTypeIdCellDeps(isMainnet, { rgbpp: true, xudt: true, unique: true });
 
   const witnesses: Hex[] = inputs.map((_, index) => (index === 0 ? RGBPP_WITNESS_PLACEHOLDER : '0x'));
 

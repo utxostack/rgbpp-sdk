@@ -10,11 +10,8 @@ import {
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
   SECP256K1_WITNESS_LOCK_SIZE,
-  getBtcTimeLockConfigDep,
-  getBtcTimeLockDep,
   getBtcTimeLockScript,
   getSecp256k1CellDep,
-  getXudtDep,
 } from '../constants';
 import { BTCTimeUnlock } from '../schemas/generated/rgbpp';
 import { BtcTimeCellStatusParams, BtcTimeCellsParams, Hex, SignBtcTimeCellsTxParams } from '../types';
@@ -23,6 +20,7 @@ import {
   btcTxIdFromBtcTimeLockArgs,
   calculateTransactionFee,
   compareInputs,
+  fetchTypeIdCellDeps,
   genBtcTimeLockArgs,
   lockScriptFromBtcTimeLockArgs,
   transformSpvProof,
@@ -62,11 +60,7 @@ export const buildBtcTimeCellsSpentTx = async ({
 
   const outputsData = sortedBtcTimeCells.map((cell) => cell.outputData);
 
-  const cellDeps: CKBComponents.CellDep[] = [
-    getBtcTimeLockDep(isMainnet),
-    getXudtDep(isMainnet),
-    getBtcTimeLockConfigDep(isMainnet),
-  ];
+  const cellDeps: CKBComponents.CellDep[] = await fetchTypeIdCellDeps(isMainnet, { btcTime: true, xudt: true });
 
   const witnesses: Hex[] = [];
 

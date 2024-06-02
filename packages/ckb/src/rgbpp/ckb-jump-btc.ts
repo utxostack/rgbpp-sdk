@@ -6,11 +6,12 @@ import {
   calculateRgbppCellCapacity,
   calculateTransactionFee,
   calculateUdtCellCapacity,
+  fetchTypeIdCellDeps,
   isTypeAssetSupported,
   u128ToLe,
 } from '../utils';
 import { genRgbppLockScript } from '../utils/rgbpp';
-import { MAX_FEE, MIN_CAPACITY, RGBPP_TX_WITNESS_MAX_SIZE, getXudtDep } from '../constants';
+import { MAX_FEE, MIN_CAPACITY, RGBPP_TX_WITNESS_MAX_SIZE } from '../constants';
 import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
 /**
@@ -98,7 +99,7 @@ export const genCkbJumpBtcVirtualTx = async ({
   });
   outputsData.push('0x');
 
-  const cellDeps = [getXudtDep(isMainnet)];
+  const cellDeps = await fetchTypeIdCellDeps(isMainnet, { xudt: true });
   const witnesses = inputs.map(() => '0x');
 
   const ckbRawTx: CKBComponents.RawTransaction = {
@@ -206,7 +207,7 @@ export const genCkbBatchJumpBtcVirtualTx = async ({
   });
   outputsData.push('0x');
 
-  const cellDeps = [getXudtDep(isMainnet)];
+  const cellDeps = await fetchTypeIdCellDeps(isMainnet, { xudt: true });
   const witnesses = inputs.map(() => '0x');
 
   const ckbRawTx: CKBComponents.RawTransaction = {

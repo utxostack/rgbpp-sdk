@@ -13,6 +13,7 @@ import {
   calculateRgbppCellCapacity,
   calculateTransactionFee,
   deduplicateList,
+  fetchTypeIdCellDeps,
   isScriptEqual,
   isUDTTypeSupported,
   u128ToLe,
@@ -33,11 +34,8 @@ import {
   MIN_CAPACITY,
   RGBPP_WITNESS_PLACEHOLDER,
   SECP256K1_WITNESS_LOCK_SIZE,
-  getRgbppLockConfigDep,
-  getRgbppLockDep,
   getRgbppLockScript,
   getSecp256k1CellDep,
-  getXudtDep,
 } from '../constants';
 import {
   addressToScript,
@@ -172,7 +170,7 @@ export const genBtcTransferCkbVirtualTx = async ({
     handleNonTargetRgbppCells(outputs.length);
   }
 
-  const cellDeps = [getRgbppLockDep(isMainnet), getXudtDep(isMainnet), getRgbppLockConfigDep(isMainnet)];
+  const cellDeps = await fetchTypeIdCellDeps(isMainnet, { rgbpp: true, xudt: true });
   if (needPaymasterCell) {
     cellDeps.push(getSecp256k1CellDep(isMainnet));
   }
@@ -287,12 +285,9 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
   }
 
   const cellDeps = [
-    getRgbppLockDep(isMainnet),
-    getXudtDep(isMainnet),
-    getRgbppLockConfigDep(isMainnet),
+    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true, xudt: true })),
     getSecp256k1CellDep(isMainnet),
   ];
-
   const witnesses: Hex[] = [];
   const lockArgsSet: Set<string> = new Set();
   for (const cell of rgbppCells) {

@@ -159,9 +159,9 @@ export class Collector {
     return { inputs, sumInputsCapacity, sumAmount };
   }
 
-  async getLiveCell(outPoint: CKBComponents.OutPoint): Promise<CKBComponents.LiveCell> {
+  async getLiveCell(outPoint: CKBComponents.OutPoint, withData = true): Promise<CKBComponents.LiveCell> {
     const ckb = new CKB(this.ckbNodeUrl);
-    const { cell } = await ckb.rpc.getLiveCell(outPoint, true);
+    const { cell } = await ckb.rpc.getLiveCell(outPoint, withData);
     return cell;
   }
 }
