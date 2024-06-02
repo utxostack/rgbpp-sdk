@@ -228,13 +228,18 @@ interface BtcApiBalanceParams {
 
 interface BtcApiBalance {
   address: string;
+  // @deprecated Use available_satoshi instead
   satoshi: number;
+  total_satoshi: number;
+  available_satoshi: number;
   pending_satoshi: number;
+  rgbpp_satoshi: number;
   dust_satoshi: number;
   utxo_count: number;
 }
 
 interface BtcApiUtxoParams {
+  only_non_rgbpp_utxos?: boolean;
   only_confirmed?: boolean;
   min_satoshi?: number;
   no_cache?: boolean;
