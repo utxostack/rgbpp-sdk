@@ -30,7 +30,7 @@ const leapFromCkbToBtc = async ({ outIndex, btcTxId, xudtTypeArgs, transferAmoun
   const emptyWitness = { lock: '', inputType: '', outputType: '' };
   const unsignedTx: CKBComponents.RawTransactionToSign = {
     ...ckbRawTx,
-    cellDeps: [...ckbRawTx.cellDeps, getSecp256k1CellDep(false)],
+    cellDeps: [...ckbRawTx.cellDeps, getSecp256k1CellDep(isMainnet)],
     witnesses: [emptyWitness, ...ckbRawTx.witnesses.slice(1)],
   };
 
