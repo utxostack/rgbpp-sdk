@@ -2,11 +2,9 @@ import { Utxo } from '../transaction/utxo';
 
 export class DataCache {
   private utxos: Map<string, Utxo[]>; // Map<Key, Utxo[]>
-  private hasRgbppAssets: Map<string, boolean>; // Map<`{txid}:{vout}`, HasAssets>
 
   constructor() {
     this.utxos = new Map();
-    this.hasRgbppAssets = new Map();
   }
 
   setUtxos(key: string, utxos: Utxo[]) {
@@ -31,32 +29,5 @@ export class DataCache {
     }
 
     return utxos;
-  }
-
-  setHasRgbppAssets(key: string, hasAssets: boolean) {
-    this.hasRgbppAssets.set(key, hasAssets);
-  }
-  getHasRgbppAssets(key: string): boolean | undefined {
-    return this.hasRgbppAssets.get(key);
-  }
-  cleanHasRgbppAssets(key: string) {
-    if (this.hasRgbppAssets.has(key)) {
-      this.hasRgbppAssets.delete(key);
-    }
-  }
-  async optionalCacheHasRgbppAssets(props: {
-    key?: string;
-    getter: () => Promise<boolean> | boolean;
-  }): Promise<boolean> {
-    if (props.key && this.hasRgbppAssets.has(props.key)) {
-      return this.getHasRgbppAssets(props.key) as boolean;
-    }
-
-    const hasRgbppAssets = await props.getter();
-    if (props.key) {
-      this.setHasRgbppAssets(props.key, hasRgbppAssets);
-    }
-
-    return hasRgbppAssets;
   }
 }

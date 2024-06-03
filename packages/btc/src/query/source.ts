@@ -116,32 +116,24 @@ export class DataSource {
     satoshi: number;
     exceedSatoshi: number;
   }> {
-    const {
-      address,
-      targetAmount,
-      minUtxoSatoshi,
-      onlyConfirmedUtxos,
-      onlyNonRgbppUtxos,
-      noAssetsApiCache,
-      internalCacheKey,
-      allowInsufficient = false,
-      excludeUtxos = [],
-    } = props;
+    const allowInsufficient = props.allowInsufficient ?? false;
+    const excludeUtxos = props.excludeUtxos ?? [];
 
     const utxos = await this.cache.optionalCacheUtxos({
-      key: internalCacheKey,
+      key: props.internalCacheKey,
       getter: () =>
-        this.getUtxos(address, {
-          only_confirmed: onlyConfirmedUtxos,
-          min_satoshi: minUtxoSatoshi,
-          no_cache: noAssetsApiCache,
+        this.getUtxos(props.address, {
+          only_non_rgbpp_utxos: props.onlyNonRgbppUtxos,
+          only_confirmed: props.onlyConfirmedUtxos,
+          min_satoshi: props.minUtxoSatoshi,
+          no_cache: props.noAssetsApiCache,
         }),
     });
 
     const collected = [];
     let collectedAmount = 0;
     for (const utxo of utxos) {
-      if (collectedAmount >= targetAmount) {
+      if (collectedAmount >= props.targetAmount) {
         break;
       }
       if (excludeUtxos.length > 0) {
@@ -152,33 +144,21 @@ export class DataSource {
           continue;
         }
       }
-      if (onlyNonRgbppUtxos) {
-        const hasRgbppAssets = await this.cache.optionalCacheHasRgbppAssets({
-          key: `${utxo.txid}:${utxo.vout}`,
-          getter: async () => {
-            const ckbRgbppAssets = await this.service.getRgbppAssetsByBtcUtxo(utxo.txid, utxo.vout);
-            return Array.isArray(ckbRgbppAssets) && ckbRgbppAssets.length > 0;
-          },
-        });
-        if (hasRgbppAssets) {
-          continue;
-        }
-      }
       collected.push(utxo);
       collectedAmount += utxo.value;
     }
 
-    if (!allowInsufficient && collectedAmount < targetAmount) {
+    if (!allowInsufficient && collectedAmount < props.targetAmount) {
       throw TxBuildError.withComment(
         ErrorCodes.INSUFFICIENT_UTXO,
-        `expected: ${targetAmount}, actual: ${collectedAmount}`,
+        `expected: ${props.targetAmount}, actual: ${collectedAmount}`,
       );
     }
 
     return {
       utxos: collected,
       satoshi: collectedAmount,
-      exceedSatoshi: collectedAmount - targetAmount,
+      exceedSatoshi: collectedAmount - props.targetAmount,
     };
   }
 

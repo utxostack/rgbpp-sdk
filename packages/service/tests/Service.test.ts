@@ -79,6 +79,8 @@ describe(
         const res = await service.getBtcBalance(btcAddress);
         expect(res.address).toEqual(btcAddress);
         expect(res.satoshi).toBeTypeOf('number');
+        expect(res.total_satoshi).toBeTypeOf('number');
+        expect(res.available_satoshi).toBeTypeOf('number');
         expect(res.pending_satoshi).toBeTypeOf('number');
         expect(res.dust_satoshi).toBeTypeOf('number');
         expect(res.utxo_count).toBeTypeOf('number');
@@ -89,8 +91,7 @@ describe(
           min_satoshi: originalBalance.satoshi + 1,
         });
 
-        expect(filteredBalance.satoshi).toEqual(0);
-        // expect(filteredBalance.dust_satoshi).toEqual(originalBalance.satoshi + originalBalance.dust_satoshi);
+        expect(filteredBalance.available_satoshi).toEqual(0);
       });
       it('getBtcBalance() with no_cache', async () => {
         const res = await service.getBtcBalance(btcAddress, {
