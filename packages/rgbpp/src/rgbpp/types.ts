@@ -20,6 +20,6 @@ export interface RgbppTransferTxParams {
 
 export interface RgbppTransferTxResult {
   ckbVirtualTxResult: BtcTransferVirtualTxResult;
-  // The BTC transaction hex string which can be used to construct Bitcoin PSBT
+  // The BTC PSBT hex string which can be used to construct Bitcoin PSBT
   btcPsbtHex: Hex;
 }
