@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { HttpAdapterHost, ModulesContainer } from '@nestjs/core';
 import { JSONRPCServer, SimpleJSONRPCMethod } from 'json-rpc-2.0';
 import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper';
@@ -8,6 +8,7 @@ import { JsonRpcConfig } from './json-rpc.module';
 @Injectable()
 export class JsonRpcServer {
   private server: JSONRPCServer;
+  private logger = new Logger(JsonRpcServer.name);
 
   constructor(
     private httpAdapterHost: HttpAdapterHost,
@@ -17,9 +18,9 @@ export class JsonRpcServer {
 
     const handlers = this.getRegisteredHandlers();
     handlers.forEach((handler, name) => {
+      this.logger.log(`Registering JSON-RPC method: ${name}`);
       this.server.addMethod(name, handler);
     });
-    console.log(this.server);
   }
 
   private getRegisteredHandlers() {
@@ -56,6 +57,7 @@ export class JsonRpcServer {
 
   public async run(config: JsonRpcConfig) {
     this.httpAdapterHost.httpAdapter.post(config.path, async (req, res) => {
+      this.logger.debug(`Received JSON-RPC request: ${JSON.stringify(req.body)}`);
       const jsonRpcResponse = await this.server.receive(req.body);
       this.httpAdapterHost.httpAdapter.setHeader(res, 'Content-Type', 'application/json');
       this.httpAdapterHost.httpAdapter.reply(res, jsonRpcResponse);
