@@ -81,6 +81,7 @@ const prepareLaunchCell = async ({
   console.info(`Launch cell has been created and the tx hash ${txHash}`);
 };
 
+// Please use your real BTC UTXO information on the BTC Testnet
 prepareLaunchCell({
   outIndex: 1,
   btcTxId: '6259ea7852e294afbd2aaf9ccd5c9c1f95087b0b08ba7e47ae35ce31170732bc',

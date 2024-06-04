@@ -1,6 +1,6 @@
 import { RgbppCkbVirtualTx } from '../types/rgbpp';
 import { packRawClusterData } from '@spore-sdk/core';
-import { append0x, calculateTransactionFee } from '../utils';
+import { append0x, calculateTransactionFee, fetchTypeIdCellDeps } from '../utils';
 import { buildPreLockArgs, calculateCommitment, genRgbppLockScript } from '../utils/rgbpp';
 import { CreateClusterCkbVirtualTxParams, Hex, SporeVirtualTxResult } from '../types';
 import {
@@ -8,8 +8,6 @@ import {
   RGBPP_WITNESS_PLACEHOLDER,
   getClusterTypeDep,
   getClusterTypeScript,
-  getRgbppLockConfigDep,
-  getRgbppLockDep,
   getRgbppLockScript,
 } from '../constants';
 import { generateClusterCreateCoBuild, generateClusterId } from '../utils/spore';
@@ -62,7 +60,7 @@ export const genCreateClusterCkbVirtualTx = async ({
     },
   ];
   const outputsData: Hex[] = [bytesToHex(packRawClusterData(clusterData))];
-  const cellDeps = [getRgbppLockDep(isMainnet), getRgbppLockConfigDep(isMainnet), getClusterTypeDep(isMainnet)];
+  const cellDeps = [...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true })), getClusterTypeDep(isMainnet)];
   const sporeCoBuild = generateClusterCreateCoBuild(outputs[0], outputsData[0]);
   const witnesses = [RGBPP_WITNESS_PLACEHOLDER, sporeCoBuild];
 
@@ -92,5 +90,6 @@ export const genCreateClusterCkbVirtualTx = async ({
     ckbRawTx,
     commitment,
     clusterId,
+    needPaymasterCell: false,
   };
 };

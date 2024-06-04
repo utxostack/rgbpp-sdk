@@ -84,10 +84,12 @@ const leapFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
   }, 30 * 1000);
 };
 
+// Please use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 leapFromBtcToCkb({
   rgbppLockArgsList: [buildRgbppLockArgs(1, '24e622419156dd3a277a90bcbb40c7117462a18d5329dd1ada320ca8bdfba715')],
   toCkbAddress: 'ckt1qrfrwcdnvssswdwpn3s9v8fp87emat306ctjwsm3nmlkjg8qyza2cqgqq9kxr7vy7yknezj0vj0xptx6thk6pwyr0sxamv6q',
+  // Please use your own RGB++ xudt asset's xudtTypeArgs
   xudtTypeArgs: '0x1ba116c119d1cfd98a53e9d1a615cf2af2bb87d95515c9d217d367054cfc696b',
   transferAmount: BigInt(800_0000_0000),
 });

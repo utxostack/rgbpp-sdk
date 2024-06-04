@@ -39,7 +39,7 @@ const leapSpore = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTypeArgs }: Sp
   // Save ckbVirtualTxResult
   saveCkbVirtualTxResult(ckbVirtualTxResult, '5-leap-spore-to-ckb-local');
 
-  const { commitment, ckbRawTx, sporeCell } = ckbVirtualTxResult;
+  const { commitment, ckbRawTx, sporeCell, needPaymasterCell } = ckbVirtualTxResult;
 
   // console.log(JSON.stringify(ckbRawTx))
 
@@ -48,6 +48,7 @@ const leapSpore = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTypeArgs }: Sp
     ckbVirtualTx: ckbRawTx,
     commitment,
     tos: [btcAddress!],
+    needPaymaster: needPaymasterCell,
     ckbCollector: collector,
     from: btcAddress!,
     source: btcDataSource,
@@ -91,11 +92,12 @@ const leapSpore = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTypeArgs }: Sp
   }, 30 * 1000);
 };
 
-// Use your real BTC UTXO information on the BTC Testnet
+// Please use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 leapSpore({
   // The spore rgbpp lock args is from 3-create-spore.ts
   sporeRgbppLockArgs: buildRgbppLockArgs(3, 'd8a31796fbd42c546f6b22014b9b82b16586ce1df81b0e7ca9a552cdc492a0af'),
   toCkbAddress: 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq0e4xk4rmg5jdkn8aams492a7jlg73ue0gc0ddfj',
+  // Please use your own RGB++ spore asset's sporeTypeArgs
   sporeTypeArgs: '0x42898ea77062256f46e8f1b861d526ae47810ecc51ab50477945d5fa90452706',
 });

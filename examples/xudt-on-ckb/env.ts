@@ -1,4 +1,10 @@
-import { AddressPrefix, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
+import {
+  blake160,
+  bytesToHex,
+  privateKeyToPublicKey,
+  scriptToAddress,
+  systemScripts,
+} from '@nervosnetwork/ckb-sdk-utils';
 import { Collector } from 'rgbpp/ckb';
 import dotenv from 'dotenv';
 
@@ -11,6 +17,8 @@ export const collector = new Collector({
   ckbIndexerUrl: process.env.CKB_INDEXER_URL!,
 });
 export const CKB_PRIVATE_KEY = process.env.CKB_SECP256K1_PRIVATE_KEY!;
-export const ckbAddress = privateKeyToAddress(CKB_PRIVATE_KEY, {
-  prefix: isMainnet ? AddressPrefix.Mainnet : AddressPrefix.Testnet,
-});
+const secp256k1Lock: CKBComponents.Script = {
+  ...systemScripts.SECP256K1_BLAKE160,
+  args: bytesToHex(blake160(privateKeyToPublicKey(CKB_PRIVATE_KEY))),
+};
+export const ckbAddress = scriptToAddress(secp256k1Lock, isMainnet);

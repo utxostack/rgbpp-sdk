@@ -9,12 +9,14 @@ import { InitOutput, TxAddressOutput, TxBuilder } from '../transaction/build';
 import { networkTypeToConfig } from '../preset/config';
 import { unpackRgbppLockArgs } from '../ckb/molecule';
 import { createSendUtxosBuilder } from './sendUtxos';
+import { limitPromiseBatchSize } from '../utils';
 
 export interface SendRgbppUtxosProps {
   ckbVirtualTx: CKBComponents.RawTransaction;
   commitment: string;
   tos?: string[];
   paymaster?: TxAddressOutput;
+  needPaymaster?: boolean;
 
   ckbCollector: Collector;
   rgbppMinUtxoSatoshi?: number;
@@ -46,12 +48,36 @@ export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): P
   const config = networkTypeToConfig(props.source.networkType);
   const isCkbMainnet = props.source.networkType === NetworkType.MAINNET;
 
+  // Batch querying live cells from CkbCollector
+  const ckbLiveCells = await Promise.all(
+    ckbVirtualTx.inputs.map((ckbInput) => {
+      return limitPromiseBatchSize(async () => {
+        const ckbLiveCell = await props.ckbCollector.getLiveCell(ckbInput.previousOutput!);
+        const isRgbppLock = isRgbppLockCell(ckbLiveCell.output, isCkbMainnet);
+        const lockArgs = isRgbppLock ? unpackRgbppLockArgs(ckbLiveCell.output.lock.args) : undefined;
+        return {
+          ckbLiveCell,
+          isRgbppLock,
+          lockArgs,
+        };
+      });
+    }),
+  );
+
+  // Batch querying UTXO from BtcAssetsApi
+  const btcUtxos = await Promise.all(
+    ckbLiveCells.map(({ ckbLiveCell, isRgbppLock }) => {
+      if (isRgbppLock) {
+        const args = unpackRgbppLockArgs(ckbLiveCell.output.lock.args);
+        return limitPromiseBatchSize(() => props.source.getUtxo(args.btcTxid, args.outIndex, props.onlyConfirmedUtxos));
+      }
+      return undefined;
+    }),
+  );
+
   // Handle and check inputs
   for (let i = 0; i < ckbVirtualTx.inputs.length; i++) {
-    const ckbInput = ckbVirtualTx.inputs[i];
-
-    const ckbLiveCell = await props.ckbCollector.getLiveCell(ckbInput.previousOutput!);
-    const isRgbppLock = isRgbppLockCell(ckbLiveCell.output, isCkbMainnet);
+    const { lockArgs, isRgbppLock } = ckbLiveCells[i];
 
     // If input.lock == RgbppLock, add to inputs if:
     // 1. input.lock.args can be unpacked to RgbppLockArgs
@@ -59,8 +85,8 @@ export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): P
     // 3. utxo.scriptPk == addressToScriptPk(props.from)
     // 4. utxo is not duplicated in the inputs
     if (isRgbppLock) {
-      const args = unpackRgbppLockArgs(ckbLiveCell.output.lock.args);
-      const utxo = await props.source.getUtxo(args.btcTxid, args.outIndex, props.onlyConfirmedUtxos);
+      const args = lockArgs!;
+      const utxo = btcUtxos[i];
       if (!utxo) {
         throw TxBuildError.withComment(ErrorCodes.CANNOT_FIND_UTXO, `hash: ${args.btcTxid}, index: ${args.outIndex}`);
       }
@@ -174,8 +200,14 @@ async function getMergedBtcOutputs(btcOutputs: InitOutput[], props: SendRgbppUtx
 
   // Add paymaster output, only if paymaster address exists and needed
   const paymaster = defaultPaymaster ?? props.paymaster;
-  const isCkbTxCapacitySufficient = await checkCkbTxInputsCapacitySufficient(props.ckbVirtualTx, props.ckbCollector);
-  if (paymaster && !isCkbTxCapacitySufficient) {
+  const isNeedPaymasterOutput = await (async () => {
+    if (props.needPaymaster !== undefined) {
+      return props.needPaymaster;
+    }
+    const isInputsSufficient = await checkCkbTxInputsCapacitySufficient(props.ckbVirtualTx, props.ckbCollector);
+    return !isInputsSufficient;
+  })();
+  if (paymaster && isNeedPaymasterOutput) {
     merged.push({
       ...paymaster,
       fixed: true,

@@ -1,6 +1,6 @@
 {
   "name": "@rgbpp-sdk/btc",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "scripts": {
     "test": "vitest",
     "build": "tsc -p tsconfig.build.json",
@@ -24,7 +24,8 @@
     "bip32": "^4.0.0",
     "bitcoinjs-lib": "^6.1.5",
     "ecpair": "^2.1.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "p-limit": "^3.1.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.0",

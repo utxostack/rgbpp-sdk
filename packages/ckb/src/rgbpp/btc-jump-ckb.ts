@@ -6,6 +6,7 @@ import {
   calculateRgbppCellCapacity,
   calculateTransactionFee,
   deduplicateList,
+  fetchTypeIdCellDeps,
   isLockArgsSizeExceeded,
   isScriptEqual,
   isUDTTypeSupported,
@@ -23,13 +24,7 @@ import {
   isRgbppCapacitySufficientForChange,
 } from '../utils/rgbpp';
 import { Hex, IndexerCell } from '../types';
-import {
-  RGBPP_WITNESS_PLACEHOLDER,
-  getRgbppLockConfigDep,
-  getRgbppLockDep,
-  getSecp256k1CellDep,
-  getXudtDep,
-} from '../constants';
+import { RGBPP_WITNESS_PLACEHOLDER, getSecp256k1CellDep } from '../constants';
 import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
 /**
@@ -139,7 +134,7 @@ export const genBtcJumpCkbVirtualTx = async ({
     outputsData.push(otherRgbppCell.outputData);
   }
 
-  const cellDeps = [getRgbppLockDep(isMainnet), getXudtDep(isMainnet), getRgbppLockConfigDep(isMainnet)];
+  const cellDeps = await fetchTypeIdCellDeps(isMainnet, { rgbpp: true, xudt: true });
   if (needPaymasterCell) {
     cellDeps.push(getSecp256k1CellDep(isMainnet));
   }

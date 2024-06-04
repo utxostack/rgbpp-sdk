@@ -30,6 +30,7 @@ interface SporeCreateParams {
   }[];
 }
 
+// Warning: Before runing this file for the first time, please run 2-prepare-cluster.ts
 const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreateParams) => {
   const ckbVirtualTxResult = await genCreateSporeCkbVirtualTx({
     collector,
@@ -42,7 +43,7 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
   // Save ckbVirtualTxResult
   saveCkbVirtualTxResult(ckbVirtualTxResult, '3-create-spores');
 
-  const { commitment, ckbRawTx, sumInputsCapacity, clusterCell } = ckbVirtualTxResult;
+  const { commitment, ckbRawTx, sumInputsCapacity, clusterCell, needPaymasterCell } = ckbVirtualTxResult;
 
   // Send BTC tx
   // The first btc address is the owner of the cluster cell and the rest btc addresses are spore receivers
@@ -51,6 +52,7 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
     ckbVirtualTx: ckbRawTx,
     commitment,
     tos: btcTos,
+    needPaymaster: needPaymasterCell,
     ckbCollector: collector,
     from: btcAddress!,
     source: btcDataSource,
@@ -114,7 +116,7 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
   }, 30 * 1000);
 };
 
-// Use your real BTC UTXO information on the BTC Testnet
+// Please use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 createSpores({
   // The cluster cell will be spent and the new cluster cell will be created in each spore creation tx,

@@ -1,3 +1,4 @@
+import limitPromiseConcurrency from 'p-limit';
 import { bitcoin, ecc, ECPair } from './bitcoin';
 import { bytes } from '@ckb-lumos/codec';
 
@@ -75,3 +76,15 @@ export function transactionToHex(tx: bitcoin.Transaction, withWitness?: boolean)
   const buffer: Buffer = tx['__toBuffer'](undefined, undefined, withWitness ?? false);
   return buffer.toString('hex');
 }
+
+/**
+ * Limits the batch size of promises when querying with Promise.all().
+ * @example
+ * await Promise.all([
+ *   limitPromiseBatchSize(() => asyncDoSomething()),
+ *   limitPromiseBatchSize(() => asyncDoSomething()),
+ *   limitPromiseBatchSize(() => asyncDoSomething()),
+ *   ...
+ * ]);
+ */
+export const limitPromiseBatchSize = limitPromiseConcurrency(10);

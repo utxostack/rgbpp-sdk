@@ -8,11 +8,10 @@ import {
   MIN_CAPACITY,
   append0x,
   u128ToLe,
-  getXudtDep,
-  getUniqueTypeDep,
   SECP256K1_WITNESS_LOCK_SIZE,
   calculateTransactionFee,
   NoXudtLiveCellError,
+  fetchTypeIdCellDeps,
 } from 'rgbpp/ckb';
 import { CKB_PRIVATE_KEY, ckbAddress, collector, isMainnet } from './env';
 
@@ -104,7 +103,7 @@ const transferXudt = async ({ xudtType, receivers }: XudtTransferParams) => {
   const emptyWitness = { lock: '', inputType: '', outputType: '' };
   const witnesses = inputs.map((_, index) => (index === 0 ? emptyWitness : '0x'));
 
-  const cellDeps = [getSecp256k1CellDep(isMainnet), getUniqueTypeDep(isMainnet), getXudtDep(isMainnet)];
+  const cellDeps = [getSecp256k1CellDep(isMainnet), ...(await fetchTypeIdCellDeps(isMainnet, { xudt: true }))];
 
   const unsignedTx = {
     version: '0x0',

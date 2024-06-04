@@ -40,9 +40,10 @@ const leapSporeFromCkbToBtc = async ({
   console.info(`RGB++ Spore has been jumped from CKB to BTC and tx hash is ${txHash}`);
 };
 
-// Use your real BTC UTXO information on the BTC Testnet
+// Please use your real BTC UTXO information on the BTC Testnet
 leapSporeFromCkbToBtc({
   outIndex: 1,
   btcTxId: '448897515cf07b4ca0cd38af9806399ede55775b4c760b274ed2322121ed185f',
+  // Please use your own RGB++ spore asset's sporeTypeArgs
   sporeTypeArgs: '0x42898ea77062256f46e8f1b861d526ae47810ecc51ab50477945d5fa90452706',
 });

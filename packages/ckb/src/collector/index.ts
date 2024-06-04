@@ -4,7 +4,7 @@ import { toCamelcase } from '../utils/case-parser';
 import { CollectConfig, CollectResult, CollectUdtResult, IndexerCell } from '../types/collector';
 import { MIN_CAPACITY } from '../constants';
 import { CapacityNotEnoughError, IndexerError, UdtAmountNotEnoughError } from '../error';
-import { isRgbppLockCellIgnoreChain, leToU128 } from '../utils';
+import { isRgbppLockCellIgnoreChain, leToU128, remove0x } from '../utils';
 import { Hex } from '../types';
 
 interface IndexerScript {
@@ -148,7 +148,9 @@ export class Collector {
         since: '0x0',
       });
       sumInputsCapacity = sumInputsCapacity + BigInt(cell.output.capacity);
-      sumAmount += leToU128(cell.outputData);
+      // XUDT cell.data = <amount: uint128> <xudt data (optional)>
+      // Ref: https://blog.cryptape.com/enhance-sudts-programmability-with-xudt#heading-xudt-cell
+      sumAmount += leToU128(remove0x(cell.outputData).slice(0, 32));
       if (sumAmount >= needAmount && !isRgbppLock) {
         break;
       }
@@ -159,9 +161,9 @@ export class Collector {
     return { inputs, sumInputsCapacity, sumAmount };
   }
 
-  async getLiveCell(outPoint: CKBComponents.OutPoint): Promise<CKBComponents.LiveCell> {
+  async getLiveCell(outPoint: CKBComponents.OutPoint, withData = true): Promise<CKBComponents.LiveCell> {
     const ckb = new CKB(this.ckbNodeUrl);
-    const { cell } = await ckb.rpc.getLiveCell(outPoint, true);
+    const { cell } = await ckb.rpc.getLiveCell(outPoint, withData);
     return cell;
   }
 }

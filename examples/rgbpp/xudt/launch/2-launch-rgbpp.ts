@@ -16,6 +16,8 @@ interface Params {
   launchAmount: bigint;
   rgbppTokenInfo: RgbppTokenInfo;
 }
+
+// Warning: Before runing this file, please run 2-prepare-launch.ts
 const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInfo }: Params) => {
   const ckbVirtualTxResult = await genRgbppLaunchCkbVirtualTx({
     collector,
@@ -28,7 +30,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
   // Save ckbVirtualTxResult
   saveCkbVirtualTxResult(ckbVirtualTxResult, '2-launch-rgbpp');
 
-  const { commitment, ckbRawTx } = ckbVirtualTxResult;
+  const { commitment, ckbRawTx, needPaymasterCell } = ckbVirtualTxResult;
 
   console.log('RGB++ Asset type script args: ', ckbRawTx.outputs[0].type?.args);
 
@@ -37,6 +39,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
     ckbVirtualTx: ckbRawTx,
     commitment,
     tos: [btcAddress!],
+    needPaymaster: needPaymasterCell,
     ckbCollector: collector,
     from: btcAddress!,
     source: btcDataSource,
@@ -73,7 +76,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
   }, 30 * 1000);
 };
 
-// Use your real BTC UTXO information on the BTC Testnet
+// Please use your real BTC UTXO information on the BTC Testnet which should be same as the 1-prepare-launch.ts
 // rgbppLockArgs: outIndexU32 + btcTxId
 launchRgppAsset({
   ownerRgbppLockArgs: buildRgbppLockArgs(1, '6259ea7852e294afbd2aaf9ccd5c9c1f95087b0b08ba7e47ae35ce31170732bc'),

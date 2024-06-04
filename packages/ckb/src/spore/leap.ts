@@ -1,5 +1,5 @@
 import { BtcTimeCellsParams, RgbppCkbVirtualTx } from '../types/rgbpp';
-import { append0x, calculateTransactionFee } from '../utils';
+import { append0x, calculateTransactionFee, fetchTypeIdCellDeps } from '../utils';
 import {
   btcTxIdFromBtcTimeLockArgs,
   buildSpvClientCellDep,
@@ -19,10 +19,6 @@ import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
   RGBPP_TX_WITNESS_MAX_SIZE,
   RGBPP_WITNESS_PLACEHOLDER,
-  getBtcTimeLockConfigDep,
-  getBtcTimeLockDep,
-  getRgbppLockConfigDep,
-  getRgbppLockDep,
   getRgbppLockScript,
   getSporeTypeDep,
 } from '../constants';
@@ -80,7 +76,7 @@ export const genLeapSporeFromBtcToCkbVirtualTx = async ({
     },
   ];
   const outputsData: Hex[] = [sporeCell.outputData];
-  const cellDeps = [getRgbppLockDep(isMainnet), getRgbppLockConfigDep(isMainnet), getSporeTypeDep(isMainnet)];
+  const cellDeps = [...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true })), getSporeTypeDep(isMainnet)];
   const sporeCoBuild = generateSporeTransferCoBuild([sporeCell], outputs);
   const witnesses = [RGBPP_WITNESS_PLACEHOLDER, sporeCoBuild];
 
@@ -142,9 +138,8 @@ export const buildSporeBtcTimeCellsSpentTx = async ({
   const outputsData = sortedBtcTimeCells.map((cell) => cell.outputData);
 
   const cellDeps: CKBComponents.CellDep[] = [
-    getBtcTimeLockDep(isMainnet),
+    ...(await fetchTypeIdCellDeps(isMainnet, { btcTime: true })),
     getSporeTypeDep(isMainnet),
-    getBtcTimeLockConfigDep(isMainnet),
   ];
 
   const witnesses: Hex[] = [];
@@ -233,7 +228,7 @@ export const genLeapSporeFromCkbToBtcRawTx = async ({
     },
   ];
   const outputsData: Hex[] = [sporeCell.outputData];
-  const cellDeps = [getRgbppLockDep(isMainnet), getRgbppLockConfigDep(isMainnet), getSporeTypeDep(isMainnet)];
+  const cellDeps = [...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true })), getSporeTypeDep(isMainnet)];
   const sporeCoBuild = generateSporeTransferCoBuild([sporeCell], outputs);
   const witnesses = [RGBPP_WITNESS_PLACEHOLDER, sporeCoBuild];
 

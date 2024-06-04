@@ -21,6 +21,6 @@
     "skipLibCheck": true,
     "strict": true
   },
-  "include": ["queue/**/*.ts", "xudt/**/*.ts"],
+  "include": ["spore", "xudt", "shared"],
   "exclude": ["node_modules"]
 }
