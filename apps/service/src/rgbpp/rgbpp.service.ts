@@ -10,8 +10,8 @@ export class RgbppService {
     @Inject('BTC_DATA_SOURCE') private btcDataSource: DataSource,
   ) {}
 
-  @RpcMethodHandler()
-  public async hello(params: unknown): Promise<{ address: string }> {
+  @RpcMethodHandler({ name: 'hello_world' })
+  public async helloWorld(params: unknown): Promise<{ address: string }> {
     console.log(params, this.collector, this.btcDataSource);
     const paymaster = await this.btcDataSource.getPaymasterOutput();
     return paymaster;
