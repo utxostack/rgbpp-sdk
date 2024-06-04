@@ -1,11 +1,13 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import JsonRpcModule from './json-rpc/json-rpc.module';
 import { RgbppModule } from './rgbpp/rgbpp.module';
 import { AppService } from './app.service';
 import { envSchema } from './env';
 import { Collector } from 'rgbpp/ckb';
+import { BtcAssetsApi, DataSource } from 'rgbpp';
 
+@Global()
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -29,6 +31,19 @@ import { Collector } from 'rgbpp/ckb';
       },
       inject: [ConfigService],
     },
+    {
+      provide: 'BTC_DATA_SOURCE',
+      useFactory: (configService: ConfigService) => {
+        const url = configService.get('BTC_SERVICE_URL');
+        const token = configService.get('BTC_SERVICE_TOKEN');
+        const origin = configService.get('BTC_SERVICE_ORIGIN');
+        const btcAssestApi = BtcAssetsApi.fromToken(url, token, origin);
+        const dataSource = new DataSource(btcAssestApi, configService.get('NETWORK'));
+        return dataSource;
+      },
+      inject: [ConfigService],
+    },
   ],
+  exports: ['COLLECTOR', 'BTC_DATA_SOURCE'],
 })
 export class AppModule {}

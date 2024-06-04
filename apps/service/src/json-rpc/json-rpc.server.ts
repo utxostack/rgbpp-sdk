@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { HttpAdapterHost, ModulesContainer } from '@nestjs/core';
+import { HttpAdapterHost, ModuleRef, ModulesContainer } from '@nestjs/core';
 import { JSONRPCServer, SimpleJSONRPCMethod } from 'json-rpc-2.0';
 import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper';
 import { JsonRpcMetadataKey, JsonRpcMethodMetadataKey } from './json-rpc.decorators';
@@ -19,14 +19,9 @@ export class JsonRpcServer {
   constructor(
     private httpAdapterHost: HttpAdapterHost,
     private modulesContainer: ModulesContainer,
+    private moduleRef: ModuleRef,
   ) {
     this.server = new JSONRPCServer();
-
-    const handlers = this.getRegisteredHandlers();
-    handlers.forEach((handler, name) => {
-      this.logger.log(`Registering JSON-RPC method: ${name}`);
-      this.server.addMethod(name, handler);
-    });
   }
 
   private getRegisteredHandlers() {
@@ -47,16 +42,18 @@ export class JsonRpcServer {
         return;
       }
 
-      const methodNames = Object.getOwnPropertyNames(Object.getPrototypeOf(instance));
-      methodNames.forEach((methodName) => {
-        const methodMetadata = Reflect.getMetadata(JsonRpcMethodMetadataKey, instance[methodName]);
+      const instanceRef = this.moduleRef.get(instance.constructor, { strict: false });
+
+      const properties = Object.getOwnPropertyNames(Object.getPrototypeOf(instanceRef));
+      properties.forEach((methodName) => {
+        const methodMetadata = Reflect.getMetadata(JsonRpcMethodMetadataKey, instanceRef[methodName]);
         if (!methodMetadata) {
           return;
         }
         const name = metadata.name
           ? `${metadata.name}.${methodMetadata.name ?? methodName}`
           : methodMetadata.name ?? methodName;
-        const handler = instance[methodName].bind(instance);
+        const handler = (params: unknown) => instanceRef[methodName](params);
         if (rpcHandlers.has(name)) {
           throw new JsonRpcServerError(`Duplicate JSON-RPC method: ${name}`);
         }
@@ -64,6 +61,14 @@ export class JsonRpcServer {
       });
     });
     return rpcHandlers;
+  }
+
+  public async resolve() {
+    const handlers = this.getRegisteredHandlers();
+    handlers.forEach((handler, name) => {
+      this.logger.log(`Registering JSON-RPC method: ${name}`);
+      this.server.addMethod(name, handler);
+    });
   }
 
   public async run(config: JsonRpcConfig) {
