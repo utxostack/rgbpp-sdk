@@ -1,6 +1,5 @@
 import { Inject, Logger, Module, OnModuleInit } from '@nestjs/common';
 import { JsonRpcServer } from './json-rpc.server';
-import { NestContainer } from '@nestjs/core';
 
 export const JSON_RPC_OPTIONS = '__JSON_RPC_OPTIONS__';
 
@@ -8,9 +7,7 @@ export interface JsonRpcConfig {
   path: string;
 }
 
-@Module({
-  providers: [NestContainer],
-})
+@Module({})
 export class JsonRpcModule implements OnModuleInit {
   private logger = new Logger(JsonRpcModule.name);
 
