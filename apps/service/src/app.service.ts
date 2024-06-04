@@ -3,7 +3,7 @@ import * as pkg from '../package.json';
 
 @RpcHandler()
 export class AppService {
-  @RpcMethodHandler({ name: 'getVersion' })
+  @RpcMethodHandler({ name: 'get_version' })
   public getAppVersion(): string {
     return pkg.version;
   }

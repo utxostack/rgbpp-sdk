@@ -42,18 +42,19 @@ export class JsonRpcServer {
         return;
       }
 
-      const instanceRef = this.moduleRef.get(instance.constructor, { strict: false });
-
-      const properties = Object.getOwnPropertyNames(Object.getPrototypeOf(instanceRef));
+      const properties = Object.getOwnPropertyNames(Object.getPrototypeOf(instance));
       properties.forEach((methodName) => {
-        const methodMetadata = Reflect.getMetadata(JsonRpcMethodMetadataKey, instanceRef[methodName]);
+        const methodMetadata = Reflect.getMetadata(JsonRpcMethodMetadataKey, instance[methodName]);
         if (!methodMetadata) {
           return;
         }
         const name = metadata.name
           ? `${metadata.name}.${methodMetadata.name ?? methodName}`
           : methodMetadata.name ?? methodName;
-        const handler = (params: unknown) => instanceRef[methodName](params);
+        const handler = (params: unknown) => {
+          const instanceRef = this.moduleRef.get(instance.constructor, { strict: false });
+          return instanceRef[methodName](params);
+        };
         if (rpcHandlers.has(name)) {
           throw new JsonRpcServerError(`Duplicate JSON-RPC method: ${name}`);
         }

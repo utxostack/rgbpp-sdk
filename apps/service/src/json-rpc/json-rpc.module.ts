@@ -1,4 +1,4 @@
-import { Inject, Logger, Module, OnApplicationBootstrap, OnModuleInit } from '@nestjs/common';
+import { Inject, Logger, Module, OnModuleInit } from '@nestjs/common';
 import { JsonRpcServer } from './json-rpc.server';
 
 export const JSON_RPC_OPTIONS = '__JSON_RPC_OPTIONS__';
@@ -8,7 +8,7 @@ export interface JsonRpcConfig {
 }
 
 @Module({})
-export class JsonRpcModule implements OnModuleInit, OnApplicationBootstrap {
+export class JsonRpcModule implements OnModuleInit {
   private logger = new Logger(JsonRpcModule.name);
 
   constructor(
@@ -30,12 +30,9 @@ export class JsonRpcModule implements OnModuleInit, OnApplicationBootstrap {
   }
 
   public async onModuleInit() {
+    await this.jsonRpcServer.resolve();
     this.jsonRpcServer.run(this.config);
     this.logger.log(`JSON-RPC server is running on ${this.config.path}`);
-  }
-
-  public async onApplicationBootstrap() {
-    await this.jsonRpcServer.resolve();
   }
 }
 
