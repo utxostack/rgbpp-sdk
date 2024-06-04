@@ -1,13 +1,7 @@
-import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { genBtcTransferCkbVirtualTx, sendRgbppUtxos, BtcAssetsApiError } from 'rgbpp';
-import {
-  appendCkbTxWitnesses,
-  buildRgbppLockArgs,
-  sendCkbTx,
-  getXudtTypeScript,
-  updateCkbTxWithRealBtcTxId,
-} from 'rgbpp/ckb';
+import { BtcAssetsApiError, buildRgbppTransferTx } from 'rgbpp';
+import { appendCkbTxWitnesses, buildRgbppLockArgs, sendCkbTx, updateCkbTxWithRealBtcTxId } from 'rgbpp/ckb';
 import { isMainnet, collector, btcDataSource, btcService, btcAccount } from '../../env';
+import { bitcoin } from 'rgbpp/btc';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
 import { signAndSendPsbt } from '../../shared/btc-account';
 
@@ -20,35 +14,24 @@ interface RgbppTransferParams {
 
 // Warning: It is not recommended for developers to use local examples unless you understand the entire process of RGB++ transactions.
 const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transferAmount }: RgbppTransferParams) => {
-  const xudtType: CKBComponents.Script = {
-    ...getXudtTypeScript(isMainnet),
-    args: xudtTypeArgs,
-  };
-
-  const ckbVirtualTxResult = await genBtcTransferCkbVirtualTx({
+  const { ckbVirtualTxResult, btcPsbtHex } = await buildRgbppTransferTx({
     collector,
+    xudtTypeArgs,
     rgbppLockArgsList,
-    xudtTypeBytes: serializeScript(xudtType),
     transferAmount,
+    fromBtcAddress: btcAddress!,
+    toBtcAddress,
+    btcDataSource,
     isMainnet,
   });
 
   // Save ckbVirtualTxResult
   saveCkbVirtualTxResult(ckbVirtualTxResult, '2-btc-transfer-local');
 
-  const { commitment, ckbRawTx } = ckbVirtualTxResult;
+  const { ckbRawTx } = ckbVirtualTxResult;
 
   // Send BTC tx
-  const psbt = await sendRgbppUtxos({
-    ckbVirtualTx: ckbRawTx,
-    commitment,
-    tos: [toBtcAddress],
-    ckbCollector: collector,
-    from: btcAccount.from,
-    fromPubkey: btcAccount.fromPubkey,
-    source: btcDataSource,
-  });
-
+  const psbt = bitcoin.Psbt.fromHex(btcPsbtHex);
   const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
   console.log('BTC TxId: ', btcTxId);
 

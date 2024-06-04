@@ -13,7 +13,7 @@ interface RgbppTransferParams {
 }
 
 const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transferAmount }: RgbppTransferParams) => {
-  const { ckbVirtualTxResult, btcTxHexToSign } = await buildRgbppTransferTx({
+  const { ckbVirtualTxResult, btcPsbtHex } = await buildRgbppTransferTx({
     collector,
     xudtTypeArgs,
     rgbppLockArgsList,
@@ -28,8 +28,7 @@ const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transfe
   saveCkbVirtualTxResult(ckbVirtualTxResult, '2-btc-transfer');
 
   // Send BTC tx
-  const psbt = bitcoin.Psbt.fromHex(btcTxHexToSign);
-
+  const psbt = bitcoin.Psbt.fromHex(btcPsbtHex);
   const { txId: btcTxId } = await signAndSendPsbt(psbt, btcAccount, btcService);
   console.log('BTC TxId: ', btcTxId);
 

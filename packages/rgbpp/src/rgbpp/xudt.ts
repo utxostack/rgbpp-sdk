@@ -51,6 +51,6 @@ export const buildRgbppTransferTx = async ({
 
   return {
     ckbVirtualTxResult,
-    btcTxHexToSign: psbt.toHex(),
+    btcPsbtHex: psbt.toHex(),
   };
 };
