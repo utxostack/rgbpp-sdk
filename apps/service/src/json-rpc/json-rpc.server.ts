@@ -5,6 +5,12 @@ import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper';
 import { JsonRpcMetadataKey, JsonRpcMethodMetadataKey } from './json-rpc.decorators';
 import { JsonRpcConfig } from './json-rpc.module';
 
+class JsonRpcServerError extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
 @Injectable()
 export class JsonRpcServer {
   private server: JSONRPCServer;
@@ -47,8 +53,13 @@ export class JsonRpcServer {
         if (!methodMetadata) {
           return;
         }
-        const name = `${metadata.name}.${methodMetadata.name ?? methodName}`;
+        const name = metadata.name
+          ? `${metadata.name}.${methodMetadata.name ?? methodName}`
+          : methodMetadata.name ?? methodName;
         const handler = instance[methodName].bind(instance);
+        if (rpcHandlers.has(name)) {
+          throw new JsonRpcServerError(`Duplicate JSON-RPC method: ${name}`);
+        }
         rpcHandlers.set(name, handler);
       });
     });

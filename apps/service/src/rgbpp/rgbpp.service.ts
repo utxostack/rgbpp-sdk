@@ -1,10 +1,12 @@
 import { RpcHandler, RpcMethodHandler } from 'src/json-rpc/json-rpc.decorators';
+// import { genCkbJumpBtcVirtualTx } from 'rgbpp';
 
-@RpcHandler({ name: 'rgbpp' })
+@RpcHandler()
 export class RgbppService {
-  @RpcMethodHandler({ name: 'hello' })
+  @RpcMethodHandler({ name: 'genCkbJumpBtcVirtualTx' })
   public getHello(params: unknown): string {
     console.log(params);
-    return 'Hello World!';
+    // return genCkbJumpBtcVirtualTx(params);
+    return 'genCkbJumpBtcVirtualTx called';
   }
 }
