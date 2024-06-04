@@ -1,5 +1,20 @@
 # @rgbpp-sdk/ckb
 
+## v0.3.0
+
+### Minor Changes
+
+- [#197](https://github.com/ckb-cell/rgbpp-sdk/pull/197): feat: Return needPaymasterCell for RGB++ ckb cirtual tx ([@duanyytop](https://github.com/duanyytop))
+
+- [#191](https://github.com/ckb-cell/rgbpp-sdk/pull/191): Dynamic fetching cell deps deployed by TypeID ([@duanyytop](https://github.com/duanyytop))
+
+### Patch Changes
+
+- [#212](https://github.com/ckb-cell/rgbpp-sdk/pull/212): Fix the XUDT cell data unpacking logic to load only the first 16 bytes ([@ShookLyngs](https://github.com/ShookLyngs))
+
+- Updated dependencies [[`4f05b1b`](https://github.com/ckb-cell/rgbpp-sdk/commit/4f05b1bba898b7acb58bdf20ae275164ad94523b)]:
+  - @rgbpp-sdk/service@0.3.0
+
 ## v0.2.0
 
 ### Minor Changes

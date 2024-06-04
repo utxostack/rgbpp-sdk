@@ -1,5 +1,26 @@
 # @rgbpp-sdk/btc
 
+## v0.3.0
+
+### Minor Changes
+
+- [#200](https://github.com/ckb-cell/rgbpp-sdk/pull/200): Add p-limit and batch queries in the sendRgbppUtxos() and TxBuilder.validateInputs() to improve construction time ([@ShookLyngs](https://github.com/ShookLyngs))
+
+- [#208](https://github.com/ckb-cell/rgbpp-sdk/pull/208): Adapt btc-assets-api#154, adding new props and return values to the /balance and /unspent APIs ([@ShookLyngs](https://github.com/ShookLyngs))
+
+- Add `available_satoshi` and `total_satoshi` to the BtcAssetsApi.getBtcBalance() API
+- Add `only_non_rgbpp_utxos` to the props of the BtcAssetsApi.getBtcUtxos() API
+- Remove `service.getRgbppAssetsByBtcUtxo()` lines from the DataCollector.collectSatoshi()
+- Remove `hasRgbppAssets` related variables/function from the DataCache
+
+- [#199](https://github.com/ckb-cell/rgbpp-sdk/pull/199): Add "needPaymaster" option to the sendRgbppUtxos() API to allow manually specifying whether a paymaster output is required ([@ShookLyngs](https://github.com/ShookLyngs))
+
+### Patch Changes
+
+- Updated dependencies [[`d2d963c`](https://github.com/ckb-cell/rgbpp-sdk/commit/d2d963c8f40d0316491df5bdccca4eba7a33977c), [`4c77e69`](https://github.com/ckb-cell/rgbpp-sdk/commit/4c77e69cadc8ce3d24f631c1348dcd7141fb1099), [`4f05b1b`](https://github.com/ckb-cell/rgbpp-sdk/commit/4f05b1bba898b7acb58bdf20ae275164ad94523b)]:
+  - @rgbpp-sdk/ckb@0.3.0
+  - @rgbpp-sdk/service@0.3.0
+
 ## v0.2.0
 
 ### Minor Changes
