@@ -1,6 +1,6 @@
 # Test the functionality of the rgbpp-sdk packages.
 
-name: Test
+name: Unit Tests
 
 on:
   workflow_dispatch:
