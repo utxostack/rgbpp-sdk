@@ -261,12 +261,20 @@ describe(
           expectCell(cell);
         }
       });
-      it('getRgbppAssetsByBtcAddress() with no_cache', async () => {
-        const res = await service.getRgbppAssetsByBtcAddress(rgbppBtcAddress, {
-          no_cache: true,
-        });
+      it('getRgbppBalanceByBtcAddress()', async () => {
+        const res = await service.getRgbppBalanceByBtcAddress(rgbppBtcAddress);
         expect(res).toBeDefined();
-        expect(res.length).toBeGreaterThan(0);
+        expect(res.address).toBeTypeOf('string');
+        expect(res.xudt.length).toBeGreaterThan(0);
+        for (const xudt of res.xudt) {
+          expect(xudt.name).toBeTypeOf('string');
+          expect(xudt.decimal).toBeTypeOf('number');
+          expect(xudt.symbol).toBeTypeOf('string');
+          expect(xudt.total_amount).toBeTypeOf('string');
+          expect(xudt.available_amount).toBeTypeOf('string');
+          expect(xudt.pending_amount).toBeTypeOf('string');
+          expect(xudt.type_hash).toBeTypeOf('string');
+        }
       });
       it('getRgbppSpvProof()', async () => {
         const res = await service.getRgbppSpvProof(rgbppBtcTxId, 6);

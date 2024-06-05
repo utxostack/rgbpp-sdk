@@ -24,6 +24,8 @@ import {
   RgbppApiSendCkbTransactionPayload,
   RgbppApiCkbTransactionHash,
   RgbppApiAssetsByAddressParams,
+  RgbppApiBalanceByAddressParams,
+  RgbppApiBalance,
   RgbppApiRetryCkbTransactionPayload,
   RgbppApiTransactionStateParams,
   RgbppApiTransactionRetry,
@@ -124,6 +126,12 @@ export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis
 
   getRgbppAssetsByBtcAddress(btcAddress: string, params?: RgbppApiAssetsByAddressParams) {
     return this.request<Cell[]>(`/rgbpp/v1/address/${btcAddress}/assets`, {
+      params,
+    });
+  }
+
+  getRgbppBalanceByBtcAddress(btcAddress: string, params?: RgbppApiBalanceByAddressParams) {
+    return this.request<RgbppApiBalance>(`/rgbpp/v1/address/${btcAddress}/balance`, {
       params,
     });
   }

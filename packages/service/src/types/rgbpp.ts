@@ -7,6 +7,7 @@ export interface RgbppApis {
   getRgbppAssetsByBtcTxId(btcTxId: string): Promise<Cell[]>;
   getRgbppAssetsByBtcUtxo(btcTxId: string, vout: number): Promise<Cell[]>;
   getRgbppAssetsByBtcAddress(btcAddress: string, params?: RgbppApiAssetsByAddressParams): Promise<Cell[]>;
+  getRgbppBalanceByBtcAddress(btcAddress: string, params?: RgbppApiBalanceByAddressParams): Promise<RgbppApiBalance>;
   getRgbppSpvProof(btcTxId: string, confirmations: number): Promise<RgbppApiSpvProof>;
   sendRgbppCkbTransaction(payload: RgbppApiSendCkbTransactionPayload): Promise<RgbppApiTransactionState>;
   retryRgbppCkbTransaction(payload: RgbppApiRetryCkbTransactionPayload): Promise<RgbppApiTransactionRetry>;
@@ -45,6 +46,24 @@ export interface RgbppApiTransactionState {
 export interface RgbppApiAssetsByAddressParams {
   type_script?: string;
   no_cache?: boolean;
+}
+
+export interface RgbppApiBalanceByAddressParams {
+  type_script?: string;
+  no_cache?: boolean;
+}
+export interface RgbppApiBalance {
+  address: string;
+  xudt: RgbppApiXudtBalance[];
+}
+export interface RgbppApiXudtBalance {
+  name: string;
+  decimal: number;
+  symbol: string;
+  total_amount: string;
+  available_amount: string;
+  pending_amount: string;
+  type_hash: string;
 }
 
 export interface RgbppApiSpvProof {
