@@ -13,9 +13,16 @@ export interface RgbppTransferReq {
   toBtcAddress: string;
 }
 
-export interface RgbppTransferResp {
+export interface RgbppCkbBtcTransaction {
   // The JSON string for the `BtcTransferVirtualTxResult`
   ckbVirtualTxResult: string;
   // The BTC PSBT hex string which can be used to construct Bitcoin PSBT
   btcPsbtHex: Hex;
+}
+
+export interface RgbppCkbTxBtcTxId {
+  // The JSON string for the `BtcTransferVirtualTxResult`
+  ckbVirtualTxResult: string;
+  // The BTC transaction id of the RGB++ operations
+  btcTxId: Hex;
 }
