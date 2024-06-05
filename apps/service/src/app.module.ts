@@ -5,7 +5,9 @@ import { RgbppModule } from './rgbpp/rgbpp.module';
 import { AppService } from './app.service';
 import { envSchema } from './env';
 import { Collector } from 'rgbpp/ckb';
-import { BtcAssetsApi, DataSource } from 'rgbpp';
+import { BtcAssetsApi, DataSource, NetworkType } from 'rgbpp';
+
+const parseNetwork = (configService: ConfigService): boolean => configService.get('NETWORK') === 'mainnet';
 
 @Global()
 @Module({
@@ -20,6 +22,11 @@ import { BtcAssetsApi, DataSource } from 'rgbpp';
   ],
   providers: [
     AppService,
+    {
+      provide: 'IS_MAINNET',
+      useFactory: parseNetwork,
+      inject: [ConfigService],
+    },
     {
       provide: 'COLLECTOR',
       useFactory: (configService: ConfigService) => {
@@ -38,12 +45,13 @@ import { BtcAssetsApi, DataSource } from 'rgbpp';
         const token = configService.get('BTC_SERVICE_TOKEN');
         const origin = configService.get('BTC_SERVICE_ORIGIN');
         const btcAssestApi = BtcAssetsApi.fromToken(url, token, origin);
-        const dataSource = new DataSource(btcAssestApi, configService.get('NETWORK'));
+        const networkType = parseNetwork(configService) ? NetworkType.MAINNET : NetworkType.TESTNET;
+        const dataSource = new DataSource(btcAssestApi, networkType);
         return dataSource;
       },
       inject: [ConfigService],
     },
   ],
-  exports: ['COLLECTOR', 'BTC_DATA_SOURCE'],
+  exports: ['IS_MAINNET', 'COLLECTOR', 'BTC_DATA_SOURCE'],
 })
 export class AppModule {}
