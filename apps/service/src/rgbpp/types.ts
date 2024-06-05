@@ -26,3 +26,8 @@ export interface RgbppCkbTxBtcTxId {
   // The BTC transaction id of the RGB++ operations
   btcTxId: Hex;
 }
+
+export interface RgbppStateReq {
+  btcTxId: Hex;
+  withData?: boolean;
+}

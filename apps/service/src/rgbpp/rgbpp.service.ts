@@ -2,10 +2,10 @@ import { Inject } from '@nestjs/common';
 import { RpcHandler, RpcMethodHandler } from 'src/json-rpc/json-rpc.decorators';
 import { DataSource, NetworkType } from 'rgbpp/btc';
 import { Collector, toCamelcase } from 'rgbpp/ckb';
-import { RgbppTransferReq, RgbppCkbBtcTransaction, RgbppCkbTxBtcTxId } from './types';
+import { RgbppTransferReq, RgbppCkbBtcTransaction, RgbppCkbTxBtcTxId, RgbppStateReq } from './types';
 import { toSnakeCase } from 'src/utils/snake';
 import { buildRgbppTransferTx } from 'rgbpp';
-import { BtcAssetsApi } from 'rgbpp/service';
+import { BtcAssetsApi, RgbppApiTransactionState } from 'rgbpp/service';
 
 @RpcHandler()
 export class RgbppService {
@@ -46,5 +46,12 @@ export class RgbppService {
       ckb_virtual_result: ckbVirtualTxResult,
     });
     return state;
+  }
+
+  @RpcMethodHandler({ name: 'get_rgbpp_tx_state' })
+  public async getRgbppTxState(request: object[]): Promise<RgbppApiTransactionState> {
+    const { btcTxId, withData } = toCamelcase<RgbppStateReq>(request[0]);
+    const response = await this.btcAssetsApi.getRgbppTransactionState(btcTxId, { withData });
+    return response;
   }
 }
