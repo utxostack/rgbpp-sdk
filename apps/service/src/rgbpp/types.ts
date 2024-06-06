@@ -29,5 +29,7 @@ export interface RgbppCkbTxBtcTxId {
 
 export interface RgbppStateReq {
   btcTxId: Hex;
-  withData?: boolean;
+  params?: {
+    withData?: boolean;
+  };
 }

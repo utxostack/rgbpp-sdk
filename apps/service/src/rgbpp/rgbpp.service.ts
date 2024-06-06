@@ -50,8 +50,11 @@ export class RgbppService {
 
   @RpcMethodHandler({ name: 'get_rgbpp_tx_state' })
   public async getRgbppTxState(request: object[]): Promise<RgbppApiTransactionState> {
-    const { btcTxId, withData } = toCamelcase<RgbppStateReq>(request[0]);
-    const response = await this.btcAssetsApi.getRgbppTransactionState(btcTxId, { withData });
+    const {
+      btcTxId,
+      params: { withData },
+    } = toCamelcase<RgbppStateReq>(request[0]);
+    const response = await this.btcAssetsApi.getRgbppTransactionState(btcTxId, { with_data: withData });
     return response;
   }
 }
