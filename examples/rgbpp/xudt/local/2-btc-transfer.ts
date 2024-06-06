@@ -49,7 +49,7 @@ const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transfe
     source: btcDataSource,
   });
 
-  const { txId: btcTxId, txHexRaw: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
+  const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
   console.log('BTC TxId: ', btcTxId);
 
   // Wait for BTC tx and proof to be ready, and then send isomorphic CKB transactions

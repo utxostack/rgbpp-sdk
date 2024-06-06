@@ -57,7 +57,7 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }
     feeRate: 30,
   });
 
-  const { txId: btcTxId, txHexRaw: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
+  const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
   console.log('BTC TxId: ', btcTxId);
 
   const interval = setInterval(async () => {

@@ -82,7 +82,7 @@ export async function signAndSendPsbt(
 ): Promise<{
   txId: string;
   txHex: string;
-  txHexRaw: string;
+  rawTxHex: string;
 }> {
   signPsbt(psbt, account);
   psbt.finalizeAllInputs();
@@ -95,6 +95,7 @@ export async function signAndSendPsbt(
   return {
     txHex,
     txId: txid,
-    txHexRaw: transactionToHex(tx, false),
+    // Exclude witness from the BTC_TX for unlocking RGBPP assets
+    rawTxHex: transactionToHex(tx, false),
   };
 }

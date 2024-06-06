@@ -50,7 +50,7 @@ const leapFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
     source: btcDataSource,
   });
 
-  const { txId: btcTxId, txHexRaw: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
+  const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
   console.log('BTC Tx bytes: ', btcTxBytes);
   console.log('BTC TxId: ', btcTxId);
   console.log('ckbRawTx', JSON.stringify(ckbRawTx));
