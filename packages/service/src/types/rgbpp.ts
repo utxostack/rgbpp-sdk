@@ -24,7 +24,7 @@ export interface RgbppApiCkbTransactionHash {
 }
 
 export interface RgbppApiTransactionStateParams {
-  withData?: boolean;
+  with_data?: boolean;
 }
 
 export interface RgbppApiTransactionState {
