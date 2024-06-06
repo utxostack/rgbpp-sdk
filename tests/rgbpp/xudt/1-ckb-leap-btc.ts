@@ -47,8 +47,8 @@ const leapFromCkbToBtc = async ({ outIndex, btcTxId, xudtTypeArgs, transferAmoun
 
 // Use your real BTC UTXO information on the BTC Testnet
 leapFromCkbToBtc({
-  outIndex: readStepLog('0').index,
-  btcTxId: readStepLog('0').txid,
+  outIndex: readStepLog('xudt').index,
+  btcTxId: readStepLog('xudt').txid,
   xudtTypeArgs: readStepLog('1').args,
   transferAmount: BigInt(800_0000_0000),
 });

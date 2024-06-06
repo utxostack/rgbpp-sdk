@@ -3,7 +3,7 @@ import { getFastestFeeRate, writeStepLog } from './utils';
 import { BtcAssetsApiError } from 'rgbpp/service';
 import { btcAddress, btcDataSource, btcKeyPair, btcService } from '../env';
 
-const prepareUtxo = async () => {
+const prepareUtxo = async (index: string | number) => {
   const feeRate = await getFastestFeeRate();
   console.log('feeRate = ', feeRate);
   console.log(btcAddress);
@@ -33,7 +33,7 @@ const prepareUtxo = async () => {
   const { txid: btcTxId } = await btcService.sendBtcTransaction(tx.toHex());
   console.log(`explorer: https://mempool.space/testnet/tx/${btcTxId}`);
 
-  writeStepLog('0', {
+  writeStepLog(String(index), {
     txid: btcTxId,
     index: 0,
   });
@@ -54,4 +54,5 @@ const prepareUtxo = async () => {
   }, 20 * 1000);
 };
 
-prepareUtxo();
+prepareUtxo('xudt');
+prepareUtxo('spore');

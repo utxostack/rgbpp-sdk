@@ -4,6 +4,7 @@ import { getSporeTypeScript, Hex } from 'rgbpp/ckb';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../env';
 import { getFastestFeeRate, readStepLog } from '../shared/utils';
+import { saveCkbVirtualTxResult } from '../../../examples/rgbpp/shared/utils';
 
 interface SporeTransferParams {
   sporeRgbppLockArgs: Hex;
@@ -28,6 +29,9 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }
       sporeTypeBytes,
       isMainnet,
     });
+
+    // Save ckbVirtualTxResult
+    saveCkbVirtualTxResult(ckbVirtualTxResult, '4-transfer-spore');
 
     const { commitment, ckbRawTx, needPaymasterCell } = ckbVirtualTxResult;
 

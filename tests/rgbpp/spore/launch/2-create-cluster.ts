@@ -10,6 +10,7 @@ import {
   updateCkbTxWithRealBtcTxId,
 } from 'rgbpp/ckb';
 import { getFastestFeeRate, readStepLog, writeStepLog } from '../../shared/utils';
+import { saveCkbVirtualTxResult } from '../../../../examples/rgbpp/shared/utils';
 
 // Warning: Before runing this file, please run 1-prepare-cluster.ts
 const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: string }) => {
@@ -26,6 +27,9 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
       isMainnet,
       ckbFeeRate: BigInt(2000),
     });
+
+    // Save ckbVirtualTxResult
+    saveCkbVirtualTxResult(ckbVirtualTxResult, '2-create-cluster');
 
     const { commitment, ckbRawTx, clusterId, needPaymasterCell } = ckbVirtualTxResult;
 
@@ -97,5 +101,5 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
 // Please use your real BTC UTXO information on the BTC Testnet which should be same as the 1-prepare-cluster.ts
 // rgbppLockArgs: outIndexU32 + btcTxId
 createCluster({
-  ownerRgbppLockArgs: buildRgbppLockArgs(readStepLog('0').index, readStepLog('0').txid),
+  ownerRgbppLockArgs: buildRgbppLockArgs(readStepLog('spore').index, readStepLog('spore').txid),
 });

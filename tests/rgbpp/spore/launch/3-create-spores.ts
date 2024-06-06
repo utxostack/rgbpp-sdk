@@ -21,6 +21,7 @@ import {
 } from 'rgbpp/ckb';
 import { transactionToHex, utf8ToBuffer } from 'rgbpp/btc';
 import { getFastestFeeRate, readStepLog, writeStepLog } from '../../shared/utils';
+import { saveCkbVirtualTxResult } from '../../../../examples/rgbpp/shared/utils';
 
 interface SporeCreateParams {
   clusterRgbppLockArgs: Hex;
@@ -44,6 +45,9 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
       isMainnet,
       ckbFeeRate: BigInt(2000),
     });
+
+    // Save ckbVirtualTxResult
+    saveCkbVirtualTxResult(ckbVirtualTxResult, '3-create-spores');
 
     const { commitment, ckbRawTx, sumInputsCapacity, clusterCell, needPaymasterCell } = ckbVirtualTxResult;
 

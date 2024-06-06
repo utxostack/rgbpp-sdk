@@ -4,6 +4,7 @@ import { getSporeTypeScript, Hex } from 'rgbpp/ckb';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../env';
 import { getFastestFeeRate, readStepLog } from '../shared/utils';
+import { saveCkbVirtualTxResult } from '../../../examples/rgbpp/shared/utils';
 
 interface SporeLeapParams {
   sporeRgbppLockArgs: Hex;
@@ -29,6 +30,9 @@ const leapSporeFromBtcToCkb = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTy
       toCkbAddress,
       isMainnet,
     });
+
+    // Save ckbVirtualTxResult
+    saveCkbVirtualTxResult(ckbVirtualTxResult, '5-leap-spore-to-ckb');
 
     const { commitment, ckbRawTx, needPaymasterCell } = ckbVirtualTxResult;
 
