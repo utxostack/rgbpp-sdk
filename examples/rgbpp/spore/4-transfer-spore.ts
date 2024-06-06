@@ -2,8 +2,9 @@ import { buildRgbppLockArgs } from 'rgbpp/ckb';
 import { genTransferSporeCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
 import { getSporeTypeScript, Hex } from 'rgbpp/ckb';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../env';
+import { isMainnet, collector, btcDataSource, btcService, btcAccount } from '../env';
 import { saveCkbVirtualTxResult } from '../shared/utils';
+import { signAndSendPsbt } from '../shared/btc-account';
 
 interface SporeTransferParams {
   sporeRgbppLockArgs: Hex;
@@ -36,16 +37,13 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }
     tos: [toBtcAddress],
     needPaymaster: needPaymasterCell,
     ckbCollector: collector,
-    from: btcAddress!,
+    from: btcAccount.from,
+    fromPubkey: btcAccount.fromPubkey,
     source: btcDataSource,
     feeRate: 30,
   });
-  psbt.signAllInputs(btcKeyPair);
-  psbt.finalizeAllInputs();
 
-  const btcTx = psbt.extractTransaction();
-  const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
-
+  const { txId: btcTxId } = await signAndSendPsbt(psbt, btcAccount, btcService);
   console.log('BTC TxId: ', btcTxId);
 
   await btcService.sendRgbppCkbTransaction({ btc_txid: btcTxId, ckb_virtual_result: ckbVirtualTxResult });

@@ -7,9 +7,9 @@ import {
   getXudtTypeScript,
   updateCkbTxWithRealBtcTxId,
 } from 'rgbpp/ckb';
-import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../env';
-import { transactionToHex } from 'rgbpp/btc';
+import { isMainnet, collector, btcDataSource, btcService, btcAccount } from '../../env';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
+import { signAndSendPsbt } from '../../shared/btc-account';
 
 interface LeapToCkbParams {
   rgbppLockArgsList: string[];
@@ -43,19 +43,14 @@ const leapFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
-    tos: [btcAddress!],
+    tos: [btcAccount.from],
     ckbCollector: collector,
-    from: btcAddress!,
+    from: btcAccount.from,
+    fromPubkey: btcAccount.fromPubkey,
     source: btcDataSource,
   });
-  psbt.signAllInputs(btcKeyPair);
-  psbt.finalizeAllInputs();
 
-  const btcTx = psbt.extractTransaction();
-  // Remove the witness from BTC tx for RGBPP unlock
-  const btcTxBytes = transactionToHex(btcTx, false);
-  const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
-
+  const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
   console.log('BTC Tx bytes: ', btcTxBytes);
   console.log('BTC TxId: ', btcTxId);
   console.log('ckbRawTx', JSON.stringify(ckbRawTx));

@@ -7,9 +7,9 @@ import {
   getXudtTypeScript,
   updateCkbTxWithRealBtcTxId,
 } from 'rgbpp/ckb';
-import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../env';
-import { transactionToHex } from 'rgbpp/btc';
+import { isMainnet, collector, btcDataSource, btcService, btcAccount } from '../../env';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
+import { signAndSendPsbt } from '../../shared/btc-account';
 
 interface RgbppTransferParams {
   rgbppLockArgsList: string[];
@@ -44,17 +44,12 @@ const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transfe
     commitment,
     tos: [toBtcAddress],
     ckbCollector: collector,
-    from: btcAddress!,
+    from: btcAccount.from,
+    fromPubkey: btcAccount.fromPubkey,
     source: btcDataSource,
   });
-  psbt.signAllInputs(btcKeyPair);
-  psbt.finalizeAllInputs();
 
-  const btcTx = psbt.extractTransaction();
-  // Remove the witness from BTC tx for RGBPP unlock
-  const btcTxBytes = transactionToHex(btcTx, false);
-  const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
-
+  const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
   console.log('BTC TxId: ', btcTxId);
 
   // Wait for BTC tx and proof to be ready, and then send isomorphic CKB transactions
