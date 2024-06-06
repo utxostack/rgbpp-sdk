@@ -39,13 +39,13 @@ export class RgbppService {
   }
 
   @RpcMethodHandler({ name: 'report_rgbpp_ckb_tx_btc_txid' })
-  public async reportRgbppCkbTxBtcTxId(request: object[]) {
+  public async reportRgbppCkbTxBtcTxId(request: object[]): Promise<RgbppApiTransactionState> {
     const { ckbVirtualTxResult, btcTxId } = toCamelcase<RgbppCkbTxBtcTxId>(request[0]);
-    const { state } = await this.btcAssetsApi.sendRgbppCkbTransaction({
+    const response = await this.btcAssetsApi.sendRgbppCkbTransaction({
       btc_txid: btcTxId,
       ckb_virtual_result: ckbVirtualTxResult,
     });
-    return state;
+    return response;
   }
 
   @RpcMethodHandler({ name: 'get_rgbpp_tx_state' })
