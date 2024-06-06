@@ -16,6 +16,7 @@ jobs:
     strategy:
       matrix:
         env_set: [ xudt, spore ]
+      fail-fast: false
 
     steps:
       - name: Checkout rgbpp-sdk
@@ -38,19 +39,25 @@ jobs:
       - name: Build packages
         run: pnpm run build:packages
 
-      - name: Set environment variables
-        run: |
-          echo "VITE_SERVICE_URL=${{ secrets.SERVICE_URL }}" >> $GITHUB_ENV
-          echo "VITE_SERVICE_TOKEN=${{ secrets.SERVICE_TOKEN }}" >> $GITHUB_ENV
-          echo "VITE_SERVICE_ORIGIN=${{ secrets.SERVICE_ORIGIN }}" >> $GITHUB_ENV
-          echo "INTEGRATION_CKB_PRIVATE_KEY=$(if [ '${{ matrix.env_set }}' == 'xudt' ]; then echo ${{ secrets.INTEGRATION_CKB_PRIVATE_KEY }}; else echo ${{ secrets.INTEGRATION_CKB_SPORE_PRIVATE_KEY }}; fi)" >> $GITHUB_ENV
-          echo "INTEGRATION_BTC_PRIVATE_KEY=$(if [ '${{ matrix.env_set }}' == 'xudt' ]; then echo ${{ secrets.INTEGRATION_BTC_PRIVATE_KEY }}; else echo ${{ secrets.INTEGRATION_BTC_SPORE_PRIVATE_KEY }}; fi)" >> $GITHUB_ENV
-            
-      - name: Run integration:xudt/spore script
+
+      - name: Run integration:xudt script
         working-directory: ./tests/rgbpp
-        run: |
-          if [ "${{ matrix.env_set }}" = "xudt" ]; then
-            pnpm run integration:xudt
-          elif [ "${{ matrix.env_set }}" = "spore" ]; then
-            pnpm run integration:spore
-          fi
+        if: ${{ matrix.env_set == 'xudt' }}
+        run: pnpm run integration:xudt
+        env:
+          VITE_SERVICE_URL: ${{ secrets.SERVICE_URL }}
+          VITE_SERVICE_TOKEN: ${{ secrets.SERVICE_TOKEN }}
+          VITE_SERVICE_ORIGIN: ${{ secrets.SERVICE_ORIGIN }}
+          INTEGRATION_CKB_PRIVATE_KEY: ${{ secrets.INTEGRATION_CKB_PRIVATE_KEY }}
+          INTEGRATION_BTC_PRIVATE_KEY: ${{ secrets.INTEGRATION_BTC_PRIVATE_KEY }}
+
+      - name: Run integration:spore script
+        working-directory: ./tests/rgbpp
+        if: ${{ matrix.env_set == 'spore' }}
+        run: pnpm run integration:spore
+        env:
+          VITE_SERVICE_URL: ${{ secrets.SERVICE_URL }}
+          VITE_SERVICE_TOKEN: ${{ secrets.SERVICE_TOKEN }}
+          VITE_SERVICE_ORIGIN: ${{ secrets.SERVICE_ORIGIN }}
+          INTEGRATION_CKB_PRIVATE_KEY: ${{ secrets.INTEGRATION_CKB_SPORE_PRIVATE_KEY }}
+          INTEGRATION_BTC_PRIVATE_KEY: ${{ secrets.INTEGRATION_BTC_SPORE_PRIVATE_KEY }}
