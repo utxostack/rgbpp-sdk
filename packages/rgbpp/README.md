@@ -22,15 +22,22 @@ The `btcPsbtHex` can be used to construct bitcoin PSBT to sign and send BTC tran
 
 ```TypeScript
 const { ckbVirtualTxResult, btcPsbtHex } = await buildRgbppTransferTx({
+  ckb: {
     collector,
     xudtTypeArgs,
     rgbppLockArgsList,
     transferAmount,
+    ckbFeeRate,
+  },
+  btc: {
     fromBtcAddress,
     toBtcAddress,
     btcDataSource,
-    isMainnet,
-  });
+    fromPubkey,
+    feeRate
+  },
+  isMainnet,
+});
 
 // Construct SPBT with btcPsbtHex to sign and send BTC transaction with the BTC key pair
 const psbt = bitcoin.Psbt.fromHex(btcPsbtHex);
