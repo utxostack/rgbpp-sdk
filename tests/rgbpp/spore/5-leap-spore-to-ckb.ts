@@ -82,8 +82,8 @@ const leapSporeFromBtcToCkb = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTy
 // Please use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 leapSporeFromBtcToCkb({
-  sporeRgbppLockArgs: buildRgbppLockArgs(3, readStepLog('5').txid),
+  sporeRgbppLockArgs: buildRgbppLockArgs(3, readStepLog('create-spores-id').txid),
   toCkbAddress: 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq0e4xk4rmg5jdkn8aams492a7jlg73ue0gc0ddfj',
   // Please use your own RGB++ spore asset's sporeTypeArgs
-  sporeTypeArgs: readStepLog('6')[1].args,
+  sporeTypeArgs: readStepLog('sporeTypeScripts')[1].args,
 });

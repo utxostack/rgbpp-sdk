@@ -47,7 +47,7 @@ const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transfe
     console.log('BTC TxId: ', btcTxId);
     console.log(`explorer: https://mempool.space/testnet/tx/${btcTxId}`);
 
-    writeStepLog('2', {
+    writeStepLog('transfer-id', {
       txid: btcTxId,
       index: 1,
     });
@@ -80,6 +80,6 @@ const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transfe
 transfer({
   rgbppLockArgsList: [buildRgbppLockArgs(readStepLog('xudt').index, readStepLog('xudt').txid)],
   toBtcAddress: 'tb1qtt2vh9q8xam35xxsy35ec6majad8lz8fep8w04',
-  xudtTypeArgs: readStepLog('1').args,
+  xudtTypeArgs: readStepLog('xUDT-type-script').args,
   transferAmount: BigInt(500_0000_0000),
 });

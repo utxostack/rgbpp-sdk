@@ -71,7 +71,7 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
     const btcTxBytes = transactionToHex(btcTx, false);
     const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
 
-    writeStepLog('5', {
+    writeStepLog('create-spores-id', {
       txid: btcTxId,
     });
     console.log('BTC TxId: ', btcTxId);
@@ -96,7 +96,7 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
         // and the spore type scripts will be used to transfer and leap spores
         const sporeTypeScripts = ckbTx.outputs.slice(1).map((output) => output.type);
         console.log('Spore type scripts: ', JSON.stringify(sporeTypeScripts));
-        writeStepLog('6', sporeTypeScripts);
+        writeStepLog('sporeTypeScripts', sporeTypeScripts);
 
         // Replace cobuild witness with the final rgbpp lock script
         ckbTx.witnesses[ckbTx.witnesses.length - 1] = generateSporeCreateCoBuild({
@@ -136,7 +136,10 @@ createSpores({
   // The cluster cell will be spent and the new cluster cell will be created in each spore creation tx,
   // so the cluster rgbpp lock args should be updated after each spore creation tx is completed.
   // The first cluster rgbpp lock args is from 2-create-cluster.ts and the new cluster rgbpp lock args can be found from the log in the line 71 of this file
-  clusterRgbppLockArgs: buildRgbppLockArgs(readStepLog('4').index, readStepLog('4').txid),
+  clusterRgbppLockArgs: buildRgbppLockArgs(
+    readStepLog('create-cluster-id').index,
+    readStepLog('create-cluster-id').txid,
+  ),
   receivers: [
     {
       toBtcAddress: 'tb1qtt2vh9q8xam35xxsy35ec6majad8lz8fep8w04',
@@ -144,7 +147,7 @@ createSpores({
         contentType: 'text/plain',
         content: utf8ToBuffer('First Spore'),
         // The cluster id is from 2-create-cluster.ts
-        clusterId: readStepLog('3').clusterid,
+        clusterId: readStepLog('clusterid').clusterid,
       },
     },
     {
@@ -153,7 +156,7 @@ createSpores({
         contentType: 'text/plain',
         content: utf8ToBuffer('Second Spore'),
         // The cluster id is from 2-create-cluster.ts
-        clusterId: readStepLog('3').clusterid,
+        clusterId: readStepLog('clusterid').clusterid,
       },
     },
   ],

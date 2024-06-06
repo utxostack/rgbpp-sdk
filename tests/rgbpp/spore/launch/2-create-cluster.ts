@@ -33,7 +33,7 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
 
     const { commitment, ckbRawTx, clusterId, needPaymasterCell } = ckbVirtualTxResult;
 
-    writeStepLog('3', {
+    writeStepLog('clusterid', {
       clusterid: clusterId,
     });
     console.log('clusterId: ', clusterId);
@@ -56,7 +56,7 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
     const btcTxBytes = transactionToHex(btcTx, false);
     const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
 
-    writeStepLog('4', {
+    writeStepLog('create-cluster-id', {
       txid: btcTxId,
       index: 1,
     });

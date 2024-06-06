@@ -49,6 +49,6 @@ const leapFromCkbToBtc = async ({ outIndex, btcTxId, xudtTypeArgs, transferAmoun
 leapFromCkbToBtc({
   outIndex: readStepLog('xudt').index,
   btcTxId: readStepLog('xudt').txid,
-  xudtTypeArgs: readStepLog('1').args,
+  xudtTypeArgs: readStepLog('xUDT-type-script').args,
   transferAmount: BigInt(800_0000_0000),
 });
