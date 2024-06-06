@@ -9,7 +9,7 @@
     "lint": "tsc && eslint . && prettier --check '**/*.{js,ts}'",
     "lint:fix": "tsc && eslint --fix --ext .js,.ts . && prettier --write '**/*.{js,ts}'",
     "integration:xudt": "npx ts-node shared/prepare-utxo.ts && npx ts-node xudt/xudt-on-ckb/1-issue-xudt.ts && npx ts-node xudt/1-ckb-leap-btc.ts && npx ts-node xudt/2-btc-transfer.ts && npx ts-node xudt/3-btc-leap-ckb.ts",
-    "integration:spore": "npx ts-node spore/launch/1-prepare-cluster.ts && npx ts-node spore/launch/2-create-cluster.ts && npx ts-node spore/launch/3-create-spores.ts && npx ts-node spore/4-transfer-spore.ts && npx ts-node spore/5-leap-spore-to-ckb.ts"
+    "integration:spore": "npx ts-node shared/prepare-utxo.ts && npx ts-node spore/launch/1-prepare-cluster.ts && npx ts-node spore/launch/2-create-cluster.ts && npx ts-node spore/launch/3-create-spores.ts && npx ts-node spore/4-transfer-spore.ts && npx ts-node spore/5-leap-spore-to-ckb.ts"
   },
   "dependencies": {
     "@nervosnetwork/ckb-sdk-utils": "^0.109.1",

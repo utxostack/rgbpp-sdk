@@ -101,5 +101,5 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
 // Please use your real BTC UTXO information on the BTC Testnet which should be same as the 1-prepare-cluster.ts
 // rgbppLockArgs: outIndexU32 + btcTxId
 createCluster({
-  ownerRgbppLockArgs: buildRgbppLockArgs(readStepLog('spore').index, readStepLog('spore').txid),
+  ownerRgbppLockArgs: buildRgbppLockArgs(readStepLog('prepare-utxo').index, readStepLog('prepare-utxo').txid),
 });

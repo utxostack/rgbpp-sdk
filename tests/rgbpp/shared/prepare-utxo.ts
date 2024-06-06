@@ -54,5 +54,4 @@ const prepareUtxo = async (index: string | number) => {
   }, 20 * 1000);
 };
 
-prepareUtxo('xudt');
-prepareUtxo('spore');
+prepareUtxo('prepare-utxo');

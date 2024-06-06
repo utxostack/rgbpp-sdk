@@ -77,6 +77,6 @@ const prepareClusterCell = async ({ outIndex, btcTxId }: { outIndex: number; btc
 
 // Please use your real BTC UTXO information on the BTC Testnet
 prepareClusterCell({
-  outIndex: readStepLog('spore').index,
-  btcTxId: readStepLog('spore').txid,
+  outIndex: readStepLog('prepare-utxo').index,
+  btcTxId: readStepLog('prepare-utxo').txid,
 });

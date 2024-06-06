@@ -78,7 +78,7 @@ const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transfe
 // Use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 transfer({
-  rgbppLockArgsList: [buildRgbppLockArgs(readStepLog('xudt').index, readStepLog('xudt').txid)],
+  rgbppLockArgsList: [buildRgbppLockArgs(readStepLog('prepare-utxo').index, readStepLog('prepare-utxo').txid)],
   toBtcAddress: 'tb1qtt2vh9q8xam35xxsy35ec6majad8lz8fep8w04',
   xudtTypeArgs: readStepLog('xUDT-type-script').args,
   transferAmount: BigInt(500_0000_0000),
