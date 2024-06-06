@@ -16,7 +16,6 @@ jobs:
     strategy:
       matrix:
         env_set: [ xudt, spore ]
-      fail-fast: false
 
     steps:
       - name: Checkout rgbpp-sdk
