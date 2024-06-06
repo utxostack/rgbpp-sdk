@@ -10,19 +10,19 @@ import { RgbppTransferTxParams, RgbppTransferTxResult } from './types';
  * @param xudtTypeArgs The transferred xUDT type script args
  * @param rgbppLockArgsList The RGB++ assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred, if the noMergeOutputCells is true, the transferAmount will be ignored
- * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ * @param feeRate The CKB transaction fee rate, default value is 1100
  *
  * BTC pramaeters
- * @param fromBtcAddress The sender BTC address
+ * @param fromAddress The sender BTC address
  * @param fromPubkey The public key of the sender BTC address
- * @param toBtcAddress The receiver BTC address
- * @param btcDataSource The BTC data source
+ * @param toAddress The receiver BTC address
+ * @param dataSource The BTC data source
  * @param feeRate The fee rate of the BTC transaction
  * @param isMainnet
  */
 export const buildRgbppTransferTx = async ({
-  ckb: { collector, xudtTypeArgs, rgbppLockArgsList, transferAmount, ckbFeeRate },
-  btc: { fromBtcAddress, toBtcAddress, btcDataSource, fromPubkey, feeRate },
+  ckb: { collector, xudtTypeArgs, rgbppLockArgsList, transferAmount, feeRate: ckbFeeRate },
+  btc,
   isMainnet,
 }: RgbppTransferTxParams): Promise<RgbppTransferTxResult> => {
   const xudtType: CKBComponents.Script = {
@@ -45,12 +45,12 @@ export const buildRgbppTransferTx = async ({
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
-    tos: [toBtcAddress],
+    tos: [btc.toAddress],
     ckbCollector: collector,
-    from: fromBtcAddress!,
-    fromPubkey,
-    source: btcDataSource,
-    feeRate,
+    from: btc.fromAddress!,
+    fromPubkey: btc.fromPubkey,
+    source: btc.dataSource,
+    feeRate: btc.feeRate,
   });
 
   return {

@@ -1,7 +1,7 @@
 import { DataSource } from '@rgbpp-sdk/btc';
 import { BtcTransferVirtualTxResult, Collector, Hex } from '@rgbpp-sdk/ckb';
 
-export interface RgbppTransferCkb {
+export interface RgbppTransferCkbParams {
   // The collector that collects CKB live cells and transactions
   collector: Collector;
   // The transferred RGB++ xUDT type script args
@@ -11,15 +11,15 @@ export interface RgbppTransferCkb {
   // The XUDT amount to be transferred, if the noMergeOutputCells is true, the transferAmount will be ignored
   transferAmount: bigint;
   // The CKB transaction fee rate, default value is 1100
-  ckbFeeRate?: bigint;
+  feeRate?: bigint;
 }
 
-export interface RgbppTransferBtc {
+export interface RgbppTransferBtcParams {
   // The sender BTC address
-  fromBtcAddress: string;
+  fromAddress: string;
   // The receiver BTC address
-  toBtcAddress: string;
-  btcDataSource: DataSource;
+  toAddress: string;
+  dataSource: DataSource;
   // The public key of sender BTC address
   fromPubkey?: Hex;
   // The fee rate of the BTC transaction
@@ -27,8 +27,8 @@ export interface RgbppTransferBtc {
 }
 
 export interface RgbppTransferTxParams {
-  ckb: RgbppTransferCkb;
-  btc: RgbppTransferBtc;
+  ckb: RgbppTransferCkbParams;
+  btc: RgbppTransferBtcParams;
   isMainnet: boolean;
 }
 
