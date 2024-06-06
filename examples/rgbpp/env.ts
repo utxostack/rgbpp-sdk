@@ -46,7 +46,7 @@ export const BTC_SERVICE_ORIGIN = process.env.VITE_BTC_SERVICE_ORIGIN!;
 // Read more about the available address types:
 // - P2WPKH: https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki#p2wpkh
 // - P2TR: https://github.com/bitcoin/bips/blob/master/bip-0341.mediawiki
-const addressType = process.env.BTC_ADDRESS_TYPE === 'P2TR' ? AddressType.P2WPKH : AddressType.P2TR;
+const addressType = process.env.BTC_ADDRESS_TYPE === 'P2TR' ? AddressType.P2TR : AddressType.P2WPKH;
 const networkType = isMainnet ? NetworkType.MAINNET : NetworkType.TESTNET;
 export const btcAccount = createBtcAccount(BTC_PRIVATE_KEY, addressType, networkType);
 
