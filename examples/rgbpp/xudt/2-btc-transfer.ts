@@ -1,6 +1,6 @@
 import { buildRgbppLockArgs } from 'rgbpp/ckb';
 import { buildRgbppTransferTx } from 'rgbpp';
-import { isMainnet, collector, btcService, btcAccount } from '../env';
+import { isMainnet, collector, btcService, btcAccount, btcDataSource } from '../env';
 import { saveCkbVirtualTxResult } from '../shared/utils';
 import { signAndSendPsbt } from '../shared/btc-account';
 import { bitcoin } from 'rgbpp/btc';
@@ -14,13 +14,17 @@ interface RgbppTransferParams {
 
 const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transferAmount }: RgbppTransferParams) => {
   const { ckbVirtualTxResult, btcPsbtHex } = await buildRgbppTransferTx({
-    collector,
-    xudtTypeArgs,
-    rgbppLockArgsList,
-    transferAmount,
-    fromBtcAddress: btcAccount.from,
-    toBtcAddress,
-    btcDataSource,
+    ckb: {
+      collector,
+      xudtTypeArgs,
+      rgbppLockArgsList,
+      transferAmount,
+    },
+    btc: {
+      fromAddress: btcAccount.from,
+      toAddress: toBtcAddress,
+      dataSource: btcDataSource,
+    },
     isMainnet,
   });
 

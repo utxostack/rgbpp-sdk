@@ -15,13 +15,17 @@ interface RgbppTransferParams {
 // Warning: It is not recommended for developers to use local examples unless you understand the entire process of RGB++ transactions.
 const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transferAmount }: RgbppTransferParams) => {
   const { ckbVirtualTxResult, btcPsbtHex } = await buildRgbppTransferTx({
-    collector,
-    xudtTypeArgs,
-    rgbppLockArgsList,
-    transferAmount,
-    fromBtcAddress: btcAddress!,
-    toBtcAddress,
-    btcDataSource,
+    ckb: {
+      collector,
+      xudtTypeArgs,
+      rgbppLockArgsList,
+      transferAmount,
+    },
+    btc: {
+      fromAddress: btcAccount.from,
+      toAddress: toBtcAddress,
+      dataSource: btcDataSource,
+    },
     isMainnet,
   });
 
