@@ -3,7 +3,7 @@ import { bitcoin } from '../bitcoin';
 import { DataSource } from '../query/source';
 import { ErrorCodes, TxBuildError } from '../error';
 import { NetworkType, RgbppBtcConfig } from '../preset/types';
-import { AddressType, addressToScriptPublicKeyHex, getAddressType, isSupportedFromAddress } from '../address';
+import { isSupportedFromAddress } from '../address';
 import { dataToOpReturnScriptPubkey, isOpReturnScriptPubkey } from './embed';
 import { networkTypeToConfig } from '../preset/config';
 import { BaseOutput, Utxo, utxoToInput } from './utxo';
@@ -213,8 +213,7 @@ export class TxBuilder {
       }
 
       // Calculate network fee
-      const addressType = getAddressType(address);
-      currentFee = await this.calculateFee(addressType, currentFeeRate);
+      currentFee = await this.calculateFee(currentFeeRate);
 
       // If (fee = previousFee ±1), the fee is considered acceptable/expected.
       isFeeExpected = [-1, 0, 1].includes(currentFee - previousFee);
@@ -471,14 +470,14 @@ export class TxBuilder {
     });
   }
 
-  async calculateFee(addressType: AddressType, feeRate?: number): Promise<number> {
+  async calculateFee(feeRate?: number): Promise<number> {
     if (!feeRate && !this.feeRate) {
       throw TxBuildError.withComment(ErrorCodes.INVALID_FEE_RATE, `${feeRate ?? this.feeRate}`);
     }
 
     const currentFeeRate = feeRate ?? this.feeRate!;
 
-    const psbt = await this.createEstimatedPsbt(addressType);
+    const psbt = await this.createEstimatedPsbt();
     const tx = psbt.extractTransaction(true);
 
     const inputs = tx.ins.length;
@@ -490,20 +489,17 @@ export class TxBuilder {
     return Math.ceil(virtualSize * currentFeeRate);
   }
 
-  async createEstimatedPsbt(addressType: AddressType): Promise<bitcoin.Psbt> {
-    const estimate = FeeEstimator.fromRandom(addressType, this.networkType);
-    const estimateScriptPk = addressToScriptPublicKeyHex(estimate.address, this.networkType);
+  async createEstimatedPsbt(): Promise<bitcoin.Psbt> {
+    const estimator = FeeEstimator.fromRandom(this.networkType);
 
     const tx = this.clone();
-    const utxos = tx.inputs.map((input) => input.utxo);
-    tx.inputs = utxos.map((utxo) => {
-      utxo.scriptPk = estimateScriptPk;
-      utxo.pubkey = estimate.publicKey;
-      return utxoToInput(utxo);
+    tx.inputs = tx.inputs.map((input) => {
+      const replacedUtxo = estimator.replaceUtxo(input.utxo);
+      return utxoToInput(replacedUtxo);
     });
 
     const psbt = tx.toPsbt();
-    await estimate.signPsbt(psbt);
+    await estimator.signPsbt(psbt);
     return psbt;
   }
 

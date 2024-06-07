@@ -857,6 +857,111 @@ describe('Transaction', () => {
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
 
+    it('Transfer P2TR, pay fee with P2WPKH', async () => {
+      const p2trUtxos = await source.getUtxos(accounts.charlie.p2tr.address, {
+        min_satoshi: BTC_UTXO_DUST_LIMIT,
+        only_confirmed: true,
+      });
+
+      const psbt = await sendUtxos({
+        inputs: [p2trUtxos[0]],
+        outputs: [
+          {
+            address: accounts.charlie.p2tr.address,
+            value: p2trUtxos[0].value,
+            fixed: true,
+          },
+        ],
+        from: accounts.charlie.p2wpkh.address,
+        feeRate: STATIC_FEE_RATE,
+        pubkeyMap: {
+          [accounts.charlie.p2tr.address]: accounts.charlie.publicKey,
+        },
+        source,
+      });
+
+      // Sign & finalize inputs
+      await signAndBroadcastPsbt({
+        psbt,
+        account: accounts.charlie,
+        feeRate: STATIC_FEE_RATE,
+        send: false,
+      });
+    });
+    it('Transfer P2WPKH, pay fee with P2TR', async () => {
+      const p2wpkhUtxos = await source.getUtxos(accounts.charlie.p2wpkh.address, {
+        min_satoshi: BTC_UTXO_DUST_LIMIT,
+        only_confirmed: true,
+      });
+
+      const psbt = await sendUtxos({
+        inputs: [p2wpkhUtxos[0]],
+        outputs: [
+          {
+            address: accounts.charlie.p2wpkh.address,
+            value: p2wpkhUtxos[0].value,
+            fixed: true,
+          },
+        ],
+        from: accounts.charlie.p2tr.address,
+        fromPubkey: accounts.charlie.publicKey,
+        feeRate: STATIC_FEE_RATE,
+        source,
+      });
+
+      // Sign & finalize inputs
+      await signAndBroadcastPsbt({
+        psbt,
+        account: accounts.charlie,
+        feeRate: STATIC_FEE_RATE,
+        send: false,
+      });
+    });
+    it('Try mixed transfer, without pubkeyMap', async () => {
+      const p2trUtxos = await source.getUtxos(accounts.charlie.p2tr.address, {
+        min_satoshi: BTC_UTXO_DUST_LIMIT,
+        only_confirmed: true,
+      });
+
+      await expect(() =>
+        sendUtxos({
+          inputs: [p2trUtxos[0]],
+          outputs: [
+            {
+              address: accounts.charlie.p2tr.address,
+              value: p2trUtxos[0].value,
+              fixed: true,
+            },
+          ],
+          from: accounts.charlie.p2wpkh.address,
+          feeRate: STATIC_FEE_RATE,
+          source,
+        }),
+      ).rejects.toHaveProperty('code', ErrorCodes.MISSING_PUBKEY);
+    });
+    it('Try mixed transfer, pay fee with P2TR without fromPubkey', async () => {
+      const p2wpkhUtxos = await source.getUtxos(accounts.charlie.p2wpkh.address, {
+        min_satoshi: BTC_UTXO_DUST_LIMIT,
+        only_confirmed: true,
+      });
+
+      await expect(() =>
+        sendUtxos({
+          inputs: [p2wpkhUtxos[0]],
+          outputs: [
+            {
+              address: accounts.charlie.p2wpkh.address,
+              value: p2wpkhUtxos[0].value,
+              fixed: true,
+            },
+          ],
+          from: accounts.charlie.p2tr.address,
+          feeRate: STATIC_FEE_RATE,
+          source,
+        }),
+      ).rejects.toHaveProperty('code', ErrorCodes.MISSING_PUBKEY);
+    });
+
     it('Try transfer non-existence UTXO', async () => {
       await expect(() =>
         sendUtxos({

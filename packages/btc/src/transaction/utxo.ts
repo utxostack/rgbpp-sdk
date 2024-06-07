@@ -1,7 +1,10 @@
+import cloneDeep from 'lodash/cloneDeep';
 import { ErrorCodes, TxBuildError } from '../error';
+import { DataSource } from '../query/source';
 import { AddressType } from '../address';
 import { TxInput } from './build';
-import { remove0x, toXOnly } from '../utils';
+import { limitPromiseBatchSize, remove0x, toXOnly } from '../utils';
+import { isP2trScript } from '../script';
 
 export interface BaseOutput {
   txid: string;
@@ -37,7 +40,7 @@ export function utxoToInput(utxo: Utxo): TxInput {
   }
   if (utxo.addressType === AddressType.P2TR) {
     if (!utxo.pubkey) {
-      throw new TxBuildError(ErrorCodes.MISSING_PUBKEY);
+      throw TxBuildError.withComment(ErrorCodes.MISSING_PUBKEY, utxo.address);
     }
     const data = {
       hash: utxo.txid,
@@ -55,4 +58,63 @@ export function utxoToInput(utxo: Utxo): TxInput {
   }
 
   throw new TxBuildError(ErrorCodes.UNSUPPORTED_ADDRESS_TYPE);
+}
+
+/**
+ * Fill pubkey for P2TR UTXO, and optionally throw an error if pubkey is missing
+ */
+export function fillUtxoPubkey(
+  utxo: Utxo,
+  pubkeyMap: Record<string, string>, // Record<address, pubkey>
+  options?: {
+    requirePubkey?: boolean;
+  },
+): Utxo {
+  const newUtxo = cloneDeep(utxo);
+  if (isP2trScript(newUtxo.scriptPk) && !newUtxo.pubkey) {
+    const pubkey = pubkeyMap[newUtxo.address];
+    if (options?.requirePubkey && !pubkey) {
+      throw TxBuildError.withComment(ErrorCodes.MISSING_PUBKEY, newUtxo.address);
+    }
+    if (pubkey) {
+      newUtxo.pubkey = pubkey;
+    }
+  }
+
+  return newUtxo;
+}
+
+/**
+ * Prepare and validate UTXOs for transaction building:
+ * 1. Fill pubkey for P2TR UTXOs, and optionally throw an error if pubkey is missing
+ * 2. Optionally check if the UTXOs are confirmed, and throw an error if not
+ */
+export async function prepareUtxoInputs(props: {
+  utxos: Utxo[];
+  source: DataSource;
+  requirePubkey?: boolean;
+  requireConfirmed?: boolean;
+  pubkeyMap?: Record<string, string>; // Record<address, pubkey>
+}): Promise<Utxo[]> {
+  const pubkeyMap = props.pubkeyMap ?? {};
+  const utxos = props.utxos.map((utxo) => {
+    return fillUtxoPubkey(utxo, pubkeyMap, {
+      requirePubkey: props.requirePubkey,
+    });
+  });
+
+  if (props.requireConfirmed) {
+    await Promise.all(
+      utxos.map(async (utxo) => {
+        return limitPromiseBatchSize(async () => {
+          const transactionConfirmed = await props.source.isTransactionConfirmed(utxo.txid);
+          if (!transactionConfirmed) {
+            throw TxBuildError.withComment(ErrorCodes.UNCONFIRMED_UTXO, `hash: ${utxo.txid}, index: ${utxo.vout}`);
+          }
+        });
+      }),
+    );
+  }
+
+  return utxos;
 }

@@ -210,3 +210,18 @@ function getAddressTypeDust(addressType: AddressType) {
     return 546;
   }
 }
+
+/**
+ * Add address/pubkey pair to a Record<address, pubkey> map
+ */
+export function addAddressToPubkeyMap(
+  pubkeyMap: Record<string, string>,
+  address: string,
+  pubkey?: string,
+): Record<string, string> {
+  const newMap = { ...pubkeyMap };
+  if (pubkey) {
+    newMap[address] = pubkey;
+  }
+  return newMap;
+}

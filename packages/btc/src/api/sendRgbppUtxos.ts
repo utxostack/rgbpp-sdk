@@ -31,7 +31,7 @@ export interface SendRgbppUtxosProps {
   excludeUtxos?: BaseOutput[];
 
   // EXPERIMENTAL: the below props are unstable and can be altered at any time
-  onlyProvableUtxos?: boolean;
+  pubkeyMap?: Record<string, string>; // Record<address, pubkey>
 }
 
 /**
@@ -45,8 +45,6 @@ export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): P
   feeRate: number;
   changeIndex: number;
 }> {
-  const onlyProvableUtxos = props.onlyProvableUtxos ?? true;
-
   const btcInputs: Utxo[] = [];
   const btcOutputs: InitOutput[] = [];
   let lastCkbTypeOutputIndex = -1;
@@ -86,22 +84,15 @@ export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): P
   for (let i = 0; i < ckbVirtualTx.inputs.length; i++) {
     const { lockArgs, isRgbppLock } = ckbLiveCells[i];
 
-    // If input.lock == RgbppLock, add to inputs if:
+    // Add to inputs if all the following conditions are met:
     // 1. input.lock.args can be unpacked to RgbppLockArgs
     // 2. utxo can be found via the DataSource.getUtxo() API
-    // 3. utxo.scriptPk == addressToScriptPk(props.from)
-    // 4. utxo is not duplicated in the inputs
+    // 3. utxo is not duplicated in the inputs
     if (isRgbppLock) {
       const args = lockArgs!;
       const utxo = btcUtxos[i];
       if (!utxo) {
         throw TxBuildError.withComment(ErrorCodes.CANNOT_FIND_UTXO, `hash: ${args.btcTxid}, index: ${args.outIndex}`);
-      }
-      if (onlyProvableUtxos && utxo.address !== props.from) {
-        throw TxBuildError.withComment(
-          ErrorCodes.REFERENCED_UNPROVABLE_UTXO,
-          `hash: ${args.btcTxid}, index: ${args.outIndex}`,
-        );
       }
 
       const foundInInputs = btcInputs.some((v) => v.txid === utxo.txid && v.vout === utxo.vout);
@@ -109,10 +100,7 @@ export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): P
         continue;
       }
 
-      btcInputs.push({
-        ...utxo,
-        pubkey: props.fromPubkey, // For P2TR addresses, a pubkey is required
-      });
+      btcInputs.push(utxo);
     }
   }
 
@@ -179,6 +167,7 @@ export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): P
     minUtxoSatoshi: props.minUtxoSatoshi,
     onlyConfirmedUtxos: props.onlyConfirmedUtxos,
     excludeUtxos: props.excludeUtxos,
+    pubkeyMap: props.pubkeyMap,
   });
 }
 

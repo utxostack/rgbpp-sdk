@@ -6,7 +6,6 @@ import { isOpReturnScriptPubkey } from '../transaction/embed';
 import { networkTypeToNetwork } from '../preset/network';
 import { networkTypeToConfig } from '../preset/config';
 import { createSendUtxosBuilder } from './sendUtxos';
-import { isP2trScript } from '../script';
 import { bitcoin } from '../bitcoin';
 
 export interface SendRbfProps {
@@ -23,7 +22,7 @@ export interface SendRbfProps {
   requireGreaterFeeAndRate?: boolean;
 
   // EXPERIMENTAL: the below props are unstable and can be altered at any time
-  inputsPubkey?: Record<string, string>; // Record<address, pubkey>
+  pubkeyMap?: Record<string, string>; // Record<address, pubkey>
 }
 
 export async function createSendRbfBuilder(props: SendRbfProps): Promise<{
@@ -43,18 +42,6 @@ export async function createSendRbfBuilder(props: SendRbfProps): Promise<{
     if (!utxo) {
       throw TxBuildError.withComment(ErrorCodes.CANNOT_FIND_UTXO, `hash: ${hash}, index: ${input.index}`);
     }
-
-    // Ensure each P2TR input has a corresponding pubkey
-    const fromPubkey = utxo.address === props.from ? props.fromPubkey : undefined;
-    const inputPubkey = props.inputsPubkey?.[utxo.address];
-    const pubkey = inputPubkey ?? fromPubkey;
-    if (pubkey) {
-      utxo.pubkey = pubkey;
-    }
-    if (isP2trScript(utxo.scriptPk) && !utxo.pubkey) {
-      throw TxBuildError.withComment(ErrorCodes.MISSING_PUBKEY, utxo.address);
-    }
-
     inputs.push(utxo);
   }
 
@@ -151,6 +138,7 @@ export async function createSendRbfBuilder(props: SendRbfProps): Promise<{
     from: props.from,
     source: props.source,
     feeRate: props.feeRate,
+    pubkeyMap: props.pubkeyMap,
     fromPubkey: props.fromPubkey,
     minUtxoSatoshi: props.minUtxoSatoshi,
     onlyConfirmedUtxos: props.onlyConfirmedUtxos ?? true,

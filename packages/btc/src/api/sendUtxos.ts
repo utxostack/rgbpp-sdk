@@ -1,7 +1,8 @@
 import { bitcoin } from '../bitcoin';
 import { DataSource } from '../query/source';
-import { BaseOutput, Utxo } from '../transaction/utxo';
 import { TxBuilder, InitOutput } from '../transaction/build';
+import { BaseOutput, Utxo, prepareUtxoInputs } from '../transaction/utxo';
+import { addAddressToPubkeyMap } from '../address';
 
 export interface SendUtxosProps {
   inputs: Utxo[];
@@ -17,6 +18,7 @@ export interface SendUtxosProps {
 
   // EXPERIMENTAL: the below props are unstable and can be altered at any time
   skipInputsValidation?: boolean;
+  pubkeyMap?: Record<string, string>; // Record<address, pubkey>
 }
 
 export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
@@ -32,16 +34,24 @@ export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
     onlyConfirmedUtxos: props.onlyConfirmedUtxos,
   });
 
-  tx.addInputs(props.inputs);
-  tx.addOutputs(props.outputs);
+  // Prepare the UTXO inputs:
+  // 1. Fill pubkey for each P2TR UTXO, and throw if the corresponding pubkey is not found
+  // 2. Throw if unconfirmed UTXOs are found (if onlyConfirmedUtxos == true && skipInputsValidation == false)
+  const pubkeyMap = addAddressToPubkeyMap(props.pubkeyMap ?? {}, props.from, props.fromPubkey);
+  const inputs = await prepareUtxoInputs({
+    utxos: props.inputs,
+    source: props.source,
+    requireConfirmed: props.onlyConfirmedUtxos && !props.skipInputsValidation,
+    requirePubkey: true,
+    pubkeyMap,
+  });
 
-  if (props.onlyConfirmedUtxos && !props.skipInputsValidation) {
-    await tx.validateInputs();
-  }
+  tx.addInputs(inputs);
+  tx.addOutputs(props.outputs);
 
   const paid = await tx.payFee({
     address: props.from,
-    publicKey: props.fromPubkey,
+    publicKey: pubkeyMap[props.from],
     changeAddress: props.changeAddress,
     excludeUtxos: props.excludeUtxos,
   });
