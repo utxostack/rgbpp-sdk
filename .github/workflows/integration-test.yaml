@@ -17,6 +17,11 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        env_set: [ xudt, spore ]
+
     steps:
       - name: Checkout rgbpp-sdk
         uses: actions/checkout@v4
@@ -38,8 +43,10 @@ jobs:
       - name: Build packages
         run: pnpm run build:packages
 
+
       - name: Run integration:xudt script
         working-directory: ./tests/rgbpp
+        if: ${{ matrix.env_set == 'xudt' }}
         run: pnpm run integration:xudt
         env:
           VITE_SERVICE_URL: ${{ secrets.SERVICE_URL }}
@@ -47,3 +54,14 @@ jobs:
           VITE_SERVICE_ORIGIN: ${{ secrets.SERVICE_ORIGIN }}
           INTEGRATION_CKB_PRIVATE_KEY: ${{ secrets.INTEGRATION_CKB_PRIVATE_KEY }}
           INTEGRATION_BTC_PRIVATE_KEY: ${{ secrets.INTEGRATION_BTC_PRIVATE_KEY }}
+
+      - name: Run integration:spore script
+        working-directory: ./tests/rgbpp
+        if: ${{ matrix.env_set == 'spore' }}
+        run: pnpm run integration:spore
+        env:
+          VITE_SERVICE_URL: ${{ secrets.SERVICE_URL }}
+          VITE_SERVICE_TOKEN: ${{ secrets.SERVICE_TOKEN }}
+          VITE_SERVICE_ORIGIN: ${{ secrets.SERVICE_ORIGIN }}
+          INTEGRATION_CKB_PRIVATE_KEY: ${{ secrets.INTEGRATION_CKB_SPORE_PRIVATE_KEY }}
+          INTEGRATION_BTC_PRIVATE_KEY: ${{ secrets.INTEGRATION_BTC_SPORE_PRIVATE_KEY }}

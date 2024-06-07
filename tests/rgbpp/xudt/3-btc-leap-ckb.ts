@@ -73,8 +73,8 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
 
 // rgbppLockArgs: outIndexU32 + btcTxId
 leapFromBtcToCKB({
-  rgbppLockArgsList: [buildRgbppLockArgs(readStepLog('2').index, readStepLog('2').txid)],
+  rgbppLockArgsList: [buildRgbppLockArgs(readStepLog('transfer-id').index, readStepLog('transfer-id').txid)],
   toCkbAddress: 'ckt1qrfrwcdnvssswdwpn3s9v8fp87emat306ctjwsm3nmlkjg8qyza2cqgqq9kxr7vy7yknezj0vj0xptx6thk6pwyr0sxamv6q',
-  xudtTypeArgs: readStepLog('1').args,
+  xudtTypeArgs: readStepLog('xUDT-type-script').args,
   transferAmount: BigInt(300_0000_0000),
 });
