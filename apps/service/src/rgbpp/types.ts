@@ -33,3 +33,7 @@ export interface RgbppStateReq {
     withData?: boolean;
   };
 }
+
+export interface RgbppCkbTxHashReq {
+  btcTxId: Hex;
+}
