@@ -24,6 +24,7 @@ const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transfe
     btc: {
       fromAddress: btcAccount.from,
       toAddress: toBtcAddress,
+      fromPubkey: btcAccount.fromPubkey,
       dataSource: btcDataSource,
     },
     isMainnet,
