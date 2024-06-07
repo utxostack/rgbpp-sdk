@@ -1,13 +1,15 @@
 # RGB++ SDK Service
 
+A RPC service for Wrapping essential RGB++ Assets Operations(**only support RGB++ Transfer on BTC now**) with [rgbpp-sdk](https://github.com/ckb-cell/rgbpp-sdk) for other programming languages to quickly manage RGB++ Assets.
 
 ## Quick Start
 
 ### Clone rgbpp-sdk repository
 
 ```shell
-git clone https://github.com/ckb-cell/rgbpp-sdk.git
-cd apps/service
+$ git clone https://github.com/ckb-cell/rgbpp-sdk.git
+$ pnpm install
+$ cd apps/service
 ```
 
 ### Update Environment Variables
@@ -15,7 +17,7 @@ cd apps/service
 Copy the `.env.example` file to `.env`:
 
 ```shell
-cp .env.example .env
+$ cp .env.example .env
 ```
 
 Update the configuration values:
@@ -41,5 +43,29 @@ BTC_SERVICE_ORIGIN=https://btc-assets-api.testnet.mibao.pro
 ### Run RGB++ SDK Service
 
 ```shell
-pnpm install && pnpm dev
+# Debug environment
+$ pnpm start:dev
+
+# Production environment
+$ pnpm start:prod
 ```
+
+## Deploy and Manage RGB++ SDK Service
+
+### 1. Use a process manager like PM2
+
+- Install PM2
+
+```shell
+$ npm install -g pm2
+```
+
+- Start RGB++ SDK Service with PM2
+
+```
+$ pm2 start dist/src/main.js --name rgbpp-sdk-service
+```
+
+### 2. Use Docker
+
+TODO
