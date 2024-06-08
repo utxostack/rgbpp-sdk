@@ -54,7 +54,7 @@ const transferXudt = async ({ xudtType, receivers }: XudtTransferParams) => {
   let inputs = udtInputs;
 
   const xudtCapacity = calculateUdtCellCapacity(fromLock);
-  const sumXudtCapacity = xudtCapacity * BigInt(receivers.length);
+  let sumXudtoutputCapacity = xudtCapacity * BigInt(receivers.length);
 
   const outputs: CKBComponents.CellOutput[] = receivers.map((receiver) => ({
     lock: addressToScript(receiver.toAddress),
@@ -63,8 +63,18 @@ const transferXudt = async ({ xudtType, receivers }: XudtTransferParams) => {
   }));
   const outputsData = receivers.map((receiver) => append0x(u128ToLe(receiver.transferAmount)));
 
+  if (sumAmount > sumTransferAmount) {
+    outputs.push({
+      lock: fromLock,
+      type: xudtType,
+      capacity: append0x(xudtCapacity.toString(16)),
+    });
+    outputsData.push(append0x(u128ToLe(sumAmount - sumTransferAmount)));
+    sumXudtoutputCapacity += xudtCapacity;
+  }
+
   const txFee = MAX_FEE;
-  if (sumXudtInputsCapacity < sumXudtCapacity) {
+  if (sumXudtInputsCapacity <= sumXudtoutputCapacity) {
     let emptyCells = await collector.getCells({
       lock: fromLock,
     });
@@ -72,7 +82,7 @@ const transferXudt = async ({ xudtType, receivers }: XudtTransferParams) => {
       throw new NoLiveCellError('The address has no empty cells');
     }
     emptyCells = emptyCells.filter((cell) => !cell.output.type);
-    const needCapacity = sumXudtCapacity - sumXudtInputsCapacity + xudtCapacity;
+    const needCapacity = sumXudtoutputCapacity - sumXudtInputsCapacity;
     const { inputs: emptyInputs, sumInputsCapacity: sumEmptyCapacity } = collector.collectInputs(
       emptyCells,
       needCapacity,
@@ -83,17 +93,7 @@ const transferXudt = async ({ xudtType, receivers }: XudtTransferParams) => {
     actualInputsCapacity += sumEmptyCapacity;
   }
 
-  let changeCapacity = actualInputsCapacity - sumXudtCapacity;
-  if (sumAmount > sumTransferAmount) {
-    outputs.push({
-      lock: fromLock,
-      type: xudtType,
-      capacity: append0x(xudtCapacity.toString(16)),
-    });
-    outputsData.push(append0x(u128ToLe(sumAmount - sumTransferAmount)));
-    changeCapacity -= xudtCapacity;
-  }
-
+  let changeCapacity = actualInputsCapacity - sumXudtoutputCapacity;
   outputs.push({
     lock: fromLock,
     capacity: append0x(changeCapacity.toString(16)),
