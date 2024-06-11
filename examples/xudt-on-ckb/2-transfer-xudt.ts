@@ -42,6 +42,10 @@ const transferXudt = async ({ xudtType, receivers }: XudtTransferParams) => {
     .map((receiver) => receiver.transferAmount)
     .reduce((prev, current) => prev + current, BigInt(0));
 
+  let sumXudtOutputCapacity = receivers
+    .map(({ toAddress }) => calculateUdtCellCapacity(addressToScript(toAddress)))
+    .reduce((prev, current) => prev + current, BigInt(0));
+
   const {
     inputs: udtInputs,
     sumInputsCapacity: sumXudtInputsCapacity,
@@ -53,18 +57,26 @@ const transferXudt = async ({ xudtType, receivers }: XudtTransferParams) => {
   let actualInputsCapacity = sumXudtInputsCapacity;
   let inputs = udtInputs;
 
-  const xudtCapacity = calculateUdtCellCapacity(fromLock);
-  const sumXudtCapacity = xudtCapacity * BigInt(receivers.length);
-
-  const outputs: CKBComponents.CellOutput[] = receivers.map((receiver) => ({
-    lock: addressToScript(receiver.toAddress),
+  const outputs: CKBComponents.CellOutput[] = receivers.map(({ toAddress }) => ({
+    lock: addressToScript(toAddress),
     type: xudtType,
-    capacity: append0x(xudtCapacity.toString(16)),
+    capacity: append0x(calculateUdtCellCapacity(addressToScript(toAddress)).toString(16)),
   }));
-  const outputsData = receivers.map((receiver) => append0x(u128ToLe(receiver.transferAmount)));
+  const outputsData = receivers.map(({ transferAmount }) => append0x(u128ToLe(transferAmount)));
+
+  if (sumAmount > sumTransferAmount) {
+    const xudtChangeCapacity = calculateUdtCellCapacity(fromLock);
+    outputs.push({
+      lock: fromLock,
+      type: xudtType,
+      capacity: append0x(xudtChangeCapacity.toString(16)),
+    });
+    outputsData.push(append0x(u128ToLe(sumAmount - sumTransferAmount)));
+    sumXudtOutputCapacity += xudtChangeCapacity;
+  }
 
   const txFee = MAX_FEE;
-  if (sumXudtInputsCapacity < sumXudtCapacity) {
+  if (sumXudtInputsCapacity <= sumXudtOutputCapacity) {
     let emptyCells = await collector.getCells({
       lock: fromLock,
     });
@@ -72,7 +84,7 @@ const transferXudt = async ({ xudtType, receivers }: XudtTransferParams) => {
       throw new NoLiveCellError('The address has no empty cells');
     }
     emptyCells = emptyCells.filter((cell) => !cell.output.type);
-    const needCapacity = sumXudtCapacity - sumXudtInputsCapacity + xudtCapacity;
+    const needCapacity = sumXudtOutputCapacity - sumXudtInputsCapacity;
     const { inputs: emptyInputs, sumInputsCapacity: sumEmptyCapacity } = collector.collectInputs(
       emptyCells,
       needCapacity,
@@ -83,17 +95,7 @@ const transferXudt = async ({ xudtType, receivers }: XudtTransferParams) => {
     actualInputsCapacity += sumEmptyCapacity;
   }
 
-  let changeCapacity = actualInputsCapacity - sumXudtCapacity;
-  if (sumAmount > sumTransferAmount) {
-    outputs.push({
-      lock: fromLock,
-      type: xudtType,
-      capacity: append0x(xudtCapacity.toString(16)),
-    });
-    outputsData.push(append0x(u128ToLe(sumAmount - sumTransferAmount)));
-    changeCapacity -= xudtCapacity;
-  }
-
+  let changeCapacity = actualInputsCapacity - sumXudtOutputCapacity;
   outputs.push({
     lock: fromLock,
     capacity: append0x(changeCapacity.toString(16)),
@@ -143,7 +145,7 @@ transferXudt({
   },
   receivers: [
     {
-      toAddress: 'ckt1qyqpyw8j7tlu3v44am8d54066zrzk4vz5lvqat8fpf',
+      toAddress: 'ckt1qrfrwcdnvssswdwpn3s9v8fp87emat306ctjwsm3nmlkjg8qyza2cqgqq92pncevj8c3nwz7f3mlx2fwqn6l44y73yr5swl5',
       transferAmount: BigInt(1000) * BigInt(10 ** XUDT_TOKEN_INFO.decimal),
     },
     {
