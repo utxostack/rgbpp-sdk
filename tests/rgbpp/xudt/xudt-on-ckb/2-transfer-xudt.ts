@@ -13,7 +13,7 @@ import {
   NoXudtLiveCellError,
   fetchTypeIdCellDeps,
 } from 'rgbpp/ckb';
-import { CKB_PRIVATE_KEY, ckbAddress, collector, isMainnet } from './env';
+import { CKB_PRIVATE_KEY, ckbAddress, collector, isMainnet } from '../../env';
 import { readStepLog } from '../../shared/utils';
 
 interface XudtTransferParams {
@@ -30,106 +30,109 @@ interface XudtTransferParams {
  * @param receivers The receiver includes toAddress and transferAmount
  */
 const transferXudt = async ({ xudtType, receivers }: XudtTransferParams) => {
-  const fromLock = addressToScript(ckbAddress);
+  const { retry } = await import('zx');
+  await retry(12, '10s', async () => {
+    const fromLock = addressToScript(ckbAddress);
 
-  const xudtCells = await collector.getCells({
-    lock: fromLock,
-    type: xudtType,
-  });
-  if (!xudtCells || xudtCells.length === 0) {
-    throw new NoXudtLiveCellError('The address has no xudt cells');
-  }
-  const sumTransferAmount = receivers
-    .map((receiver) => receiver.transferAmount)
-    .reduce((prev, current) => prev + current, BigInt(0));
-
-  let sumXudtOutputCapacity = receivers
-    .map(({ toAddress }) => calculateUdtCellCapacity(addressToScript(toAddress)))
-    .reduce((prev, current) => prev + current, BigInt(0));
-
-  const {
-    inputs: udtInputs,
-    sumInputsCapacity: sumXudtInputsCapacity,
-    sumAmount,
-  } = collector.collectUdtInputs({
-    liveCells: xudtCells,
-    needAmount: sumTransferAmount,
-  });
-  let actualInputsCapacity = sumXudtInputsCapacity;
-  let inputs = udtInputs;
-
-  const outputs: CKBComponents.CellOutput[] = receivers.map(({ toAddress }) => ({
-    lock: addressToScript(toAddress),
-    type: xudtType,
-    capacity: append0x(calculateUdtCellCapacity(addressToScript(toAddress)).toString(16)),
-  }));
-  const outputsData = receivers.map(({ transferAmount }) => append0x(u128ToLe(transferAmount)));
-
-  if (sumAmount > sumTransferAmount) {
-    const xudtChangeCapacity = calculateUdtCellCapacity(fromLock);
-    outputs.push({
+    const xudtCells = await collector.getCells({
       lock: fromLock,
       type: xudtType,
-      capacity: append0x(xudtChangeCapacity.toString(16)),
     });
-    outputsData.push(append0x(u128ToLe(sumAmount - sumTransferAmount)));
-    sumXudtOutputCapacity += xudtChangeCapacity;
-  }
-
-  const txFee = MAX_FEE;
-  if (sumXudtInputsCapacity <= sumXudtOutputCapacity) {
-    let emptyCells = await collector.getCells({
-      lock: fromLock,
-    });
-    if (!emptyCells || emptyCells.length === 0) {
-      throw new NoLiveCellError('The address has no empty cells');
+    if (!xudtCells || xudtCells.length === 0) {
+      throw new NoXudtLiveCellError('The address has no xudt cells');
     }
-    emptyCells = emptyCells.filter((cell) => !cell.output.type);
-    const needCapacity = sumXudtOutputCapacity - sumXudtInputsCapacity;
-    const { inputs: emptyInputs, sumInputsCapacity: sumEmptyCapacity } = collector.collectInputs(
-      emptyCells,
-      needCapacity,
-      txFee,
-      { minCapacity: MIN_CAPACITY },
-    );
-    inputs = [...inputs, ...emptyInputs];
-    actualInputsCapacity += sumEmptyCapacity;
-  }
+    const sumTransferAmount = receivers
+      .map((receiver) => receiver.transferAmount)
+      .reduce((prev, current) => prev + current, BigInt(0));
 
-  let changeCapacity = actualInputsCapacity - sumXudtOutputCapacity;
-  outputs.push({
-    lock: fromLock,
-    capacity: append0x(changeCapacity.toString(16)),
+    let sumXudtOutputCapacity = receivers
+      .map(({ toAddress }) => calculateUdtCellCapacity(addressToScript(toAddress)))
+      .reduce((prev, current) => prev + current, BigInt(0));
+
+    const {
+      inputs: udtInputs,
+      sumInputsCapacity: sumXudtInputsCapacity,
+      sumAmount,
+    } = collector.collectUdtInputs({
+      liveCells: xudtCells,
+      needAmount: sumTransferAmount,
+    });
+    let actualInputsCapacity = sumXudtInputsCapacity;
+    let inputs = udtInputs;
+
+    const outputs: CKBComponents.CellOutput[] = receivers.map(({ toAddress }) => ({
+      lock: addressToScript(toAddress),
+      type: xudtType,
+      capacity: append0x(calculateUdtCellCapacity(addressToScript(toAddress)).toString(16)),
+    }));
+    const outputsData = receivers.map(({ transferAmount }) => append0x(u128ToLe(transferAmount)));
+
+    if (sumAmount > sumTransferAmount) {
+      const xudtChangeCapacity = calculateUdtCellCapacity(fromLock);
+      outputs.push({
+        lock: fromLock,
+        type: xudtType,
+        capacity: append0x(xudtChangeCapacity.toString(16)),
+      });
+      outputsData.push(append0x(u128ToLe(sumAmount - sumTransferAmount)));
+      sumXudtOutputCapacity += xudtChangeCapacity;
+    }
+
+    const txFee = MAX_FEE;
+    if (sumXudtInputsCapacity <= sumXudtOutputCapacity) {
+      let emptyCells = await collector.getCells({
+        lock: fromLock,
+      });
+      if (!emptyCells || emptyCells.length === 0) {
+        throw new NoLiveCellError('The address has no empty cells');
+      }
+      emptyCells = emptyCells.filter((cell) => !cell.output.type);
+      const needCapacity = sumXudtOutputCapacity - sumXudtInputsCapacity;
+      const { inputs: emptyInputs, sumInputsCapacity: sumEmptyCapacity } = collector.collectInputs(
+        emptyCells,
+        needCapacity,
+        txFee,
+        { minCapacity: MIN_CAPACITY },
+      );
+      inputs = [...inputs, ...emptyInputs];
+      actualInputsCapacity += sumEmptyCapacity;
+    }
+
+    let changeCapacity = actualInputsCapacity - sumXudtOutputCapacity;
+    outputs.push({
+      lock: fromLock,
+      capacity: append0x(changeCapacity.toString(16)),
+    });
+    outputsData.push('0x');
+
+    const emptyWitness = { lock: '', inputType: '', outputType: '' };
+    const witnesses = inputs.map((_, index) => (index === 0 ? emptyWitness : '0x'));
+
+    const cellDeps = [getSecp256k1CellDep(isMainnet), ...(await fetchTypeIdCellDeps(isMainnet, { xudt: true }))];
+
+    const unsignedTx = {
+      version: '0x0',
+      cellDeps,
+      headerDeps: [],
+      inputs,
+      outputs,
+      outputsData,
+      witnesses,
+    };
+
+    if (txFee === MAX_FEE) {
+      const txSize = getTransactionSize(unsignedTx) + SECP256K1_WITNESS_LOCK_SIZE;
+      const estimatedTxFee = calculateTransactionFee(txSize);
+      changeCapacity -= estimatedTxFee;
+      unsignedTx.outputs[unsignedTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
+    }
+
+    const signedTx = collector.getCkb().signTransaction(CKB_PRIVATE_KEY)(unsignedTx);
+    const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
+
+    console.info(`xUDT asset has been minted or transferred and tx hash is ${txHash}`);
+    console.info(`explorer: https://pudge.explorer.nervos.org/transaction/${txHash}`);
   });
-  outputsData.push('0x');
-
-  const emptyWitness = { lock: '', inputType: '', outputType: '' };
-  const witnesses = inputs.map((_, index) => (index === 0 ? emptyWitness : '0x'));
-
-  const cellDeps = [getSecp256k1CellDep(isMainnet), ...(await fetchTypeIdCellDeps(isMainnet, { xudt: true }))];
-
-  const unsignedTx = {
-    version: '0x0',
-    cellDeps,
-    headerDeps: [],
-    inputs,
-    outputs,
-    outputsData,
-    witnesses,
-  };
-
-  if (txFee === MAX_FEE) {
-    const txSize = getTransactionSize(unsignedTx) + SECP256K1_WITNESS_LOCK_SIZE;
-    const estimatedTxFee = calculateTransactionFee(txSize);
-    changeCapacity -= estimatedTxFee;
-    unsignedTx.outputs[unsignedTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
-  }
-
-  const signedTx = collector.getCkb().signTransaction(CKB_PRIVATE_KEY)(unsignedTx);
-  const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
-
-  console.info(`xUDT asset has been minted or transferred and tx hash is ${txHash}`);
-  console.info(`explorer: https://pudge.explorer.nervos.org/transaction/${txHash}`);
 };
 
 const XUDT_TOKEN_INFO: RgbppTokenInfo = {
