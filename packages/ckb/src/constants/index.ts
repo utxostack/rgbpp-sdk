@@ -1,3 +1,5 @@
+import { BTCTestnetType } from '../types';
+
 export const CKB_UNIT = BigInt(10000_0000);
 export const MAX_FEE = BigInt(2000_0000);
 export const MIN_CAPACITY = BigInt(61) * BigInt(10000_0000);
@@ -103,6 +105,39 @@ const TestnetInfo = {
       txHash: '0x5e8d2a517d50fd4bb4d01737a7952a1f1d35c8afc77240695bb569cd7d9d5a1f',
       index: '0x0',
     },
+    depType: 'code',
+  } as CKBComponents.CellDep,
+
+  // The CKB testnet RGB++ deployment information for the BTC Signet network
+  RgbppSignetLockScript: {
+    codeHash: '0x61ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248',
+    hashType: 'type',
+    args: '',
+  } as CKBComponents.Script,
+
+  RgbppSignetLockDep: {
+    outPoint: { txHash: '0xf1de59e973b85791ec32debbba08dff80c63197e895eb95d67fc1e9f6b413e00', index: '0x0' },
+    depType: 'code',
+  } as CKBComponents.CellDep,
+
+  RgbppSignetLockConfigDep: {
+    outPoint: { txHash: '0xf1de59e973b85791ec32debbba08dff80c63197e895eb95d67fc1e9f6b413e00', index: '0x1' },
+    depType: 'code',
+  } as CKBComponents.CellDep,
+
+  BtcTimeSignetLockScript: {
+    codeHash: '0x00cdf8fab0f8ac638758ebf5ea5e4052b1d71e8a77b9f43139718621f6849326',
+    hashType: 'type',
+    args: '',
+  } as CKBComponents.Script,
+
+  BtcTimeSignetLockDep: {
+    outPoint: { txHash: '0xde0f87878a97500f549418e5d46d2f7704c565a262aa17036c9c1c13ad638529', index: '0x0' },
+    depType: 'code',
+  } as CKBComponents.CellDep,
+
+  BtcTimeSignetLockConfigDep: {
+    outPoint: { txHash: '0xde0f87878a97500f549418e5d46d2f7704c565a262aa17036c9c1c13ad638529', index: '0x1' },
     depType: 'code',
   } as CKBComponents.CellDep,
 };
@@ -218,21 +253,46 @@ export const getXudtTypeScript = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.XUDTTypeScript : TestnetInfo.XUDTTypeScript;
 export const getXudtDep = (isMainnet: boolean) => (isMainnet ? MainnetInfo.XUDTTypeDep : TestnetInfo.XUDTTypeDep);
 
-export const getRgbppLockScript = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.RgbppLockScript : TestnetInfo.RgbppLockScript;
-export const getRgbppLockDep = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.RgbppLockDep : TestnetInfo.RgbppLockDep;
+export const getRgbppLockScript = (isMainnet: boolean, btcTestnetType?: BTCTestnetType) => {
+  if (isMainnet) {
+    return MainnetInfo.RgbppLockScript;
+  }
+  return btcTestnetType === 'Signet' ? TestnetInfo.RgbppSignetLockScript : TestnetInfo.RgbppLockScript;
+};
 
-export const getRgbppLockConfigDep = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.RgbppLockConfigDep : TestnetInfo.RgbppLockConfigDep;
+export const getRgbppLockDep = (isMainnet: boolean, btcTestnetType?: BTCTestnetType) => {
+  if (isMainnet) {
+    return MainnetInfo.RgbppLockDep;
+  }
+  return btcTestnetType === 'Signet' ? TestnetInfo.RgbppSignetLockDep : TestnetInfo.RgbppLockDep;
+};
 
-export const getBtcTimeLockScript = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.BtcTimeLockScript : TestnetInfo.BtcTimeLockScript;
-export const getBtcTimeLockDep = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.BtcTimeLockDep : TestnetInfo.BtcTimeLockDep;
+export const getRgbppLockConfigDep = (isMainnet: boolean, btcTestnetType?: BTCTestnetType) => {
+  if (isMainnet) {
+    return MainnetInfo.RgbppLockConfigDep;
+  }
+  return btcTestnetType === 'Signet' ? TestnetInfo.RgbppSignetLockConfigDep : TestnetInfo.RgbppLockConfigDep;
+};
 
-export const getBtcTimeLockConfigDep = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.BtcTimeLockConfigDep : TestnetInfo.BtcTimeLockConfigDep;
+export const getBtcTimeLockScript = (isMainnet: boolean, btcTestnetType?: BTCTestnetType) => {
+  if (isMainnet) {
+    return MainnetInfo.BtcTimeLockScript;
+  }
+  return btcTestnetType === 'Signet' ? TestnetInfo.BtcTimeSignetLockScript : TestnetInfo.BtcTimeLockScript;
+};
+export const getBtcTimeLockDep = (isMainnet: boolean, btcTestnetType?: BTCTestnetType) => {
+  if (isMainnet) {
+    return MainnetInfo.BtcTimeLockDep;
+  }
+  return btcTestnetType === 'Signet' ? TestnetInfo.BtcTimeSignetLockDep : TestnetInfo.BtcTimeLockDep;
+};
+
+export const getBtcTimeLockConfigDep = (isMainnet: boolean, btcTestnetType?: BTCTestnetType) => {
+  if (isMainnet) {
+    return MainnetInfo.BtcTimeLockConfigDep;
+  }
+  return btcTestnetType === 'Signet' ? TestnetInfo.BtcTimeSignetLockConfigDep : TestnetInfo.BtcTimeLockConfigDep;
+};
 
 export const getUniqueTypeScript = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.UniqueTypeScript : TestnetInfo.UniqueTypeScript;

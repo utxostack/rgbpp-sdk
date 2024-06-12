@@ -52,10 +52,11 @@ import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
  * @param xudtTypeBytes The serialized hex string of the XUDT type script
  * @param rgbppLockArgsList The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred, if the noMergeOutputCells is true, the transferAmount will be ignored
- * @param isMainnet
- * @param noMergeOutputCells The noMergeOutputCells indicates whether the CKB outputs need to be merged. By default, the outputs will be merged.
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
- * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ * @param isMainnet True is for BTC and CKB Mainnet, flase is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param noMergeOutputCells(Optional) The noMergeOutputCells indicates whether the CKB outputs need to be merged. By default, the outputs will be merged.
+ * @param witnessLockPlaceholderSize(Optional) The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+ * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
+ * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const genBtcTransferCkbVirtualTx = async ({
   collector,
@@ -66,6 +67,7 @@ export const genBtcTransferCkbVirtualTx = async ({
   noMergeOutputCells,
   witnessLockPlaceholderSize,
   ckbFeeRate,
+  btcTestnetType,
 }: BtcTransferVirtualTxParams): Promise<BtcTransferVirtualTxResult> => {
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
 
@@ -170,7 +172,7 @@ export const genBtcTransferCkbVirtualTx = async ({
     handleNonTargetRgbppCells(outputs.length);
   }
 
-  const cellDeps = await fetchTypeIdCellDeps(isMainnet, { rgbpp: true, xudt: true });
+  const cellDeps = await fetchTypeIdCellDeps(isMainnet, { rgbpp: true, xudt: true }, btcTestnetType);
   if (needPaymasterCell) {
     cellDeps.push(getSecp256k1CellDep(isMainnet));
   }
@@ -224,7 +226,8 @@ export const genBtcTransferCkbVirtualTx = async ({
  * @param xudtTypeBytes The serialized hex string of the XUDT type script
  * @param rgbppLockArgsList The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
  * @param rgbppReceivers The rgbpp receiver list which include toBtcAddress and transferAmount
- * @param isMainnet
+ * @param isMainnet True is for BTC and CKB Mainnet, flase is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const genBtcBatchTransferCkbVirtualTx = async ({
   collector,
@@ -232,6 +235,7 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
   rgbppLockArgsList,
   rgbppReceivers,
   isMainnet,
+  btcTestnetType,
 }: BtcBatchTransferVirtualTxParams): Promise<BtcBatchTransferVirtualTxResult> => {
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
 
@@ -285,7 +289,7 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
   }
 
   const cellDeps = [
-    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true, xudt: true })),
+    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true, xudt: true }, btcTestnetType)),
     getSecp256k1CellDep(isMainnet),
   ];
   const witnesses: Hex[] = [];
@@ -330,6 +334,7 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
  * @param collector The collector that collects CKB live cells and transactions
  * @param ckbRawTx CKB raw transaction
  * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
+ * @param isMainnet True is for BTC and CKB Mainnet, flase is for BTC and CKB Testnet
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
  */
 export const appendIssuerCellToBtcBatchTransfer = async ({

@@ -39,12 +39,14 @@ export const buildBtcTimeUnlockWitness = (btcTxProof: Hex): Hex => {
  * The btc time lock args data structure is: lock_script | after | new_bitcoin_tx_id
  * @param btcTimeCells The BTC time cells of xUDT
  * @param btcAssetsApi BTC Assets Api
- * @param isMainnet
+ * @param isMainnet True is for BTC and CKB Mainnet, flase is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const buildBtcTimeCellsSpentTx = async ({
   btcTimeCells,
   btcAssetsApi,
   isMainnet,
+  btcTestnetType,
 }: BtcTimeCellsParams): Promise<CKBComponents.RawTransaction> => {
   const sortedBtcTimeCells = btcTimeCells.sort(compareInputs);
   const inputs: CKBComponents.CellInput[] = sortedBtcTimeCells.map((cell) => ({
@@ -60,7 +62,11 @@ export const buildBtcTimeCellsSpentTx = async ({
 
   const outputsData = sortedBtcTimeCells.map((cell) => cell.outputData);
 
-  const cellDeps: CKBComponents.CellDep[] = await fetchTypeIdCellDeps(isMainnet, { btcTime: true, xudt: true });
+  const cellDeps: CKBComponents.CellDep[] = await fetchTypeIdCellDeps(
+    isMainnet,
+    { btcTime: true, xudt: true },
+    btcTestnetType,
+  );
 
   const witnesses: Hex[] = [];
 
@@ -108,9 +114,8 @@ export const buildBtcTimeCellsSpentTx = async ({
  * @param ckbRawTx The CKB raw transaction to be signed
  * @param collector The collector that collects CKB live cells and transactions
  * @param masterCkbAddress The master CKB address
- * @param outputCapacityRange [u64; 2], filter cells by output capacity range, [inclusive, exclusive]
- * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
- * @param isMainnet
+ * @param outputCapacityRange(Optional) [u64; 2], filter cells by output capacity range, [inclusive, exclusive]
+ * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
  */
 export const signBtcTimeCellSpentTx = async ({
   secp256k1PrivateKey,

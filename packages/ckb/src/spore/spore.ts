@@ -56,12 +56,15 @@ import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
  * @param collector The collector that collects CKB live cells and transactions
  * @param clusterRgbppLockArgs The cluster rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param sporeDataList The spore's data list, including name and description.
+ * @param isMainnet True is for BTC and CKB Mainnet, flase is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const genCreateSporeCkbVirtualTx = async ({
   collector,
   clusterRgbppLockArgs,
   sporeDataList,
   isMainnet,
+  btcTestnetType,
 }: CreateSporeCkbVirtualTxParams): Promise<SporeCreateVirtualTxResult> => {
   const clusterRgbppLock = {
     ...getRgbppLockScript(isMainnet),
@@ -116,7 +119,7 @@ export const genCreateSporeCkbVirtualTx = async ({
   ];
   const outputsData: Hex[] = [clusterCell.outputData, ...sporeOutputsData];
   const cellDeps = [
-    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true })),
+    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true }, btcTestnetType)),
     getClusterTypeDep(isMainnet),
     getSporeTypeDep(isMainnet),
     clusterCellDep,
@@ -161,8 +164,8 @@ const CELL_DEP_SIZE = 32 + 4 + 1;
  * @param collector The collector that collects CKB live cells and transactions
  * @param ckbRawTx CKB raw transaction
  * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 65
- * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ * @param witnessLockPlaceholderSize(Optional) The WitnessArgs.lock placeholder bytes array size and the default value is 65
+ * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
  */
 export const buildAppendingIssuerCellToSporesCreateTx = async ({
   issuerAddress,
@@ -217,7 +220,8 @@ export const buildAppendingIssuerCellToSporesCreateTx = async ({
  * @param collector The collector that collects CKB live cells and transactions
  * @param ckbRawTx CKB raw transaction
  * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
- * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ * @param isMainnet True is for BTC and CKB Mainnet, flase is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
  */
 export const appendIssuerCellToSporesCreate = async ({
   secp256k1PrivateKey,
@@ -285,8 +289,10 @@ export const appendIssuerCellToSporesCreate = async ({
  * @param collector The collector that collects CKB live cells and transactions
  * @param sporeRgbppLockArgs The spore rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param sporeTypeBytes The spore type script serialized bytes
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
- * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ * @param isMainnet True is for BTC and CKB Mainnet, flase is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param witnessLockPlaceholderSize(Optional) The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+ * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
+ * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const genTransferSporeCkbVirtualTx = async ({
   collector,
@@ -295,6 +301,7 @@ export const genTransferSporeCkbVirtualTx = async ({
   isMainnet,
   witnessLockPlaceholderSize,
   ckbFeeRate,
+  btcTestnetType,
 }: TransferSporeCkbVirtualTxParams): Promise<SporeTransferVirtualTxResult> => {
   const sporeRgbppLock = {
     ...getRgbppLockScript(isMainnet),
@@ -321,7 +328,10 @@ export const genTransferSporeCkbVirtualTx = async ({
     },
   ];
   const outputsData: Hex[] = [sporeCell.outputData];
-  const cellDeps = [...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true })), getSporeTypeDep(isMainnet)];
+  const cellDeps = [
+    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true }, btcTestnetType)),
+    getSporeTypeDep(isMainnet),
+  ];
   const sporeCoBuild = generateSporeTransferCoBuild([sporeCell], outputs);
   const witnesses = [RGBPP_WITNESS_PLACEHOLDER, sporeCoBuild];
 

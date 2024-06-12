@@ -23,7 +23,6 @@ import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-util
  * @param transferAmount The XUDT amount to be transferred
  * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
- * @param isMainnet
  */
 export const genCkbJumpBtcVirtualTx = async ({
   collector,
@@ -130,7 +129,6 @@ export const genCkbJumpBtcVirtualTx = async ({
  * @param rgbppReceivers The rgbpp receiver list which include toRgbppLockArgs and transferAmount
  * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
- * @param isMainnet
  */
 export const genCkbBatchJumpBtcVirtualTx = async ({
   collector,

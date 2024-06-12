@@ -29,6 +29,7 @@ export interface RgbppTransferBtcParams {
 export interface RgbppTransferTxParams {
   ckb: RgbppTransferCkbParams;
   btc: RgbppTransferBtcParams;
+  // True is for BTC and CKB Mainnet, flase is for BTC and CKB Testnet
   isMainnet: boolean;
 }
 
