@@ -110,34 +110,34 @@ const TestnetInfo = {
 
   // The CKB testnet RGB++ deployment information for the BTC Signet network
   RgbppSignetLockScript: {
-    codeHash: '0x61ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248',
+    codeHash: '0xd07598deec7ce7b5665310386b4abd06a6d48843e953c5cc2112ad0d5a220364',
     hashType: 'type',
     args: '',
   } as CKBComponents.Script,
 
   RgbppSignetLockDep: {
-    outPoint: { txHash: '0xf1de59e973b85791ec32debbba08dff80c63197e895eb95d67fc1e9f6b413e00', index: '0x0' },
+    outPoint: { txHash: '0x61efdeddbaa0bb4132c0eb174b3e8002ff5ec430f61ba46f30768d683c516eec', index: '0x0' },
     depType: 'code',
   } as CKBComponents.CellDep,
 
   RgbppSignetLockConfigDep: {
-    outPoint: { txHash: '0xf1de59e973b85791ec32debbba08dff80c63197e895eb95d67fc1e9f6b413e00', index: '0x1' },
+    outPoint: { txHash: '0x61efdeddbaa0bb4132c0eb174b3e8002ff5ec430f61ba46f30768d683c516eec', index: '0x1' },
     depType: 'code',
   } as CKBComponents.CellDep,
 
   BtcTimeSignetLockScript: {
-    codeHash: '0x00cdf8fab0f8ac638758ebf5ea5e4052b1d71e8a77b9f43139718621f6849326',
+    codeHash: '0x80a09eca26d77cea1f5a69471c59481be7404febf40ee90f886c36a948385b55',
     hashType: 'type',
     args: '',
   } as CKBComponents.Script,
 
   BtcTimeSignetLockDep: {
-    outPoint: { txHash: '0xde0f87878a97500f549418e5d46d2f7704c565a262aa17036c9c1c13ad638529', index: '0x0' },
+    outPoint: { txHash: '0x5364b3535965e9eac9a35dd7af8e9e45a61d30a16e115923c032f80b28783e21', index: '0x0' },
     depType: 'code',
   } as CKBComponents.CellDep,
 
   BtcTimeSignetLockConfigDep: {
-    outPoint: { txHash: '0xde0f87878a97500f549418e5d46d2f7704c565a262aa17036c9c1c13ad638529', index: '0x1' },
+    outPoint: { txHash: '0x5364b3535965e9eac9a35dd7af8e9e45a61d30a16e115923c032f80b28783e21', index: '0x1' },
     depType: 'code',
   } as CKBComponents.CellDep,
 };
