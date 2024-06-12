@@ -153,5 +153,13 @@ transferXudt({
       toAddress: 'ckt1qrfrwcdnvssswdwpn3s9v8fp87emat306ctjwsm3nmlkjg8qyza2cqgqqxtfdmw2e5kzfcz536qrnf6w36kyhpzweupegx46',
       transferAmount: BigInt(1) * BigInt(10 ** XUDT_TOKEN_INFO.decimal),
     },
+    {
+      toAddress: 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqgj8re09l7gk267ank62hadpp3t2kp20kqnud0jc',
+      transferAmount: BigInt(1000) * BigInt(10 ** XUDT_TOKEN_INFO.decimal),
+    },
+    {
+      toAddress: 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqgj8re09l7gk267ank62hadpp3t2kp20kqnud0jc',
+      transferAmount: BigInt(2000) * BigInt(10 ** XUDT_TOKEN_INFO.decimal),
+    },
   ],
 });
