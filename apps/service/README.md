@@ -68,4 +68,14 @@ $ pm2 start dist/src/main.js --name rgbpp-sdk-service
 
 ### 2. Use Docker
 
-TODO
+- Copy the `.env.example` file to `.env` and Update the configuration values
+
+- Use the provided `docker-compose.yml` file to run the service:
+
+```bash
+docker-compose up
+```
+
+### 3. Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fckb-cell%2Frgbpp-sdk%2Ftree%2Ffeat%2Frgbpp-sdk-service%2Fapps%2Fservice&env=NETWORK,CKB_RPC_URL,BTC_SERVICE_URL,BTC_SERVICE_TOKEN,BTC_SERVICE_ORIGIN&project-name=rgbpp-sdk-service&repository-name=rgbpp-sdk)
