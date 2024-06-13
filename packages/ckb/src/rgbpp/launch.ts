@@ -69,7 +69,7 @@ export const genRgbppLaunchCkbVirtualTx = async ({
       capacity: append0x(rgbppCellCapacity.toString(16)),
     },
     {
-      lock: genBtcTimeLockScript(UNLOCKABLE_LOCK_SCRIPT, isMainnet),
+      lock: genBtcTimeLockScript(UNLOCKABLE_LOCK_SCRIPT, isMainnet, btcTestnetType),
       type: {
         ...getUniqueTypeScript(isMainnet),
         args: generateUniqueTypeArgs(inputs[0], 1),

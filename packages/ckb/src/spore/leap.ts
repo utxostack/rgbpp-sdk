@@ -75,7 +75,7 @@ export const genLeapSporeFromBtcToCkbVirtualTx = async ({
   const outputs: CKBComponents.CellOutput[] = [
     {
       ...sporeCell.output,
-      lock: genBtcTimeLockScript(toLock, isMainnet),
+      lock: genBtcTimeLockScript(toLock, isMainnet, btcTestnetType),
     },
   ];
   const outputsData: Hex[] = [sporeCell.outputData];

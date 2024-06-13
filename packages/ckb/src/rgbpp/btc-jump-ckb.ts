@@ -99,7 +99,7 @@ export const genBtcJumpCkbVirtualTx = async ({
   // The BTC time cell does not need to be bound to the BTC UTXO
   const outputs: CKBComponents.CellOutput[] = [
     {
-      lock: genBtcTimeLockScript(toLock, isMainnet),
+      lock: genBtcTimeLockScript(toLock, isMainnet, btcTestnetType),
       type: xudtType,
       capacity: append0x(receiverOutputCapacity.toString(16)),
     },
