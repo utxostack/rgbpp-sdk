@@ -1,5 +1,5 @@
 import { DataSource } from '@rgbpp-sdk/btc';
-import { BtcTransferVirtualTxResult, Collector, Hex } from '@rgbpp-sdk/ckb';
+import { BTCTestnetType, BtcTransferVirtualTxResult, Collector, Hex } from '@rgbpp-sdk/ckb';
 
 export interface RgbppTransferCkbParams {
   // The collector that collects CKB live cells and transactions
@@ -24,6 +24,8 @@ export interface RgbppTransferBtcParams {
   fromPubkey?: Hex;
   // The fee rate of the BTC transaction
   feeRate?: number;
+  // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+  testnetType?: BTCTestnetType;
 }
 
 export interface RgbppTransferTxParams {
