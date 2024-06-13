@@ -25,7 +25,7 @@ export interface RgbppApiCkbTransactionHash {
 }
 
 export interface RgbppApiTransactionStateParams {
-  withData?: boolean;
+  with_data?: boolean;
 }
 
 export interface RgbppApiTransactionState {
@@ -76,12 +76,15 @@ export interface RgbppApiSpvProof {
 
 export interface RgbppApiSendCkbTransactionPayload {
   btc_txid: string;
-  ckb_virtual_result: {
-    ckbRawTx: CKBComponents.RawTransaction;
-    needPaymasterCell: boolean;
-    sumInputsCapacity: string;
-    commitment: string;
-  };
+  // Support ckbVirtaulTxResult and it's JSON string as request parameter
+  ckb_virtual_result:
+    | {
+        ckbRawTx: CKBComponents.RawTransaction;
+        needPaymasterCell: boolean;
+        sumInputsCapacity: string;
+        commitment: string;
+      }
+    | string;
 }
 
 export interface RgbppApiRetryCkbTransactionPayload {
