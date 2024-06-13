@@ -64,7 +64,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
       });
 
       const txHash = await sendCkbTx({ collector, signedTx: ckbTx });
-      console.info(`RGB++ Asset has been launched and tx hash is ${txHash}`);
+      console.info(`RGB++ Asset has been launched and CKB tx hash is ${txHash}`);
     } catch (error) {
       if (!(error instanceof BtcAssetsApiError)) {
         console.error(error);

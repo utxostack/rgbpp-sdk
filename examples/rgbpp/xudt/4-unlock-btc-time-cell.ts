@@ -32,7 +32,7 @@ const unlockBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string 
   });
 
   const txHash = await sendCkbTx({ collector, signedTx });
-  console.info(`BTC time cell has been spent and tx hash is ${txHash}`);
+  console.info(`BTC time cell has been spent and CKB tx hash is ${txHash}`);
 };
 
 // The btcTimeCellArgs is from the outputs[0].lock.args(BTC Time lock args) of the 3-btc-leap-ckb.ts CKB transaction

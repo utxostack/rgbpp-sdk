@@ -38,7 +38,7 @@ const leapFromCkbToBtc = async ({ outIndex, btcTxId, xudtTypeArgs, transferAmoun
   const signedTx = collector.getCkb().signTransaction(CKB_PRIVATE_KEY)(unsignedTx);
 
   const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
-  console.info(`Rgbpp asset has been jumped from CKB to BTC and tx hash is ${txHash}`);
+  console.info(`Rgbpp asset has been jumped from CKB to BTC and CKB tx hash is ${txHash}`);
 };
 
 // Please use your real BTC UTXO information on the BTC Testnet

@@ -94,7 +94,7 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers, xudtTyp
       });
 
       const txHash = await sendCkbTx({ collector, signedTx });
-      console.info(`RGB++ Asset has been distributed and tx hash is ${txHash}`);
+      console.info(`RGB++ Asset has been distributed and CKB tx hash is ${txHash}`);
     } catch (error) {
       if (!(error instanceof BtcAssetsApiError)) {
         console.error(error);

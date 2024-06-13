@@ -78,7 +78,7 @@ const prepareLaunchCell = async ({
   const signedTx = collector.getCkb().signTransaction(CKB_PRIVATE_KEY)(unsignedTx);
   const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
 
-  console.info(`Launch cell has been created and the tx hash ${txHash}`);
+  console.info(`Launch cell has been created and the CKB tx hash ${txHash}`);
 };
 
 // Please use your real BTC UTXO information on the BTC Testnet

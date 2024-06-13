@@ -4,7 +4,9 @@
 - Spore directory: The examples for RGB++ Spore creation, transfer and leap
 
 > [!TIP]
-> All the parameters of the examples should be repalced with your own, including BTC private key, CKB private key, BTC Service origin, BTC Service token, BTC UTXO, xUDT type args, Spore type args, etc. Please confirm whether the parameters are correct according to the code comments
+> All the parameters of the examples should be repalced with your own, including BTC private key, CKB private key, BTC Service origin, BTC Service token, BTC UTXO, xUDT type args, Spore type args, etc. 
+
+> Please confirm whether the parameters are correct according to the code comments
 
 ## How to Start
 
@@ -41,11 +43,11 @@ CKB_INDEXER_URL=https://testnet.ckb.dev/indexer
 # BTC Variables
 
 # The BTC private key whose format is 32bytes hex string without 0x prefix
-# The Native Segwit P2WPKH address will be generated with the BTC private key
-# Read more about P2WPKH in BIP141: https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki#p2wpkh
 BTC_PRIVATE_KEY=private-key
 
 # The BTC address type to use, available options: P2WPKH or P2TR
+# The Native Segwit P2WPKH address will be generated with the BTC private key as default
+# Read more about P2WPKH in BIP141: https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki#p2wpkh
 BTC_ADDRESS_TYPE=P2WPKH
 
 # The BTC assets api url which should be matched with IS_MAINNET
@@ -57,6 +59,11 @@ VITE_BTC_SERVICE_TOKEN=
 
 # The BTC assets api origin which should be matched with IS_MAINNET
 VITE_BTC_SERVICE_ORIGIN=https://btc-test.app
+
+# The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+# Testnet3: https://mempool.space/testnet
+# Signet: https://mempool.space/signet
+VITE_BTC_TESTNET_TYPE=Testnet3
 ```
 
 ## RGB++ xUDT Examples
@@ -66,7 +73,7 @@ VITE_BTC_SERVICE_ORIGIN=https://btc-test.app
 #### 1. Prepare Launch
 
 > [!TIP]
-> Please make sure the CKB private key in the .env is correct
+> Please make sure the CKB private key in the .env is correct.
 
 ```shell
 # Create a CKB empty rgbpp lock cell to launch RGB++ xUDT assets later
@@ -75,7 +82,7 @@ npx ts-node xudt/launch/1-prepare-launch.ts
 #### 2. Launch RGB++ xUDT on BTC
 
 > [!TIP]
-> Please make sure the `1-prepare-launch.ts` has been run and the corresponding CKB transaction has been committed
+> Please make sure the `1-prepare-launch.ts` has been run and the corresponding CKB transaction has been committed.
 
 ```shell
 npx ts-node xudt/launch/2-launch-rgbpp.ts
@@ -86,8 +93,8 @@ When the command is executed successfully, the **RGB++ Asset type script args** 
 #### 3. Distribute RGB++ xUDT on BTC
 
 > [!TIP]
-> Please make sure the `2-launch-rgbpp.ts` has been run and the corresponding BTC and CKB transactions have been committed
-> The **RGB++ Asset type script args** in the above should be set to the `xudtTypeArgs`
+> Please make sure the `2-launch-rgbpp.ts` has been run and the corresponding BTC and CKB transactions have been committed.
+> The **RGB++ Asset type script args** in the above should be set to the `xudtTypeArgs`.
 
 ```shell
 npx ts-node xudt/launch/3-distribute-rgbpp.ts
@@ -132,8 +139,8 @@ npx ts-node xudt/4-unlock-btc-time.ts
 #### 1. Create RGB++ Cluster Cell
 
 > [!TIP]
-> Please make sure all the variables in the .env are correct
-> The BTC UTXO of `1-prepare-cluster.ts` and `2-create-cluster.ts` should be same
+> Please make sure all the variables in the .env are correct.
+> The BTC UTXO of `1-prepare-cluster.ts` and `2-create-cluster.ts` should be same.
 
 ```shell
 # Create a CKB empty rgbpp lock cell to create cluster later
@@ -148,8 +155,8 @@ When the commands are executed successfully, the **clusterId** and **cluster rgb
 #### 2. Create RGB++ Spores with Cluster on BTC
 
 > [!TIP]
-> Please make sure the `2-create-cluster.ts` has been run and the corresponding BTC and CKB transactions have been committed
-> The **clusterId** in the above should be set to the `clusterId` and the **cluster rgbpp lock args** should be set to the `clusterRgbppLockArgs`
+> Please make sure the `2-create-cluster.ts` has been run and the corresponding BTC and CKB transactions have been committed.
+> The **clusterId** in the above should be set to the `clusterId` and the **cluster rgbpp lock args** should be set to the `clusterRgbppLockArgs`.
 
 ```shell
 npx ts-node spore/launch/3-create-spores.ts
