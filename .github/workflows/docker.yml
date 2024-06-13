@@ -24,7 +24,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           context: git
-          images: ghcr.io/${{ github.repository }}
+          images: ghcr.io/${{ github.repository }}-service
           flavor: |
             latest=auto
           tags: |
