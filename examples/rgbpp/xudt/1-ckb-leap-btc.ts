@@ -1,7 +1,7 @@
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { genCkbJumpBtcVirtualTx } from 'rgbpp';
 import { getSecp256k1CellDep, buildRgbppLockArgs, getXudtTypeScript } from 'rgbpp/ckb';
-import { CKB_PRIVATE_KEY, isMainnet, collector, ckbAddress } from '../env';
+import { CKB_PRIVATE_KEY, isMainnet, collector, ckbAddress, BTC_TESTNET_TYPE } from '../env';
 
 interface LeapToBtcParams {
   outIndex: number;
@@ -25,6 +25,7 @@ const leapFromCkbToBtc = async ({ outIndex, btcTxId, xudtTypeArgs, transferAmoun
     toRgbppLockArgs,
     xudtTypeBytes: serializeScript(xudtType),
     transferAmount,
+    btcTestnetType: BTC_TESTNET_TYPE,
   });
 
   const emptyWitness = { lock: '', inputType: '', outputType: '' };
@@ -41,10 +42,12 @@ const leapFromCkbToBtc = async ({ outIndex, btcTxId, xudtTypeArgs, transferAmoun
 };
 
 // Please use your real BTC UTXO information on the BTC Testnet
+// BTC Testnet3: https://mempool.space/testnet
+// BTC Signet: https://mempool.space/signet
 leapFromCkbToBtc({
   outIndex: 1,
-  btcTxId: '4ff1855b64b309afa19a8b9be3d4da99dcb18b083b65d2d851662995c7d99e7a',
+  btcTxId: '3f6db9a387587006cb2fa8c6352bc728984bf39cb010789dffe574f27775a6ac',
   // Please use your own RGB++ xudt asset's xudtTypeArgs
-  xudtTypeArgs: '0x1ba116c119d1cfd98a53e9d1a615cf2af2bb87d95515c9d217d367054cfc696b',
+  xudtTypeArgs: '0x562e4e8a2f64a3e9c24beb4b7dd002d0ad3b842d0cc77924328e36ad114e3ebe',
   transferAmount: BigInt(800_0000_0000),
 });

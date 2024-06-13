@@ -13,7 +13,7 @@ import {
   getSecp256k1CellDep,
 } from 'rgbpp/ckb';
 import { RGBPP_TOKEN_INFO } from './0-rgbpp-token-info';
-import { CKB_PRIVATE_KEY, ckbAddress, collector, isMainnet } from '../../env';
+import { BTC_TESTNET_TYPE, CKB_PRIVATE_KEY, ckbAddress, collector, isMainnet } from '../../env';
 
 const prepareLaunchCell = async ({
   outIndex,
@@ -44,7 +44,7 @@ const prepareLaunchCell = async ({
 
   const outputs: CKBComponents.CellOutput[] = [
     {
-      lock: genRgbppLockScript(buildRgbppLockArgs(outIndex, btcTxId), isMainnet),
+      lock: genRgbppLockScript(buildRgbppLockArgs(outIndex, btcTxId), isMainnet, BTC_TESTNET_TYPE),
       capacity: append0x(launchCellCapacity.toString(16)),
     },
   ];
@@ -82,8 +82,10 @@ const prepareLaunchCell = async ({
 };
 
 // Please use your real BTC UTXO information on the BTC Testnet
+// BTC Testnet3: https://mempool.space/testnet
+// BTC Signet: https://mempool.space/signet
 prepareLaunchCell({
   outIndex: 1,
-  btcTxId: '6259ea7852e294afbd2aaf9ccd5c9c1f95087b0b08ba7e47ae35ce31170732bc',
+  btcTxId: 'c1f7fe5d4898194ed8ee5a38597cd28c7981e32e0e6aeb770f3f1b87df21434c',
   rgbppTokenInfo: RGBPP_TOKEN_INFO,
 });

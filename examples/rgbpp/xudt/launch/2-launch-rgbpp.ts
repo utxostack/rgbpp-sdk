@@ -7,7 +7,7 @@ import {
   sendCkbTx,
 } from 'rgbpp/ckb';
 import { RGBPP_TOKEN_INFO } from './0-rgbpp-token-info';
-import { btcAccount, btcDataSource, btcService, collector, isMainnet } from '../../env';
+import { BTC_TESTNET_TYPE, btcAccount, btcDataSource, btcService, collector, isMainnet } from '../../env';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
 import { signAndSendPsbt } from '../../shared/btc-account';
 
@@ -25,6 +25,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
     rgbppTokenInfo,
     launchAmount,
     isMainnet,
+    btcTestnetType: BTC_TESTNET_TYPE,
   });
 
   // Save ckbVirtualTxResult
@@ -47,7 +48,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
   });
 
   const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
-  console.log('BTC TxId: ', btcTxId);
+  console.log(`BTC ${BTC_TESTNET_TYPE} TxId: ${btcTxId}`);
 
   const interval = setInterval(async () => {
     try {
@@ -73,9 +74,12 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
 };
 
 // Please use your real BTC UTXO information on the BTC Testnet which should be same as the 1-prepare-launch.ts
+// BTC Testnet3: https://mempool.space/testnet
+// BTC Signet: https://mempool.space/signet
+
 // rgbppLockArgs: outIndexU32 + btcTxId
 launchRgppAsset({
-  ownerRgbppLockArgs: buildRgbppLockArgs(1, '6259ea7852e294afbd2aaf9ccd5c9c1f95087b0b08ba7e47ae35ce31170732bc'),
+  ownerRgbppLockArgs: buildRgbppLockArgs(1, 'c1f7fe5d4898194ed8ee5a38597cd28c7981e32e0e6aeb770f3f1b87df21434c'),
   rgbppTokenInfo: RGBPP_TOKEN_INFO,
   // The total issuance amount of RGBPP Token, the decimal is determined by RGBPP Token info
   launchAmount: BigInt(2100_0000) * BigInt(10 ** RGBPP_TOKEN_INFO.decimal),
