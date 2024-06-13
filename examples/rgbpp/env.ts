@@ -8,7 +8,7 @@ import {
 } from '@nervosnetwork/ckb-sdk-utils';
 import { NetworkType, AddressType, DataSource } from 'rgbpp/btc';
 import { BtcAssetsApi } from 'rgbpp/service';
-import { Collector } from 'rgbpp/ckb';
+import { BTCTestnetType, Collector } from 'rgbpp/ckb';
 import { createBtcAccount } from './shared/btc-account';
 
 dotenv.config({ path: __dirname + '/.env' });
@@ -42,6 +42,7 @@ export const BTC_PRIVATE_KEY = process.env.BTC_PRIVATE_KEY!;
 export const BTC_SERVICE_URL = process.env.VITE_BTC_SERVICE_URL!;
 export const BTC_SERVICE_TOKEN = process.env.VITE_BTC_SERVICE_TOKEN!;
 export const BTC_SERVICE_ORIGIN = process.env.VITE_BTC_SERVICE_ORIGIN!;
+export const BTC_TESTNET_TYPE = process.env.VITE_BTC_TESTNET_TYPE! as BTCTestnetType;
 
 // Read more about the available address types:
 // - P2WPKH: https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki#p2wpkh
