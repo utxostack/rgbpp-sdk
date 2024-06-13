@@ -7,7 +7,7 @@ on:
       - main
       - develop
     tags:
-      - release/*
+      - v*.*.*
 
 jobs:
   docker-build-push:
