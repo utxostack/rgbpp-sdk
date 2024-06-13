@@ -78,4 +78,4 @@ docker-compose up
 
 ### 3. Deploy to Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fckb-cell%2Frgbpp-sdk%2Ftree%2Ffeat%2Frgbpp-sdk-service%2Fapps%2Fservice&env=NETWORK,CKB_RPC_URL,BTC_SERVICE_URL,BTC_SERVICE_TOKEN,BTC_SERVICE_ORIGIN&project-name=rgbpp-sdk-service&repository-name=rgbpp-sdk)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fckb-cell%2Frgbpp-sdk%2Ftree%2Fmain%2Fapps%2Fservice&env=NETWORK,CKB_RPC_URL,BTC_SERVICE_URL,BTC_SERVICE_TOKEN,BTC_SERVICE_ORIGIN&project-name=rgbpp-sdk-service&repository-name=rgbpp-sdk)
