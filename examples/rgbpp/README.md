@@ -42,6 +42,11 @@ CKB_INDEXER_URL=https://testnet.ckb.dev/indexer
 
 # BTC Variables
 
+# The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+# Testnet3: https://mempool.space/testnet
+# Signet: https://mempool.space/signet
+BTC_TESTNET_TYPE=Testnet3
+
 # The BTC private key whose format is 32bytes hex string without 0x prefix
 BTC_PRIVATE_KEY=private-key
 
@@ -59,11 +64,6 @@ VITE_BTC_SERVICE_TOKEN=
 
 # The BTC assets api origin which should be matched with IS_MAINNET
 VITE_BTC_SERVICE_ORIGIN=https://btc-test.app
-
-# The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
-# Testnet3: https://mempool.space/testnet
-# Signet: https://mempool.space/signet
-VITE_BTC_TESTNET_TYPE=Testnet3
 ```
 
 ## RGB++ xUDT Examples
