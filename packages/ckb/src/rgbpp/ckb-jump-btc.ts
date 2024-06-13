@@ -21,8 +21,9 @@ import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-util
  * @param fromCkbAddress The from ckb address who will use his private key to sign the ckb tx
  * @param toRgbppLockArgs The receiver rgbpp lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
- * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ * @param witnessLockPlaceholderSize(Optional)  The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+ * @param ckbFeeRate(Optional)  The CKB transaction fee rate, default value is 1100
+ * @param btcTestnetType(Optional)  The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const genCkbJumpBtcVirtualTx = async ({
   collector,
@@ -32,6 +33,7 @@ export const genCkbJumpBtcVirtualTx = async ({
   transferAmount,
   witnessLockPlaceholderSize,
   ckbFeeRate,
+  btcTestnetType,
 }: CkbJumpBtcVirtualTxParams): Promise<CKBComponents.RawTransaction> => {
   const isMainnet = fromCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
@@ -59,7 +61,7 @@ export const genCkbJumpBtcVirtualTx = async ({
 
   const outputs: CKBComponents.CellOutput[] = [
     {
-      lock: genRgbppLockScript(toRgbppLockArgs, isMainnet),
+      lock: genRgbppLockScript(toRgbppLockArgs, isMainnet, btcTestnetType),
       type: xudtType,
       capacity: append0x(rpbppCellCapacity.toString(16)),
     },
@@ -137,6 +139,7 @@ export const genCkbBatchJumpBtcVirtualTx = async ({
   rgbppReceivers,
   witnessLockPlaceholderSize,
   ckbFeeRate,
+  btcTestnetType,
 }: CkbBatchJumpBtcVirtualTxParams): Promise<CKBComponents.RawTransaction> => {
   const isMainnet = fromCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
@@ -166,7 +169,7 @@ export const genCkbBatchJumpBtcVirtualTx = async ({
   const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
   const sumRgbppCellCapacity = rpbppCellCapacity * BigInt(rgbppReceivers.length);
   const outputs: CKBComponents.CellOutput[] = rgbppReceivers.map((receiver) => ({
-    lock: genRgbppLockScript(receiver.toRgbppLockArgs, isMainnet),
+    lock: genRgbppLockScript(receiver.toRgbppLockArgs, isMainnet, btcTestnetType),
     type: xudtType,
     capacity: append0x(rpbppCellCapacity.toString(16)),
   }));

@@ -116,6 +116,7 @@ export const buildBtcTimeCellsSpentTx = async ({
  * @param masterCkbAddress The master CKB address
  * @param outputCapacityRange(Optional) [u64; 2], filter cells by output capacity range, [inclusive, exclusive]
  * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
+ * @param isMainnet True is for BTC and CKB Mainnet, flase is for BTC and CKB Testnet
  */
 export const signBtcTimeCellSpentTx = async ({
   secp256k1PrivateKey,
@@ -158,7 +159,6 @@ export const signBtcTimeCellSpentTx = async ({
 
   const keyMap = new Map<string, string>();
   keyMap.set(scriptToHash(masterLock), secp256k1PrivateKey);
-  keyMap.set(scriptToHash(getBtcTimeLockScript(isMainnet)), '');
 
   const cells = rawTx.inputs.map((input, index) => ({
     outPoint: input.previousOutput,
@@ -193,11 +193,12 @@ export const isBtcTimeCellsSpent = async ({
   collector,
   ckbAddress,
   btcTxId,
+  btcTestnetType,
 }: BtcTimeCellStatusParams): Promise<boolean> => {
   const isMainnet = ckbAddress.startsWith('ckb');
   const lock = addressToScript(ckbAddress);
   const btcTimeLock: CKBComponents.Script = {
-    ...getBtcTimeLockScript(isMainnet),
+    ...getBtcTimeLockScript(isMainnet, btcTestnetType),
     args: genBtcTimeLockArgs(lock, btcTxId, BTC_JUMP_CONFIRMATION_BLOCKS),
   };
   const btcTimeCells = await collector.getCells({ lock: btcTimeLock, isDataMustBeEmpty: false });

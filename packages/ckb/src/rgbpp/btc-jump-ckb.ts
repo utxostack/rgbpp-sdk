@@ -57,7 +57,7 @@ export const genBtcJumpCkbVirtualTx = async ({
 
   const deduplicatedLockArgsList = deduplicateList(rgbppLockArgsList);
 
-  const rgbppLocks = deduplicatedLockArgsList.map((args) => genRgbppLockScript(args, isMainnet));
+  const rgbppLocks = deduplicatedLockArgsList.map((args) => genRgbppLockScript(args, isMainnet, btcTestnetType));
   let rgbppTargetCells: IndexerCell[] = [];
   let rgbppOtherTypeCells: IndexerCell[] = [];
   for await (const rgbppLock of rgbppLocks) {
@@ -113,7 +113,7 @@ export const genBtcJumpCkbVirtualTx = async ({
     const udtChangeCapacity = isCapacitySufficient ? sumInputsCapacity - receiverOutputCapacity : rgbppCellCapacity;
     outputs.push({
       // The Vouts[0] for OP_RETURN and Vouts[1] for RGBPP assets, BTC time cells don't need btc tx out_index
-      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
+      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet, btcTestnetType),
       type: xudtType,
       capacity: append0x(udtChangeCapacity.toString(16)),
     });
@@ -130,7 +130,7 @@ export const genBtcJumpCkbVirtualTx = async ({
     outputs.push({
       ...otherRgbppCell.output,
       // Vouts[targetRgbppOutputLen + 1], ..., Vouts[targetRgbppOutputLen + rgbppOtherTypeCells.length] for other RGBPP assets
-      lock: genRgbppLockScript(buildPreLockArgs(targetRgbppOutputLen + index + 1), isMainnet),
+      lock: genRgbppLockScript(buildPreLockArgs(targetRgbppOutputLen + index + 1), isMainnet, btcTestnetType),
     });
     outputsData.push(otherRgbppCell.outputData);
   }

@@ -66,10 +66,7 @@ export const genCreateSporeCkbVirtualTx = async ({
   isMainnet,
   btcTestnetType,
 }: CreateSporeCkbVirtualTxParams): Promise<SporeCreateVirtualTxResult> => {
-  const clusterRgbppLock = {
-    ...getRgbppLockScript(isMainnet),
-    args: append0x(clusterRgbppLockArgs),
-  };
+  const clusterRgbppLock = genRgbppLockScript(clusterRgbppLockArgs, isMainnet, btcTestnetType);
   const clusterCells = await collector.getCells({ lock: clusterRgbppLock, isDataMustBeEmpty: false });
   if (!clusterCells || clusterCells.length === 0) {
     throw new NoRgbppLiveCellError('No cluster rgbpp cells found with the cluster rgbpp lock args');
@@ -99,7 +96,7 @@ export const genCreateSporeCkbVirtualTx = async ({
 
   const sporeOutputs = sporeDataList.map((data, index) => ({
     // The BTC transaction Vouts[0] for OP_RETURN, Vouts[1] for cluster and Vouts[2]... for spore
-    lock: genRgbppLockScript(buildPreLockArgs(index + 2), isMainnet),
+    lock: genRgbppLockScript(buildPreLockArgs(index + 2), isMainnet, btcTestnetType),
     type: {
       ...getSporeTypeScript(isMainnet),
       // The CKB transaction outputs[0] fro cluster and outputs[1]... for spore
@@ -113,7 +110,7 @@ export const genCreateSporeCkbVirtualTx = async ({
     {
       ...clusterCell.output,
       // The BTC transaction Vouts[0] for OP_RETURN, Vouts[1] for cluster
-      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
+      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet, btcTestnetType),
     },
     ...sporeOutputs,
   ];
@@ -248,7 +245,6 @@ export const appendIssuerCellToSporesCreate = async ({
 
   const keyMap = new Map<string, string>();
   keyMap.set(scriptToHash(issuerLock), secp256k1PrivateKey);
-  keyMap.set(scriptToHash(getRgbppLockScript(isMainnet)), '');
 
   const issuerCellIndex = rgbppInputsLength;
   const cells = rawTx.inputs.map((input, index) => ({
@@ -303,10 +299,7 @@ export const genTransferSporeCkbVirtualTx = async ({
   ckbFeeRate,
   btcTestnetType,
 }: TransferSporeCkbVirtualTxParams): Promise<SporeTransferVirtualTxResult> => {
-  const sporeRgbppLock = {
-    ...getRgbppLockScript(isMainnet),
-    args: append0x(sporeRgbppLockArgs),
-  };
+  const sporeRgbppLock = genRgbppLockScript(sporeRgbppLockArgs, isMainnet, btcTestnetType);
   const sporeCells = await collector.getCells({ lock: sporeRgbppLock, isDataMustBeEmpty: false });
 
   throwErrorWhenSporeCellsInvalid(sporeCells, sporeTypeBytes, isMainnet);
@@ -324,7 +317,7 @@ export const genTransferSporeCkbVirtualTx = async ({
     {
       ...sporeCell.output,
       // The BTC transaction Vouts[0] for OP_RETURN, Vouts[1] for spore
-      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
+      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet, btcTestnetType),
     },
   ];
   const outputsData: Hex[] = [sporeCell.outputData];

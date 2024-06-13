@@ -55,7 +55,7 @@ export const genLeapSporeFromBtcToCkbVirtualTx = async ({
   btcTestnetType,
 }: LeapSporeFromBtcToCkbVirtualTxParams): Promise<SporeLeapVirtualTxResult> => {
   const sporeRgbppLock = {
-    ...getRgbppLockScript(isMainnet),
+    ...getRgbppLockScript(isMainnet, btcTestnetType),
     args: append0x(sporeRgbppLockArgs),
   };
   const sporeCells = await collector.getCells({ lock: sporeRgbppLock, isDataMustBeEmpty: false });
@@ -211,6 +211,7 @@ export const genLeapSporeFromCkbToBtcRawTx = async ({
   isMainnet,
   witnessLockPlaceholderSize,
   ckbFeeRate,
+  btcTestnetType,
 }: LeapSporeFromCkbToBtcVirtualTxParams): Promise<CKBComponents.RawTransaction> => {
   const fromLock = addressToScript(fromCkbAddress);
   const sporeType = blockchain.Script.unpack(sporeTypeBytes) as CKBComponents.Script;
@@ -231,7 +232,7 @@ export const genLeapSporeFromCkbToBtcRawTx = async ({
     {
       ...sporeCell.output,
       lock: {
-        ...getRgbppLockScript(isMainnet),
+        ...getRgbppLockScript(isMainnet, btcTestnetType),
         args: append0x(toRgbppLockArgs),
       },
     },

@@ -8,7 +8,6 @@ import {
   RGBPP_WITNESS_PLACEHOLDER,
   getClusterTypeDep,
   getClusterTypeScript,
-  getRgbppLockScript,
 } from '../constants';
 import { generateClusterCreateCoBuild, generateClusterId } from '../utils/spore';
 import { NoRgbppLiveCellError } from '../error';
@@ -33,10 +32,7 @@ export const genCreateClusterCkbVirtualTx = async ({
   ckbFeeRate,
   btcTestnetType,
 }: CreateClusterCkbVirtualTxParams): Promise<SporeVirtualTxResult> => {
-  const rgbppLock = {
-    ...getRgbppLockScript(isMainnet),
-    args: append0x(rgbppLockArgs),
-  };
+  const rgbppLock = genRgbppLockScript(rgbppLockArgs, isMainnet, btcTestnetType);
   const rgbppCells = await collector.getCells({ lock: rgbppLock });
   if (!rgbppCells || rgbppCells.length === 0) {
     throw new NoRgbppLiveCellError('No rgbpp cells found with the rgbpp lock args');
@@ -55,7 +51,7 @@ export const genCreateClusterCkbVirtualTx = async ({
     {
       ...rgbppCell.output,
       // The BTC transaction Vouts[0] for OP_RETURN, Vouts[1] for cluster
-      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
+      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet, btcTestnetType),
       type: {
         ...getClusterTypeScript(isMainnet),
         args: clusterId,

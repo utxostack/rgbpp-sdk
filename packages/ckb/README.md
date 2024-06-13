@@ -116,6 +116,7 @@ The method `genCkbJumpBtcVirtualTx` can generate a CKB transaction for RGB++ xUD
  * @param transferAmount The XUDT amount to be transferred
  * @param witnessLockPlaceholderSize(Optional) The WitnessArgs.lock placeholder bytes array size and the default value is 5000
  * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
+ * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const genCkbJumpBtcVirtualTx = async ({
   collector,

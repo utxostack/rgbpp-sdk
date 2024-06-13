@@ -154,7 +154,7 @@ export const sendCkbTx = async ({ collector, signedTx }: SendCkbTxParams) => {
  * Replace the RGBPP_TX_ID_PLACEHOLDER with the real btc tx id of the rgbpp lock args and BTC time lock args
  * @param ckbRawTx CKB raw transaction
  * @param btcTxId The BTC transaction id
- * @param isMainnet
+ * @param isMainnet True is for BTC and CKB Mainnet, flase is for BTC and CKB Testnet
  */
 export const updateCkbTxWithRealBtcTxId = ({
   ckbRawTx,

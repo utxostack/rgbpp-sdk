@@ -47,7 +47,7 @@ export const genRgbppLaunchCkbVirtualTx = async ({
   isMainnet,
   btcTestnetType,
 }: RgbppLaunchCkbVirtualTxParams): Promise<RgbppLaunchVirtualTxResult> => {
-  const ownerLock = genRgbppLockScript(ownerRgbppLockArgs, isMainnet);
+  const ownerLock = genRgbppLockScript(ownerRgbppLockArgs, isMainnet, btcTestnetType);
   let emptyCells = await collector.getCells({ lock: ownerLock });
   if (!emptyCells || emptyCells.length === 0) {
     throw new NoLiveCellError('The owner address has no empty cells');
@@ -61,7 +61,7 @@ export const genRgbppLaunchCkbVirtualTx = async ({
   let rgbppCellCapacity = sumInputsCapacity - infoCellCapacity;
   const outputs: CKBComponents.CellOutput[] = [
     {
-      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
+      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet, btcTestnetType),
       type: {
         ...getXudtTypeScript(isMainnet),
         args: append0x(scriptToHash(ownerLock)),

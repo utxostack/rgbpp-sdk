@@ -101,8 +101,6 @@ export interface AppendWitnessesParams {
   rgbppApiSpvProof: RgbppApiSpvProof;
   // The hex string of btc transaction, refer to https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/ts_src/transaction.ts#L609
   btcTxBytes: Hex;
-  // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
-  btcTestnetType?: BTCTestnetType;
 }
 
 export interface AppendPaymasterCellAndSignTxParams {
@@ -177,6 +175,8 @@ export interface CkbJumpBtcVirtualTxParams {
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
+  // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+  btcTestnetType?: BTCTestnetType;
 }
 
 export interface UpdateCkbTxWithRealBtcTxIdParams {
@@ -195,6 +195,8 @@ export interface BtcTimeCellStatusParams {
   ckbAddress: Address;
   // The BTC transaction id
   btcTxId: Hex;
+  // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+  btcTestnetType?: BTCTestnetType;
 }
 
 export interface RgbppLockArgsReceiver {
@@ -217,6 +219,8 @@ export interface CkbBatchJumpBtcVirtualTxParams {
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
+  // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+  btcTestnetType?: BTCTestnetType;
 }
 
 export interface AppendIssuerCellToBtcBatchTransfer {

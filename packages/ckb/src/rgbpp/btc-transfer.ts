@@ -77,7 +77,7 @@ export const genBtcTransferCkbVirtualTx = async ({
 
   const deduplicatedLockArgsList = deduplicateList(rgbppLockArgsList);
 
-  const rgbppLocks = deduplicatedLockArgsList.map((args) => genRgbppLockScript(args, isMainnet));
+  const rgbppLocks = deduplicatedLockArgsList.map((args) => genRgbppLockScript(args, isMainnet, btcTestnetType));
   let rgbppTargetCells: IndexerCell[] = [];
   let rgbppOtherTypeCells: IndexerCell[] = [];
   for await (const rgbppLock of rgbppLocks) {
@@ -110,7 +110,7 @@ export const genBtcTransferCkbVirtualTx = async ({
       outputs.push({
         ...otherRgbppCell.output,
         // Vouts[targetRgbppOutputLen + 1], ..., Vouts[targetRgbppOutputLen + rgbppOtherTypeCells.length] for other RGBPP assets
-        lock: genRgbppLockScript(buildPreLockArgs(targetRgbppOutputLen + index + 1), isMainnet),
+        lock: genRgbppLockScript(buildPreLockArgs(targetRgbppOutputLen + index + 1), isMainnet, btcTestnetType),
       });
       outputsData.push(otherRgbppCell.outputData);
     }
@@ -127,7 +127,7 @@ export const genBtcTransferCkbVirtualTx = async ({
       outputs.push({
         ...targetRgbppCell.output,
         // The Vouts[0] for OP_RETURN and Vouts[1], ..., Vouts[rgbppTargetCells.length] for target RGBPP assets
-        lock: genRgbppLockScript(buildPreLockArgs(index + 1), isMainnet),
+        lock: genRgbppLockScript(buildPreLockArgs(index + 1), isMainnet, btcTestnetType),
       });
       outputsData.push(targetRgbppCell.outputData);
     }
@@ -149,7 +149,7 @@ export const genBtcTransferCkbVirtualTx = async ({
     const receiverOutputCapacity = needRgbppChange ? BigInt(rgbppTargetCells[0].output.capacity) : sumInputsCapacity;
     // The Vouts[0] for OP_RETURN and Vouts[1] for target transfer RGBPP assets
     outputs.push({
-      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
+      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet, btcTestnetType),
       type: xudtType,
       capacity: append0x(receiverOutputCapacity.toString(16)),
     });
@@ -162,7 +162,7 @@ export const genBtcTransferCkbVirtualTx = async ({
       const udtChangeCapacity = isCapacitySufficient ? sumInputsCapacity - receiverOutputCapacity : rgbppCellCapacity;
       // The Vouts[2] for target change RGBPP assets
       outputs.push({
-        lock: genRgbppLockScript(buildPreLockArgs(2), isMainnet),
+        lock: genRgbppLockScript(buildPreLockArgs(2), isMainnet, btcTestnetType),
         type: xudtType,
         capacity: append0x(udtChangeCapacity.toString(16)),
       });
@@ -243,7 +243,7 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
     throw new TypeAssetNotSupportedError('The type script asset is not supported now');
   }
 
-  const rgbppLocks = rgbppLockArgsList.map((args) => genRgbppLockScript(args, isMainnet));
+  const rgbppLocks = rgbppLockArgsList.map((args) => genRgbppLockScript(args, isMainnet, btcTestnetType));
   let rgbppCells: IndexerCell[] = [];
   for await (const rgbppLock of rgbppLocks) {
     const cells = await collector.getCells({ lock: rgbppLock, type: xudtType });
@@ -261,7 +261,7 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
   const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
   const outputs: CKBComponents.CellOutput[] = rgbppReceivers.map((_, index) => ({
     // The Vouts[0] for OP_RETURN and Vouts[1], Vouts[2], ... for RGBPP assets
-    lock: genRgbppLockScript(buildPreLockArgs(index + 1), isMainnet),
+    lock: genRgbppLockScript(buildPreLockArgs(index + 1), isMainnet, btcTestnetType),
     type: xudtType,
     capacity: append0x(rpbppCellCapacity.toString(16)),
   }));
@@ -281,7 +281,7 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
     rgbppChangeOutIndex = rgbppReceivers.length + 1;
     outputs.push({
       // The Vouts[0] for OP_RETURN and Vouts[rgbppChangeOutIndex] for RGBPP change assets
-      lock: genRgbppLockScript(buildPreLockArgs(rgbppChangeOutIndex), isMainnet),
+      lock: genRgbppLockScript(buildPreLockArgs(rgbppChangeOutIndex), isMainnet, btcTestnetType),
       type: xudtType,
       capacity: append0x(rpbppCellCapacity.toString(16)),
     });
@@ -385,7 +385,6 @@ export const appendIssuerCellToBtcBatchTransfer = async ({
 
   const keyMap = new Map<string, string>();
   keyMap.set(scriptToHash(issuerLock), secp256k1PrivateKey);
-  keyMap.set(scriptToHash(getRgbppLockScript(isMainnet)), '');
 
   const issuerCellIndex = rgbppInputsLength;
   const cells = rawTx.inputs.map((input, index) => ({
