@@ -1,6 +1,6 @@
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { genLeapSporeFromCkbToBtcRawTx } from 'rgbpp';
-import { isMainnet, collector, ckbAddress, CKB_PRIVATE_KEY } from '../env';
+import { isMainnet, collector, ckbAddress, CKB_PRIVATE_KEY, BTC_TESTNET_TYPE } from '../env';
 import { buildRgbppLockArgs, getSecp256k1CellDep, getSporeTypeScript } from 'rgbpp/ckb';
 
 const leapSporeFromCkbToBtc = async ({
@@ -25,6 +25,7 @@ const leapSporeFromCkbToBtc = async ({
     toRgbppLockArgs,
     sporeTypeBytes: serializeScript(sporeType),
     isMainnet,
+    btcTestnetType: BTC_TESTNET_TYPE,
   });
 
   const emptyWitness = { lock: '', inputType: '', outputType: '' };
@@ -41,6 +42,8 @@ const leapSporeFromCkbToBtc = async ({
 };
 
 // Please use your real BTC UTXO information on the BTC Testnet
+// BTC Testnet3: https://mempool.space/testnet
+// BTC Signet: https://mempool.space/signet
 leapSporeFromCkbToBtc({
   outIndex: 1,
   btcTxId: '448897515cf07b4ca0cd38af9806399ede55775b4c760b274ed2322121ed185f',

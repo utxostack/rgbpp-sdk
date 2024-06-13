@@ -1,5 +1,5 @@
 import { BtcAssetsApiError, genCreateClusterCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
-import { isMainnet, collector, btcAccount, btcDataSource, btcService } from '../../env';
+import { isMainnet, collector, btcAccount, btcDataSource, btcService, BTC_TESTNET_TYPE } from '../../env';
 import { CLUSTER_DATA } from './0-cluster-info';
 import {
   appendCkbTxWitnesses,
@@ -19,6 +19,7 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
     clusterData: CLUSTER_DATA,
     isMainnet,
     ckbFeeRate: BigInt(2000),
+    btcTestnetType: BTC_TESTNET_TYPE,
   });
 
   // Save ckbVirtualTxResult
@@ -78,6 +79,9 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
 };
 
 // Please use your real BTC UTXO information on the BTC Testnet which should be same as the 1-prepare-cluster.ts
+// BTC Testnet3: https://mempool.space/testnet
+// BTC Signet: https://mempool.space/signet
+
 // rgbppLockArgs: outIndexU32 + btcTxId
 createCluster({
   ownerRgbppLockArgs: buildRgbppLockArgs(3, 'aee4e8e3aa95e9e9ab1f0520714031d92d3263262099dcc7f7d64e62fa2fcb44'),

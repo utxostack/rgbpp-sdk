@@ -1,5 +1,14 @@
 import { BtcAssetsApiError, genCreateSporeCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
-import { isMainnet, collector, btcDataSource, btcService, CKB_PRIVATE_KEY, ckbAddress, btcAccount } from '../../env';
+import {
+  isMainnet,
+  collector,
+  btcDataSource,
+  btcService,
+  CKB_PRIVATE_KEY,
+  ckbAddress,
+  btcAccount,
+  BTC_TESTNET_TYPE,
+} from '../../env';
 import {
   Hex,
   appendCkbTxWitnesses,
@@ -30,6 +39,7 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
     clusterRgbppLockArgs,
     isMainnet,
     ckbFeeRate: BigInt(2000),
+    btcTestnetType: BTC_TESTNET_TYPE,
   });
 
   // Save ckbVirtualTxResult
@@ -105,6 +115,9 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
 };
 
 // Please use your real BTC UTXO information on the BTC Testnet
+// BTC Testnet3: https://mempool.space/testnet
+// BTC Signet: https://mempool.space/signet
+
 // rgbppLockArgs: outIndexU32 + btcTxId
 createSpores({
   // The cluster cell will be spent and the new cluster cell will be created in each spore creation tx,

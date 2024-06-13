@@ -10,7 +10,7 @@ import {
 } from 'rgbpp/ckb';
 import { sendRgbppUtxos } from 'rgbpp/btc';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { isMainnet, collector, btcDataSource, btcService, btcAccount } from '../../env';
+import { isMainnet, collector, btcDataSource, btcService, btcAccount, BTC_TESTNET_TYPE } from '../../env';
 import { BtcAssetsApiError } from 'rgbpp';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
 import { signAndSendPsbt } from '../../shared/btc-account';
@@ -35,6 +35,7 @@ const leapSpore = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTypeArgs }: Sp
     sporeTypeBytes,
     toCkbAddress,
     isMainnet,
+    btcTestnetType: BTC_TESTNET_TYPE,
   });
 
   // Save ckbVirtualTxResult
@@ -90,6 +91,9 @@ const leapSpore = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTypeArgs }: Sp
 };
 
 // Please use your real BTC UTXO information on the BTC Testnet
+// BTC Testnet3: https://mempool.space/testnet
+// BTC Signet: https://mempool.space/signet
+
 // rgbppLockArgs: outIndexU32 + btcTxId
 leapSpore({
   // The spore rgbpp lock args is from 3-create-spore.ts

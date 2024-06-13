@@ -1,12 +1,12 @@
 import { buildSporeBtcTimeCellsSpentTx, signBtcTimeCellSpentTx } from 'rgbpp';
-import { CKB_PRIVATE_KEY, btcService, ckbAddress, collector, isMainnet } from '../env';
+import { BTC_TESTNET_TYPE, CKB_PRIVATE_KEY, btcService, ckbAddress, collector, isMainnet } from '../env';
 import { sendCkbTx, getBtcTimeLockScript } from 'rgbpp/ckb';
 
 // Warning: Wait at least 6 BTC confirmation blocks to spend the BTC time cells after 5-leap-spore-to-ckb.ts
 const unlockSporeBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string }) => {
   const btcTimeCells = await collector.getCells({
     lock: {
-      ...getBtcTimeLockScript(false),
+      ...getBtcTimeLockScript(isMainnet, BTC_TESTNET_TYPE),
       args: btcTimeCellArgs,
     },
     isDataMustBeEmpty: false,
@@ -20,6 +20,7 @@ const unlockSporeBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: st
     btcTimeCells,
     btcAssetsApi: btcService,
     isMainnet,
+    btcTestnetType: BTC_TESTNET_TYPE,
   });
 
   const signedTx = await signBtcTimeCellSpentTx({
