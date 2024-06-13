@@ -57,7 +57,7 @@ importers:
         specifier: ^3.2.2
         version: 3.2.2(@nestjs/common@10.3.9)(rxjs@7.8.1)
       '@nestjs/core':
-        specifier: ^10.0.0
+        specifier: ^10.3.9
         version: 10.3.9(@nestjs/common@10.3.9)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/platform-fastify':
         specifier: ^10.3.9

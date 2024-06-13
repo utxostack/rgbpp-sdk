@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  rgbpp-sdk-service:
+    build:
+      context: ../..
+      target: service
+    # image: ghcr.io/ckb-cell/rgbpp-sdk-service:develop
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+
