@@ -4,7 +4,7 @@ import JsonRpcModule from './json-rpc/json-rpc.module';
 import { RgbppModule } from './rgbpp/rgbpp.module';
 import { AppService } from './app.service';
 import { envSchema } from './env';
-import { Collector } from 'rgbpp/ckb';
+import { BTCTestnetType, Collector } from 'rgbpp/ckb';
 import { BtcAssetsApi } from 'rgbpp';
 
 @Global()
@@ -23,6 +23,11 @@ import { BtcAssetsApi } from 'rgbpp';
     {
       provide: 'IS_MAINNET',
       useFactory: (configService: ConfigService): boolean => configService.get('NETWORK') === 'mainnet',
+      inject: [ConfigService],
+    },
+    {
+      provide: 'BTC_TESTNET_TYPE',
+      useFactory: (configService: ConfigService): BTCTestnetType => configService.get('BTC_TESTNET_TYPE'),
       inject: [ConfigService],
     },
     {
@@ -47,6 +52,6 @@ import { BtcAssetsApi } from 'rgbpp';
       inject: [ConfigService],
     },
   ],
-  exports: ['IS_MAINNET', 'COLLECTOR', 'BTC_ASSETS_API'],
+  exports: ['IS_MAINNET', 'COLLECTOR', 'BTC_ASSETS_API', 'BTC_TESTNET_TYPE'],
 })
 export class AppModule {}

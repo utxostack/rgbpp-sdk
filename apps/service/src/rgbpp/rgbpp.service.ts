@@ -1,7 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { RpcHandler, RpcMethodHandler } from 'src/json-rpc/json-rpc.decorators';
 import { DataSource, NetworkType } from 'rgbpp/btc';
-import { Collector, Hex, toCamelcase } from 'rgbpp/ckb';
+import { BTCTestnetType, Collector, Hex, toCamelcase } from 'rgbpp/ckb';
 import { RgbppTransferReq, RgbppCkbBtcTransaction, RgbppCkbTxBtcTxId, RgbppStateReq, RgbppCkbTxHashReq } from './types';
 import { toSnakeCase } from 'src/utils/snake';
 import { buildRgbppTransferTx } from 'rgbpp';
@@ -11,6 +11,7 @@ import { BtcAssetsApi } from 'rgbpp/service';
 export class RgbppService {
   constructor(
     @Inject('IS_MAINNET') private isMainnet: boolean,
+    @Inject('BTC_TESTNET_TYPE') private btcTestnetType: BTCTestnetType,
     @Inject('COLLECTOR') private collector: Collector,
     @Inject('BTC_ASSETS_API') private btcAssetsApi: BtcAssetsApi,
   ) {}
@@ -32,6 +33,7 @@ export class RgbppService {
         fromAddress: fromBtcAddress,
         toAddress: toBtcAddress,
         dataSource: btcDataSource,
+        testnetType: this.btcTestnetType,
       },
       isMainnet: this.isMainnet,
     });

@@ -7,4 +7,5 @@ export const envSchema = z.object({
   BTC_SERVICE_URL: z.string(),
   BTC_SERVICE_TOKEN: z.string(),
   BTC_SERVICE_ORIGIN: z.string(),
+  BTC_TESTNET_TYPE: z.string().default('Testnet3'),
 });
