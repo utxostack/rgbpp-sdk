@@ -73,7 +73,7 @@ $ pm2 start dist/src/main.js --name rgbpp-sdk-service
 - Use the provided `docker-compose.yml` file to run the service:
 
 ```bash
-docker-compose up
+$ docker-compose up
 ```
 
 ### 3. Deploy to Vercel
