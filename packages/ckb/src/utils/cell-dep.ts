@@ -49,8 +49,8 @@ export const fetchTypeIdCellDeps = async (
   selected: CellDepsSelected,
   btcTestnetType?: BTCTestnetType,
 ): Promise<CKBComponents.CellDep[]> => {
-  let rgbppLockDep = getRgbppLockDep(isMainnet);
-  let btcTimeDep = getBtcTimeLockDep(isMainnet);
+  let rgbppLockDep = getRgbppLockDep(isMainnet, btcTestnetType);
+  let btcTimeDep = getBtcTimeLockDep(isMainnet, btcTestnetType);
   let xudtDep = getXudtDep(isMainnet);
   let uniqueDep = getUniqueTypeDep(isMainnet);
 
