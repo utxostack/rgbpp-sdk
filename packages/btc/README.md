@@ -221,7 +221,32 @@ const psbt = await sendRgbppUtxos({
   minUtxoSatoshi: config.btcUtxoDustLimit, // optional, default to 1000 on the testnet, 1,0000 on the mainnet
   rgbppMinUtxoSatoshi: config.rgbppUtxoDustLimit, // optional, default to 546 on both testnet/mainnet
   onlyConfirmedUtxos: false, // optional, default to false, only confirmed utxos are allowed in the transaction
+  onlyProvableUtxos: true, // optional, default to true, only utxos that satisfy (utxo.address == from) are allowed 
   feeRate: 1, // optional, default to 1 on the testnet, and it is a floating number on the mainnet
+});
+```
+
+### Construct a Full-RBF transaction
+
+```typescript
+import { sendRbf, networkTypeToConfig, DataSource, Collector, NetworkType } from '@rgbpp-sdk/btc';
+import { BtcAssetsApi } from '@rgbpp-sdk/service';
+
+const networkType = NetworkType.TESTNET;
+const config = networkTypeToConfig(networkType);
+
+const service = BtcAssetsApi.fromToken('btc_assets_api_url', 'your_token');
+const source = new DataSource(service, networkType);
+
+const psbt = await sendRbf({
+  txHex: 'your_original_transaction_hex',
+  from: account.address,
+  feeRate: 40, // the feeRate should be greater than the feeRate of the original transaction
+  changeIndex: 1, // optional, return change to outputs[changeIndex], will create a new output if not specified
+  changeAddress: 'address_to_return_change', // optional, where should the change satoshi be returned to
+  requireValidOutputsValue: false, // optional, default to false, require each output's value to be >= minUtxoSatoshi
+  requireGreaterFeeAndRate: true, // optional, default to true, require the fee rate&amount to be greater than the original transction
+  source,
 });
 ```
 
@@ -238,8 +263,9 @@ declare function sendBtc(props: SendBtcProps): Promise<bitcoin.Psbt>;
 ```typescript
 declare function createSendBtcBuilder(props: SendBtcProps): Promise<{
   builder: TxBuilder;
-  feeRate: number;
   fee: number;
+  feeRate: number;
+  changeIndex: number;
 }>;
 ```
 
@@ -265,8 +291,9 @@ declare function sendUtxos(props: SendUtxosProps): Promise<bitcoin.Psbt>;
 ```typescript
 declare function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
   builder: TxBuilder;
-  feeRate: number;
   fee: number;
+  feeRate: number;
+  changeIndex: number;
 }>;
 ```
 
@@ -281,6 +308,10 @@ interface SendUtxosProps {
   changeAddress?: string;
   minUtxoSatoshi?: number;
   onlyConfirmedUtxos?: boolean;
+  excludeUtxos?: BaseOutput[];
+
+  // EXPERIMENTAL: the below props are unstable and can be altered at any time
+  skipInputsValidation?: boolean;
 }
 ```
 
@@ -293,8 +324,9 @@ declare function sendRgbppUtxos(props: SendRgbppUtxosProps): Promise<bitcoin.Psb
 ```typescript
 declare function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise<{
   builder: TxBuilder;
-  feeRate: number;
   fee: number;
+  feeRate: number;
+  changeIndex: number;
 }>;
 ```
 
@@ -317,6 +349,44 @@ interface SendRgbppUtxosProps {
   changeAddress?: string;
   minUtxoSatoshi?: number;
   onlyConfirmedUtxos?: boolean;
+  excludeUtxos?: BaseOutput[];
+
+  // EXPERIMENTAL: the below props are experimental and can be altered at any time
+  onlyProvableUtxos?: boolean;
+}
+```
+
+#### sendRbf / createSendRbfBuilder / SendRbfProps
+
+```typescript
+declare function sendRbf(props: SendRbfProps): Promise<bitcoin.Psbt>;
+```
+
+```typescript
+declare function createSendRbfBuilder(props: SendRbfProps): Promise<{
+  builder: TxBuilder;
+  fee: number;
+  feeRate: number;
+  changeIndex: number;
+}>;
+```
+
+```typescript
+interface SendRbfProps {
+  from: string;
+  txHex: string;
+  source: DataSource;
+  feeRate?: number;
+  fromPubkey?: string;
+  changeIndex?: number;
+  changeAddress?: string;
+  minUtxoSatoshi?: number;
+  onlyConfirmedUtxos?: boolean;
+  requireValidOutputsValue?: boolean;
+  requireGreaterFeeAndRate?: boolean;
+
+  // EXPERIMENTAL: the below props are experimental and can be altered at any time
+  inputsPubkey?: Record<string, string>; // Record<address, pubkey>
 }
 ```
 
@@ -329,27 +399,27 @@ type InitOutput = TxAddressOutput | TxDataOutput | TxScriptOutput;
 #### TxAddressOutput / TxDataOutput / TxScriptOutput
 
 ```typescript
-interface TxAddressOutput extends BaseOutput {
+interface TxAddressOutput extends TxBaseOutput {
   address: string;
 }
 ```
 
 ```typescript
-interface TxDataOutput extends BaseOutput {
+interface TxDataOutput extends TxBaseOutput {
   data: Buffer | string;
 }
 ```
 
 ```typescript
-interface TxScriptOutput extends BaseOutput {
+interface TxScriptOutput extends TxBaseOutput {
   script: Buffer;
 }
 ```
 
-#### BaseOutput
+#### TxBaseOutput
 
 ```typescript
-interface BaseOutput {
+interface TxBaseOutput {
   value: number;
   fixed?: boolean;
   protected?: boolean;
@@ -374,10 +444,7 @@ interface DataSource {
     onlyConfirmedUtxos?: boolean;
     noAssetsApiCache?: boolean;
     internalCacheKey?: string;
-    excludeUtxos?: {
-      txid: string;
-      vout: number;
-    }[];
+    excludeUtxos?: BaseOutput[];
   }): Promise<{
     utxos: Utxo[];
     satoshi: number;
@@ -399,16 +466,23 @@ interface FeesRecommended {
 
 ### Basic
 
-#### Utxo / Output
+#### BaseOutput / Output / Utxo
 
 ```typescript
-interface Output {
+interface BaseOutput {
   txid: string;
   vout: number;
+}
+```
+
+```typescript
+interface Output extends BaseOutput {
   value: number;
   scriptPk: string;
 }
+```
 
+```typescript
 interface Utxo extends Output {
   addressType: AddressType;
   address: string;

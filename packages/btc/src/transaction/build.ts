@@ -6,8 +6,8 @@ import { NetworkType, RgbppBtcConfig } from '../preset/types';
 import { AddressType, addressToScriptPublicKeyHex, getAddressType, isSupportedFromAddress } from '../address';
 import { dataToOpReturnScriptPubkey, isOpReturnScriptPubkey } from './embed';
 import { networkTypeToConfig } from '../preset/config';
+import { BaseOutput, Utxo, utxoToInput } from './utxo';
 import { limitPromiseBatchSize } from '../utils';
-import { Utxo, utxoToInput } from './utxo';
 import { FeeEstimator } from './fee';
 
 export interface TxInput {
@@ -21,21 +21,21 @@ export interface TxInput {
 }
 
 export type TxOutput = TxAddressOutput | TxScriptOutput;
-export interface BaseOutput {
+export interface TxBaseOutput {
   value: number;
   fixed?: boolean;
   protected?: boolean;
   minUtxoSatoshi?: number;
 }
-export interface TxAddressOutput extends BaseOutput {
+export interface TxAddressOutput extends TxBaseOutput {
   address: string;
 }
-export interface TxScriptOutput extends BaseOutput {
+export interface TxScriptOutput extends TxBaseOutput {
   script: Buffer;
 }
 
 export type InitOutput = TxAddressOutput | TxDataOutput | TxScriptOutput;
-export interface TxDataOutput extends BaseOutput {
+export interface TxDataOutput extends TxBaseOutput {
   data: Buffer | string;
 }
 
@@ -141,12 +141,14 @@ export class TxBuilder {
     publicKey?: string;
     changeAddress?: string;
     deductFromOutputs?: boolean;
+    excludeUtxos?: BaseOutput[];
     feeRate?: number;
   }): Promise<{
     fee: number;
     feeRate: number;
+    changeIndex: number;
   }> {
-    const { address, publicKey, feeRate, changeAddress, deductFromOutputs } = props;
+    const { address, publicKey, feeRate, changeAddress, deductFromOutputs, excludeUtxos } = props;
     const originalInputs = clone(this.inputs);
     const originalOutputs = clone(this.outputs);
 
@@ -168,6 +170,7 @@ export class TxBuilder {
     let previousFee = 0;
     let isLoopedOnce = false;
     let isFeeExpected = false;
+    let currentChangeIndex = -1;
     while (!isFeeExpected) {
       if (isLoopedOnce) {
         previousFee = currentFee;
@@ -181,26 +184,32 @@ export class TxBuilder {
       if (safeToProcess && returnAmount > 0) {
         // If sum(inputs) - sum(outputs) > fee, return (change - fee) to a non-fixed output or to a new output.
         // Note when returning change to a new output, another satoshi collection may be needed.
-        await this.injectChange({
+        const { changeIndex } = await this.injectChange({
           address: changeAddress ?? address,
           amount: returnAmount,
           fromAddress: address,
           fromPublicKey: publicKey,
           internalCacheKey,
+          excludeUtxos,
         });
+
+        currentChangeIndex = changeIndex;
       } else {
         // If the inputs have insufficient satoshi, a satoshi collection is required.
         // For protection, at least collect 1 satoshi if the inputs are empty or the fee hasn't been calculated.
         const protectionAmount = safeToProcess ? 0 : 1;
         const targetAmount = needCollect - needReturn + previousFee + protectionAmount;
-        await this.injectSatoshi({
+        const { changeIndex } = await this.injectSatoshi({
           address,
           publicKey,
           targetAmount,
           changeAddress,
           deductFromOutputs,
           internalCacheKey,
+          excludeUtxos,
         });
+
+        currentChangeIndex = changeIndex;
       }
 
       // Calculate network fee
@@ -220,6 +229,7 @@ export class TxBuilder {
     return {
       fee: currentFee,
       feeRate: currentFeeRate,
+      changeIndex: currentChangeIndex,
     };
   }
 
@@ -231,12 +241,18 @@ export class TxBuilder {
     injectCollected?: boolean;
     deductFromOutputs?: boolean;
     internalCacheKey?: string;
-  }) {
+    excludeUtxos?: BaseOutput[];
+  }): Promise<{
+    collected: number;
+    changeIndex: number;
+    changeAmount: number;
+  }> {
     if (!isSupportedFromAddress(props.address)) {
       throw TxBuildError.withComment(ErrorCodes.UNSUPPORTED_ADDRESS_TYPE, props.address);
     }
 
     const targetAmount = props.targetAmount;
+    const excludeUtxos = props.excludeUtxos ?? [];
     const injectCollected = props.injectCollected ?? false;
     const deductFromOutputs = props.deductFromOutputs ?? true;
 
@@ -261,7 +277,7 @@ export class TxBuilder {
         minUtxoSatoshi: this.minUtxoSatoshi,
         onlyNonRgbppUtxos: this.onlyNonRgbppUtxos,
         onlyConfirmedUtxos: this.onlyConfirmedUtxos,
-        excludeUtxos: this.inputs.map((row) => row.utxo),
+        excludeUtxos: [...this.inputs.map((v) => v.utxo), ...excludeUtxos],
       });
       utxos.forEach((utxo) => {
         this.addInput({
@@ -331,10 +347,12 @@ export class TxBuilder {
     // 3. Collect from "from" one more time if:
     // - Need to create an output to return change (changeAmount > 0)
     // - The change is insufficient for a non-dust output (changeAmount < minUtxoSatoshi)
-    const needForChange = changeAmount > 0 && changeAmount < this.minUtxoSatoshi;
-    const changeUtxoNeedAmount = needForChange ? this.minUtxoSatoshi - changeAmount : 0;
-    if (needForChange) {
-      await _collect(changeUtxoNeedAmount);
+    const changeAddress = props.changeAddress ?? props.address;
+    const changeToOutputs = !this.canInjectChangeToOutputs(changeAddress);
+    const needChangeOutput = !changeToOutputs && changeAmount > 0 && changeAmount < this.minUtxoSatoshi;
+    const changeOutputNeedAmount = needChangeOutput ? this.minUtxoSatoshi - changeAmount : 0;
+    if (changeOutputNeedAmount > 0) {
+      await _collect(changeOutputNeedAmount);
     }
 
     // 4. If not collected enough satoshi, throw an error
@@ -346,9 +364,9 @@ export class TxBuilder {
         `expected: ${targetAmount}, actual: ${collected}. You may wanna deposit more satoshi to prevent the error, for example: ${recommendedDeposit}`,
       );
     }
-    const insufficientForChange = changeAmount > 0 && changeAmount < this.minUtxoSatoshi;
+    const insufficientForChange = !changeToOutputs && changeAmount > 0 && changeAmount < this.minUtxoSatoshi;
     if (insufficientForChange) {
-      const shiftedExpectAmount = collected + changeUtxoNeedAmount;
+      const shiftedExpectAmount = collected + changeOutputNeedAmount;
       throw TxBuildError.withComment(
         ErrorCodes.INSUFFICIENT_UTXO,
         `expected: ${shiftedExpectAmount}, actual: ${collected}`,
@@ -360,14 +378,14 @@ export class TxBuilder {
     // - If changeAmount>0, return change to an output or create a change output
     let changeIndex: number = -1;
     if (changeAmount > 0) {
-      changeIndex = this.outputs.length;
-      const changeAddress = props.changeAddress ?? props.address;
-      await this.injectChange({
+      const injectedChanged = await this.injectChange({
         amount: changeAmount,
         address: changeAddress,
         fromAddress: props.address,
         fromPublicKey: props.publicKey,
       });
+
+      changeIndex = injectedChanged.changeIndex;
     }
 
     return {
@@ -383,8 +401,11 @@ export class TxBuilder {
     fromAddress: string;
     fromPublicKey?: string;
     internalCacheKey?: string;
-  }) {
-    const { address, fromAddress, fromPublicKey, amount, internalCacheKey } = props;
+    excludeUtxos?: BaseOutput[];
+  }): Promise<{
+    changeIndex: number;
+  }> {
+    const { address, fromAddress, fromPublicKey, amount, excludeUtxos, internalCacheKey } = props;
 
     // If any (output.fixed != true) is found in the outputs (search in ASC order),
     // return the change value to the first matched output.
@@ -398,9 +419,12 @@ export class TxBuilder {
       }
 
       output.value += amount;
-      return;
+      return {
+        changeIndex: i,
+      };
     }
 
+    let changeIndex: number = -1;
     if (amount < this.minUtxoSatoshi) {
       // If the change is not enough to create a non-dust output, try collect more.
       // - injectCollected=true, expect to put all (collected + amount) of satoshi as change
@@ -409,7 +433,7 @@ export class TxBuilder {
       // 1. Expected to return change of 500 satoshi, amount=500
       // 2. Collected 2000 satoshi from the "fromAddress", collected=2000
       // 3. Create a change output and return (collected + amount), output.value=2000+500=2500
-      const { collected } = await this.injectSatoshi({
+      const injected = await this.injectSatoshi({
         address: fromAddress,
         publicKey: fromPublicKey,
         targetAmount: amount,
@@ -417,16 +441,34 @@ export class TxBuilder {
         injectCollected: true,
         deductFromOutputs: false,
         internalCacheKey,
+        excludeUtxos,
       });
-      if (collected < amount) {
-        throw TxBuildError.withComment(ErrorCodes.INSUFFICIENT_UTXO, `expected: ${amount}, actual: ${collected}`);
+      if (injected.collected < amount) {
+        throw TxBuildError.withComment(
+          ErrorCodes.INSUFFICIENT_UTXO,
+          `expected: ${amount}, actual: ${injected.collected}`,
+        );
       }
+
+      changeIndex = injected.changeIndex;
     } else {
       this.addOutput({
         address: address,
         value: amount,
       });
+
+      changeIndex = this.outputs.length - 1;
     }
+
+    return {
+      changeIndex,
+    };
+  }
+
+  canInjectChangeToOutputs(changeAddress: string): boolean {
+    return this.outputs.some((output) => {
+      return !output.fixed && (!('address' in output) || output.address === changeAddress);
+    });
   }
 
   async calculateFee(addressType: AddressType, feeRate?: number): Promise<number> {

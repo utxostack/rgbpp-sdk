@@ -3,9 +3,12 @@ import { AddressType } from '../address';
 import { TxInput } from './build';
 import { remove0x, toXOnly } from '../utils';
 
-export interface Output {
+export interface BaseOutput {
   txid: string;
   vout: number;
+}
+
+export interface Output extends BaseOutput {
   value: number;
   scriptPk: string;
 }
