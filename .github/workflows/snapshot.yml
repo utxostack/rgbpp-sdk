@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - develop
-      - feat/btc-signet
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
