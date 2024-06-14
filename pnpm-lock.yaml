@@ -127,7 +127,7 @@ importers:
         specifier: ^0.109.1
         version: 0.109.1
       rgbpp:
-        specifier: ^0.3.0
+        specifier: workspace:*
         version: link:../../packages/rgbpp
     devDependencies:
       '@types/dotenv':

@@ -1,14 +1,17 @@
 import axios from 'axios';
 import { getBtcTimeLockDep, getRgbppLockDep, getUniqueTypeDep, getXudtDep } from '../constants';
+import { BTCTestnetType } from '../types';
 
 interface CellDepsObject {
   rgbpp: {
     mainnet: CKBComponents.CellDep;
     testnet: CKBComponents.CellDep;
+    signet: CKBComponents.CellDep;
   };
   btcTime: {
     mainnet: CKBComponents.CellDep;
     testnet: CKBComponents.CellDep;
+    signet: CKBComponents.CellDep;
   };
   xudt: {
     testnet: CKBComponents.CellDep;
@@ -44,16 +47,22 @@ export interface CellDepsSelected {
 export const fetchTypeIdCellDeps = async (
   isMainnet: boolean,
   selected: CellDepsSelected,
+  btcTestnetType?: BTCTestnetType,
 ): Promise<CKBComponents.CellDep[]> => {
-  let rgbppLockDep = getRgbppLockDep(isMainnet);
-  let btcTimeDep = getBtcTimeLockDep(isMainnet);
+  let rgbppLockDep = getRgbppLockDep(isMainnet, btcTestnetType);
+  let btcTimeDep = getBtcTimeLockDep(isMainnet, btcTestnetType);
   let xudtDep = getXudtDep(isMainnet);
   let uniqueDep = getUniqueTypeDep(isMainnet);
 
   const cellDepsObj = await fetchCellDepsJson();
   if (cellDepsObj) {
-    rgbppLockDep = isMainnet ? cellDepsObj.rgbpp.mainnet : cellDepsObj.rgbpp.testnet;
-    btcTimeDep = isMainnet ? cellDepsObj.btcTime.mainnet : cellDepsObj.btcTime.testnet;
+    if (btcTestnetType === 'Signet') {
+      rgbppLockDep = cellDepsObj.rgbpp.signet;
+      btcTimeDep = cellDepsObj.btcTime.signet;
+    } else {
+      rgbppLockDep = isMainnet ? cellDepsObj.rgbpp.mainnet : cellDepsObj.rgbpp.testnet;
+      btcTimeDep = isMainnet ? cellDepsObj.btcTime.mainnet : cellDepsObj.btcTime.testnet;
+    }
     if (!isMainnet) {
       xudtDep = cellDepsObj.xudt.testnet;
       uniqueDep = cellDepsObj.unique.testnet;

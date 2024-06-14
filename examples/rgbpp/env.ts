@@ -8,7 +8,7 @@ import {
 } from '@nervosnetwork/ckb-sdk-utils';
 import { NetworkType, AddressType, DataSource } from 'rgbpp/btc';
 import { BtcAssetsApi } from 'rgbpp/service';
-import { Collector } from 'rgbpp/ckb';
+import { BTCTestnetType, Collector } from 'rgbpp/ckb';
 import { createBtcAccount } from './shared/btc-account';
 
 dotenv.config({ path: __dirname + '/.env' });
@@ -39,6 +39,7 @@ export const ckbAddress = scriptToAddress(secp256k1Lock, isMainnet);
  */
 
 export const BTC_PRIVATE_KEY = process.env.BTC_PRIVATE_KEY!;
+export const BTC_TESTNET_TYPE = process.env.BTC_TESTNET_TYPE! as BTCTestnetType;
 export const BTC_SERVICE_URL = process.env.VITE_BTC_SERVICE_URL!;
 export const BTC_SERVICE_TOKEN = process.env.VITE_BTC_SERVICE_TOKEN!;
 export const BTC_SERVICE_ORIGIN = process.env.VITE_BTC_SERVICE_ORIGIN!;
