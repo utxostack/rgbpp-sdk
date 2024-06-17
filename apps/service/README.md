@@ -37,14 +37,14 @@ CKB_RPC_URL=https://testnet.ckb.dev
 # The BTC assets api url which should match NETWORK and BTC_TESTNET_TYPE
 # The BTC Testnet Service url is: https://btc-assets-api.testnet.mibao.pro
 # The BTC Signet Service url is: https://api.signet.rgbpp.io
-BTC_SERVICE_URL=https://btc-assets-api.testnet.mibao.pro
+BTC_SERVICE_URL=hhttps://api.signet.rgbpp.io
 
 # The BTC assets api token which should match NETWORK and BTC_TESTNET_TYPE
 # To get an access token, please refer to https://github.com/ckb-cell/rgbpp-sdk/tree/develop/packages/service#get-an-access-token
 BTC_SERVICE_TOKEN=
 
 # The BTC assets api origin which should match NETWORK and BTC_TESTNET_TYPE
-BTC_SERVICE_ORIGIN=https://btc-assets-api.testnet.mibao.pro
+BTC_SERVICE_ORIGIN=https://btc-test.app
 ```
 
 ### Run RGB++ SDK Service

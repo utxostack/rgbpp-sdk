@@ -58,7 +58,7 @@ BTC_ADDRESS_TYPE=P2WPKH
 # The BTC assets api url which should match IS_MAINNET and BTC_TESTNET_TYPE
 # The BTC Testnet Service url is: https://btc-assets-api.testnet.mibao.pro
 # The BTC Signet Service url is: https://api.signet.rgbpp.io
-VITE_BTC_SERVICE_URL=https://btc-assets-api.testnet.mibao.pro
+VITE_BTC_SERVICE_URL=https://api.signet.rgbpp.io
 
 # The BTC assets api token which should match IS_MAINNET and BTC_TESTNET_TYPE
 # To get an access token, please refer to https://github.com/ckb-cell/rgbpp-sdk/tree/develop/packages/service#get-an-access-token
