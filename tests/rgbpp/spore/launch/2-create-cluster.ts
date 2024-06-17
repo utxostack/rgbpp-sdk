@@ -14,7 +14,7 @@ import { signAndSendPsbt } from '../../../../examples/rgbpp/shared/btc-account';
 
 // Warning: Before runing this file, please run 1-prepare-cluster.ts
 const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: string }) => {
-  console.log(btcAccount);
+  console.log(btcAccount.from);
   const { retry } = await import('zx');
   await retry(20, '10s', async () => {
     const ckbVirtualTxResult = await genCreateClusterCkbVirtualTx({
