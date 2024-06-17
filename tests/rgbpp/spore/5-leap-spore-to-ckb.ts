@@ -51,7 +51,7 @@ const leapSporeFromBtcToCkb = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTy
 
     const { txId: btcTxId } = await signAndSendPsbt(psbt, btcAccount, btcService);
     console.log('BTC TxId: ', btcTxId);
-    console.log(`explorer: https://mempool.space/testnet/tx/${btcTxId}`);
+    console.log(`explorer: https://mempool.space/signet/tx/${btcTxId}`);
 
     await btcService.sendRgbppCkbTransaction({ btc_txid: btcTxId, ckb_virtual_result: ckbVirtualTxResult });
 

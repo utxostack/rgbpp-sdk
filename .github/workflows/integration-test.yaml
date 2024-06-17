@@ -4,6 +4,7 @@ name: Integration Tests
 
 on:
   workflow_dispatch:
+  pull_request:
   # Run integration-tests every day
   schedule:
     - cron: '59 0 * * *'

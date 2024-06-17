@@ -42,7 +42,7 @@ const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transfe
     const psbt = bitcoin.Psbt.fromHex(btcPsbtHex);
     const { txId: btcTxId } = await signAndSendPsbt(psbt, btcAccount, btcService);
     console.log(`BTC ${BTC_TESTNET_TYPE} TxId: ${btcTxId}`);
-    console.log(`explorer: https://mempool.space/testnet/tx/${btcTxId}`);
+    console.log(`explorer: https://mempool.space/signet/tx/${btcTxId}`);
 
     writeStepLog('transfer-id', {
       txid: btcTxId,
