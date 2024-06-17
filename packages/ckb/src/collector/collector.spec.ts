@@ -7,7 +7,7 @@ describe('collector', () => {
     ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
   });
 
-  it('getLiveCells', async () => {
+  it('getLiveCell', async () => {
     const cell = await collector.getLiveCell({
       txHash: '0xfa87db3187be8cf850117ccfcdfe2525c44f1a58f71d9714dd2ce489e9723182',
       index: '0x0',
