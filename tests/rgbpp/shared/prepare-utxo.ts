@@ -4,15 +4,14 @@ import { BtcAssetsApiError } from 'rgbpp/service';
 import { btcAccount, btcDataSource, btcKeyPair, btcService } from '../env';
 
 const prepareUtxo = async (index: string | number) => {
-  const address = btcAccount.toString();
-  console.log(address);
+  console.log(btcAccount.from);
 
   // Send BTC tx
   const psbt = await sendBtc({
-    from: address!,
+    from: btcAccount.from!,
     tos: [
       {
-        address: address!,
+        address: btcAccount.from!,
         value: 546,
         minUtxoSatoshi: 546,
       },
