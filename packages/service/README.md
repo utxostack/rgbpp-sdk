@@ -8,7 +8,7 @@ The `@rgbpp-sdk/service` package provides a wrapped class to interact with `Bitc
 - **Handle transactions** by posting to `/bitcoin/v1/transaction` or `/rgbpp/v1/transaction/ckb-tx`
 - **Generate Bitcoin transaction Proof** via `/rgbpp/v1/btc-spv/proof` through [Bitcoin SPV Service on CKB](https://github.com/ckb-cell/ckb-bitcoin-spv-service)
 - Simplify RGB++ assets workflows with **RGB++ CKB transaction Queue** and cron jobs
-- More detailed API documentation can be found on [Testnet](https://btc-assets-api.testnet.mibao.pro/docs) and [Mainnet](https://api.rgbpp.io/docs)
+- More detailed API documentation can be found on [Testnet](https://btc-assets-api.testnet.mibao.pro/docs), [Signet](https://api.signet.rgbpp.io/docs) and [Mainnet](https://api.rgbpp.io/docs)
 
 > [!NOTE]
 > `Bitcoin/RGB++ Assets Service` is designed to streamline the transaction workflow. Developers have the option to implement its features by themselves without limitation.
@@ -31,6 +31,10 @@ $ pnpm add @rgbpp-sdk/service
 #### Testnet
 
 You can get a testnet access token through the [/token/generate](https://btc-assets-api.testnet.mibao.pro/docs/static/index.html#/Token/post_token_generate) API directly.
+
+### Signet
+
+And you can get an access token of BTC Signet network through the [/token/generate](https://api.signet.rgbpp.io/docs/static/index.html#/Token/post_token_generate) API directly.
 
 #### Mainnet
 

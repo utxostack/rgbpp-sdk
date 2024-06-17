@@ -34,10 +34,10 @@ IS_MAINNET=false
 # The CKB secp256k1 private key whose format is 32bytes hex string with 0x prefix
 CKB_SECP256K1_PRIVATE_KEY=0x-private-key
 
-# CKB node url which should be matched with IS_MAINNET
+# CKB node url which should match IS_MAINNET
 CKB_NODE_URL=https://testnet.ckb.dev/rpc
 
-# CKB indexer url which should be matched with IS_MAINNET
+# CKB indexer url which should match IS_MAINNET
 CKB_INDEXER_URL=https://testnet.ckb.dev/indexer
 
 # BTC Variables
@@ -55,14 +55,16 @@ BTC_PRIVATE_KEY=private-key
 # Read more about P2WPKH in BIP141: https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki#p2wpkh
 BTC_ADDRESS_TYPE=P2WPKH
 
-# The BTC assets api url which should be matched with IS_MAINNET
+# The BTC assets api url which should match IS_MAINNET and BTC_TESTNET_TYPE
+# The BTC Testnet Service url is: https://btc-assets-api.testnet.mibao.pro
+# The BTC Signet Service url is: https://api.signet.rgbpp.io
 VITE_BTC_SERVICE_URL=https://btc-assets-api.testnet.mibao.pro
 
-# The BTC assets api token which should be matched with IS_MAINNET
+# The BTC assets api token which should match IS_MAINNET and BTC_TESTNET_TYPE
 # To get an access token, please refer to https://github.com/ckb-cell/rgbpp-sdk/tree/develop/packages/service#get-an-access-token
 VITE_BTC_SERVICE_TOKEN=
 
-# The BTC assets api origin which should be matched with IS_MAINNET
+# The BTC assets api origin which should match IS_MAINNET and BTC_TESTNET_TYPE
 VITE_BTC_SERVICE_ORIGIN=https://btc-test.app
 ```
 
