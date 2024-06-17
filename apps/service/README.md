@@ -26,10 +26,10 @@ Update the configuration values:
 # The network includes testnet and mainnet, the default value is testnet
 NETWORK=testnet  # or mainnet
 
-# The Bitcoin Testnet type includs Testnet3 and Signet, the default value is Testnet3
+# The Bitcoin Testnet type includs Testnet3 and Signet, the default value is Signet
 # Testnet3: https://mempool.space/testnet
 # Signet: https://mempool.space/signet
-BTC_TESTNET_TYPE=Testnet3
+BTC_TESTNET_TYPE=Signet
 
 # CKB node url which should match NETWORK
 CKB_RPC_URL=https://testnet.ckb.dev
