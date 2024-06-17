@@ -37,3 +37,7 @@ export interface RgbppStateReq {
 export interface RgbppCkbTxHashReq {
   btcTxId: Hex;
 }
+
+export interface BtcTxSendReq {
+  txHex: Hex;
+}
