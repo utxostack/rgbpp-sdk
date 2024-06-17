@@ -35,7 +35,7 @@ BTC_TESTNET_TYPE=Signet
 CKB_RPC_URL=https://testnet.ckb.dev
 
 # The BTC assets api url which should match NETWORK and BTC_TESTNET_TYPE
-# The BTC Testnet Service url is: https://btc-assets-api.testnet.mibao.pro
+# The BTC Testnet Service url is: https://api.testnet.rgbpp.io
 # The BTC Signet Service url is: https://api.signet.rgbpp.io
 BTC_SERVICE_URL=hhttps://api.signet.rgbpp.io
 
