@@ -2,7 +2,14 @@ import { Inject } from '@nestjs/common';
 import { RpcHandler, RpcMethodHandler } from 'src/json-rpc/json-rpc.decorators';
 import { DataSource, NetworkType } from 'rgbpp/btc';
 import { BTCTestnetType, Collector, Hex, toCamelcase } from 'rgbpp/ckb';
-import { RgbppTransferReq, RgbppCkbBtcTransaction, RgbppCkbTxBtcTxId, RgbppStateReq, RgbppCkbTxHashReq } from './types';
+import {
+  RgbppTransferReq,
+  RgbppCkbBtcTransaction,
+  RgbppCkbTxBtcTxId,
+  RgbppStateReq,
+  RgbppCkbTxHashReq,
+  BtcTxSendReq,
+} from './types';
 import { toSnakeCase } from 'src/utils/snake';
 import { buildRgbppTransferTx } from 'rgbpp';
 import { BtcAssetsApi } from 'rgbpp/service';
@@ -69,5 +76,12 @@ export class RgbppService {
     const { btcTxId } = toCamelcase<RgbppCkbTxHashReq>(request[0]);
     const { txhash: txHash } = await this.btcAssetsApi.getRgbppTransactionHash(btcTxId);
     return txHash;
+  }
+
+  @RpcMethodHandler({ name: 'send_btc_transaction' })
+  public async sendBtcTransaction(request: object[]): Promise<Hex> {
+    const { txHex } = toCamelcase<BtcTxSendReq>(request[0]);
+    const { txid } = await this.btcAssetsApi.sendBtcTransaction(txHex);
+    return txid;
   }
 }
