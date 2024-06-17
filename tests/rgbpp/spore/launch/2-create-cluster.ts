@@ -1,7 +1,6 @@
 import { BtcAssetsApiError, genCreateClusterCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
-import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../env';
+import { isMainnet, collector, btcDataSource, btcService, btcAccount, BTC_TESTNET_TYPE } from '../../env';
 import { CLUSTER_DATA } from './0-cluster-info';
-import { transactionToHex } from 'rgbpp/btc';
 import {
   appendCkbTxWitnesses,
   buildRgbppLockArgs,
@@ -9,23 +8,22 @@ import {
   sendCkbTx,
   updateCkbTxWithRealBtcTxId,
 } from 'rgbpp/ckb';
-import { getFastestFeeRate, readStepLog, writeStepLog } from '../../shared/utils';
+import { readStepLog, writeStepLog } from '../../shared/utils';
 import { saveCkbVirtualTxResult } from '../../../../examples/rgbpp/shared/utils';
+import { signAndSendPsbt } from '../../../../examples/rgbpp/shared/btc-account';
 
 // Warning: Before runing this file, please run 1-prepare-cluster.ts
 const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: string }) => {
-  console.log(btcAddress);
+  console.log(btcAccount);
   const { retry } = await import('zx');
   await retry(20, '10s', async () => {
-    const feeRate = await getFastestFeeRate();
-    console.log('feeRate = ', feeRate);
-
     const ckbVirtualTxResult = await genCreateClusterCkbVirtualTx({
       collector,
       rgbppLockArgs: ownerRgbppLockArgs,
       clusterData: CLUSTER_DATA,
       isMainnet,
       ckbFeeRate: BigInt(2000),
+      btcTestnetType: BTC_TESTNET_TYPE,
     });
 
     // Save ckbVirtualTxResult
@@ -42,19 +40,16 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
     const psbt = await sendRgbppUtxos({
       ckbVirtualTx: ckbRawTx,
       commitment,
-      tos: [btcAddress!],
+      tos: [btcAccount.from],
       needPaymaster: needPaymasterCell,
       ckbCollector: collector,
-      from: btcAddress!,
+      from: btcAccount.from,
+      fromPubkey: btcAccount.fromPubkey,
       source: btcDataSource,
-      feeRate: feeRate,
+      feeRate: 1,
     });
-    psbt.signAllInputs(btcKeyPair);
-    psbt.finalizeAllInputs();
 
-    const btcTx = psbt.extractTransaction();
-    const btcTxBytes = transactionToHex(btcTx, false);
-    const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
+    const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
 
     writeStepLog('create-cluster-id', {
       txid: btcTxId,

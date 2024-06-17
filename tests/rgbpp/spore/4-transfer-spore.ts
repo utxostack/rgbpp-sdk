@@ -2,9 +2,11 @@ import { buildRgbppLockArgs } from 'rgbpp/ckb';
 import { genTransferSporeCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
 import { getSporeTypeScript, Hex } from 'rgbpp/ckb';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../env';
-import { getFastestFeeRate, readStepLog } from '../shared/utils';
+import { isMainnet, collector, btcDataSource, btcService, btcAccount } from '../env';
+import { readStepLog } from '../shared/utils';
 import { saveCkbVirtualTxResult } from '../../../examples/rgbpp/shared/utils';
+import { BTC_TESTNET_TYPE } from '../../../examples/rgbpp/env';
+import { signAndSendPsbt } from '../../../examples/rgbpp/shared/btc-account';
 
 interface SporeTransferParams {
   sporeRgbppLockArgs: Hex;
@@ -20,14 +22,12 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }
       args: sporeTypeArgs,
     });
 
-    const feeRate = await getFastestFeeRate();
-    console.log('feeRate = ', feeRate);
-
     const ckbVirtualTxResult = await genTransferSporeCkbVirtualTx({
       collector,
       sporeRgbppLockArgs,
       sporeTypeBytes,
       isMainnet,
+      btcTestnetType: BTC_TESTNET_TYPE,
     });
 
     // Save ckbVirtualTxResult
@@ -42,16 +42,13 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }
       tos: [toBtcAddress],
       needPaymaster: needPaymasterCell,
       ckbCollector: collector,
-      from: btcAddress!,
+      from: btcAccount.from,
+      fromPubkey: btcAccount.fromPubkey,
       source: btcDataSource,
-      feeRate: feeRate,
+      feeRate: 1,
     });
-    psbt.signAllInputs(btcKeyPair);
-    psbt.finalizeAllInputs();
 
-    const btcTx = psbt.extractTransaction();
-    const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
-
+    const { txId: btcTxId } = await signAndSendPsbt(psbt, btcAccount, btcService);
     console.log('BTC TxId: ', btcTxId);
     console.log(`explorer: https://mempool.space/testnet/tx/${btcTxId}`);
 

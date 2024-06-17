@@ -1,24 +1,23 @@
 import { sendBtc } from 'rgbpp/btc';
-import { getFastestFeeRate, writeStepLog } from './utils';
+import { writeStepLog } from './utils';
 import { BtcAssetsApiError } from 'rgbpp/service';
-import { btcAddress, btcDataSource, btcKeyPair, btcService } from '../env';
+import { btcAccount, btcDataSource, btcKeyPair, btcService } from '../env';
 
 const prepareUtxo = async (index: string | number) => {
-  const feeRate = await getFastestFeeRate();
-  console.log('feeRate = ', feeRate);
-  console.log(btcAddress);
+  const address = btcAccount.toString();
+  console.log(address);
 
   // Send BTC tx
   const psbt = await sendBtc({
-    from: btcAddress!,
+    from: address!,
     tos: [
       {
-        address: btcAddress!,
+        address: address!,
         value: 546,
         minUtxoSatoshi: 546,
       },
     ],
-    feeRate: feeRate,
+    feeRate: 1,
     source: btcDataSource,
   });
 
