@@ -21,18 +21,17 @@ export const collector = new Collector({
   ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
   ckbIndexerUrl: 'https://testnet.ckb.dev/indexer',
 });
-export const CKB_PRIVATE_KEY = '0x469cc5b62555090f376866fe3fe780339104cfdcf5011e7d887d71bb99ca2e2b';
+export const CKB_PRIVATE_KEY = process.env.INTEGRATION_CKB_PRIVATE_KEY!;
 const secp256k1Lock: CKBComponents.Script = {
   ...systemScripts.SECP256K1_BLAKE160,
   args: bytesToHex(blake160(privateKeyToPublicKey(CKB_PRIVATE_KEY))),
 };
 export const ckbAddress = scriptToAddress(secp256k1Lock, isMainnet);
 
-export const BTC_PRIVATE_KEY = '5c213d9478a310fcf9fb4a973d1b4a7592769b4bccbda335b5c1886a3929a00b';
-export const BTC_SERVICE_URL = 'https://api.signet.rgbpp.io';
-export const BTC_SERVICE_TOKEN =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJteS1hcHAiLCJhdWQiOiJhcGkuc2lnbmV0LnJnYnBwLmlvIiwianRpIjoiZWJkMGJlNGYtZTZlNS00M2M4LTlmMmMtNGUwYjk3YWM1ZjVkIiwiaWF0IjoxNzE4NTk1Mzg2fQ.8Q35BzMYHNHS0Fqe_4coALnIsBDVUm3Ro-zF6SN83PM';
-export const BTC_SERVICE_ORIGIN = 'https://api.signet.rgbpp.io';
+export const BTC_PRIVATE_KEY = process.env.INTEGRATION_BTC_PRIVATE_KEY!;
+export const BTC_SERVICE_URL = process.env.VITE_SERVICE_URL!;
+export const BTC_SERVICE_TOKEN = process.env.VITE_SERVICE_TOKEN!;
+export const BTC_SERVICE_ORIGIN = process.env.VITE_SERVICE_ORIGIN!;
 
 const network = isMainnet ? bitcoin.networks.bitcoin : bitcoin.networks.testnet;
 export const btcKeyPair: ECPairInterface = ECPair.fromPrivateKey(Buffer.from(BTC_PRIVATE_KEY, 'hex'), { network });

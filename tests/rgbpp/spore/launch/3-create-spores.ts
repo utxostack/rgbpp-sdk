@@ -13,7 +13,7 @@ import {
 import { utf8ToBuffer } from 'rgbpp/btc';
 import { readStepLog, writeStepLog } from '../../shared/utils';
 import { saveCkbVirtualTxResult } from '../../../../examples/rgbpp/shared/utils';
-import { BTC_TESTNET_TYPE, btcAccount } from '../../../../examples/rgbpp/env';
+import { BTC_TESTNET_TYPE, btcAccount } from '../../env';
 import { signAndSendPsbt } from '../../../../examples/rgbpp/shared/btc-account';
 
 interface SporeCreateParams {

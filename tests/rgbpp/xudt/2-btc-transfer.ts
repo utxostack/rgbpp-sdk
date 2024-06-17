@@ -1,8 +1,7 @@
 import { buildRgbppLockArgs } from 'rgbpp/ckb';
 import { buildRgbppTransferTx } from 'rgbpp';
-import { isMainnet, collector, btcService, btcDataSource } from '../env';
+import { isMainnet, collector, btcService, btcDataSource, BTC_TESTNET_TYPE, btcAccount } from '../env';
 import { readStepLog, writeStepLog } from '../shared/utils';
-import { BTC_TESTNET_TYPE, btcAccount } from '../env';
 import { saveCkbVirtualTxResult } from '../../../examples/rgbpp/shared/utils';
 import { bitcoin } from 'rgbpp/btc';
 import { signAndSendPsbt } from '../../../examples/rgbpp/shared/btc-account';

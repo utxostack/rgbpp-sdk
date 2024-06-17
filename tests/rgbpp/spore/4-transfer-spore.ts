@@ -2,10 +2,9 @@ import { buildRgbppLockArgs } from 'rgbpp/ckb';
 import { genTransferSporeCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
 import { getSporeTypeScript, Hex } from 'rgbpp/ckb';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { isMainnet, collector, btcDataSource, btcService, btcAccount } from '../env';
+import { isMainnet, collector, btcDataSource, btcService, btcAccount, BTC_TESTNET_TYPE } from '../env';
 import { readStepLog } from '../shared/utils';
 import { saveCkbVirtualTxResult } from '../../../examples/rgbpp/shared/utils';
-import { BTC_TESTNET_TYPE } from '../../../examples/rgbpp/env';
 import { signAndSendPsbt } from '../../../examples/rgbpp/shared/btc-account';
 
 interface SporeTransferParams {
