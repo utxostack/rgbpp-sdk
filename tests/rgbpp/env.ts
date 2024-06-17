@@ -8,14 +8,14 @@ import {
 import { DataSource, BtcAssetsApi, AddressType } from 'rgbpp';
 import { ECPair, ECPairInterface, bitcoin, NetworkType } from 'rgbpp/btc';
 import dotenv from 'dotenv';
-import { BTCTestnetType, Collector } from 'rgbpp/ckb';
+import { Collector } from 'rgbpp/ckb';
 import { createBtcAccount } from '../../examples/rgbpp/shared/btc-account';
 
 dotenv.config({ path: __dirname + '/.env' });
 
 export const isMainnet = false;
-// export const BTC_TESTNET_TYPE = 'Signet';
-export const BTC_TESTNET_TYPE = process.env.BTC_TESTNET_TYPE! as BTCTestnetType;
+
+export const BTC_TESTNET_TYPE = 'Signet';
 
 export const collector = new Collector({
   ckbNodeUrl: 'https://testnet.ckb.dev/rpc',
