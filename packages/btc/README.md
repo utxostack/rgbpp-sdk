@@ -221,7 +221,6 @@ const psbt = await sendRgbppUtxos({
   minUtxoSatoshi: config.btcUtxoDustLimit, // optional, default to 1000 on the testnet, 1,0000 on the mainnet
   rgbppMinUtxoSatoshi: config.rgbppUtxoDustLimit, // optional, default to 546 on both testnet/mainnet
   onlyConfirmedUtxos: false, // optional, default to false, only confirmed utxos are allowed in the transaction
-  onlyProvableUtxos: true, // optional, default to true, only utxos that satisfy (utxo.address == from) are allowed 
   feeRate: 1, // optional, default to 1 on the testnet, and it is a floating number on the mainnet
 });
 ```
