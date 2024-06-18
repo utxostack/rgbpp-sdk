@@ -39,7 +39,7 @@ export const buildBtcTimeUnlockWitness = (btcTxProof: Hex): Hex => {
  * The btc time lock args data structure is: lock_script | after | new_bitcoin_tx_id
  * @param btcTimeCells The BTC time cells of xUDT
  * @param btcAssetsApi BTC Assets Api
- * @param isMainnet True is for BTC and CKB Mainnet, flase is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
  * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const buildBtcTimeCellsSpentTx = async ({
@@ -116,7 +116,7 @@ export const buildBtcTimeCellsSpentTx = async ({
  * @param masterCkbAddress The master CKB address
  * @param outputCapacityRange(Optional) [u64; 2], filter cells by output capacity range, [inclusive, exclusive]
  * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
- * @param isMainnet True is for BTC and CKB Mainnet, flase is for BTC and CKB Testnet
+ * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
  */
 export const signBtcTimeCellSpentTx = async ({
   secp256k1PrivateKey,
