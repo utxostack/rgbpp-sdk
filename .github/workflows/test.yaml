@@ -52,6 +52,6 @@ jobs:
       - name: Run tests for packages
         run: pnpm run test:packages
         env:
-          VITE_BTC_SERVICE_URL: ${{ secrets.SERVICE_URL }}
-          VITE_BTC_SERVICE_TOKEN: ${{ secrets.SERVICE_TOKEN }}
-          VITE_BTC_SERVICE_ORIGIN: ${{ secrets.SERVICE_ORIGIN }}
+          VITE_BTC_SERVICE_URL: https://btc-assets-api.testnet.mibao.pro
+          VITE_BTC_SERVICE_TOKEN: ${{ secrets.TESTNET_SERVICE_TOKEN }}
+          VITE_BTC_SERVICE_ORIGIN: https://btc-assets-api.testnet.mibao.pro
