@@ -312,6 +312,7 @@ interface SendUtxosProps {
 
   // EXPERIMENTAL: the below props are unstable and can be altered at any time
   skipInputsValidation?: boolean;
+  pubkeyMap?: AddressToPubkeyMap;
 }
 ```
 
@@ -352,7 +353,7 @@ interface SendRgbppUtxosProps {
   excludeUtxos?: BaseOutput[];
 
   // EXPERIMENTAL: the below props are experimental and can be altered at any time
-  onlyProvableUtxos?: boolean;
+  pubkeyMap?: AddressToPubkeyMap;
 }
 ```
 
@@ -386,7 +387,7 @@ interface SendRbfProps {
   requireGreaterFeeAndRate?: boolean;
 
   // EXPERIMENTAL: the below props are experimental and can be altered at any time
-  inputsPubkey?: Record<string, string>; // Record<address, pubkey>
+  pubkeyMap?: AddressToPubkeyMap;
 }
 ```
 
@@ -512,4 +513,10 @@ enum NetworkType {
   TESTNET,
   REGTEST,
 }
+```
+
+#### AddressToPubkeyMap
+
+```typescript
+type AddressToPubkeyMap = Record<string, string>;
 ```
