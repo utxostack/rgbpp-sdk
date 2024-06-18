@@ -1,5 +1,6 @@
 import { BaseOutput, Utxo } from '../transaction/utxo';
 import { DataSource } from '../query/source';
+import { AddressToPubkeyMap } from '../address';
 import { ErrorCodes, TxBuildError } from '../error';
 import { InitOutput, TxBuilder } from '../transaction/build';
 import { isOpReturnScriptPubkey } from '../transaction/embed';
@@ -22,7 +23,7 @@ export interface SendRbfProps {
   requireGreaterFeeAndRate?: boolean;
 
   // EXPERIMENTAL: the below props are unstable and can be altered at any time
-  pubkeyMap?: Record<string, string>; // Record<address, pubkey>
+  pubkeyMap?: AddressToPubkeyMap;
 }
 
 export async function createSendRbfBuilder(props: SendRbfProps): Promise<{

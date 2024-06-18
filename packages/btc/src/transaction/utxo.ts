@@ -1,7 +1,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 import { ErrorCodes, TxBuildError } from '../error';
 import { DataSource } from '../query/source';
-import { AddressType } from '../address';
+import { AddressType, AddressToPubkeyMap } from '../address';
 import { TxInput } from './build';
 import { limitPromiseBatchSize, remove0x, toXOnly } from '../utils';
 import { isP2trScript } from '../script';
@@ -65,7 +65,7 @@ export function utxoToInput(utxo: Utxo): TxInput {
  */
 export function fillUtxoPubkey(
   utxo: Utxo,
-  pubkeyMap: Record<string, string>, // Record<address, pubkey>
+  pubkeyMap: AddressToPubkeyMap,
   options?: {
     requirePubkey?: boolean;
   },
@@ -94,7 +94,7 @@ export async function prepareUtxoInputs(props: {
   source: DataSource;
   requirePubkey?: boolean;
   requireConfirmed?: boolean;
-  pubkeyMap?: Record<string, string>; // Record<address, pubkey>
+  pubkeyMap?: AddressToPubkeyMap;
 }): Promise<Utxo[]> {
   const pubkeyMap = props.pubkeyMap ?? {};
   const utxos = props.utxos.map((utxo) => {

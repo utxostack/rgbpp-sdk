@@ -2,7 +2,7 @@ import { bitcoin } from '../bitcoin';
 import { DataSource } from '../query/source';
 import { TxBuilder, InitOutput } from '../transaction/build';
 import { BaseOutput, Utxo, prepareUtxoInputs } from '../transaction/utxo';
-import { addAddressToPubkeyMap } from '../address';
+import { AddressToPubkeyMap, addAddressToPubkeyMap } from '../address';
 
 export interface SendUtxosProps {
   inputs: Utxo[];
@@ -18,7 +18,7 @@ export interface SendUtxosProps {
 
   // EXPERIMENTAL: the below props are unstable and can be altered at any time
   skipInputsValidation?: boolean;
-  pubkeyMap?: Record<string, string>; // Record<address, pubkey>
+  pubkeyMap?: AddressToPubkeyMap;
 }
 
 export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{

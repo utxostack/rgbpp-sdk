@@ -2,6 +2,7 @@ import { Collector, checkCkbTxInputsCapacitySufficient } from '@rgbpp-sdk/ckb';
 import { isRgbppLockCell, isBtcTimeLockCell, calculateCommitment } from '@rgbpp-sdk/ckb';
 import { bitcoin } from '../bitcoin';
 import { BaseOutput, Utxo } from '../transaction/utxo';
+import { AddressToPubkeyMap } from '../address';
 import { DataSource } from '../query/source';
 import { NetworkType } from '../preset/types';
 import { ErrorCodes, TxBuildError } from '../error';
@@ -31,7 +32,7 @@ export interface SendRgbppUtxosProps {
   excludeUtxos?: BaseOutput[];
 
   // EXPERIMENTAL: the below props are unstable and can be altered at any time
-  pubkeyMap?: Record<string, string>; // Record<address, pubkey>
+  pubkeyMap?: AddressToPubkeyMap;
 }
 
 /**
