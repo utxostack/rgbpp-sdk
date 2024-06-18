@@ -56,7 +56,7 @@ import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
  * @param collector The collector that collects CKB live cells and transactions
  * @param clusterRgbppLockArgs The cluster rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param sporeDataList The spore's data list, including name and description.
- * @param isMainnet True is for BTC and CKB Mainnet, flase is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
  * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const genCreateSporeCkbVirtualTx = async ({
@@ -217,7 +217,7 @@ export const buildAppendingIssuerCellToSporesCreateTx = async ({
  * @param collector The collector that collects CKB live cells and transactions
  * @param ckbRawTx CKB raw transaction
  * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
- * @param isMainnet True is for BTC and CKB Mainnet, flase is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
  * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
  */
 export const appendIssuerCellToSporesCreate = async ({
@@ -285,7 +285,7 @@ export const appendIssuerCellToSporesCreate = async ({
  * @param collector The collector that collects CKB live cells and transactions
  * @param sporeRgbppLockArgs The spore rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param sporeTypeBytes The spore type script serialized bytes
- * @param isMainnet True is for BTC and CKB Mainnet, flase is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
  * @param witnessLockPlaceholderSize(Optional) The WitnessArgs.lock placeholder bytes array size and the default value is 5000
  * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
  * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3

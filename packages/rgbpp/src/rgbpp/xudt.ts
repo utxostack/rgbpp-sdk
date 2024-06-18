@@ -12,13 +12,13 @@ import { RgbppTransferTxParams, RgbppTransferTxResult } from './types';
  * @param transferAmount The XUDT amount to be transferred, if the noMergeOutputCells is true, the transferAmount will be ignored
  * @param feeRate The CKB transaction fee rate, default value is 1100
  *
- * BTC pramaeters
+ * BTC parameters
  * @param fromAddress The sender BTC address
  * @param fromPubkey The public key of the sender BTC address
  * @param toAddress The receiver BTC address
  * @param dataSource The BTC data source
  * @param feeRate The fee rate of the BTC transaction
- * @param isMainnet True is for BTC and CKB Mainnet, flase is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
  * @param testnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const buildRgbppTransferTx = async ({

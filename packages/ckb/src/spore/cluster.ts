@@ -18,7 +18,7 @@ import { bytesToHex, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
  * @param collector The collector that collects CKB live cells and transactions
  * @param rgbppLockArgs The rgbpp assets cell lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param clusterData The cluster's data, including name and description.
- * @param isMainnet True is for BTC and CKB Mainnet, flase is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
  * @param witnessLockPlaceholderSize(Optional) The WitnessArgs.lock placeholder bytes array size and the default value is 5000
  * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
  * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
