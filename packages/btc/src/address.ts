@@ -15,6 +15,13 @@ export enum AddressType {
 }
 
 /**
+ * Type: Record<Address, Pubkey>
+ *
+ * The map of address and pubkey, usually for recognizing the P2TR inputs in the transaction.
+ */
+export type AddressToPubkeyMap = Record<string, string>;
+
+/**
  * Check weather the address is supported as a from address.
  * Currently, only P2WPKH and P2TR addresses are supported.
  */
@@ -209,4 +216,19 @@ function getAddressTypeDust(addressType: AddressType) {
   } else {
     return 546;
   }
+}
+
+/**
+ * Add address/pubkey pair to a Record<address, pubkey> map
+ */
+export function addAddressToPubkeyMap(
+  pubkeyMap: AddressToPubkeyMap,
+  address: string,
+  pubkey?: string,
+): Record<string, string> {
+  const newMap = { ...pubkeyMap };
+  if (pubkey) {
+    newMap[address] = pubkey;
+  }
+  return newMap;
 }

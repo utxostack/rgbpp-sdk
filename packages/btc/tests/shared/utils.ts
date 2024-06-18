@@ -109,11 +109,47 @@ export function createAccount(props: { privateKey: string; network?: bitcoin.Net
 }
 
 /**
- * Sign and broadcast a transaction to the service
+ * Sign a PSBT with one or multiple BtcAccounts
+ */
+export function signPsbt(props: {
+  psbt: bitcoin.Psbt;
+  account: Account | Account[];
+  finalizeInputs?: boolean;
+}): bitcoin.Psbt {
+  const accounts = Array.isArray(props.account) ? props.account : [props.account];
+
+  const psbt = props.psbt;
+  for (const account of accounts) {
+    // Create a tweaked signer for P2TR
+    const tweakedSigner = tweakSigner(account.keyPair, { network });
+
+    // Sign each input
+    psbt.data.inputs.forEach((input, index) => {
+      if (input.witnessUtxo) {
+        const script = input.witnessUtxo.script.toString('hex');
+        if (isP2wpkhScript(script) && script === account.p2wpkh.scriptPubkey.toString('hex')) {
+          psbt.signInput(index, account.keyPair);
+        }
+        if (isP2trScript(script) && script === account.p2tr.scriptPubkey.toString('hex')) {
+          psbt.signInput(index, tweakedSigner);
+        }
+      }
+    });
+  }
+
+  if (props.finalizeInputs) {
+    psbt.finalizeAllInputs();
+  }
+
+  return psbt;
+}
+
+/**
+ * Sign and broadcast a PSBT to the service
  */
 export async function signAndBroadcastPsbt(props: {
   psbt: bitcoin.Psbt;
-  account: Account;
+  account: Account | Account[];
   feeRate?: number;
   send?: boolean;
 }): Promise<{
@@ -123,23 +159,13 @@ export async function signAndBroadcastPsbt(props: {
 }> {
   const { psbt, account, feeRate, send = true } = props;
 
-  // Create a tweaked signer for P2TR
-  const tweakedSigner = tweakSigner(account.keyPair, { network });
-
-  // Sign each input
-  psbt.data.inputs.forEach((input, index) => {
-    if (input.witnessUtxo) {
-      const script = input.witnessUtxo.script.toString('hex');
-      if (isP2wpkhScript(script) && script === account.p2wpkh.scriptPubkey.toString('hex')) {
-        psbt.signInput(index, account.keyPair);
-      }
-      if (isP2trScript(script) && script === account.p2tr.scriptPubkey.toString('hex')) {
-        psbt.signInput(index, tweakedSigner);
-      }
-    }
+  // Sign inputs
+  signPsbt({
+    psbt,
+    account,
+    finalizeInputs: true,
   });
 
-  psbt.finalizeAllInputs();
   expectPsbtFeeInRange(psbt, feeRate);
 
   const tx = psbt.extractTransaction();
