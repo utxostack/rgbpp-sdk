@@ -1,5 +1,27 @@
 # @rgbpp-sdk/btc
 
+## 0.4.0
+
+### Minor Changes
+
+- [#228](https://github.com/ckb-cell/rgbpp-sdk/pull/228): Support including multi-origin UTXOs in the same transaction ([@ShookLyngs](https://github.com/ShookLyngs))
+
+  - Add `pubkeyMap` option in the sendUtxos(), sendRgbppUtxos() and sendRbf() API
+  - Rename `inputsPubkey` option to `pubkeyMap` in the sendRbf() API
+  - Delete `onlyProvableUtxos` option from the sendRgbppUtxos() API
+
+- [#150](https://github.com/ckb-cell/rgbpp-sdk/pull/150): Support Full-RBF feature with the sendRbf() and createSendRbfBuilder() API ([@ShookLyngs](https://github.com/ShookLyngs))
+
+  - Add `excludeUtxos`, `skipInputsValidation` options in the `sendUtxos()` API to support the RBF feature
+  - Add `onlyProvableUtxos` option in the `sendRgbppUtxos()` API for future update supports
+  - Add `changeIndex` in the return type of the BTC Builder APIs
+
+### Patch Changes
+
+- Updated dependencies [[`e5f41fd`](https://github.com/ckb-cell/rgbpp-sdk/commit/e5f41fd2b275182d2ab3fdf17e3b8853025fd2b9), [`6e840c1`](https://github.com/ckb-cell/rgbpp-sdk/commit/6e840c196fbece06430c559aebbdadaf7fb6e632)]:
+  - @rgbpp-sdk/service@0.4.0
+  - @rgbpp-sdk/ckb@0.4.0
+
 ## v0.3.0
 
 ### Minor Changes

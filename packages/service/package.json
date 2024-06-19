@@ -1,6 +1,6 @@
 {
   "name": "@rgbpp-sdk/service",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "scripts": {
     "test": "vitest",
     "build": "tsc -p tsconfig.build.json",
