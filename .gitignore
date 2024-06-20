@@ -42,3 +42,5 @@ devbox.json
 devbox.lock
 .envrc
 
+# examples logs
+examples/rgbpp/logs

@@ -52,7 +52,7 @@ const issueXudt = async ({ xudtTotalAmount, tokenInfo }: { xudtTotalAmount: bigi
 
   console.log('xUDT type script', xudtType);
 
-  writeStepLog('1', {
+  writeStepLog('xUDT-type-script', {
     codeHash: xudtType.codeHash,
     hashType: xudtType.hashType,
     args: xudtType.args,

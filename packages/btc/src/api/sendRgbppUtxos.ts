@@ -1,7 +1,8 @@
 import { Collector, checkCkbTxInputsCapacitySufficient } from '@rgbpp-sdk/ckb';
 import { isRgbppLockCell, isBtcTimeLockCell, calculateCommitment } from '@rgbpp-sdk/ckb';
 import { bitcoin } from '../bitcoin';
-import { Utxo } from '../transaction/utxo';
+import { BaseOutput, Utxo } from '../transaction/utxo';
+import { AddressToPubkeyMap } from '../address';
 import { DataSource } from '../query/source';
 import { NetworkType } from '../preset/types';
 import { ErrorCodes, TxBuildError } from '../error';
@@ -28,6 +29,10 @@ export interface SendRgbppUtxosProps {
   changeAddress?: string;
   minUtxoSatoshi?: number;
   onlyConfirmedUtxos?: boolean;
+  excludeUtxos?: BaseOutput[];
+
+  // EXPERIMENTAL: the below props are unstable and can be altered at any time
+  pubkeyMap?: AddressToPubkeyMap;
 }
 
 /**
@@ -37,8 +42,9 @@ export const sendRgbppUtxosBuilder = createSendRgbppUtxosBuilder;
 
 export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): Promise<{
   builder: TxBuilder;
-  feeRate: number;
   fee: number;
+  feeRate: number;
+  changeIndex: number;
 }> {
   const btcInputs: Utxo[] = [];
   const btcOutputs: InitOutput[] = [];
@@ -79,22 +85,15 @@ export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): P
   for (let i = 0; i < ckbVirtualTx.inputs.length; i++) {
     const { lockArgs, isRgbppLock } = ckbLiveCells[i];
 
-    // If input.lock == RgbppLock, add to inputs if:
+    // Add to inputs if all the following conditions are met:
     // 1. input.lock.args can be unpacked to RgbppLockArgs
     // 2. utxo can be found via the DataSource.getUtxo() API
-    // 3. utxo.scriptPk == addressToScriptPk(props.from)
-    // 4. utxo is not duplicated in the inputs
+    // 3. utxo is not duplicated in the inputs
     if (isRgbppLock) {
       const args = lockArgs!;
       const utxo = btcUtxos[i];
       if (!utxo) {
         throw TxBuildError.withComment(ErrorCodes.CANNOT_FIND_UTXO, `hash: ${args.btcTxid}, index: ${args.outIndex}`);
-      }
-      if (utxo.address !== props.from) {
-        throw TxBuildError.withComment(
-          ErrorCodes.REFERENCED_UNPROVABLE_UTXO,
-          `hash: ${args.btcTxid}, index: ${args.outIndex}`,
-        );
       }
 
       const foundInInputs = btcInputs.some((v) => v.txid === utxo.txid && v.vout === utxo.vout);
@@ -102,10 +101,7 @@ export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): P
         continue;
       }
 
-      btcInputs.push({
-        ...utxo,
-        pubkey: props.fromPubkey, // For P2TR addresses, a pubkey is required
-      });
+      btcInputs.push(utxo);
     }
   }
 
@@ -171,6 +167,8 @@ export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): P
     changeAddress: props.changeAddress,
     minUtxoSatoshi: props.minUtxoSatoshi,
     onlyConfirmedUtxos: props.onlyConfirmedUtxos,
+    excludeUtxos: props.excludeUtxos,
+    pubkeyMap: props.pubkeyMap,
   });
 }
 

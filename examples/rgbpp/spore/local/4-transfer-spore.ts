@@ -8,11 +8,12 @@ import {
   generateSporeTransferCoBuild,
   genTransferSporeCkbVirtualTx,
 } from 'rgbpp/ckb';
-import { sendRgbppUtxos, transactionToHex } from 'rgbpp/btc';
+import { sendRgbppUtxos } from 'rgbpp/btc';
 import { BtcAssetsApiError } from 'rgbpp';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../env';
+import { isMainnet, collector, btcDataSource, btcService, btcAccount, BTC_TESTNET_TYPE } from '../../env';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
+import { signAndSendPsbt } from '../../shared/btc-account';
 
 interface SporeTransferParams {
   sporeRgbppLockArgs: Hex;
@@ -34,6 +35,7 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }
     sporeTypeBytes,
     isMainnet,
     ckbFeeRate: BigInt(5000),
+    btcTestnetType: BTC_TESTNET_TYPE,
   });
 
   // Save ckbVirtualTxResult
@@ -50,17 +52,13 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }
     tos: [toBtcAddress],
     needPaymaster: needPaymasterCell,
     ckbCollector: collector,
-    from: btcAddress!,
+    from: btcAccount.from,
+    fromPubkey: btcAccount.fromPubkey,
     source: btcDataSource,
     feeRate: 30,
   });
-  psbt.signAllInputs(btcKeyPair);
-  psbt.finalizeAllInputs();
 
-  const btcTx = psbt.extractTransaction();
-  const btcTxBytes = transactionToHex(btcTx, false);
-  const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
-
+  const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
   console.log('BTC TxId: ', btcTxId);
 
   const interval = setInterval(async () => {
@@ -93,6 +91,9 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }
 };
 
 // Please use your real BTC UTXO information on the BTC Testnet
+// BTC Testnet3: https://mempool.space/testnet
+// BTC Signet: https://mempool.space/signet
+
 // rgbppLockArgs: outIndexU32 + btcTxId
 transferSpore({
   // The spore rgbpp lock args is from 3-create-spore.ts

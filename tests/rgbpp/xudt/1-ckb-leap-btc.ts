@@ -1,7 +1,7 @@
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { genCkbJumpBtcVirtualTx } from 'rgbpp';
 import { getSecp256k1CellDep, buildRgbppLockArgs, getXudtTypeScript } from 'rgbpp/ckb';
-import { CKB_PRIVATE_KEY, isMainnet, collector, ckbAddress } from '../env';
+import { CKB_PRIVATE_KEY, isMainnet, collector, ckbAddress, BTC_TESTNET_TYPE } from '../env';
 import { readStepLog } from '../shared/utils';
 
 interface LeapToBtcParams {
@@ -28,27 +28,28 @@ const leapFromCkbToBtc = async ({ outIndex, btcTxId, xudtTypeArgs, transferAmoun
       toRgbppLockArgs,
       xudtTypeBytes: serializeScript(xudtType),
       transferAmount,
+      btcTestnetType: BTC_TESTNET_TYPE,
     });
 
     const emptyWitness = { lock: '', inputType: '', outputType: '' };
     const unsignedTx: CKBComponents.RawTransactionToSign = {
       ...ckbRawTx,
-      cellDeps: [...ckbRawTx.cellDeps, getSecp256k1CellDep(false)],
+      cellDeps: [...ckbRawTx.cellDeps, getSecp256k1CellDep(isMainnet)],
       witnesses: [emptyWitness, ...ckbRawTx.witnesses.slice(1)],
     };
 
     const signedTx = collector.getCkb().signTransaction(CKB_PRIVATE_KEY)(unsignedTx);
 
     const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
-    console.info(`Rgbpp asset has been jumped from CKB to BTC and tx hash is ${txHash}`);
+    console.info(`Rgbpp asset has been jumped from CKB to BTC and CKB tx hash is ${txHash}`);
     console.info(`explorer: https://pudge.explorer.nervos.org/transaction/${txHash}`);
   });
 };
 
 // Use your real BTC UTXO information on the BTC Testnet
 leapFromCkbToBtc({
-  outIndex: readStepLog('0').index,
-  btcTxId: readStepLog('0').txid,
-  xudtTypeArgs: readStepLog('1').args,
+  outIndex: readStepLog('prepare-utxo').index,
+  btcTxId: readStepLog('prepare-utxo').txid,
+  xudtTypeArgs: readStepLog('xUDT-type-script').args,
   transferAmount: BigInt(800_0000_0000),
 });

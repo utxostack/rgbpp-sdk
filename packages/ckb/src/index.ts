@@ -1,3 +1,5 @@
+export { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
+
 export * from './schemas/generated/blockchain';
 export * from './schemas/generated/rgbpp';
 export * from './collector';

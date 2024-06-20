@@ -1,5 +1,11 @@
 # @rgbpp-sdk/service
 
+## 0.4.0
+
+### Minor Changes
+
+- [#222](https://github.com/ckb-cell/rgbpp-sdk/pull/222): Add BtcAssetsApi.getRgbppApiBalanceByAddress() API for querying RGBPP XUDT balances by a BTC address ([@ShookLyngs](https://github.com/ShookLyngs))
+
 ## v0.3.0
 
 ### Minor Changes

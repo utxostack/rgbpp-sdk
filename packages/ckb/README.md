@@ -46,10 +46,11 @@ export interface BtcTransferVirtualTxResult {
  * @param xudtTypeBytes The serialized hex string of the XUDT type script
  * @param rgbppLockArgsList The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred, if the noMergeOutputCells is true, the transferAmount will be ignored
- * @param isMainnet
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
- * @param noMergeOutputCells The noMergeOutputCells indicates whether the CKB outputs need to be merged. By default, the outputs will be merged.
- * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param witnessLockPlaceholderSize(Optional) The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+ * @param noMergeOutputCells(Optional) The noMergeOutputCells indicates whether the CKB outputs need to be merged. By default, the outputs will be merged.
+ * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
+ * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const genBtcTransferCkbVirtualTx = async ({
   collector,
@@ -60,6 +61,7 @@ export const genBtcTransferCkbVirtualTx = async ({
   witnessLockPlaceholderSize,
   noMergeOutputCells,
   ckbFeeRate,
+  btcTestnetType
 }: BtcTransferVirtualTxParams): Promise<BtcTransferVirtualTxResult>
 ```
 
@@ -84,9 +86,9 @@ interface BtcJumpCkbVirtualTxResult {
  * @param xudtTypeBytes The serialized hex string of the XUDT type script
  * @param rgbppLockArgsList The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
- * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
- * @param isMainnet
+ * @param witnessLockPlaceholderSize(Optional) The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+ * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
+ * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const genBtcJumpCkbVirtualTx = async ({
   collector,
@@ -96,6 +98,7 @@ export const genBtcJumpCkbVirtualTx = async ({
   toCkbAddress,
   witnessLockPlaceholderSize,
   ckbFeeRate,
+  btcTestnetType
 }: BtcJumpCkbVirtualTxParams): Promise<BtcJumpCkbVirtualTxResult>
 ```
 
@@ -111,9 +114,9 @@ The method `genCkbJumpBtcVirtualTx` can generate a CKB transaction for RGB++ xUD
  * @param fromCkbAddress The from ckb address who will use his private key to sign the ckb tx
  * @param toRgbppLockArgs The receiver rgbpp lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
- * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
- * @param isMainnet
+ * @param witnessLockPlaceholderSize(Optional) The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+ * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
+ * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const genCkbJumpBtcVirtualTx = async ({
   collector,
@@ -147,12 +150,15 @@ export interface SporeCreateVirtualTxResult {
  * @param collector The collector that collects CKB live cells and transactions
  * @param clusterRgbppLockArgs The cluster rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param sporeDataList The spore's data list, including name and description.
+ * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const genCreateSporeCkbVirtualTx = async ({
   collector,
   clusterRgbppLockArgs,
   sporeDataList,
   isMainnet,
+  btcTestnetType
 }: CreateSporeCkbVirtualTxParams): Promise<SporeCreateVirtualTxResult>
 ```
 
@@ -179,8 +185,10 @@ export interface SporeTransferVirtualTxResult {
  * @param collector The collector that collects CKB live cells and transactions
  * @param sporeRgbppLockArgs The spore rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param sporeTypeBytes The spore type script serialized bytes
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
- * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param witnessLockPlaceholderSize(Optional) The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+ * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
+ * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const genTransferSporeCkbVirtualTx = async ({
   collector,
@@ -189,6 +197,7 @@ export const genTransferSporeCkbVirtualTx = async ({
   isMainnet,
   witnessLockPlaceholderSize,
   ckbFeeRate,
+  btcTestnetType
 }: TransferSporeCkbVirtualTxParams): Promise<SporeTransferVirtualTxResult>
 ```
 
@@ -216,8 +225,10 @@ export interface SporeLeapVirtualTxResult {
  * @param sporeRgbppLockArgs The spore rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param sporeTypeBytes The spore type script serialized bytes
  * @param toCkbAddress The receiver ckb address
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
- * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param witnessLockPlaceholderSize(Optional) The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+ * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
+ * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const genLeapSporeFromBtcToCkbVirtualTx = async ({
   collector,
@@ -227,6 +238,7 @@ export const genLeapSporeFromBtcToCkbVirtualTx = async ({
   isMainnet,
   witnessLockPlaceholderSize,
   ckbFeeRate,
+  btcTestnetType
 }: LeapSporeFromBtcToCkbVirtualTxParams): Promise<SporeLeapVirtualTxResult>
 ```
 
@@ -241,8 +253,10 @@ The method `genLeapSporeFromCkbToBtcRawTx` can generate a CKB transaction for RG
  * @param sporeRgbppLockArgs The spore rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param sporeTypeBytes The spore type script serialized bytes
  * @param toCkbAddress The receiver ckb address
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
- * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
+ * @param witnessLockPlaceholderSize(Optional) The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+ * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
+ * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet
  */
 export const genLeapSporeFromCkbToBtcRawTx = async ({
   collector,

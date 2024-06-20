@@ -1,7 +1,6 @@
 import { BtcAssetsApiError, genCreateClusterCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
-import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../env';
+import { isMainnet, collector, btcAccount, btcDataSource, btcService, BTC_TESTNET_TYPE } from '../../env';
 import { CLUSTER_DATA } from './0-cluster-info';
-import { transactionToHex } from 'rgbpp/btc';
 import {
   appendCkbTxWitnesses,
   buildRgbppLockArgs,
@@ -10,6 +9,7 @@ import {
   updateCkbTxWithRealBtcTxId,
 } from 'rgbpp/ckb';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
+import { signAndSendPsbt } from '../../shared/btc-account';
 
 // Warning: Before runing this file, please run 1-prepare-cluster.ts
 const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: string }) => {
@@ -19,6 +19,7 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
     clusterData: CLUSTER_DATA,
     isMainnet,
     ckbFeeRate: BigInt(2000),
+    btcTestnetType: BTC_TESTNET_TYPE,
   });
 
   // Save ckbVirtualTxResult
@@ -32,20 +33,16 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
-    tos: [btcAddress!],
+    tos: [btcAccount.from],
     needPaymaster: needPaymasterCell,
     ckbCollector: collector,
-    from: btcAddress!,
+    from: btcAccount.from,
+    fromPubkey: btcAccount.fromPubkey,
     source: btcDataSource,
     feeRate: 30,
   });
-  psbt.signAllInputs(btcKeyPair);
-  psbt.finalizeAllInputs();
 
-  const btcTx = psbt.extractTransaction();
-  const btcTxBytes = transactionToHex(btcTx, false);
-  const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
-
+  const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
   console.log('BTC TxId: ', btcTxId);
 
   const interval = setInterval(async () => {
@@ -82,6 +79,9 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
 };
 
 // Please use your real BTC UTXO information on the BTC Testnet which should be same as the 1-prepare-cluster.ts
+// BTC Testnet3: https://mempool.space/testnet
+// BTC Signet: https://mempool.space/signet
+
 // rgbppLockArgs: outIndexU32 + btcTxId
 createCluster({
   ownerRgbppLockArgs: buildRgbppLockArgs(3, 'aee4e8e3aa95e9e9ab1f0520714031d92d3263262099dcc7f7d64e62fa2fcb44'),

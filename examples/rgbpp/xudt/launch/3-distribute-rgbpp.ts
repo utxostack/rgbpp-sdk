@@ -4,12 +4,12 @@ import { RGBPP_TOKEN_INFO } from './0-rgbpp-token-info';
 import {
   isMainnet,
   collector,
-  btcAddress,
   btcDataSource,
-  btcKeyPair,
   btcService,
   CKB_PRIVATE_KEY,
   ckbAddress,
+  btcAccount,
+  BTC_TESTNET_TYPE,
 } from '../../env';
 import {
   RgbppBtcAddressReceiver,
@@ -20,8 +20,8 @@ import {
   sendCkbTx,
   updateCkbTxWithRealBtcTxId,
 } from 'rgbpp/ckb';
-import { transactionToHex } from 'rgbpp/btc';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
+import { signAndSendPsbt } from '../../shared/btc-account';
 
 interface Params {
   rgbppLockArgsList: string[];
@@ -44,6 +44,7 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers, xudtTyp
     xudtTypeBytes: serializeScript(xudtType),
     rgbppReceivers: receivers,
     isMainnet,
+    btcTestnetType: BTC_TESTNET_TYPE,
   });
 
   // Save ckbVirtualTxResult
@@ -62,17 +63,13 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers, xudtTyp
     tos: receivers.map((receiver) => receiver.toBtcAddress),
     needPaymaster: needPaymasterCell,
     ckbCollector: collector,
-    from: btcAddress!,
+    from: btcAccount.from,
+    fromPubkey: btcAccount.fromPubkey,
     source: btcDataSource,
   });
-  psbt.signAllInputs(btcKeyPair);
-  psbt.finalizeAllInputs();
 
-  const btcTx = psbt.extractTransaction();
-  const btcTxBytes = transactionToHex(btcTx, false);
-  const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
-
-  console.log('BTC TxId: ', btcTxId);
+  const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
+  console.log(`BTC ${BTC_TESTNET_TYPE} TxId: ${btcTxId}`);
 
   const interval = setInterval(async () => {
     try {
@@ -97,7 +94,7 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers, xudtTyp
       });
 
       const txHash = await sendCkbTx({ collector, signedTx });
-      console.info(`RGB++ Asset has been distributed and tx hash is ${txHash}`);
+      console.info(`RGB++ Asset has been distributed and CKB tx hash is ${txHash}`);
     } catch (error) {
       if (!(error instanceof BtcAssetsApiError)) {
         console.error(error);
@@ -107,15 +104,18 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers, xudtTyp
 };
 
 // Please use your real BTC UTXO information on the BTC Testnet
+// BTC Testnet3: https://mempool.space/testnet
+// BTC Signet: https://mempool.space/signet
+
 // rgbppLockArgs: outIndexU32 + btcTxId
 distributeRgbppAssetOnBtc({
   // Warning: If rgbpp assets are distributed continuously, then the position of the current rgbpp asset utxo depends on the position of the previous change utxo distributed
-  rgbppLockArgsList: [buildRgbppLockArgs(2, '012bfee9c1e8a6e9e272b63ff54d5138efe910cc7aac413221cb3634ea176866')],
+  rgbppLockArgsList: [buildRgbppLockArgs(1, '5ab72e296c7e4f93302f5b1827c59860a95b94958942c65977bf25fcd7364bf3')],
   // The xudtTypeArgs comes from the logs "RGB++ Asset type script args" of 2-launch-rgbpp.ts
-  xudtTypeArgs: '0x4c1ecf2f14edae73b76ccf115ecfa40ba68ee315c96bd4fcfd771c2fb4c69e8f',
+  xudtTypeArgs: '0x157339c6b1ad2156bc9aa3f901abb07253f198160fb484226127ccafedd690c8',
   receivers: [
     {
-      toBtcAddress: 'tb1qvt7p9g6mw70sealdewtfp0sekquxuru6j3gwmt',
+      toBtcAddress: 'tb1qhp9fh9qsfeyh0yhewgu27ndqhs5qlrqwau28m7',
       transferAmount: BigInt(1000) * BigInt(10 ** RGBPP_TOKEN_INFO.decimal),
     },
   ],

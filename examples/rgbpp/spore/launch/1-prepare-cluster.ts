@@ -10,7 +10,7 @@ import {
   genRgbppLockScript,
   getSecp256k1CellDep,
 } from 'rgbpp/ckb';
-import { ckbAddress, isMainnet, collector, CKB_PRIVATE_KEY } from '../../env';
+import { ckbAddress, isMainnet, collector, CKB_PRIVATE_KEY, BTC_TESTNET_TYPE } from '../../env';
 import { CLUSTER_DATA } from './0-cluster-info';
 
 const prepareClusterCell = async ({ outIndex, btcTxId }: { outIndex: number; btcTxId: string }) => {
@@ -33,7 +33,7 @@ const prepareClusterCell = async ({ outIndex, btcTxId }: { outIndex: number; btc
 
   const outputs: CKBComponents.CellOutput[] = [
     {
-      lock: genRgbppLockScript(buildRgbppLockArgs(outIndex, btcTxId), isMainnet),
+      lock: genRgbppLockScript(buildRgbppLockArgs(outIndex, btcTxId), isMainnet, BTC_TESTNET_TYPE),
       capacity: append0x(clusterCellCapacity.toString(16)),
     },
   ];

@@ -1,7 +1,8 @@
 import { bitcoin } from '../bitcoin';
-import { Utxo } from '../transaction/utxo';
 import { DataSource } from '../query/source';
 import { TxBuilder, InitOutput } from '../transaction/build';
+import { BaseOutput, Utxo, prepareUtxoInputs } from '../transaction/utxo';
+import { AddressToPubkeyMap, addAddressToPubkeyMap } from '../address';
 
 export interface SendUtxosProps {
   inputs: Utxo[];
@@ -13,12 +14,18 @@ export interface SendUtxosProps {
   changeAddress?: string;
   minUtxoSatoshi?: number;
   onlyConfirmedUtxos?: boolean;
+  excludeUtxos?: BaseOutput[];
+
+  // EXPERIMENTAL: the below props are unstable and can be altered at any time
+  skipInputsValidation?: boolean;
+  pubkeyMap?: AddressToPubkeyMap;
 }
 
 export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
   builder: TxBuilder;
-  feeRate: number;
   fee: number;
+  feeRate: number;
+  changeIndex: number;
 }> {
   const tx = new TxBuilder({
     source: props.source,
@@ -27,23 +34,33 @@ export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
     onlyConfirmedUtxos: props.onlyConfirmedUtxos,
   });
 
-  tx.addInputs(props.inputs);
-  tx.addOutputs(props.outputs);
+  // Prepare the UTXO inputs:
+  // 1. Fill pubkey for each P2TR UTXO, and throw if the corresponding pubkey is not found
+  // 2. Throw if unconfirmed UTXOs are found (if onlyConfirmedUtxos == true && skipInputsValidation == false)
+  const pubkeyMap = addAddressToPubkeyMap(props.pubkeyMap ?? {}, props.from, props.fromPubkey);
+  const inputs = await prepareUtxoInputs({
+    utxos: props.inputs,
+    source: props.source,
+    requireConfirmed: props.onlyConfirmedUtxos && !props.skipInputsValidation,
+    requirePubkey: true,
+    pubkeyMap,
+  });
 
-  if (props.onlyConfirmedUtxos) {
-    await tx.validateInputs();
-  }
+  tx.addInputs(inputs);
+  tx.addOutputs(props.outputs);
 
   const paid = await tx.payFee({
     address: props.from,
-    publicKey: props.fromPubkey,
+    publicKey: pubkeyMap[props.from],
     changeAddress: props.changeAddress,
+    excludeUtxos: props.excludeUtxos,
   });
 
   return {
     builder: tx,
     fee: paid.fee,
     feeRate: paid.feeRate,
+    changeIndex: paid.changeIndex,
   };
 }
 

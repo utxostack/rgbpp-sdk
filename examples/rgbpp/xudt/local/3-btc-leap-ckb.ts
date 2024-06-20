@@ -7,9 +7,9 @@ import {
   getXudtTypeScript,
   updateCkbTxWithRealBtcTxId,
 } from 'rgbpp/ckb';
-import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../env';
-import { transactionToHex } from 'rgbpp/btc';
+import { isMainnet, collector, btcDataSource, btcService, btcAccount, BTC_TESTNET_TYPE } from '../../env';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
+import { signAndSendPsbt } from '../../shared/btc-account';
 
 interface LeapToCkbParams {
   rgbppLockArgsList: string[];
@@ -32,6 +32,7 @@ const leapFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
     transferAmount,
     toCkbAddress,
     isMainnet,
+    btcTestnetType: BTC_TESTNET_TYPE,
   });
 
   // Save ckbVirtualTxResult
@@ -39,26 +40,21 @@ const leapFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
 
   const { commitment, ckbRawTx } = ckbVirtualTxResult;
 
+  console.log('ckbRawTx', JSON.stringify(ckbRawTx));
+
   // Send BTC tx
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
-    tos: [btcAddress!],
+    tos: [btcAccount.from],
     ckbCollector: collector,
-    from: btcAddress!,
+    from: btcAccount.from,
+    fromPubkey: btcAccount.fromPubkey,
     source: btcDataSource,
   });
-  psbt.signAllInputs(btcKeyPair);
-  psbt.finalizeAllInputs();
 
-  const btcTx = psbt.extractTransaction();
-  // Remove the witness from BTC tx for RGBPP unlock
-  const btcTxBytes = transactionToHex(btcTx, false);
-  const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
-
-  console.log('BTC Tx bytes: ', btcTxBytes);
-  console.log('BTC TxId: ', btcTxId);
-  console.log('ckbRawTx', JSON.stringify(ckbRawTx));
+  const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
+  console.log(`BTC ${BTC_TESTNET_TYPE} TxId: ${btcTxId}`);
 
   // Wait for BTC tx and proof to be ready, and then send isomorphic CKB transactions
   const interval = setInterval(async () => {
@@ -74,6 +70,8 @@ const leapFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
         rgbppApiSpvProof,
       });
 
+      console.log(JSON.stringify(ckbTx));
+
       const txHash = await sendCkbTx({ collector, signedTx: ckbTx });
       console.info(`RGB++ Asset has been leaped from BTC to CKB and the CKB tx hash is ${txHash}`);
     } catch (error) {
@@ -85,11 +83,14 @@ const leapFromBtcToCkb = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
 };
 
 // Please use your real BTC UTXO information on the BTC Testnet
+// BTC Testnet3: https://mempool.space/testnet
+// BTC Signet: https://mempool.space/signet
+
 // rgbppLockArgs: outIndexU32 + btcTxId
 leapFromBtcToCkb({
-  rgbppLockArgsList: [buildRgbppLockArgs(1, '24e622419156dd3a277a90bcbb40c7117462a18d5329dd1ada320ca8bdfba715')],
+  rgbppLockArgsList: [buildRgbppLockArgs(1, '3f6db9a387587006cb2fa8c6352bc728984bf39cb010789dffe574f27775a6ac')],
   toCkbAddress: 'ckt1qrfrwcdnvssswdwpn3s9v8fp87emat306ctjwsm3nmlkjg8qyza2cqgqq9kxr7vy7yknezj0vj0xptx6thk6pwyr0sxamv6q',
   // Please use your own RGB++ xudt asset's xudtTypeArgs
-  xudtTypeArgs: '0x1ba116c119d1cfd98a53e9d1a615cf2af2bb87d95515c9d217d367054cfc696b',
+  xudtTypeArgs: '0x562e4e8a2f64a3e9c24beb4b7dd002d0ad3b842d0cc77924328e36ad114e3ebe',
   transferAmount: BigInt(800_0000_0000),
 });

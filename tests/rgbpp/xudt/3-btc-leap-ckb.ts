@@ -1,8 +1,10 @@
 import { buildRgbppLockArgs, getXudtTypeScript } from 'rgbpp/ckb';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { genBtcJumpCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
-import { isMainnet, collector, btcAddress, btcKeyPair, btcService, btcDataSource } from '../env';
+import { isMainnet, collector, btcService, btcDataSource, btcAccount, BTC_TESTNET_TYPE } from '../env';
 import { readStepLog } from '../shared/utils';
+import { saveCkbVirtualTxResult } from '../../../examples/rgbpp/shared/utils';
+import { signAndSendPsbt } from '../../../examples/rgbpp/shared/btc-account';
 
 interface LeapToCkbParams {
   rgbppLockArgsList: string[];
@@ -26,7 +28,11 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
       transferAmount,
       toCkbAddress,
       isMainnet,
+      btcTestnetType: BTC_TESTNET_TYPE,
     });
+
+    // Save ckbVirtualTxResult
+    saveCkbVirtualTxResult(ckbVirtualTxResult, '3-btc-leap-ckb');
 
     const { commitment, ckbRawTx } = ckbVirtualTxResult;
 
@@ -34,19 +40,17 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
     const psbt = await sendRgbppUtxos({
       ckbVirtualTx: ckbRawTx,
       commitment,
-      tos: [btcAddress!],
+      tos: [btcAccount.from],
       ckbCollector: collector,
-      from: btcAddress!,
+      from: btcAccount.from,
+      fromPubkey: btcAccount.fromPubkey,
       source: btcDataSource,
+      feeRate: 1,
     });
-    psbt.signAllInputs(btcKeyPair);
-    psbt.finalizeAllInputs();
 
-    const btcTx = psbt.extractTransaction();
-    const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
-
-    console.log('BTC TxId: ', btcTxId);
-    console.log(`explorer: https://mempool.space/testnet/tx/${btcTxId}`);
+    const { txId: btcTxId } = await signAndSendPsbt(psbt, btcAccount, btcService);
+    console.log(`BTC ${BTC_TESTNET_TYPE} TxId: ${btcTxId}`);
+    console.log(`explorer: https://mempool.space/signet/tx/${btcTxId}`);
 
     await btcService.sendRgbppCkbTransaction({ btc_txid: btcTxId, ckb_virtual_result: ckbVirtualTxResult });
 
@@ -73,8 +77,8 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
 
 // rgbppLockArgs: outIndexU32 + btcTxId
 leapFromBtcToCKB({
-  rgbppLockArgsList: [buildRgbppLockArgs(readStepLog('2').index, readStepLog('2').txid)],
+  rgbppLockArgsList: [buildRgbppLockArgs(readStepLog('transfer-id').index, readStepLog('transfer-id').txid)],
   toCkbAddress: 'ckt1qrfrwcdnvssswdwpn3s9v8fp87emat306ctjwsm3nmlkjg8qyza2cqgqq9kxr7vy7yknezj0vj0xptx6thk6pwyr0sxamv6q',
-  xudtTypeArgs: readStepLog('1').args,
+  xudtTypeArgs: readStepLog('xUDT-type-script').args,
   transferAmount: BigInt(300_0000_0000),
 });

@@ -1,10 +1,21 @@
 # @rgbpp-sdk/ckb
 
+## 0.4.0
+
+### Minor Changes
+
+- [#236](https://github.com/ckb-cell/rgbpp-sdk/pull/236): Fix typo and remove useless queue types ([@duanyytop](https://github.com/duanyytop))
+
+### Patch Changes
+
+- Updated dependencies [[`e5f41fd`](https://github.com/ckb-cell/rgbpp-sdk/commit/e5f41fd2b275182d2ab3fdf17e3b8853025fd2b9)]:
+  - @rgbpp-sdk/service@0.4.0
+
 ## v0.3.0
 
 ### Minor Changes
 
-- [#197](https://github.com/ckb-cell/rgbpp-sdk/pull/197): feat: Return needPaymasterCell for RGB++ ckb cirtual tx ([@duanyytop](https://github.com/duanyytop))
+- [#197](https://github.com/ckb-cell/rgbpp-sdk/pull/197): Return needPaymasterCell for RGB++ ckb cirtual tx ([@duanyytop](https://github.com/duanyytop))
 
 - [#191](https://github.com/ckb-cell/rgbpp-sdk/pull/191): Dynamic fetching cell deps deployed by TypeID ([@duanyytop](https://github.com/duanyytop))
 

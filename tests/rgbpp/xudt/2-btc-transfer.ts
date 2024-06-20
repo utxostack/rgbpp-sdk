@@ -1,8 +1,10 @@
-import { buildRgbppLockArgs, getXudtTypeScript } from 'rgbpp/ckb';
-import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { genBtcTransferCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
-import { isMainnet, collector, btcAddress, btcKeyPair, btcService, btcDataSource } from '../env';
+import { buildRgbppLockArgs } from 'rgbpp/ckb';
+import { buildRgbppTransferTx } from 'rgbpp';
+import { isMainnet, collector, btcService, btcDataSource, BTC_TESTNET_TYPE, btcAccount } from '../env';
 import { readStepLog, writeStepLog } from '../shared/utils';
+import { saveCkbVirtualTxResult } from '../../../examples/rgbpp/shared/utils';
+import { bitcoin } from 'rgbpp/btc';
+import { signAndSendPsbt } from '../../../examples/rgbpp/shared/btc-account';
 
 interface RgbppTransferParams {
   rgbppLockArgsList: string[];
@@ -14,40 +16,34 @@ interface RgbppTransferParams {
 const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transferAmount }: RgbppTransferParams) => {
   const { retry } = await import('zx');
   await retry(120, '10s', async () => {
-    const xudtType: CKBComponents.Script = {
-      ...getXudtTypeScript(isMainnet),
-      args: xudtTypeArgs,
-    };
-
-    const ckbVirtualTxResult = await genBtcTransferCkbVirtualTx({
-      collector,
-      rgbppLockArgsList,
-      xudtTypeBytes: serializeScript(xudtType),
-      transferAmount,
+    const { ckbVirtualTxResult, btcPsbtHex } = await buildRgbppTransferTx({
+      ckb: {
+        collector,
+        xudtTypeArgs,
+        rgbppLockArgsList,
+        transferAmount,
+      },
+      btc: {
+        fromAddress: btcAccount.from,
+        toAddress: toBtcAddress,
+        fromPubkey: btcAccount.fromPubkey,
+        dataSource: btcDataSource,
+        testnetType: BTC_TESTNET_TYPE,
+        feeRate: 1,
+      },
       isMainnet,
     });
 
-    const { commitment, ckbRawTx } = ckbVirtualTxResult;
+    // Save ckbVirtualTxResult
+    saveCkbVirtualTxResult(ckbVirtualTxResult, '2-btc-transfer');
 
     // Send BTC tx
-    const psbt = await sendRgbppUtxos({
-      ckbVirtualTx: ckbRawTx,
-      commitment,
-      tos: [toBtcAddress],
-      ckbCollector: collector,
-      from: btcAddress!,
-      source: btcDataSource,
-    });
-    psbt.signAllInputs(btcKeyPair);
-    psbt.finalizeAllInputs();
+    const psbt = bitcoin.Psbt.fromHex(btcPsbtHex);
+    const { txId: btcTxId } = await signAndSendPsbt(psbt, btcAccount, btcService);
+    console.log(`BTC ${BTC_TESTNET_TYPE} TxId: ${btcTxId}`);
+    console.log(`explorer: https://mempool.space/signet/tx/${btcTxId}`);
 
-    const btcTx = psbt.extractTransaction();
-    const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
-
-    console.log('BTC TxId: ', btcTxId);
-    console.log(`explorer: https://mempool.space/testnet/tx/${btcTxId}`);
-
-    writeStepLog('2', {
+    writeStepLog('transfer-id', {
       txid: btcTxId,
       index: 1,
     });
@@ -78,8 +74,8 @@ const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transfe
 // Use your real BTC UTXO information on the BTC Testnet
 // rgbppLockArgs: outIndexU32 + btcTxId
 transfer({
-  rgbppLockArgsList: [buildRgbppLockArgs(readStepLog('0').index, readStepLog('0').txid)],
+  rgbppLockArgsList: [buildRgbppLockArgs(readStepLog('prepare-utxo').index, readStepLog('prepare-utxo').txid)],
   toBtcAddress: 'tb1qtt2vh9q8xam35xxsy35ec6majad8lz8fep8w04',
-  xudtTypeArgs: readStepLog('1').args,
+  xudtTypeArgs: readStepLog('xUDT-type-script').args,
   transferAmount: BigInt(500_0000_0000),
 });

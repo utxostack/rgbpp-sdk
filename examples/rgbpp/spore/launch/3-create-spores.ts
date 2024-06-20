@@ -2,12 +2,12 @@ import { BtcAssetsApiError, genCreateSporeCkbVirtualTx, sendRgbppUtxos } from 'r
 import {
   isMainnet,
   collector,
-  btcAddress,
   btcDataSource,
-  btcKeyPair,
   btcService,
   CKB_PRIVATE_KEY,
   ckbAddress,
+  btcAccount,
+  BTC_TESTNET_TYPE,
 } from '../../env';
 import {
   Hex,
@@ -19,8 +19,9 @@ import {
   updateCkbTxWithRealBtcTxId,
   RawSporeData,
 } from 'rgbpp/ckb';
-import { transactionToHex, utf8ToBuffer } from 'rgbpp/btc';
+import { utf8ToBuffer } from 'rgbpp/btc';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
+import { signAndSendPsbt } from '../../shared/btc-account';
 
 interface SporeCreateParams {
   clusterRgbppLockArgs: Hex;
@@ -38,6 +39,7 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
     clusterRgbppLockArgs,
     isMainnet,
     ckbFeeRate: BigInt(2000),
+    btcTestnetType: BTC_TESTNET_TYPE,
   });
 
   // Save ckbVirtualTxResult
@@ -47,24 +49,20 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
 
   // Send BTC tx
   // The first btc address is the owner of the cluster cell and the rest btc addresses are spore receivers
-  const btcTos = [btcAddress!, ...receivers.map((receiver) => receiver.toBtcAddress)];
+  const btcTos = [btcAccount.from, ...receivers.map((receiver) => receiver.toBtcAddress)];
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
     tos: btcTos,
     needPaymaster: needPaymasterCell,
     ckbCollector: collector,
-    from: btcAddress!,
+    from: btcAccount.from,
+    fromPubkey: btcAccount.fromPubkey,
     source: btcDataSource,
     feeRate: 120,
   });
-  psbt.signAllInputs(btcKeyPair);
-  psbt.finalizeAllInputs();
 
-  const btcTx = psbt.extractTransaction();
-  const btcTxBytes = transactionToHex(btcTx, false);
-  const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
-
+  const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
   console.log('BTC TxId: ', btcTxId);
 
   const interval = setInterval(async () => {
@@ -117,6 +115,9 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
 };
 
 // Please use your real BTC UTXO information on the BTC Testnet
+// BTC Testnet3: https://mempool.space/testnet
+// BTC Signet: https://mempool.space/signet
+
 // rgbppLockArgs: outIndexU32 + btcTxId
 createSpores({
   // The cluster cell will be spent and the new cluster cell will be created in each spore creation tx,

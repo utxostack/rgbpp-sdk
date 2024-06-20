@@ -1,5 +1,18 @@
 # rgbpp
 
+## 0.4.0
+
+### Minor Changes
+
+- [#216](https://github.com/ckb-cell/rgbpp-sdk/pull/216): Export buildRgbppTransferTx from rgbpp package ([@duanyytop](https://github.com/duanyytop))
+
+### Patch Changes
+
+- Updated dependencies [[`1ecac34`](https://github.com/ckb-cell/rgbpp-sdk/commit/1ecac341d5ced04e59bfdcd432a9bce84bedd959), [`e5f41fd`](https://github.com/ckb-cell/rgbpp-sdk/commit/e5f41fd2b275182d2ab3fdf17e3b8853025fd2b9), [`08200c9`](https://github.com/ckb-cell/rgbpp-sdk/commit/08200c974ef336661723cc7556a003932babda9a), [`6e840c1`](https://github.com/ckb-cell/rgbpp-sdk/commit/6e840c196fbece06430c559aebbdadaf7fb6e632)]:
+  - @rgbpp-sdk/btc@0.4.0
+  - @rgbpp-sdk/service@0.4.0
+  - @rgbpp-sdk/ckb@0.4.0
+
 ## v0.3.0
 
 ### Patch Changes

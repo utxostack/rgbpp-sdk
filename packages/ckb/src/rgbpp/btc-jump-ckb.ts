@@ -34,9 +34,9 @@ import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-util
  * @param rgbppLockArgsList The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred
  * @param toCkbAddress The receiver ckb address
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
- * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
- * @param isMainnet
+ * @param witnessLockPlaceholderSize(Optional) The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+ * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
+ * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const genBtcJumpCkbVirtualTx = async ({
   collector,
@@ -46,6 +46,7 @@ export const genBtcJumpCkbVirtualTx = async ({
   toCkbAddress,
   witnessLockPlaceholderSize,
   ckbFeeRate,
+  btcTestnetType,
 }: BtcJumpCkbVirtualTxParams): Promise<BtcJumpCkbVirtualTxResult> => {
   const isMainnet = toCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
@@ -56,7 +57,7 @@ export const genBtcJumpCkbVirtualTx = async ({
 
   const deduplicatedLockArgsList = deduplicateList(rgbppLockArgsList);
 
-  const rgbppLocks = deduplicatedLockArgsList.map((args) => genRgbppLockScript(args, isMainnet));
+  const rgbppLocks = deduplicatedLockArgsList.map((args) => genRgbppLockScript(args, isMainnet, btcTestnetType));
   let rgbppTargetCells: IndexerCell[] = [];
   let rgbppOtherTypeCells: IndexerCell[] = [];
   for await (const rgbppLock of rgbppLocks) {
@@ -98,7 +99,7 @@ export const genBtcJumpCkbVirtualTx = async ({
   // The BTC time cell does not need to be bound to the BTC UTXO
   const outputs: CKBComponents.CellOutput[] = [
     {
-      lock: genBtcTimeLockScript(toLock, isMainnet),
+      lock: genBtcTimeLockScript(toLock, isMainnet, btcTestnetType),
       type: xudtType,
       capacity: append0x(receiverOutputCapacity.toString(16)),
     },
@@ -112,7 +113,7 @@ export const genBtcJumpCkbVirtualTx = async ({
     const udtChangeCapacity = isCapacitySufficient ? sumInputsCapacity - receiverOutputCapacity : rgbppCellCapacity;
     outputs.push({
       // The Vouts[0] for OP_RETURN and Vouts[1] for RGBPP assets, BTC time cells don't need btc tx out_index
-      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
+      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet, btcTestnetType),
       type: xudtType,
       capacity: append0x(udtChangeCapacity.toString(16)),
     });
@@ -129,12 +130,12 @@ export const genBtcJumpCkbVirtualTx = async ({
     outputs.push({
       ...otherRgbppCell.output,
       // Vouts[targetRgbppOutputLen + 1], ..., Vouts[targetRgbppOutputLen + rgbppOtherTypeCells.length] for other RGBPP assets
-      lock: genRgbppLockScript(buildPreLockArgs(targetRgbppOutputLen + index + 1), isMainnet),
+      lock: genRgbppLockScript(buildPreLockArgs(targetRgbppOutputLen + index + 1), isMainnet, btcTestnetType),
     });
     outputsData.push(otherRgbppCell.outputData);
   }
 
-  const cellDeps = await fetchTypeIdCellDeps(isMainnet, { rgbpp: true, xudt: true });
+  const cellDeps = await fetchTypeIdCellDeps(isMainnet, { rgbpp: true, xudt: true }, btcTestnetType);
   if (needPaymasterCell) {
     cellDeps.push(getSecp256k1CellDep(isMainnet));
   }

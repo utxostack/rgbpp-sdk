@@ -1,5 +1,5 @@
 import { BtcApiUtxoParams, BtcAssetsApi, BtcAssetsApiError, ErrorCodes as ServiceErrorCodes } from '@rgbpp-sdk/service';
-import { Output, Utxo } from '../transaction/utxo';
+import { BaseOutput, Output, Utxo } from '../transaction/utxo';
 import { NetworkType } from '../preset/types';
 import { ErrorCodes, TxBuildError } from '../error';
 import { TxAddressOutput } from '../transaction/build';
@@ -107,10 +107,7 @@ export class DataSource {
     onlyConfirmedUtxos?: boolean;
     noAssetsApiCache?: boolean;
     internalCacheKey?: string;
-    excludeUtxos?: {
-      txid: string;
-      vout: number;
-    }[];
+    excludeUtxos?: BaseOutput[];
   }): Promise<{
     utxos: Utxo[];
     satoshi: number;

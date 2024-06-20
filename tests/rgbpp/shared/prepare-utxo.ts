@@ -1,24 +1,22 @@
 import { sendBtc } from 'rgbpp/btc';
-import { getFastestFeeRate, writeStepLog } from './utils';
+import { writeStepLog } from './utils';
 import { BtcAssetsApiError } from 'rgbpp/service';
-import { btcAddress, btcDataSource, btcKeyPair, btcService } from '../env';
+import { btcAccount, btcDataSource, btcKeyPair, btcService } from '../env';
 
-const prepareUtxo = async () => {
-  const feeRate = await getFastestFeeRate();
-  console.log('feeRate = ', feeRate);
-  console.log(btcAddress);
+const prepareUtxo = async (index: string | number) => {
+  console.log(btcAccount.from);
 
   // Send BTC tx
   const psbt = await sendBtc({
-    from: btcAddress!,
+    from: btcAccount.from!,
     tos: [
       {
-        address: btcAddress!,
+        address: btcAccount.from!,
         value: 546,
         minUtxoSatoshi: 546,
       },
     ],
-    feeRate: feeRate,
+    feeRate: 1,
     source: btcDataSource,
   });
 
@@ -31,9 +29,9 @@ const prepareUtxo = async () => {
   console.log(tx.toHex());
 
   const { txid: btcTxId } = await btcService.sendBtcTransaction(tx.toHex());
-  console.log(`explorer: https://mempool.space/testnet/tx/${btcTxId}`);
+  console.log(`explorer: https://mempool.space/signet/tx/${btcTxId}`);
 
-  writeStepLog('0', {
+  writeStepLog(String(index), {
     txid: btcTxId,
     index: 0,
   });
@@ -54,4 +52,4 @@ const prepareUtxo = async () => {
   }, 20 * 1000);
 };
 
-prepareUtxo();
+prepareUtxo('prepare-utxo');

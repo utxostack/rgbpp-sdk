@@ -1,7 +1,7 @@
 import { BtcAssetsApi, RgbppApiSpvProof } from '@rgbpp-sdk/service';
 import { Collector } from '../collector';
 import { IndexerCell } from './collector';
-import { Address, Hex } from './common';
+import { Address, Hex, BTCTestnetType } from './common';
 
 export interface ConstructPaymasterParams {
   // The collector that collects CKB live cells and transactions
@@ -25,7 +25,10 @@ export interface BtcTransferVirtualTxParams {
   rgbppLockArgsList: Hex[];
   // The XUDT amount to be transferred, if the noMergeOutputCells is true, the transferAmount will be ignored
   transferAmount: bigint;
+  // True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
   isMainnet: boolean;
+  // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+  btcTestnetType?: BTCTestnetType;
   // The noMergeOutputCells indicates whether the CKB outputs need to be merged. By default, the outputs will be merged.
   noMergeOutputCells?: boolean;
   // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
@@ -50,7 +53,10 @@ export interface BtcBatchTransferVirtualTxParams {
   rgbppLockArgsList: Hex[];
   // The rgbpp receiver list which include toRgbppLockArgs and transferAmount
   rgbppReceivers: RgbppBtcAddressReceiver[];
+  // True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
   isMainnet: boolean;
+  // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+  btcTestnetType?: BTCTestnetType;
 }
 
 export interface RgbppCkbVirtualTx {
@@ -106,6 +112,7 @@ export interface AppendPaymasterCellAndSignTxParams {
   sumInputsCapacity: Hex;
   // The paymaster cell to be inserted into CKB transaction to pay an extra output cell
   paymasterCell: IndexerCell;
+  // True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
   isMainnet: boolean;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
@@ -130,7 +137,10 @@ export interface BtcTimeCellsParams {
   btcTimeCells: IndexerCell[];
   // BTC Assets Api
   btcAssetsApi: BtcAssetsApi;
+  // True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
   isMainnet: boolean;
+  // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+  btcTestnetType?: BTCTestnetType;
 }
 
 export interface SignBtcTimeCellsTxParams {
@@ -142,6 +152,7 @@ export interface SignBtcTimeCellsTxParams {
   collector: Collector;
   // The master CKB address to pay the time cells spent tx fee
   masterCkbAddress: Address;
+  // True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
   isMainnet: boolean;
   // [u64; 2], filter cells by output capacity range, [inclusive, exclusive]
   outputCapacityRange?: Hex[];
@@ -164,6 +175,8 @@ export interface CkbJumpBtcVirtualTxParams {
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
+  // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+  btcTestnetType?: BTCTestnetType;
 }
 
 export interface UpdateCkbTxWithRealBtcTxIdParams {
@@ -171,6 +184,7 @@ export interface UpdateCkbTxWithRealBtcTxIdParams {
   ckbRawTx: CKBComponents.RawTransaction;
   // The BTC transaction id
   btcTxId: Hex;
+  // True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
   isMainnet: boolean;
 }
 
@@ -181,6 +195,8 @@ export interface BtcTimeCellStatusParams {
   ckbAddress: Address;
   // The BTC transaction id
   btcTxId: Hex;
+  // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+  btcTestnetType?: BTCTestnetType;
 }
 
 export interface RgbppLockArgsReceiver {
@@ -203,6 +219,8 @@ export interface CkbBatchJumpBtcVirtualTxParams {
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
+  // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+  btcTestnetType?: BTCTestnetType;
 }
 
 export interface AppendIssuerCellToBtcBatchTransfer {
@@ -216,6 +234,7 @@ export interface AppendIssuerCellToBtcBatchTransfer {
   ckbRawTx: CKBComponents.RawTransaction;
   // The sum capacity of the ckb inputs
   sumInputsCapacity: Hex;
+  // True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
   isMainnet: boolean;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
@@ -242,9 +261,12 @@ export interface RgbppLaunchCkbVirtualTxParams {
   launchAmount: bigint;
   // The RGBPP token info https://github.com/ckb-cell/unique-cell?tab=readme-ov-file#xudt-information
   rgbppTokenInfo: RgbppTokenInfo;
+  // True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+  isMainnet: boolean;
+  // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+  btcTestnetType?: BTCTestnetType;
   // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
-  isMainnet: boolean;
 }

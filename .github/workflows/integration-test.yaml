@@ -4,14 +4,23 @@ name: Integration Tests
 
 on:
   workflow_dispatch:
-  pull_request:
+  # Run integration-tests every day
+  schedule:
+    - cron: '59 0 * * *'
 
+# https://docs.github.com/en/actions/using-jobs/using-concurrency
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        env_set: [ xudt, spore ]
+
     steps:
       - name: Checkout rgbpp-sdk
         uses: actions/checkout@v4
@@ -33,12 +42,25 @@ jobs:
       - name: Build packages
         run: pnpm run build:packages
 
+
       - name: Run integration:xudt script
         working-directory: ./tests/rgbpp
+        if: ${{ matrix.env_set == 'xudt' }}
         run: pnpm run integration:xudt
         env:
-          VITE_SERVICE_URL: ${{ secrets.SERVICE_URL }}
-          VITE_SERVICE_TOKEN: ${{ secrets.SERVICE_TOKEN }}
-          VITE_SERVICE_ORIGIN: ${{ secrets.SERVICE_ORIGIN }}
+          VITE_SERVICE_URL: https://api.signet.rgbpp.io
+          VITE_SERVICE_TOKEN: ${{ secrets.SIGNET_SERVICE_TOKEN }}
+          VITE_SERVICE_ORIGIN: https://api.signet.rgbpp.io
           INTEGRATION_CKB_PRIVATE_KEY: ${{ secrets.INTEGRATION_CKB_PRIVATE_KEY }}
           INTEGRATION_BTC_PRIVATE_KEY: ${{ secrets.INTEGRATION_BTC_PRIVATE_KEY }}
+
+      - name: Run integration:spore script
+        working-directory: ./tests/rgbpp
+        if: ${{ matrix.env_set == 'spore' }}
+        run: pnpm run integration:spore
+        env:
+          VITE_SERVICE_URL: https://api.signet.rgbpp.io
+          VITE_SERVICE_TOKEN: ${{ secrets.SIGNET_SERVICE_TOKEN }}
+          VITE_SERVICE_ORIGIN: https://api.signet.rgbpp.io
+          INTEGRATION_CKB_PRIVATE_KEY: ${{ secrets.INTEGRATION_CKB_SPORE_PRIVATE_KEY }}
+          INTEGRATION_BTC_PRIVATE_KEY: ${{ secrets.INTEGRATION_BTC_SPORE_PRIVATE_KEY }}

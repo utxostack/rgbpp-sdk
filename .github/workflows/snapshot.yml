@@ -63,22 +63,29 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish to npm
-        id: changesets
+      - name: Publish snapshot versions to npm
         uses: changesets/action@v1
+        id: changesets
         with:
-          publish: npx changeset publish --no-git-tag --snapshot --tag snap
+          publish: npx changeset publish --snapshot --tag snap
           createGithubReleases: false
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create commit comment
-        uses: peter-evans/commit-comment@v3
-        if: ${{ steps.changesets.outputs.published == 'true' }}
+      - name: Create comment on commit
+        uses: actions/github-script@v7
+        if: steps.changesets.outputs.published
+        env:
+          PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          body: |
-            ```json
-            ${{ steps.changesets.outputs.publishedPackages }}
-            ```
+          script: |
+            const packages = JSON.parse(process.env.PACKAGES)
+            const packagesTable = packages.map((p) => `| ${p.name} | \`${p.version}\` |`)
+            const body = ['New snapshot version of the rgbpp-sdk packages have been released:', '| Name | Version |', '| --- | --- |', packagesTable].join('\n')
+            github.rest.repos.createCommitComment({
+              commit_sha: context.sha,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body,
+            });

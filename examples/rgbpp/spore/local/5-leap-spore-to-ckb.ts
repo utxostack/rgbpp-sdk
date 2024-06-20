@@ -8,11 +8,12 @@ import {
   generateSporeTransferCoBuild,
   genLeapSporeFromBtcToCkbVirtualTx,
 } from 'rgbpp/ckb';
-import { sendRgbppUtxos, transactionToHex } from 'rgbpp/btc';
+import { sendRgbppUtxos } from 'rgbpp/btc';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../../env';
+import { isMainnet, collector, btcDataSource, btcService, btcAccount, BTC_TESTNET_TYPE } from '../../env';
 import { BtcAssetsApiError } from 'rgbpp';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
+import { signAndSendPsbt } from '../../shared/btc-account';
 
 interface SporeLeapParams {
   sporeRgbppLockArgs: Hex;
@@ -34,6 +35,7 @@ const leapSpore = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTypeArgs }: Sp
     sporeTypeBytes,
     toCkbAddress,
     isMainnet,
+    btcTestnetType: BTC_TESTNET_TYPE,
   });
 
   // Save ckbVirtualTxResult
@@ -47,20 +49,16 @@ const leapSpore = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTypeArgs }: Sp
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
-    tos: [btcAddress!],
+    tos: [btcAccount.from],
     needPaymaster: needPaymasterCell,
     ckbCollector: collector,
-    from: btcAddress!,
+    from: btcAccount.from,
+    fromPubkey: btcAccount.fromPubkey,
     source: btcDataSource,
     feeRate: 120,
   });
-  psbt.signAllInputs(btcKeyPair);
-  psbt.finalizeAllInputs();
 
-  const btcTx = psbt.extractTransaction();
-  const btcTxBytes = transactionToHex(btcTx, false);
-  const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
-
+  const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
   console.log('BTC TxId: ', btcTxId);
 
   const interval = setInterval(async () => {
@@ -93,6 +91,9 @@ const leapSpore = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTypeArgs }: Sp
 };
 
 // Please use your real BTC UTXO information on the BTC Testnet
+// BTC Testnet3: https://mempool.space/testnet
+// BTC Signet: https://mempool.space/signet
+
 // rgbppLockArgs: outIndexU32 + btcTxId
 leapSpore({
   // The spore rgbpp lock args is from 3-create-spore.ts

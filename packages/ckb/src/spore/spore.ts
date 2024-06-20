@@ -56,17 +56,17 @@ import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
  * @param collector The collector that collects CKB live cells and transactions
  * @param clusterRgbppLockArgs The cluster rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param sporeDataList The spore's data list, including name and description.
+ * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const genCreateSporeCkbVirtualTx = async ({
   collector,
   clusterRgbppLockArgs,
   sporeDataList,
   isMainnet,
+  btcTestnetType,
 }: CreateSporeCkbVirtualTxParams): Promise<SporeCreateVirtualTxResult> => {
-  const clusterRgbppLock = {
-    ...getRgbppLockScript(isMainnet),
-    args: append0x(clusterRgbppLockArgs),
-  };
+  const clusterRgbppLock = genRgbppLockScript(clusterRgbppLockArgs, isMainnet, btcTestnetType);
   const clusterCells = await collector.getCells({ lock: clusterRgbppLock, isDataMustBeEmpty: false });
   if (!clusterCells || clusterCells.length === 0) {
     throw new NoRgbppLiveCellError('No cluster rgbpp cells found with the cluster rgbpp lock args');
@@ -96,7 +96,7 @@ export const genCreateSporeCkbVirtualTx = async ({
 
   const sporeOutputs = sporeDataList.map((data, index) => ({
     // The BTC transaction Vouts[0] for OP_RETURN, Vouts[1] for cluster and Vouts[2]... for spore
-    lock: genRgbppLockScript(buildPreLockArgs(index + 2), isMainnet),
+    lock: genRgbppLockScript(buildPreLockArgs(index + 2), isMainnet, btcTestnetType),
     type: {
       ...getSporeTypeScript(isMainnet),
       // The CKB transaction outputs[0] fro cluster and outputs[1]... for spore
@@ -110,13 +110,13 @@ export const genCreateSporeCkbVirtualTx = async ({
     {
       ...clusterCell.output,
       // The BTC transaction Vouts[0] for OP_RETURN, Vouts[1] for cluster
-      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
+      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet, btcTestnetType),
     },
     ...sporeOutputs,
   ];
   const outputsData: Hex[] = [clusterCell.outputData, ...sporeOutputsData];
   const cellDeps = [
-    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true })),
+    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true }, btcTestnetType)),
     getClusterTypeDep(isMainnet),
     getSporeTypeDep(isMainnet),
     clusterCellDep,
@@ -161,8 +161,8 @@ const CELL_DEP_SIZE = 32 + 4 + 1;
  * @param collector The collector that collects CKB live cells and transactions
  * @param ckbRawTx CKB raw transaction
  * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 65
- * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ * @param witnessLockPlaceholderSize(Optional) The WitnessArgs.lock placeholder bytes array size and the default value is 65
+ * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
  */
 export const buildAppendingIssuerCellToSporesCreateTx = async ({
   issuerAddress,
@@ -217,7 +217,8 @@ export const buildAppendingIssuerCellToSporesCreateTx = async ({
  * @param collector The collector that collects CKB live cells and transactions
  * @param ckbRawTx CKB raw transaction
  * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
- * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
  */
 export const appendIssuerCellToSporesCreate = async ({
   secp256k1PrivateKey,
@@ -244,7 +245,6 @@ export const appendIssuerCellToSporesCreate = async ({
 
   const keyMap = new Map<string, string>();
   keyMap.set(scriptToHash(issuerLock), secp256k1PrivateKey);
-  keyMap.set(scriptToHash(getRgbppLockScript(isMainnet)), '');
 
   const issuerCellIndex = rgbppInputsLength;
   const cells = rawTx.inputs.map((input, index) => ({
@@ -285,8 +285,10 @@ export const appendIssuerCellToSporesCreate = async ({
  * @param collector The collector that collects CKB live cells and transactions
  * @param sporeRgbppLockArgs The spore rgbpp cell lock script args whose data structure is: out_index | bitcoin_tx_id
  * @param sporeTypeBytes The spore type script serialized bytes
- * @param witnessLockPlaceholderSize The WitnessArgs.lock placeholder bytes array size and the default value is 5000
- * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+ * @param witnessLockPlaceholderSize(Optional) The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+ * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
+ * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const genTransferSporeCkbVirtualTx = async ({
   collector,
@@ -295,11 +297,9 @@ export const genTransferSporeCkbVirtualTx = async ({
   isMainnet,
   witnessLockPlaceholderSize,
   ckbFeeRate,
+  btcTestnetType,
 }: TransferSporeCkbVirtualTxParams): Promise<SporeTransferVirtualTxResult> => {
-  const sporeRgbppLock = {
-    ...getRgbppLockScript(isMainnet),
-    args: append0x(sporeRgbppLockArgs),
-  };
+  const sporeRgbppLock = genRgbppLockScript(sporeRgbppLockArgs, isMainnet, btcTestnetType);
   const sporeCells = await collector.getCells({ lock: sporeRgbppLock, isDataMustBeEmpty: false });
 
   throwErrorWhenSporeCellsInvalid(sporeCells, sporeTypeBytes, isMainnet);
@@ -317,11 +317,14 @@ export const genTransferSporeCkbVirtualTx = async ({
     {
       ...sporeCell.output,
       // The BTC transaction Vouts[0] for OP_RETURN, Vouts[1] for spore
-      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet),
+      lock: genRgbppLockScript(buildPreLockArgs(1), isMainnet, btcTestnetType),
     },
   ];
   const outputsData: Hex[] = [sporeCell.outputData];
-  const cellDeps = [...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true })), getSporeTypeDep(isMainnet)];
+  const cellDeps = [
+    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true }, btcTestnetType)),
+    getSporeTypeDep(isMainnet),
+  ];
   const sporeCoBuild = generateSporeTransferCoBuild([sporeCell], outputs);
   const witnesses = [RGBPP_WITNESS_PLACEHOLDER, sporeCoBuild];
 

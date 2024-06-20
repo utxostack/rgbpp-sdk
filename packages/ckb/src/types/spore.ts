@@ -1,5 +1,5 @@
 import { RawClusterData, RawSporeData } from '@spore-sdk/core';
-import { Address, Hex } from './common';
+import { Address, Hex, BTCTestnetType } from './common';
 import { Collector } from '../collector';
 import { IndexerCell } from './collector';
 
@@ -10,7 +10,10 @@ export interface CreateClusterCkbVirtualTxParams {
   rgbppLockArgs: Hex;
   // The cluster's data, including name and description.
   clusterData: RawClusterData;
+  // True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
   isMainnet: boolean;
+  // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+  btcTestnetType?: BTCTestnetType;
   // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
@@ -35,7 +38,10 @@ export interface CreateSporeCkbVirtualTxParams {
   clusterRgbppLockArgs: Hex;
   // The cluster's data, including name and description.
   sporeDataList: RawSporeData[];
+  // True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
   isMainnet: boolean;
+  // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+  btcTestnetType?: BTCTestnetType;
   // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
@@ -81,6 +87,7 @@ export interface AppendIssuerCellToSporeCreate {
   ckbRawTx: CKBComponents.RawTransaction;
   // The sum capacity of the ckb inputs
   sumInputsCapacity: Hex;
+  // True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
   isMainnet: boolean;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
@@ -100,7 +107,10 @@ export interface TransferSporeCkbVirtualTxParams {
   sporeRgbppLockArgs: Hex;
   // The spore type script serialized bytes
   sporeTypeBytes: Hex;
+  // True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
   isMainnet: boolean;
+  // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+  btcTestnetType?: BTCTestnetType;
   // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
@@ -131,7 +141,10 @@ export interface LeapSporeFromBtcToCkbVirtualTxParams {
   sporeTypeBytes: Hex;
   // The receiver ckb address
   toCkbAddress: Address;
+  // True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
   isMainnet: boolean;
+  // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+  btcTestnetType?: BTCTestnetType;
   // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
@@ -147,7 +160,10 @@ export interface LeapSporeFromCkbToBtcVirtualTxParams {
   toRgbppLockArgs: Hex;
   // The spore type script serialized bytes
   sporeTypeBytes: Hex;
+  // True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
   isMainnet: boolean;
+  // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+  btcTestnetType?: BTCTestnetType;
   // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100

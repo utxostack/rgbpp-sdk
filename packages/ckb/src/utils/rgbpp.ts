@@ -1,5 +1,5 @@
 import { sha256 } from 'js-sha256';
-import { Hex, IndexerCell, RgbppCkbVirtualTx, RgbppTokenInfo, SpvClientCellTxProof } from '../types';
+import { BTCTestnetType, Hex, IndexerCell, RgbppCkbVirtualTx, RgbppTokenInfo, SpvClientCellTxProof } from '../types';
 import { append0x, remove0x, reverseHex, u32ToLe, u8ToHex, utf8ToHex } from './hex';
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
@@ -31,9 +31,9 @@ import {
 } from '../error';
 import { calculateRgbppCellCapacity, isScriptEqual, isUDTTypeSupported } from './ckb-tx';
 
-export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean) => {
+export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean, btcTestnetType?: BTCTestnetType) => {
   return {
-    ...getRgbppLockScript(isMainnet),
+    ...getRgbppLockScript(isMainnet, btcTestnetType),
     args: append0x(rgbppLockArgs),
   } as CKBComponents.Script;
 };
@@ -51,10 +51,14 @@ export const genBtcTimeLockArgs = (lock: CKBComponents.Script, btcTxId: Hex, aft
     btc_txid: Byte32,
   }
  */
-export const genBtcTimeLockScript = (toLock: CKBComponents.Script, isMainnet: boolean) => {
+export const genBtcTimeLockScript = (
+  toLock: CKBComponents.Script,
+  isMainnet: boolean,
+  btcTestnetType?: BTCTestnetType,
+) => {
   const args = genBtcTimeLockArgs(toLock, RGBPP_TX_ID_PLACEHOLDER, BTC_JUMP_CONFIRMATION_BLOCKS);
   return {
-    ...getBtcTimeLockScript(isMainnet),
+    ...getBtcTimeLockScript(isMainnet, btcTestnetType),
     args,
   } as CKBComponents.Script;
 };
@@ -113,16 +117,6 @@ export const btcTxIdFromBtcTimeLockArgs = (args: Hex): Hex => {
   return reverseHex(append0x(btcTimeLockArgs.btcTxid));
 };
 
-export const isRgbppLockOrBtcTimeLock = (lock: CKBComponents.Script, isMainnet: boolean) => {
-  const rgbppLock = getRgbppLockScript(isMainnet);
-  const isRgbppLock = lock.codeHash === rgbppLock.codeHash && lock.hashType === rgbppLock.hashType;
-
-  const btcTimeLock = getBtcTimeLockScript(isMainnet);
-  const isBtcTimeLock = lock.codeHash === btcTimeLock.codeHash && lock.hashType === btcTimeLock.hashType;
-
-  return isRgbppLock || isBtcTimeLock;
-};
-
 /**
  * https://learnmeabitcoin.com/technical/general/byte-order/
  * Whenever you're working with transaction/block hashes internally (e.g. inside raw bitcoin data), you use the natural byte order.
@@ -164,10 +158,15 @@ export const replaceLockArgsWithRealBtcTxId = (lockArgs: Hex, txId: Hex): Hex =>
   return `0x${remove0x(lockArgs).substring(0, argsLength - BTC_TX_ID_SIZE)}${remove0x(reverseHex(txId))}`;
 };
 
+const BTC_TESTNETS: BTCTestnetType[] = ['Testnet3', 'Signet'];
+const isLockEqual = (lock1: CKBComponents.Script, lock2: CKBComponents.Script) =>
+  lock1.codeHash === lock2.codeHash && lock1.hashType === lock2.hashType;
+
 export const isRgbppLockCell = (cell: CKBComponents.CellOutput, isMainnet: boolean): boolean => {
-  const rgbppLock = getRgbppLockScript(isMainnet);
-  const isRgbppLock = cell.lock.codeHash === rgbppLock.codeHash && cell.lock.hashType === rgbppLock.hashType;
-  return isRgbppLock;
+  if (isMainnet) {
+    return isLockEqual(cell.lock, getRgbppLockScript(isMainnet));
+  }
+  return BTC_TESTNETS.some((network) => isLockEqual(cell.lock, getRgbppLockScript(isMainnet, network)));
 };
 
 export const isRgbppLockCellIgnoreChain = (cell: CKBComponents.CellOutput): boolean => {
@@ -175,9 +174,20 @@ export const isRgbppLockCellIgnoreChain = (cell: CKBComponents.CellOutput): bool
 };
 
 export const isBtcTimeLockCell = (cell: CKBComponents.CellOutput, isMainnet: boolean): boolean => {
-  const btcTimeLock = getBtcTimeLockScript(isMainnet);
-  const isBtcTimeLock = cell.lock.codeHash === btcTimeLock.codeHash && cell.lock.hashType === btcTimeLock.hashType;
-  return isBtcTimeLock;
+  if (isMainnet) {
+    return isLockEqual(cell.lock, getBtcTimeLockScript(isMainnet));
+  }
+  return BTC_TESTNETS.some((network) => isLockEqual(cell.lock, getBtcTimeLockScript(isMainnet, network)));
+};
+
+export const isRgbppLockOrBtcTimeLock = (lock: CKBComponents.Script, isMainnet: boolean) => {
+  if (isMainnet) {
+    return isLockEqual(lock, getRgbppLockScript(isMainnet)) || isLockEqual(lock, getBtcTimeLockScript(isMainnet));
+  }
+  return BTC_TESTNETS.flatMap((network) => [
+    getRgbppLockScript(isMainnet, network),
+    getBtcTimeLockScript(isMainnet, network),
+  ]).some((script) => isLockEqual(script, lock));
 };
 
 export const transformSpvProof = (spvProof: RgbppApiSpvProof): SpvClientCellTxProof => {

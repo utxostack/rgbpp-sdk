@@ -2,8 +2,9 @@ import { buildRgbppLockArgs } from 'rgbpp/ckb';
 import { genLeapSporeFromBtcToCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
 import { getSporeTypeScript, Hex } from 'rgbpp/ckb';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { isMainnet, collector, btcAddress, btcDataSource, btcKeyPair, btcService } from '../env';
+import { isMainnet, collector, btcDataSource, btcService, btcAccount, BTC_TESTNET_TYPE } from '../env';
 import { saveCkbVirtualTxResult } from '../shared/utils';
+import { signAndSendPsbt } from '../shared/btc-account';
 
 interface SporeLeapParams {
   sporeRgbppLockArgs: Hex;
@@ -23,6 +24,7 @@ const leapSporeFromBtcToCkb = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTy
     sporeTypeBytes,
     toCkbAddress,
     isMainnet,
+    btcTestnetType: BTC_TESTNET_TYPE,
   });
 
   // Save ckbVirtualTxResult
@@ -34,19 +36,16 @@ const leapSporeFromBtcToCkb = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTy
   const psbt = await sendRgbppUtxos({
     ckbVirtualTx: ckbRawTx,
     commitment,
-    tos: [btcAddress!],
+    tos: [btcAccount.from],
     needPaymaster: needPaymasterCell,
     ckbCollector: collector,
-    from: btcAddress!,
+    from: btcAccount.from,
+    fromPubkey: btcAccount.fromPubkey,
     source: btcDataSource,
     feeRate: 30,
   });
-  psbt.signAllInputs(btcKeyPair);
-  psbt.finalizeAllInputs();
 
-  const btcTx = psbt.extractTransaction();
-  const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
-
+  const { txId: btcTxId } = await signAndSendPsbt(psbt, btcAccount, btcService);
   console.log('BTC TxId: ', btcTxId);
 
   await btcService.sendRgbppCkbTransaction({ btc_txid: btcTxId, ckb_virtual_result: ckbVirtualTxResult });
@@ -71,6 +70,9 @@ const leapSporeFromBtcToCkb = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTy
 };
 
 // Please use your real BTC UTXO information on the BTC Testnet
+// BTC Testnet3: https://mempool.space/testnet
+// BTC Signet: https://mempool.space/signet
+
 // rgbppLockArgs: outIndexU32 + btcTxId
 leapSporeFromBtcToCkb({
   sporeRgbppLockArgs: buildRgbppLockArgs(3, 'd8a31796fbd42c546f6b22014b9b82b16586ce1df81b0e7ca9a552cdc492a0af'),
