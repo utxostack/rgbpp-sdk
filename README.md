@@ -13,10 +13,10 @@ This repository offers utilities for Bitcoin and RGB++ asset integration.
 - Find code examples at https://github.com/ckb-cell/rgbpp-sdk/tree/develop/examples/rgbpp
 
 ## Related CKB Scripts (Contracts)
-- [CKB Bitcoin SPV Type Script](https://github.com/ckb-cell/ckb-bitcoin-spv-contracts/tree/master/contracts/ckb-bitcoin-spv-type-lock): A [type script](https://docs.nervos.org/docs/basics/glossary#type-script) for [Bitcoin SPV](https://bitcoinwiki.org/wiki/simplified-payment-verification) clients which synchronize [Bitcoin](https://bitcoin.org) state into [CKB](https://github.com/nervosnetwork/ckb)
+- [CKB Bitcoin SPV Type Script](https://github.com/ckb-cell/ckb-bitcoin-spv-contracts/tree/master/contracts/ckb-bitcoin-spv-type-lock): A [type script](https://docs-old.nervos.org/docs/basics/glossary#type-script) for [Bitcoin SPV](https://bitcoinwiki.org/wiki/simplified-payment-verification) clients which synchronize [Bitcoin](https://bitcoin.org) state into [CKB](https://github.com/nervosnetwork/ckb)
 
 - [RgbppLockScript and BtcTimeLockScript](https://github.com/ckb-cell/rgbpp-sdk/blob/63df2dcd95b1b735b5d235e156e4361a3c87b0ac/packages/ckb/src/constants/index.ts#L12-L206)
-  * design: https://github.com/ckb-cell/RGBPlusPlus-design/blob/main/docs/light-paper-en.md
+  * design: https://github.com/ckb-cell/RGBPlusPlus-design/blob/main/docs/lockscript-design-prd-en.md
   * testnet: https://pudge.explorer.nervos.org/scripts#RGB++
   * mainnet: https://explorer.nervos.org/scripts#RGB++
 
