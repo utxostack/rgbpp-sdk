@@ -8,6 +8,7 @@ export default defineConfig({
   bundle: true,
   sourcemap: true,
   splitting: true,
+  cjsInterop: true,
   target: 'esnext',
   format: ['esm', 'cjs'],
   entry: ['src/index.ts'],
