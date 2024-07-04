@@ -27,7 +27,7 @@ import {
 } from '../utils';
 import { buildSpvClientCellDep } from '../utils';
 import { blockchain } from '@ckb-lumos/base';
-import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
+import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses.js';
 
 export const buildBtcTimeUnlockWitness = (btcTxProof: Hex): Hex => {
   const btcTimeUnlock = BTCTimeUnlock.pack({ btcTxProof: blockchain.Bytes.pack(btcTxProof) });

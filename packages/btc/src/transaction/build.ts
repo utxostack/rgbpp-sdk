@@ -1,4 +1,4 @@
-import clone from 'lodash/cloneDeep';
+import cloneDeep from 'lodash/cloneDeep.js';
 import { bitcoin } from '../bitcoin';
 import { DataSource } from '../query/source';
 import { ErrorCodes, TxBuildError } from '../error';
@@ -76,7 +76,7 @@ export class TxBuilder {
       throw TxBuildError.withComment(ErrorCodes.DUPLICATED_UTXO, `hash: ${utxo.txid}, index: ${utxo.vout}`);
     }
 
-    utxo = clone(utxo);
+    utxo = cloneDeep(utxo);
     this.inputs.push(utxoToInput(utxo));
   }
 
@@ -115,7 +115,7 @@ export class TxBuilder {
       };
     }
     if ('address' in output || 'script' in output) {
-      result = clone(output);
+      result = cloneDeep(output);
     }
     if (!result) {
       throw new TxBuildError(ErrorCodes.UNSUPPORTED_OUTPUT);
@@ -149,8 +149,8 @@ export class TxBuilder {
     changeIndex: number;
   }> {
     const { address, publicKey, feeRate, changeAddress, deductFromOutputs, excludeUtxos } = props;
-    const originalInputs = clone(this.inputs);
-    const originalOutputs = clone(this.outputs);
+    const originalInputs = cloneDeep(this.inputs);
+    const originalOutputs = cloneDeep(this.outputs);
 
     // Create a cache key to enable the internal caching, prevent querying the Utxo[] too often
     // TODO: consider provide an option to disable the cache
@@ -174,8 +174,8 @@ export class TxBuilder {
     while (!isFeeExpected) {
       if (isLoopedOnce) {
         previousFee = currentFee;
-        this.inputs = clone(originalInputs);
-        this.outputs = clone(originalOutputs);
+        this.inputs = cloneDeep(originalInputs);
+        this.outputs = cloneDeep(originalOutputs);
       }
 
       const { needCollect, needReturn, inputsTotal } = this.summary();
@@ -527,8 +527,8 @@ export class TxBuilder {
       minUtxoSatoshi: this.minUtxoSatoshi,
     });
 
-    tx.inputs = clone(this.inputs);
-    tx.outputs = clone(this.outputs);
+    tx.inputs = cloneDeep(this.inputs);
+    tx.outputs = cloneDeep(this.outputs);
 
     return tx;
   }
