@@ -1,4 +1,3 @@
-import { Cell } from '@ckb-lumos/base';
 import { BtcAssetsApiBase } from './base';
 import {
   BtcApis,
@@ -18,6 +17,7 @@ import {
 } from '../types';
 import {
   RgbppApis,
+  RgbppCell,
   RgbppApiSpvProof,
   RgbppApiPaymasterInfo,
   RgbppApiTransactionState,
@@ -117,15 +117,15 @@ export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis
   }
 
   getRgbppAssetsByBtcTxId(btcTxId: string) {
-    return this.request<Cell[]>(`/rgbpp/v1/assets/${btcTxId}`);
+    return this.request<RgbppCell[]>(`/rgbpp/v1/assets/${btcTxId}`);
   }
 
   getRgbppAssetsByBtcUtxo(btcTxId: string, vout: number) {
-    return this.request<Cell[]>(`/rgbpp/v1/assets/${btcTxId}/${vout}`);
+    return this.request<RgbppCell[]>(`/rgbpp/v1/assets/${btcTxId}/${vout}`);
   }
 
   getRgbppAssetsByBtcAddress(btcAddress: string, params?: RgbppApiAssetsByAddressParams) {
-    return this.request<Cell[]>(`/rgbpp/v1/address/${btcAddress}/assets`, {
+    return this.request<RgbppCell[]>(`/rgbpp/v1/address/${btcAddress}/assets`, {
       params,
     });
   }

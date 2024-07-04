@@ -1,7 +1,7 @@
-import { Cell, blockchain } from '@ckb-lumos/base';
+import { Cell, blockchain, Script } from '@ckb-lumos/base';
 import { bytes } from '@ckb-lumos/codec';
 import { describe, expect, it } from 'vitest';
-import { BtcAssetsApiError, BtcAssetsApi, ErrorCodes, ErrorMessages } from '../src';
+import { BtcAssetsApiError, BtcAssetsApi, ErrorCodes, ErrorMessages, RgbppCell } from '../src';
 
 describe(
   'BtcServiceApi',
@@ -240,7 +240,7 @@ describe(
         expect(res).toBeDefined();
         expect(res.length).toBeGreaterThan(0);
         for (const cell of res) {
-          expectCell(cell);
+          expectRgbppCell(cell);
         }
       });
       it('getRgbppAssetsByBtcUtxo()', async () => {
@@ -248,7 +248,7 @@ describe(
         expect(res).toBeDefined();
         expect(res.length).toBeGreaterThan(0);
         for (const cell of res) {
-          expectCell(cell);
+          expectRgbppCell(cell);
         }
       });
       it('getRgbppAssetsByBtcAddress()', async () => {
@@ -258,7 +258,7 @@ describe(
         expect(res).toBeDefined();
         expect(res.length).toBeGreaterThan(0);
         for (const cell of res) {
-          expectCell(cell);
+          expectRgbppCell(cell);
         }
       });
       it('getRgbppBalanceByBtcAddress()', async () => {
@@ -274,6 +274,7 @@ describe(
           expect(xudt.available_amount).toBeTypeOf('string');
           expect(xudt.pending_amount).toBeTypeOf('string');
           expect(xudt.type_hash).toBeTypeOf('string');
+          expectScript(xudt.type_script);
         }
       });
       it('getRgbppSpvProof()', async () => {
@@ -315,4 +316,19 @@ function expectCell(cell: Cell) {
   expect(cell.outPoint?.index).toBeTypeOf('string');
 
   expect(cell.data).toBeTypeOf('string');
+}
+
+function expectRgbppCell(cell: RgbppCell) {
+  expectCell(cell);
+
+  if (cell.typeHash) {
+    expect(cell.typeHash).toBeTypeOf('string');
+  }
+}
+
+function expectScript(script: Script) {
+  expect(script).toBeDefined();
+  expect(script.codeHash).toBeTypeOf('string');
+  expect(script.hashType).toBeTypeOf('string');
+  expect(script.args).toBeTypeOf('string');
 }
