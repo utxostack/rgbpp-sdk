@@ -1,4 +1,4 @@
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash/cloneDeep.js';
 import { bitcoin } from '../bitcoin';
 import { ErrorCodes, TxBuildError } from '../error';
 import { NetworkType, RgbppBtcConfig } from './types';
