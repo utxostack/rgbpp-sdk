@@ -1,4 +1,4 @@
-import pickBy from 'lodash/pickBy';
+import pickBy from 'lodash/pickBy.js';
 import { isDomain } from '../utils';
 import { BtcAssetsApiError, ErrorCodes } from '../error';
 import { BaseApis, BaseApiRequestOptions, BtcAssetsApiToken, BtcAssetsApiContext, Json } from '../types';

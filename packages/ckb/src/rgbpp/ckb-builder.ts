@@ -22,10 +22,10 @@ import {
   u8ToHex,
 } from '../utils';
 import { InputsCapacityNotEnoughError } from '../error';
-import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
+import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses.js';
 import { buildSpvClientCellDep } from '../utils';
 import { RGBPPUnlock, Uint16 } from '../schemas/generated/rgbpp';
-import { Bytes } from '@ckb-lumos/base/lib/blockchain';
+import { Bytes } from '@ckb-lumos/base/lib/blockchain.js';
 
 export const buildRgbppUnlockWitness = (
   btcTxBytes: Hex,
