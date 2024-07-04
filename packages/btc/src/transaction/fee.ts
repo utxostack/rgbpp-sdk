@@ -1,10 +1,9 @@
-import { ECPairInterface } from 'ecpair';
 import { AddressType } from '../address';
 import { NetworkType } from '../preset/types';
 import { toXOnly, tweakSigner } from '../utils';
 import { networkTypeToNetwork } from '../preset/network';
 import { isP2trScript, isP2wpkhScript } from '../script';
-import { bitcoin, ECPair, isTaprootInput } from '../bitcoin';
+import { ECPairInterface, bitcoin, ECPair, isTaprootInput } from '../bitcoin';
 import { Utxo } from './utxo';
 
 interface FeeEstimateAccount {

@@ -1,4 +1,4 @@
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash/cloneDeep.js';
 import { ErrorCodes, TxBuildError } from '../error';
 import { DataSource } from '../query/source';
 import { AddressType, AddressToPubkeyMap } from '../address';
