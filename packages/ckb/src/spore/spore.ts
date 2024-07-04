@@ -49,7 +49,7 @@ import {
   scriptToHash,
   serializeWitnessArgs,
 } from '@nervosnetwork/ckb-sdk-utils';
-import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
+import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses.js';
 
 /**
  * Generate the virtual ckb transaction for creating spores
