@@ -8,7 +8,7 @@ import {
   assembleCreateClusterAction,
   assembleCreateSporeAction,
   assembleTransferClusterAction,
-} from '@spore-sdk/core/lib/cobuild';
+} from '@spore-sdk/core/lib/cobuild/index.js';
 import { u64ToLe } from './hex';
 import { Hex, IndexerCell, SporesCreateCobuildParams } from '../types';
 import { NoRgbppLiveCellError, RgbppSporeTypeMismatchError, RgbppUtxoBindMultiTypeAssetsError } from '../error';
