@@ -1,12 +1,12 @@
-import { Cell } from '@ckb-lumos/base';
+import { Cell, Hash, Script } from '@ckb-lumos/base';
 
 export interface RgbppApis {
   getRgbppPaymasterInfo(): Promise<RgbppApiPaymasterInfo>;
   getRgbppTransactionHash(btcTxId: string): Promise<RgbppApiCkbTransactionHash>;
   getRgbppTransactionState(btcTxId: string): Promise<RgbppApiTransactionState>;
-  getRgbppAssetsByBtcTxId(btcTxId: string): Promise<Cell[]>;
-  getRgbppAssetsByBtcUtxo(btcTxId: string, vout: number): Promise<Cell[]>;
-  getRgbppAssetsByBtcAddress(btcAddress: string, params?: RgbppApiAssetsByAddressParams): Promise<Cell[]>;
+  getRgbppAssetsByBtcTxId(btcTxId: string): Promise<RgbppCell[]>;
+  getRgbppAssetsByBtcUtxo(btcTxId: string, vout: number): Promise<RgbppCell[]>;
+  getRgbppAssetsByBtcAddress(btcAddress: string, params?: RgbppApiAssetsByAddressParams): Promise<RgbppCell[]>;
   getRgbppBalanceByBtcAddress(btcAddress: string, params?: RgbppApiBalanceByAddressParams): Promise<RgbppApiBalance>;
   getRgbppSpvProof(btcTxId: string, confirmations: number): Promise<RgbppApiSpvProof>;
   sendRgbppCkbTransaction(payload: RgbppApiSendCkbTransactionPayload): Promise<RgbppApiTransactionState>;
@@ -43,6 +43,10 @@ export interface RgbppApiTransactionState {
   };
 }
 
+export interface RgbppCell extends Cell {
+  typeHash?: Hash;
+}
+
 export interface RgbppApiAssetsByAddressParams {
   type_script?: string;
   no_cache?: boolean;
@@ -64,6 +68,7 @@ export interface RgbppApiXudtBalance {
   available_amount: string;
   pending_amount: string;
   type_hash: string;
+  type_script: Script;
 }
 
 export interface RgbppApiSpvProof {
