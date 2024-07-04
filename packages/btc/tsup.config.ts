@@ -1,13 +1,11 @@
 import { defineConfig } from 'tsup';
 
-import { dependencies, name } from './package.json';
-
-import config from '../../tsup-base.config';
-
 export default defineConfig({
-  ...config,
-  name,
+  name: '@rgbpp-sdk/btc',
+  dts: true,
+  clean: true,
+  sourcemap: true,
+  target: 'esnext',
+  format: ['esm', 'cjs'],
   entry: ['src/index.ts'],
-  external: Object.keys(dependencies),
-  platform: 'browser',
 });

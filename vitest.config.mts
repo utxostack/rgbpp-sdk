@@ -4,6 +4,5 @@ export default defineConfig({
   test: {
     watch: false,
     reporters: ['verbose'],
-    exclude: ['dist', 'node_modules'],
   },
 });
