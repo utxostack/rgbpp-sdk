@@ -1,13 +1,13 @@
 import { defineConfig } from 'tsup';
-
-import { dependencies, name } from './package.json';
-
-import config from '../../tsup-base.config';
+import { name } from './package.json';
 
 export default defineConfig({
-  ...config,
   name,
+  dts: true,
+  clean: true,
+  bundle: true,
+  sourcemap: true,
+  target: 'esnext',
+  format: ['esm', 'cjs'],
   entry: ['src/index.ts'],
-  external: Object.keys(dependencies),
-  platform: 'browser',
 });
