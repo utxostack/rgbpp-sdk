@@ -6,57 +6,56 @@
     "lint": "tsc && eslint --ext .ts src/* && prettier --check 'src/*.ts'",
     "lint:fix": "tsc && eslint --fix --ext .ts src/* && prettier --write 'src/*.ts'"
   },
-  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": [
-    "src",
-    "dist"
-  ],
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
       },
       "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
       }
     },
     "./btc": {
       "import": {
-        "types": "./dist/btc.d.ts",
-        "default": "./dist/btc.js"
+        "types": "./dist/btc.d.mts",
+        "default": "./dist/btc.mjs"
       },
       "require": {
-        "types": "./dist/btc.d.cts",
-        "default": "./dist/btc.cjs"
+        "types": "./dist/btc.d.ts",
+        "default": "./dist/btc.js"
       }
     },
     "./ckb": {
       "import": {
-        "types": "./dist/ckb.d.ts",
-        "default": "./dist/ckb.js"
+        "types": "./dist/ckb.d.mts",
+        "default": "./dist/ckb.mjs"
       },
       "require": {
-        "types": "./dist/ckb.d.cts",
-        "default": "./dist/ckb.cjs"
+        "types": "./dist/ckb.d.ts",
+        "default": "./dist/ckb.js"
       }
     },
     "./service": {
       "import": {
-        "types": "./dist/service.d.ts",
-        "default": "./dist/service.js"
+        "types": "./dist/service.d.mts",
+        "default": "./dist/service.mjs"
       },
       "require": {
-        "types": "./dist/service.d.cts",
-        "default": "./dist/service.cjs"
+        "types": "./dist/service.d.ts",
+        "default": "./dist/service.js"
       }
     },
     "./dist/*": "./dist/*",
     "./package.json": "./package.json"
   },
+  "files": [
+    "src",
+    "dist"
+  ],
   "dependencies": {
     "@rgbpp-sdk/btc": "workspace:*",
     "@rgbpp-sdk/ckb": "workspace:*",
