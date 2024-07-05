@@ -9,10 +9,12 @@ import {
   getXudtTypeScript,
 } from '../constants';
 import { Hex, RgbppTokenInfo } from '../types';
-import { PERSONAL, blake2b, hexToBytes, serializeInput, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
+import ckbUtils from '@nervosnetwork/ckb-sdk-utils';
 import { encodeRgbppTokenInfo, genBtcTimeLockScript } from './rgbpp';
 import { Collector } from '../collector';
 import { NoLiveCellError } from '../error';
+
+const { PERSONAL, blake2b, hexToBytes, serializeInput, serializeScript } = ckbUtils;
 
 export const calculateTransactionFee = (txSize: number, feeRate?: bigint): bigint => {
   const rate = feeRate ?? BigInt(1100);

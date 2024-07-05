@@ -37,14 +37,10 @@ import {
   getRgbppLockScript,
   getSecp256k1CellDep,
 } from '../constants';
-import {
-  addressToScript,
-  getTransactionSize,
-  rawTransactionToHash,
-  scriptToHash,
-  serializeWitnessArgs,
-} from '@nervosnetwork/ckb-sdk-utils';
+import ckbUtils from '@nervosnetwork/ckb-sdk-utils';
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses.js';
+
+const { addressToScript, getTransactionSize, rawTransactionToHash, scriptToHash, serializeWitnessArgs } = ckbUtils;
 
 /**
  * Generate the virtual ckb transaction for the btc transfer tx

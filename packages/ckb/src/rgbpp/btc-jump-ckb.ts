@@ -25,7 +25,9 @@ import {
 } from '../utils/rgbpp';
 import { Hex, IndexerCell } from '../types';
 import { RGBPP_WITNESS_PLACEHOLDER, getSecp256k1CellDep } from '../constants';
-import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
+import ckbUtils from '@nervosnetwork/ckb-sdk-utils';
+
+const { addressToScript, getTransactionSize } = ckbUtils;
 
 /**
  * Generate the virtual ckb transaction for the jumping tx from BTC to CKB

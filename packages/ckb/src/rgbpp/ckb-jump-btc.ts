@@ -12,7 +12,9 @@ import {
 } from '../utils';
 import { genRgbppLockScript } from '../utils/rgbpp';
 import { MAX_FEE, MIN_CAPACITY, RGBPP_TX_WITNESS_MAX_SIZE } from '../constants';
-import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
+import ckbUtils from '@nervosnetwork/ckb-sdk-utils';
+
+const { addressToScript, getTransactionSize } = ckbUtils;
 
 /**
  * Generate the virtual ckb transaction for the jumping tx from CKB to BTC
