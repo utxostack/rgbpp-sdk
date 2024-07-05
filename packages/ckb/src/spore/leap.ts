@@ -23,14 +23,11 @@ import {
 } from '../constants';
 import { generateSporeTransferCoBuild, throwErrorWhenSporeCellsInvalid } from '../utils/spore';
 import { NoRgbppLiveCellError } from '../error';
-import {
-  addressToScript,
-  getTransactionSize,
-  serializeOutPoint,
-  serializeWitnessArgs,
-} from '@nervosnetwork/ckb-sdk-utils';
+import * as ckbUtils from '@nervosnetwork/ckb-sdk-utils';
 import { blockchain } from '@ckb-lumos/base';
 import { buildBtcTimeUnlockWitness } from '../rgbpp';
+
+const { addressToScript, getTransactionSize, serializeOutPoint, serializeWitnessArgs } = ckbUtils;
 
 /**
  * Generate the virtual ckb transaction for leaping spore from BTC to CKB

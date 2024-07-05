@@ -1,4 +1,5 @@
-export { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
+import * as ckbUtils from '@nervosnetwork/ckb-sdk-utils';
+export const serializeScript = ckbUtils.serializeScript;
 
 export * from './schemas/generated/blockchain';
 export * from './schemas/generated/rgbpp';
