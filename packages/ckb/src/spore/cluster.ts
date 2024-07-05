@@ -11,7 +11,9 @@ import {
 } from '../constants';
 import { generateClusterCreateCoBuild, generateClusterId } from '../utils/spore';
 import { NoRgbppLiveCellError } from '../error';
-import { bytesToHex, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
+import * as ckbUtils from '@nervosnetwork/ckb-sdk-utils';
+
+const { bytesToHex, getTransactionSize } = ckbUtils;
 
 /**
  * Generate the virtual ckb transaction for creating cluster

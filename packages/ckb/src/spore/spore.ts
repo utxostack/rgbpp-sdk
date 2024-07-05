@@ -41,15 +41,11 @@ import {
   RgbppUtxoBindMultiTypeAssetsError,
   TypeAssetNotSupportedError,
 } from '../error';
-import {
-  addressToScript,
-  bytesToHex,
-  getTransactionSize,
-  rawTransactionToHash,
-  scriptToHash,
-  serializeWitnessArgs,
-} from '@nervosnetwork/ckb-sdk-utils';
+import * as ckbUtils from '@nervosnetwork/ckb-sdk-utils';
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses.js';
+
+const { addressToScript, bytesToHex, getTransactionSize, rawTransactionToHash, scriptToHash, serializeWitnessArgs } =
+  ckbUtils;
 
 /**
  * Generate the virtual ckb transaction for creating spores

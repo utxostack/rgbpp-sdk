@@ -1,5 +1,4 @@
-import { genBtcTransferCkbVirtualTx, getXudtTypeScript } from '@rgbpp-sdk/ckb';
-import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
+import { genBtcTransferCkbVirtualTx, getXudtTypeScript, serializeScript } from '@rgbpp-sdk/ckb';
 import { sendRgbppUtxos } from '@rgbpp-sdk/btc';
 import { RgbppTransferTxParams, RgbppTransferTxResult } from './types';
 
