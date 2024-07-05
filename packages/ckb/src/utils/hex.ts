@@ -1,5 +1,7 @@
-import { hexToBytes, bytesToHex } from '@nervosnetwork/ckb-sdk-utils';
+import * as ckbUtils from '@nervosnetwork/ckb-sdk-utils';
 import { Hex } from '../types';
+
+const { hexToBytes, bytesToHex } = ckbUtils;
 
 export const remove0x = (hex: string): string => {
   if (hex.startsWith('0x')) {
