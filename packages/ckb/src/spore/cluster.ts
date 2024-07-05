@@ -1,7 +1,17 @@
-import { RgbppCkbVirtualTx } from '../types/rgbpp';
 import { packRawClusterData } from '@spore-sdk/core';
-import { append0x, calculateTransactionFee, fetchTypeIdCellDeps } from '../utils';
-import { buildPreLockArgs, calculateCommitment, genRgbppLockScript } from '../utils/rgbpp';
+import { RgbppCkbVirtualTx } from '../types/rgbpp';
+import {
+  append0x,
+  calculateTransactionFee,
+  fetchTypeIdCellDeps,
+  bytesToHex,
+  getTransactionSize,
+  buildPreLockArgs,
+  calculateCommitment,
+  genRgbppLockScript,
+  generateClusterCreateCoBuild,
+  generateClusterId,
+} from '../utils';
 import { CreateClusterCkbVirtualTxParams, Hex, SporeVirtualTxResult } from '../types';
 import {
   RGBPP_TX_WITNESS_MAX_SIZE,
@@ -9,11 +19,7 @@ import {
   getClusterTypeDep,
   getClusterTypeScript,
 } from '../constants';
-import { generateClusterCreateCoBuild, generateClusterId } from '../utils/spore';
 import { NoRgbppLiveCellError } from '../error';
-import * as ckbUtils from '@nervosnetwork/ckb-sdk-utils';
-
-const { bytesToHex, getTransactionSize } = ckbUtils;
 
 /**
  * Generate the virtual ckb transaction for creating cluster

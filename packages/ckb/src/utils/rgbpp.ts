@@ -1,4 +1,5 @@
 import { sha256 } from 'js-sha256';
+import { RgbppApiSpvProof } from '@rgbpp-sdk/service';
 import { BTCTestnetType, Hex, IndexerCell, RgbppCkbVirtualTx, RgbppTokenInfo, SpvClientCellTxProof } from '../types';
 import { append0x, remove0x, reverseHex, u32ToLe, u8ToHex, utf8ToHex } from './hex';
 import {
@@ -10,12 +11,9 @@ import {
   getBtcTimeLockScript,
   getRgbppLockScript,
 } from '../constants';
-import * as ckbUtils from '@nervosnetwork/ckb-sdk-utils';
 import { BTCTimeLock } from '../schemas/generated/rgbpp';
 import { Script } from '../schemas/generated/blockchain';
-import { blockchain } from '@ckb-lumos/base';
 import { bytes } from '@ckb-lumos/codec';
-import { RgbppApiSpvProof } from '@rgbpp-sdk/service';
 import { toCamelcase } from './case-parser';
 import {
   InputsOrOutputsLenError,
@@ -23,9 +21,17 @@ import {
   RgbppCkbTxInputsExceededError,
   RgbppUtxoBindMultiTypeAssetsError,
 } from '../error';
-import { calculateRgbppCellCapacity, isScriptEqual, isUDTTypeSupported } from './ckb-tx';
-
-const { bytesToHex, hexToBytes, serializeOutPoint, serializeOutput, serializeScript } = ckbUtils;
+import {
+  calculateRgbppCellCapacity,
+  isScriptEqual,
+  isUDTTypeSupported,
+  bytesToHex,
+  hexToBytes,
+  serializeOutPoint,
+  serializeOutput,
+  serializeScript,
+  blockchain,
+} from './ckb-tx';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean, btcTestnetType?: BTCTestnetType) => {
   return {

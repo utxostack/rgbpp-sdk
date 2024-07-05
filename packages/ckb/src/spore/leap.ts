@@ -1,6 +1,12 @@
 import { BtcTimeCellsParams, RgbppCkbVirtualTx } from '../types/rgbpp';
-import { append0x, calculateTransactionFee, fetchTypeIdCellDeps } from '../utils';
 import {
+  append0x,
+  calculateTransactionFee,
+  fetchTypeIdCellDeps,
+  addressToScript,
+  getTransactionSize,
+  serializeOutPoint,
+  serializeWitnessArgs,
   btcTxIdFromBtcTimeLockArgs,
   buildSpvClientCellDep,
   calculateCommitment,
@@ -8,7 +14,10 @@ import {
   genBtcTimeLockScript,
   lockScriptFromBtcTimeLockArgs,
   transformSpvProof,
-} from '../utils/rgbpp';
+  generateSporeTransferCoBuild,
+  throwErrorWhenSporeCellsInvalid,
+  blockchain,
+} from '../utils';
 import {
   Hex,
   LeapSporeFromBtcToCkbVirtualTxParams,
@@ -22,13 +31,8 @@ import {
   getRgbppLockScript,
   getSporeTypeDep,
 } from '../constants';
-import { generateSporeTransferCoBuild, throwErrorWhenSporeCellsInvalid } from '../utils/spore';
 import { NoRgbppLiveCellError } from '../error';
-import * as ckbUtils from '@nervosnetwork/ckb-sdk-utils';
-import { blockchain } from '@ckb-lumos/base';
 import { buildBtcTimeUnlockWitness } from '../rgbpp';
-
-const { addressToScript, getTransactionSize, serializeOutPoint, serializeWitnessArgs } = ckbUtils;
 
 /**
  * Generate the virtual ckb transaction for leaping spore from BTC to CKB

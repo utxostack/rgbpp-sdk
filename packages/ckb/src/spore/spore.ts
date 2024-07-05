@@ -6,8 +6,21 @@ import {
   calculateTransactionFee,
   fetchTypeIdCellDeps,
   isClusterSporeTypeSupported,
+  addressToScript,
+  bytesToHex,
+  getTransactionSize,
+  rawTransactionToHash,
+  scriptToHash,
+  serializeWitnessArgs,
+  buildPreLockArgs,
+  calculateCommitment,
+  genRgbppLockScript,
+  generateSporeCreateCoBuild,
+  generateSporeId,
+  generateSporeTransferCoBuild,
+  throwErrorWhenSporeCellsInvalid,
+  signWitnesses,
 } from '../utils';
-import { buildPreLockArgs, calculateCommitment, genRgbppLockScript } from '../utils/rgbpp';
 import {
   AppendIssuerCellToSporeCreate,
   BuildAppendingIssuerCellTxParams,
@@ -30,22 +43,11 @@ import {
   getSporeTypeScript,
 } from '../constants';
 import {
-  generateSporeCreateCoBuild,
-  generateSporeId,
-  generateSporeTransferCoBuild,
-  throwErrorWhenSporeCellsInvalid,
-} from '../utils/spore';
-import {
   NoLiveCellError,
   NoRgbppLiveCellError,
   RgbppUtxoBindMultiTypeAssetsError,
   TypeAssetNotSupportedError,
 } from '../error';
-import * as ckbUtils from '@nervosnetwork/ckb-sdk-utils';
-import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses.js';
-
-const { addressToScript, bytesToHex, getTransactionSize, rawTransactionToHash, scriptToHash, serializeWitnessArgs } =
-  ckbUtils;
 
 /**
  * Generate the virtual ckb transaction for creating spores

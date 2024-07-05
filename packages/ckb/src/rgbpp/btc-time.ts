@@ -1,4 +1,3 @@
-import * as ckbUtils from '@nervosnetwork/ckb-sdk-utils';
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
   SECP256K1_WITNESS_LOCK_SIZE,
@@ -16,12 +15,6 @@ import {
   genBtcTimeLockArgs,
   lockScriptFromBtcTimeLockArgs,
   transformSpvProof,
-} from '../utils';
-import { buildSpvClientCellDep } from '../utils';
-import { blockchain } from '@ckb-lumos/base';
-import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses.js';
-
-const {
   addressToScript,
   bytesToHex,
   getTransactionSize,
@@ -29,7 +22,10 @@ const {
   scriptToHash,
   serializeOutPoint,
   serializeWitnessArgs,
-} = ckbUtils;
+  buildSpvClientCellDep,
+  blockchain,
+  signWitnesses,
+} from '../utils';
 
 export const buildBtcTimeUnlockWitness = (btcTxProof: Hex): Hex => {
   const btcTimeUnlock = BTCTimeUnlock.pack({ btcTxProof: blockchain.Bytes.pack(btcTxProof) });
