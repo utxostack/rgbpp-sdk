@@ -5,6 +5,7 @@ export default defineConfig({
   dts: true,
   clean: true,
   sourcemap: true,
+  splitting: true,
   target: 'esnext',
   format: ['esm', 'cjs'],
   entry: ['src/index.ts'],
