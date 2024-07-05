@@ -1,5 +1,4 @@
 import { RgbppCkbVirtualTx, BtcJumpCkbVirtualTxParams, BtcJumpCkbVirtualTxResult } from '../types/rgbpp';
-import { blockchain } from '@ckb-lumos/base';
 import { TypeAssetNotSupportedError } from '../error';
 import {
   append0x,
@@ -11,8 +10,6 @@ import {
   isScriptEqual,
   isUDTTypeSupported,
   u128ToLe,
-} from '../utils';
-import {
   buildPreLockArgs,
   calculateCommitment,
   throwErrorWhenTxInputsExceeded,
@@ -22,12 +19,11 @@ import {
   genRgbppLockScript,
   throwErrorWhenRgbppCellsInvalid,
   isRgbppCapacitySufficientForChange,
-} from '../utils/rgbpp';
+} from '../utils';
 import { Hex, IndexerCell } from '../types';
 import { RGBPP_WITNESS_PLACEHOLDER, getSecp256k1CellDep } from '../constants';
-import * as ckbUtils from '@nervosnetwork/ckb-sdk-utils';
-
-const { addressToScript, getTransactionSize } = ckbUtils;
+import { blockchain } from '@ckb-lumos/base';
+import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
 /**
  * Generate the virtual ckb transaction for the jumping tx from BTC to CKB

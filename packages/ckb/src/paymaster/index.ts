@@ -1,10 +1,14 @@
-import * as ckbUtils from '@nervosnetwork/ckb-sdk-utils';
 import { ConstructPaymasterParams } from '../types/rgbpp';
 import { NoLiveCellError } from '../error';
 import { CKB_UNIT, MAX_FEE, SECP256K1_WITNESS_LOCK_SIZE, getSecp256k1CellDep } from '../constants';
-import { append0x, calculateTransactionFee } from '../utils';
-
-const { AddressPrefix, addressToScript, getTransactionSize, privateKeyToAddress } = ckbUtils;
+import {
+  append0x,
+  calculateTransactionFee,
+  AddressPrefix,
+  addressToScript,
+  getTransactionSize,
+  privateKeyToAddress,
+} from '../utils';
 
 const SECP256K1_MIN_CAPACITY = BigInt(61) * CKB_UNIT;
 

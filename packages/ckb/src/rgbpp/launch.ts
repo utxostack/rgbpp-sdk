@@ -7,14 +7,12 @@ import {
   fetchTypeIdCellDeps,
   generateUniqueTypeArgs,
   u128ToLe,
-} from '../utils';
-import {
   buildPreLockArgs,
   calculateCommitment,
   encodeRgbppTokenInfo,
   genBtcTimeLockScript,
   genRgbppLockScript,
-} from '../utils/rgbpp';
+} from '../utils';
 import { Hex } from '../types';
 import {
   MAX_FEE,
@@ -24,9 +22,7 @@ import {
   getUniqueTypeScript,
   UNLOCKABLE_LOCK_SCRIPT,
 } from '../constants';
-import * as ckbUtils from '@nervosnetwork/ckb-sdk-utils';
-
-const { getTransactionSize, scriptToHash } = ckbUtils;
+import { getTransactionSize, scriptToHash } from '@nervosnetwork/ckb-sdk-utils';
 
 /**
  * Generate the virtual ckb transaction for the btc transfer tx
