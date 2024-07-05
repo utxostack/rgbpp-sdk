@@ -1,10 +1,4 @@
-import {
-  bytesToHex,
-  getTransactionSize,
-  rawTransactionToHash,
-  scriptToHash,
-  serializeWitnessArgs,
-} from '@nervosnetwork/ckb-sdk-utils';
+import ckbUtils from '@nervosnetwork/ckb-sdk-utils';
 import {
   UpdateCkbTxWithRealBtcTxIdParams,
   AppendPaymasterCellAndSignTxParams,
@@ -26,6 +20,8 @@ import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses.js';
 import { buildSpvClientCellDep } from '../utils';
 import { RGBPPUnlock, Uint16 } from '../schemas/generated/rgbpp';
 import { Bytes } from '@ckb-lumos/base/lib/blockchain.js';
+
+const { bytesToHex, getTransactionSize, rawTransactionToHash, scriptToHash, serializeWitnessArgs } = ckbUtils;
 
 export const buildRgbppUnlockWitness = (
   btcTxBytes: Hex,

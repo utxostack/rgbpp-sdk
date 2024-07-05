@@ -24,7 +24,9 @@ import {
   getUniqueTypeScript,
   UNLOCKABLE_LOCK_SCRIPT,
 } from '../constants';
-import { getTransactionSize, scriptToHash } from '@nervosnetwork/ckb-sdk-utils';
+import ckbUtils from '@nervosnetwork/ckb-sdk-utils';
+
+const { getTransactionSize, scriptToHash } = ckbUtils;
 
 /**
  * Generate the virtual ckb transaction for the btc transfer tx

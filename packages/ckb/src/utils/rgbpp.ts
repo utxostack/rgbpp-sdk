@@ -10,13 +10,7 @@ import {
   getBtcTimeLockScript,
   getRgbppLockScript,
 } from '../constants';
-import {
-  bytesToHex,
-  hexToBytes,
-  serializeOutPoint,
-  serializeOutput,
-  serializeScript,
-} from '@nervosnetwork/ckb-sdk-utils';
+import ckbUtils from '@nervosnetwork/ckb-sdk-utils';
 import { BTCTimeLock } from '../schemas/generated/rgbpp';
 import { Script } from '../schemas/generated/blockchain';
 import { blockchain } from '@ckb-lumos/base';
@@ -30,6 +24,8 @@ import {
   RgbppUtxoBindMultiTypeAssetsError,
 } from '../error';
 import { calculateRgbppCellCapacity, isScriptEqual, isUDTTypeSupported } from './ckb-tx';
+
+const { bytesToHex, hexToBytes, serializeOutPoint, serializeOutput, serializeScript } = ckbUtils;
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean, btcTestnetType?: BTCTestnetType) => {
   return {
