@@ -1,6 +1,6 @@
-import { bitcoin } from '../bitcoin';
-import { NetworkType } from './types';
-import { networkToConfig, networkTypeToConfig } from './config';
+import { bitcoin } from '../bitcoin.js';
+import { NetworkType } from './types.js';
+import { networkToConfig, networkTypeToConfig } from './config.js';
 
 /**
  * Convert network type to bitcoinjs-lib network.

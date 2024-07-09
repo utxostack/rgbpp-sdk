@@ -11,11 +11,11 @@ import {
   isScriptEqual,
   isTypeAssetSupported,
   checkCkbTxInputsCapacitySufficient,
-} from './ckb-tx';
+} from './ckb-tx.js';
 import { hexToBytes } from '@nervosnetwork/ckb-sdk-utils';
-import { Collector } from '../collector';
-import { NoLiveCellError } from '../error';
-import { utf8ToHex } from './hex';
+import { Collector } from '../collector/index.js';
+import { NoLiveCellError } from '../error/index.js';
+import { utf8ToHex } from './hex.js';
 
 describe('ckb tx utils', () => {
   it('calculateTransactionFee', () => {

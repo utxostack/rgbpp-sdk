@@ -58,5 +58,5 @@ export type { SendBtcProps, SendUtxosProps, SendRgbppUtxosProps } from '@rgbpp-s
 /**
  * RGB++
  */
-export { buildRgbppTransferTx } from './rgbpp/xudt';
-export type { RgbppTransferTxParams, RgbppTransferTxResult } from './rgbpp/types';
+export { buildRgbppTransferTx } from './rgbpp/xudt.js';
+export type { RgbppTransferTxParams, RgbppTransferTxResult } from './rgbpp/types.js';

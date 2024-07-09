@@ -1,4 +1,4 @@
-import { BtcAssetsApiContext } from './types';
+import { BtcAssetsApiContext } from './types/index.js';
 
 export enum ErrorCodes {
   UNKNOWN,

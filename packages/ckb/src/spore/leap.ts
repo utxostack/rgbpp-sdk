@@ -1,4 +1,4 @@
-import { BtcTimeCellsParams, RgbppCkbVirtualTx } from '../types/rgbpp';
+import { BtcTimeCellsParams, RgbppCkbVirtualTx } from '../types/rgbpp.js';
 import {
   append0x,
   calculateTransactionFee,
@@ -17,22 +17,22 @@ import {
   generateSporeTransferCoBuild,
   throwErrorWhenSporeCellsInvalid,
   blockchain,
-} from '../utils';
+} from '../utils/index.js';
 import {
   Hex,
   LeapSporeFromBtcToCkbVirtualTxParams,
   LeapSporeFromCkbToBtcVirtualTxParams,
   SporeLeapVirtualTxResult,
-} from '../types';
+} from '../types/index.js';
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
   RGBPP_TX_WITNESS_MAX_SIZE,
   RGBPP_WITNESS_PLACEHOLDER,
   getRgbppLockScript,
   getSporeTypeDep,
-} from '../constants';
-import { NoRgbppLiveCellError } from '../error';
-import { buildBtcTimeUnlockWitness } from '../rgbpp';
+} from '../constants/index.js';
+import { NoRgbppLiveCellError } from '../error/index.js';
+import { buildBtcTimeUnlockWitness } from '../rgbpp/index.js';
 
 /**
  * Generate the virtual ckb transaction for leaping spore from BTC to CKB

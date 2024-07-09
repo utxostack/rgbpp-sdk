@@ -1,4 +1,4 @@
-import { BTCTestnetType } from '../types';
+import { BTCTestnetType } from '../types/index.js';
 
 export const CKB_UNIT = BigInt(10000_0000);
 export const MAX_FEE = BigInt(2000_0000);

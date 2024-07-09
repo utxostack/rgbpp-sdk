@@ -1,6 +1,6 @@
-import { ConstructPaymasterParams } from '../types/rgbpp';
-import { NoLiveCellError } from '../error';
-import { CKB_UNIT, MAX_FEE, SECP256K1_WITNESS_LOCK_SIZE, getSecp256k1CellDep } from '../constants';
+import { ConstructPaymasterParams } from '../types/rgbpp.js';
+import { NoLiveCellError } from '../error/index.js';
+import { CKB_UNIT, MAX_FEE, SECP256K1_WITNESS_LOCK_SIZE, getSecp256k1CellDep } from '../constants/index.js';
 import {
   append0x,
   calculateTransactionFee,
@@ -8,7 +8,7 @@ import {
   addressToScript,
   getTransactionSize,
   privateKeyToAddress,
-} from '../utils';
+} from '../utils/index.js';
 
 const SECP256K1_MIN_CAPACITY = BigInt(61) * CKB_UNIT;
 

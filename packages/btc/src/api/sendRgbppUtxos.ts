@@ -1,16 +1,16 @@
 import { Collector, checkCkbTxInputsCapacitySufficient } from '@rgbpp-sdk/ckb';
 import { isRgbppLockCell, isBtcTimeLockCell, calculateCommitment } from '@rgbpp-sdk/ckb';
-import { bitcoin } from '../bitcoin';
-import { BaseOutput, Utxo } from '../transaction/utxo';
-import { AddressToPubkeyMap } from '../address';
-import { DataSource } from '../query/source';
-import { NetworkType } from '../preset/types';
-import { ErrorCodes, TxBuildError } from '../error';
-import { InitOutput, TxAddressOutput, TxBuilder } from '../transaction/build';
-import { networkTypeToConfig } from '../preset/config';
-import { unpackRgbppLockArgs } from '../ckb/molecule';
-import { createSendUtxosBuilder } from './sendUtxos';
-import { limitPromiseBatchSize } from '../utils';
+import { bitcoin } from '../bitcoin.js';
+import { BaseOutput, Utxo } from '../transaction/utxo.js';
+import { AddressToPubkeyMap } from '../address.js';
+import { DataSource } from '../query/source.js';
+import { NetworkType } from '../preset/types.js';
+import { ErrorCodes, TxBuildError } from '../error.js';
+import { InitOutput, TxAddressOutput, TxBuilder } from '../transaction/build.js';
+import { networkTypeToConfig } from '../preset/config.js';
+import { unpackRgbppLockArgs } from '../ckb/molecule.js';
+import { createSendUtxosBuilder } from './sendUtxos.js';
+import { limitPromiseBatchSize } from '../utils.js';
 
 export interface SendRgbppUtxosProps {
   ckbVirtualTx: CKBComponents.RawTransaction;

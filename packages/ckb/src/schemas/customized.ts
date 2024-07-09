@@ -1,3 +1,4 @@
+import type {} from '@ckb-lumos/bi'; // Fix TS2742 issue caused by symlink
 import { createFixedBytesCodec, number } from '@ckb-lumos/codec';
 
 const { Uint32, Uint64, Uint128 } = number;

@@ -1,7 +1,14 @@
 import { sha256 } from 'js-sha256';
 import { RgbppApiSpvProof } from '@rgbpp-sdk/service';
-import { BTCTestnetType, Hex, IndexerCell, RgbppCkbVirtualTx, RgbppTokenInfo, SpvClientCellTxProof } from '../types';
-import { append0x, remove0x, reverseHex, u32ToLe, u8ToHex, utf8ToHex } from './hex';
+import {
+  BTCTestnetType,
+  Hex,
+  IndexerCell,
+  RgbppCkbVirtualTx,
+  RgbppTokenInfo,
+  SpvClientCellTxProof,
+} from '../types/index.js';
+import { append0x, remove0x, reverseHex, u32ToLe, u8ToHex, utf8ToHex } from './hex.js';
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
   CKB_UNIT,
@@ -10,17 +17,17 @@ import {
   RGBPP_TX_WITNESS_MAX_SIZE,
   getBtcTimeLockScript,
   getRgbppLockScript,
-} from '../constants';
-import { BTCTimeLock } from '../schemas/generated/rgbpp';
-import { Script } from '../schemas/generated/blockchain';
+} from '../constants/index.js';
+import { BTCTimeLock } from '../schemas/generated/rgbpp.js';
+import { Script } from '../schemas/generated/blockchain.js';
 import { bytes } from '@ckb-lumos/codec';
-import { toCamelcase } from './case-parser';
+import { toCamelcase } from './case-parser.js';
 import {
   InputsOrOutputsLenError,
   NoRgbppLiveCellError,
   RgbppCkbTxInputsExceededError,
   RgbppUtxoBindMultiTypeAssetsError,
-} from '../error';
+} from '../error/index.js';
 import {
   calculateRgbppCellCapacity,
   isScriptEqual,
@@ -31,7 +38,7 @@ import {
   serializeOutput,
   serializeScript,
   blockchain,
-} from './ckb-tx';
+} from './ckb-tx.js';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean, btcTestnetType?: BTCTestnetType) => {
   return {

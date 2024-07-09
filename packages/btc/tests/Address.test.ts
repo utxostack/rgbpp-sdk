@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { bitcoin, ECPair, toXOnly } from '../src';
-import { network } from './shared/env';
+import { network } from './shared/env.js';
 
 describe('Address', () => {
   it('Create SegWit (P2WPKH) address', () => {

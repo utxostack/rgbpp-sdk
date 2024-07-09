@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { toCamelcase } from './case-parser';
+import { toCamelcase } from './case-parser.js';
 
 interface TestType {
   firstField: number;

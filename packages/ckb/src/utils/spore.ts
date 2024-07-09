@@ -8,10 +8,14 @@ import {
   assembleCreateSporeAction,
   assembleTransferClusterAction,
 } from '@spore-sdk/core/lib/cobuild/index.js';
-import { u64ToLe } from './hex';
-import { Hex, IndexerCell, SporesCreateCobuildParams } from '../types';
-import { NoRgbppLiveCellError, RgbppSporeTypeMismatchError, RgbppUtxoBindMultiTypeAssetsError } from '../error';
-import { isScriptEqual, isSporeTypeSupported, PERSONAL, blake2b, hexToBytes, serializeInput } from './ckb-tx';
+import { u64ToLe } from './hex.js';
+import { Hex, IndexerCell, SporesCreateCobuildParams } from '../types/index.js';
+import {
+  NoRgbppLiveCellError,
+  RgbppSporeTypeMismatchError,
+  RgbppUtxoBindMultiTypeAssetsError,
+} from '../error/index.js';
+import { isScriptEqual, isSporeTypeSupported, PERSONAL, blake2b, hexToBytes, serializeInput } from './ckb-tx.js';
 
 // Generate type id for cluster id
 export const generateClusterId = (firstInput: CKBComponents.CellInput, firstOutputIndex: number) => {

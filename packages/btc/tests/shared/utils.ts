@@ -2,7 +2,7 @@ import { expect } from 'vitest';
 import { ECPairInterface } from 'ecpair';
 import { NetworkType, bitcoin, ECPair } from '../../src';
 import { toXOnly, remove0x, tweakSigner, isP2trScript, isP2wpkhScript } from '../../src';
-import { config, network, networkType, service } from './env';
+import { config, network, networkType, service } from './env.js';
 
 /**
  * Wait for a number of milliseconds.

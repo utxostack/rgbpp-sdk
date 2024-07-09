@@ -1,6 +1,6 @@
 import { genBtcTransferCkbVirtualTx, getXudtTypeScript, serializeScript } from '@rgbpp-sdk/ckb';
 import { sendRgbppUtxos } from '@rgbpp-sdk/btc';
-import { RgbppTransferTxParams, RgbppTransferTxResult } from './types';
+import { RgbppTransferTxParams, RgbppTransferTxResult } from './types.js';
 
 /**
  * Build the CKB virtual transaction and BTC transaction to be signed for the RGB++ transfer tx

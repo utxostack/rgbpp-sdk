@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Collector } from '.';
+import { Collector } from './index.js';
 
 describe('collector', () => {
   const collector = new Collector({

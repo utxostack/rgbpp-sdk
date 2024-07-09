@@ -1,4 +1,4 @@
-import { Capacity, Hex } from './common';
+import { Capacity, Hex } from './common.js';
 
 export interface IndexerCell {
   blockNumber: CKBComponents.BlockNumber;

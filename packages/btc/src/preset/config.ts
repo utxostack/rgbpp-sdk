@@ -1,7 +1,7 @@
 import cloneDeep from 'lodash/cloneDeep.js';
-import { bitcoin } from '../bitcoin';
-import { ErrorCodes, TxBuildError } from '../error';
-import { NetworkType, RgbppBtcConfig } from './types';
+import { bitcoin } from '../bitcoin.js';
+import { ErrorCodes, TxBuildError } from '../error.js';
+import { NetworkType, RgbppBtcConfig } from './types.js';
 
 const defaultConfigs: Record<'testnet' | 'mainnet', RgbppBtcConfig> = {
   testnet: {

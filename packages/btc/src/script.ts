@@ -1,4 +1,4 @@
-import { isP2TR, isP2WPKH } from './bitcoin';
+import { isP2TR, isP2WPKH } from './bitcoin.js';
 
 export function isP2wpkhScript(script: Buffer | string): boolean {
   const buffer = typeof script === 'string' ? Buffer.from(script, 'hex') : script;

@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { getBtcTimeLockDep, getRgbppLockDep, getUniqueTypeDep, getXudtDep } from '../constants';
-import { BTCTestnetType } from '../types';
+import { getBtcTimeLockDep, getRgbppLockDep, getUniqueTypeDep, getXudtDep } from '../constants/index.js';
+import { BTCTestnetType } from '../types/index.js';
 
 interface CellDepsObject {
   rgbpp: {

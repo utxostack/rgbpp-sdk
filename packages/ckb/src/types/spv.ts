@@ -1,4 +1,4 @@
-import { Hex } from './common';
+import { Hex } from './common.js';
 
 export interface SpvClientCellTxProof {
   // The OutPoint of spv client cell

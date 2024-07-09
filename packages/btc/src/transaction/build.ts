@@ -1,14 +1,14 @@
 import cloneDeep from 'lodash/cloneDeep.js';
-import { bitcoin } from '../bitcoin';
-import { DataSource } from '../query/source';
-import { ErrorCodes, TxBuildError } from '../error';
-import { NetworkType, RgbppBtcConfig } from '../preset/types';
-import { isSupportedFromAddress } from '../address';
-import { dataToOpReturnScriptPubkey, isOpReturnScriptPubkey } from './embed';
-import { networkTypeToConfig } from '../preset/config';
-import { BaseOutput, Utxo, utxoToInput } from './utxo';
-import { limitPromiseBatchSize } from '../utils';
-import { FeeEstimator } from './fee';
+import { bitcoin } from '../bitcoin.js';
+import { DataSource } from '../query/source.js';
+import { ErrorCodes, TxBuildError } from '../error.js';
+import { NetworkType, RgbppBtcConfig } from '../preset/types.js';
+import { isSupportedFromAddress } from '../address.js';
+import { dataToOpReturnScriptPubkey, isOpReturnScriptPubkey } from './embed.js';
+import { networkTypeToConfig } from '../preset/config.js';
+import { BaseOutput, Utxo, utxoToInput } from './utxo.js';
+import { limitPromiseBatchSize } from '../utils.js';
+import { FeeEstimator } from './fee.js';
 
 export interface TxInput {
   data: {

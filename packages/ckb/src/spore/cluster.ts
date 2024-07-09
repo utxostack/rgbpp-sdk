@@ -1,5 +1,5 @@
 import { packRawClusterData } from '@spore-sdk/core';
-import { RgbppCkbVirtualTx } from '../types/rgbpp';
+import { RgbppCkbVirtualTx } from '../types/rgbpp.js';
 import {
   append0x,
   calculateTransactionFee,
@@ -11,15 +11,15 @@ import {
   genRgbppLockScript,
   generateClusterCreateCoBuild,
   generateClusterId,
-} from '../utils';
-import { CreateClusterCkbVirtualTxParams, Hex, SporeVirtualTxResult } from '../types';
+} from '../utils/index.js';
+import { CreateClusterCkbVirtualTxParams, Hex, SporeVirtualTxResult } from '../types/index.js';
 import {
   RGBPP_TX_WITNESS_MAX_SIZE,
   RGBPP_WITNESS_PLACEHOLDER,
   getClusterTypeDep,
   getClusterTypeScript,
-} from '../constants';
-import { NoRgbppLiveCellError } from '../error';
+} from '../constants/index.js';
+import { NoRgbppLiveCellError } from '../error/index.js';
 
 /**
  * Generate the virtual ckb transaction for creating cluster

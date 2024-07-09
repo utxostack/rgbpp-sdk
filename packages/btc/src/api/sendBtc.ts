@@ -1,7 +1,7 @@
-import { bitcoin } from '../bitcoin';
-import { DataSource } from '../query/source';
-import { InitOutput, TxBuilder } from '../transaction/build';
-import { createSendUtxosBuilder } from './sendUtxos';
+import { bitcoin } from '../bitcoin.js';
+import { DataSource } from '../query/source.js';
+import { InitOutput, TxBuilder } from '../transaction/build.js';
+import { createSendUtxosBuilder } from './sendUtxos.js';
 
 export interface SendBtcProps {
   from: string;

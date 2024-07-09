@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { buildRgbppUnlockWitness } from './ckb-builder';
-import { buildBtcTimeUnlockWitness } from './btc-time';
+import { buildRgbppUnlockWitness } from './ckb-builder.js';
+import { buildBtcTimeUnlockWitness } from './btc-time.js';
 
 describe('RGBPP schemas', () => {
   // The test data is from RGBPP lock contract test

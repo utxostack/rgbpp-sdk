@@ -1,4 +1,4 @@
-import { BtcAssetsApiBase } from './base';
+import { BtcAssetsApiBase } from './base.js';
 import {
   BtcApis,
   BtcApiBalance,
@@ -14,7 +14,7 @@ import {
   BtcApiUtxoParams,
   BtcApiTransactionParams,
   BtcApiRecommendedFeeRates,
-} from '../types';
+} from '../types/index.js';
 import {
   RgbppApis,
   RgbppCell,
@@ -29,7 +29,7 @@ import {
   RgbppApiRetryCkbTransactionPayload,
   RgbppApiTransactionStateParams,
   RgbppApiTransactionRetry,
-} from '../types';
+} from '../types/index.js';
 
 export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis {
   /**

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { leToU128, reverseHex, u128ToLe, u32ToLe, u32ToLeHex, u64ToLe, u8ToHex, utf8ToHex } from './hex';
+import { leToU128, reverseHex, u128ToLe, u32ToLe, u32ToLeHex, u64ToLe, u8ToHex, utf8ToHex } from './hex.js';
 import { bytesToHex } from '@nervosnetwork/ckb-sdk-utils';
 
 describe('number to little endian', () => {

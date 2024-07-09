@@ -17,17 +17,17 @@ import {
   throwErrorWhenTxInputsExceeded,
   throwErrorWhenRgbppCellsInvalid,
   isRgbppCapacitySufficientForChange,
-} from './rgbpp';
-import { getXudtTypeScript } from '../constants';
-import { IndexerCell, RgbppCkbVirtualTx } from '../types';
-import { calculateUdtCellCapacity } from './ckb-tx';
+} from './rgbpp.js';
+import { getXudtTypeScript } from '../constants/index.js';
+import { IndexerCell, RgbppCkbVirtualTx } from '../types/index.js';
+import { calculateUdtCellCapacity } from './ckb-tx.js';
 import {
   InputsOrOutputsLenError,
   NoRgbppLiveCellError,
   RgbppCkbTxInputsExceededError,
   RgbppUtxoBindMultiTypeAssetsError,
-} from '../error';
-import { remove0x } from './hex';
+} from '../error/index.js';
+import { remove0x } from './hex.js';
 
 describe('rgbpp tests', () => {
   it('sha256', () => {

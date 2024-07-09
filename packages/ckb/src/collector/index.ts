@@ -1,10 +1,9 @@
 import axios from 'axios';
-import CKB from '@nervosnetwork/ckb-sdk-core';
-import { CollectConfig, CollectResult, CollectUdtResult, IndexerCell } from '../types/collector';
-import { MIN_CAPACITY } from '../constants';
-import { CapacityNotEnoughError, IndexerError, UdtAmountNotEnoughError } from '../error';
-import { isRgbppLockCellIgnoreChain, leToU128, remove0x, toCamelcase } from '../utils';
-import { Hex } from '../types';
+import { CollectConfig, CollectResult, CollectUdtResult, IndexerCell } from '../types/index.js';
+import { MIN_CAPACITY } from '../constants/index.js';
+import { CapacityNotEnoughError, IndexerError, UdtAmountNotEnoughError } from '../error/index.js';
+import { CKB, isRgbppLockCellIgnoreChain, leToU128, remove0x, toCamelcase } from '../utils/index.js';
+import { Hex } from '../types/index.js';
 
 interface IndexerScript {
   code_hash: Hex;

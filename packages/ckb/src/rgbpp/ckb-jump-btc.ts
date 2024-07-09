@@ -1,5 +1,5 @@
-import { CkbBatchJumpBtcVirtualTxParams, CkbJumpBtcVirtualTxParams } from '../types/rgbpp';
-import { NoLiveCellError, NoXudtLiveCellError, TypeAssetNotSupportedError } from '../error';
+import { CkbBatchJumpBtcVirtualTxParams, CkbJumpBtcVirtualTxParams } from '../types/rgbpp.js';
+import { NoLiveCellError, NoXudtLiveCellError, TypeAssetNotSupportedError } from '../error/index.js';
 import {
   append0x,
   calculateRgbppCellCapacity,
@@ -12,8 +12,8 @@ import {
   getTransactionSize,
   genRgbppLockScript,
   blockchain,
-} from '../utils';
-import { MAX_FEE, MIN_CAPACITY, RGBPP_TX_WITNESS_MAX_SIZE } from '../constants';
+} from '../utils/index.js';
+import { MAX_FEE, MIN_CAPACITY, RGBPP_TX_WITNESS_MAX_SIZE } from '../constants/index.js';
 
 /**
  * Generate the virtual ckb transaction for the jumping tx from CKB to BTC

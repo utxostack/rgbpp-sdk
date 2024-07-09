@@ -1,8 +1,8 @@
-import { bitcoin } from './bitcoin';
-import { NetworkType } from './preset/types';
-import { networkTypeToNetwork } from './preset/network';
-import { ErrorCodes, TxBuildError } from './error';
-import { remove0x, toXOnly } from './utils';
+import { bitcoin } from './bitcoin.js';
+import { NetworkType } from './preset/types.js';
+import { networkTypeToNetwork } from './preset/network.js';
+import { ErrorCodes, TxBuildError } from './error.js';
+import { remove0x, toXOnly } from './utils.js';
 
 export enum AddressType {
   P2PKH,

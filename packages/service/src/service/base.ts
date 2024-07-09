@@ -1,7 +1,7 @@
 import pickBy from 'lodash/pickBy.js';
-import { isDomain } from '../utils';
-import { BtcAssetsApiError, ErrorCodes } from '../error';
-import { BaseApis, BaseApiRequestOptions, BtcAssetsApiToken, BtcAssetsApiContext, Json } from '../types';
+import { isDomain } from '../utils.js';
+import { BtcAssetsApiError, ErrorCodes } from '../error.js';
+import { BaseApis, BaseApiRequestOptions, BtcAssetsApiToken, BtcAssetsApiContext, Json } from '../types/index.js';
 
 export class BtcAssetsApiBase implements BaseApis {
   public url: string;

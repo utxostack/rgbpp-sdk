@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { fetchTypeIdCellDeps } from './cell-dep';
-import { getBtcTimeLockDep, getRgbppLockDep, getUniqueTypeDep, getXudtDep } from '../constants';
+import { fetchTypeIdCellDeps } from './cell-dep.js';
+import { getBtcTimeLockDep, getRgbppLockDep, getUniqueTypeDep, getXudtDep } from '../constants/index.js';
 
 describe('dynamic fetch cell dep', () => {
   it('fetchTypeIdCellDeps with xudt and unique', async () => {

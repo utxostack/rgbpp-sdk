@@ -1,6 +1,6 @@
 import { isP2trScript, isP2wpkhScript } from '../src';
 import { describe, expect, it } from 'vitest';
-import { accounts } from './shared/env';
+import { accounts } from './shared/env.js';
 
 describe('Script', () => {
   const p2wpkh = accounts.charlie.p2wpkh.scriptPubkey;

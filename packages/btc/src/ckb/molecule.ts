@@ -1,7 +1,7 @@
 import { bytes, BytesLike, UnpackResult } from '@ckb-lumos/codec';
 import { RGBPPLock } from '@rgbpp-sdk/ckb';
-import { ErrorCodes, TxBuildError } from '../error';
-import { remove0x } from '../utils';
+import { ErrorCodes, TxBuildError } from '../error.js';
+import { remove0x } from '../utils.js';
 
 /**
  * Unpack RgbppLockArgs from a BytesLike (Buffer, Uint8Array, HexString, etc) value.

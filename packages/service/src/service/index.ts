@@ -1,2 +1,2 @@
-export * from './base';
-export * from './service';
+export * from './base.js';
+export * from './service.js';

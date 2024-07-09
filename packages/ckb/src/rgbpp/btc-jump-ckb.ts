@@ -1,5 +1,5 @@
-import { RgbppCkbVirtualTx, BtcJumpCkbVirtualTxParams, BtcJumpCkbVirtualTxResult } from '../types/rgbpp';
-import { TypeAssetNotSupportedError } from '../error';
+import { RgbppCkbVirtualTx, BtcJumpCkbVirtualTxParams, BtcJumpCkbVirtualTxResult } from '../types/rgbpp.js';
+import { TypeAssetNotSupportedError } from '../error/index.js';
 import {
   append0x,
   calculateRgbppCellCapacity,
@@ -22,9 +22,9 @@ import {
   throwErrorWhenRgbppCellsInvalid,
   isRgbppCapacitySufficientForChange,
   blockchain,
-} from '../utils';
-import { Hex, IndexerCell } from '../types';
-import { RGBPP_WITNESS_PLACEHOLDER, getSecp256k1CellDep } from '../constants';
+} from '../utils/index.js';
+import { Hex, IndexerCell } from '../types/index.js';
+import { RGBPP_WITNESS_PLACEHOLDER, getSecp256k1CellDep } from '../constants/index.js';
 
 /**
  * Generate the virtual ckb transaction for the jumping tx from BTC to CKB

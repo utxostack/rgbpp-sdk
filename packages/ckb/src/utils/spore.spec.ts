@@ -4,11 +4,15 @@ import {
   generateSporeCreateCoBuild,
   generateSporeTransferCoBuild,
   throwErrorWhenSporeCellsInvalid,
-} from './spore';
-import { IndexerCell } from '../types';
-import { getSporeTypeScript } from '../constants';
+} from './spore.js';
+import { IndexerCell } from '../types/index.js';
+import { getSporeTypeScript } from '../constants/index.js';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
-import { NoRgbppLiveCellError, RgbppSporeTypeMismatchError, RgbppUtxoBindMultiTypeAssetsError } from '../error';
+import {
+  NoRgbppLiveCellError,
+  RgbppSporeTypeMismatchError,
+  RgbppUtxoBindMultiTypeAssetsError,
+} from '../error/index.js';
 
 describe('spore utils', () => {
   it('generateClusterId', () => {

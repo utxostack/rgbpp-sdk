@@ -1,8 +1,8 @@
-import { bitcoin } from '../bitcoin';
-import { DataSource } from '../query/source';
-import { TxBuilder, InitOutput } from '../transaction/build';
-import { BaseOutput, Utxo, prepareUtxoInputs } from '../transaction/utxo';
-import { AddressToPubkeyMap, addAddressToPubkeyMap } from '../address';
+import { bitcoin } from '../bitcoin.js';
+import { DataSource } from '../query/source.js';
+import { TxBuilder, InitOutput } from '../transaction/build.js';
+import { BaseOutput, Utxo, prepareUtxoInputs } from '../transaction/utxo.js';
+import { AddressToPubkeyMap, addAddressToPubkeyMap } from '../address.js';
 
 export interface SendUtxosProps {
   inputs: Utxo[];

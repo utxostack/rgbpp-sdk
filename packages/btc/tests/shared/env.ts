@@ -1,6 +1,6 @@
 import { BtcAssetsApi } from '@rgbpp-sdk/service';
 import { DataSource, NetworkType, networkTypeToConfig } from '../../src';
-import { createAccount } from './utils';
+import { createAccount } from './utils.js';
 
 export const networkType = NetworkType.TESTNET;
 export const config = networkTypeToConfig(networkType);

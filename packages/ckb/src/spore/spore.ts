@@ -1,4 +1,4 @@
-import { RgbppCkbVirtualTx } from '../types/rgbpp';
+import { RgbppCkbVirtualTx } from '../types/rgbpp.js';
 import { packRawSporeData } from '@spore-sdk/core';
 import {
   append0x,
@@ -20,7 +20,7 @@ import {
   generateSporeTransferCoBuild,
   throwErrorWhenSporeCellsInvalid,
   signWitnesses,
-} from '../utils';
+} from '../utils/index.js';
 import {
   AppendIssuerCellToSporeCreate,
   BuildAppendingIssuerCellTxParams,
@@ -29,7 +29,7 @@ import {
   SporeCreateVirtualTxResult,
   SporeTransferVirtualTxResult,
   TransferSporeCkbVirtualTxParams,
-} from '../types';
+} from '../types/index.js';
 import {
   MAX_FEE,
   MIN_CAPACITY,
@@ -41,13 +41,13 @@ import {
   getSecp256k1CellDep,
   getSporeTypeDep,
   getSporeTypeScript,
-} from '../constants';
+} from '../constants/index.js';
 import {
   NoLiveCellError,
   NoRgbppLiveCellError,
   RgbppUtxoBindMultiTypeAssetsError,
   TypeAssetNotSupportedError,
-} from '../error';
+} from '../error/index.js';
 
 /**
  * Generate the virtual ckb transaction for creating spores

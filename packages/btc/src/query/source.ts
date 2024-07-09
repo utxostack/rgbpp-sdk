@@ -1,12 +1,12 @@
 import { BtcApiUtxoParams, BtcAssetsApi, BtcAssetsApiError, ErrorCodes as ServiceErrorCodes } from '@rgbpp-sdk/service';
-import { BaseOutput, Output, Utxo } from '../transaction/utxo';
-import { NetworkType } from '../preset/types';
-import { ErrorCodes, TxBuildError } from '../error';
-import { TxAddressOutput } from '../transaction/build';
-import { isOpReturnScriptPubkey } from '../transaction/embed';
-import { addressToScriptPublicKeyHex, getAddressType } from '../address';
-import { remove0x } from '../utils';
-import { DataCache } from './cache';
+import { BaseOutput, Output, Utxo } from '../transaction/utxo.js';
+import { NetworkType } from '../preset/types.js';
+import { ErrorCodes, TxBuildError } from '../error.js';
+import { TxAddressOutput } from '../transaction/build.js';
+import { isOpReturnScriptPubkey } from '../transaction/embed.js';
+import { addressToScriptPublicKeyHex, getAddressType } from '../address.js';
+import { remove0x } from '../utils.js';
+import { DataCache } from './cache.js';
 
 export class DataSource {
   public cache: DataCache;

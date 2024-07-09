@@ -3,9 +3,9 @@ import {
   SECP256K1_WITNESS_LOCK_SIZE,
   getBtcTimeLockScript,
   getSecp256k1CellDep,
-} from '../constants';
-import { BTCTimeUnlock } from '../schemas/generated/rgbpp';
-import { BtcTimeCellStatusParams, BtcTimeCellsParams, Hex, SignBtcTimeCellsTxParams } from '../types';
+} from '../constants/index.js';
+import { BTCTimeUnlock } from '../schemas/generated/rgbpp.js';
+import { BtcTimeCellStatusParams, BtcTimeCellsParams, Hex, SignBtcTimeCellsTxParams } from '../types/index.js';
 import {
   append0x,
   btcTxIdFromBtcTimeLockArgs,
@@ -25,7 +25,7 @@ import {
   buildSpvClientCellDep,
   blockchain,
   signWitnesses,
-} from '../utils';
+} from '../utils/index.js';
 
 export const buildBtcTimeUnlockWitness = (btcTxProof: Hex): Hex => {
   const btcTimeUnlock = BTCTimeUnlock.pack({ btcTxProof: blockchain.Bytes.pack(btcTxProof) });

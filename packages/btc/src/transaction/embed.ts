@@ -1,6 +1,6 @@
-import { remove0x } from '../utils';
-import { bitcoin } from '../bitcoin';
-import { ErrorCodes, TxBuildError } from '../error';
+import { remove0x } from '../utils.js';
+import { bitcoin } from '../bitcoin.js';
+import { ErrorCodes, TxBuildError } from '../error.js';
 
 /**
  * Convert data to OP_RETURN script pubkey.

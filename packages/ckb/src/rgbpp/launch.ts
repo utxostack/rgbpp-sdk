@@ -1,5 +1,5 @@
-import { RgbppCkbVirtualTx, RgbppLaunchCkbVirtualTxParams, RgbppLaunchVirtualTxResult } from '../types/rgbpp';
-import { NoLiveCellError } from '../error';
+import { RgbppCkbVirtualTx, RgbppLaunchCkbVirtualTxParams, RgbppLaunchVirtualTxResult } from '../types/rgbpp.js';
+import { NoLiveCellError } from '../error/index.js';
 import {
   append0x,
   calculateRgbppTokenInfoCellCapacity,
@@ -14,8 +14,8 @@ import {
   encodeRgbppTokenInfo,
   genBtcTimeLockScript,
   genRgbppLockScript,
-} from '../utils';
-import { Hex } from '../types';
+} from '../utils/index.js';
+import { Hex } from '../types/index.js';
 import {
   MAX_FEE,
   RGBPP_TX_WITNESS_MAX_SIZE,
@@ -23,7 +23,7 @@ import {
   getXudtTypeScript,
   getUniqueTypeScript,
   UNLOCKABLE_LOCK_SCRIPT,
-} from '../constants';
+} from '../constants/index.js';
 
 /**
  * Generate the virtual ckb transaction for the btc transfer tx

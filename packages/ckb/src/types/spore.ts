@@ -1,7 +1,7 @@
 import { RawClusterData, RawSporeData } from '@spore-sdk/core';
-import { Address, Hex, BTCTestnetType } from './common';
-import { Collector } from '../collector';
-import { IndexerCell } from './collector';
+import { Address, Hex, BTCTestnetType } from './common.js';
+import { Collector } from '../collector/index.js';
+import { IndexerCell } from './collector.js';
 
 export interface CreateClusterCkbVirtualTxParams {
   // The collector that collects CKB live cells and transactions

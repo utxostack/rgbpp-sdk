@@ -1,5 +1,5 @@
 import limitPromiseConcurrency from 'p-limit';
-import { bitcoin, ecc, ECPair } from './bitcoin';
+import { bitcoin, ecc, ECPair } from './bitcoin.js';
 import { bytes } from '@ckb-lumos/codec';
 
 interface TweakableSigner extends bitcoin.Signer {

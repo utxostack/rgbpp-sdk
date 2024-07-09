@@ -1,10 +1,10 @@
-import { AddressType } from '../address';
-import { NetworkType } from '../preset/types';
-import { toXOnly, tweakSigner } from '../utils';
-import { networkTypeToNetwork } from '../preset/network';
-import { isP2trScript, isP2wpkhScript } from '../script';
-import { ECPairInterface, bitcoin, ECPair, isTaprootInput } from '../bitcoin';
-import { Utxo } from './utxo';
+import { AddressType } from '../address.js';
+import { NetworkType } from '../preset/types.js';
+import { toXOnly, tweakSigner } from '../utils.js';
+import { networkTypeToNetwork } from '../preset/network.js';
+import { isP2trScript, isP2wpkhScript } from '../script.js';
+import { ECPairInterface, bitcoin, ECPair, isTaprootInput } from '../bitcoin.js';
+import { Utxo } from './utxo.js';
 
 interface FeeEstimateAccount {
   payment: bitcoin.Payment;

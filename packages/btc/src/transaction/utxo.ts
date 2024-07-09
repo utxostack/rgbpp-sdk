@@ -1,10 +1,10 @@
 import cloneDeep from 'lodash/cloneDeep.js';
-import { ErrorCodes, TxBuildError } from '../error';
-import { DataSource } from '../query/source';
-import { AddressType, AddressToPubkeyMap } from '../address';
-import { TxInput } from './build';
-import { limitPromiseBatchSize, remove0x, toXOnly } from '../utils';
-import { isP2trScript } from '../script';
+import { ErrorCodes, TxBuildError } from '../error.js';
+import { DataSource } from '../query/source.js';
+import { AddressType, AddressToPubkeyMap } from '../address.js';
+import { TxInput } from './build.js';
+import { limitPromiseBatchSize, remove0x, toXOnly } from '../utils.js';
+import { isP2trScript } from '../script.js';
 
 export interface BaseOutput {
   txid: string;

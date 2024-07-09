@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { accounts, config, network, service, source } from './shared/env';
-import { expectPsbtFeeInRange, signAndBroadcastPsbt, waitFor } from './shared/utils';
+import { accounts, config, network, service, source } from './shared/env.js';
+import { expectPsbtFeeInRange, signAndBroadcastPsbt, waitFor } from './shared/utils.js';
 import { bitcoin, ErrorMessages, ErrorCodes, AddressType } from '../src';
 import { createSendUtxosBuilder, createSendBtcBuilder, sendBtc, sendUtxos, sendRbf, tweakSigner } from '../src';
 

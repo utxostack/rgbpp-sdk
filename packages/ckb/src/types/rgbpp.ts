@@ -1,7 +1,7 @@
 import { BtcAssetsApi, RgbppApiSpvProof } from '@rgbpp-sdk/service';
-import { Collector } from '../collector';
-import { IndexerCell } from './collector';
-import { Address, Hex, BTCTestnetType } from './common';
+import { Collector } from '../collector/index.js';
+import { IndexerCell } from './collector.js';
+import { Address, Hex, BTCTestnetType } from './common.js';
 
 export interface ConstructPaymasterParams {
   // The collector that collects CKB live cells and transactions

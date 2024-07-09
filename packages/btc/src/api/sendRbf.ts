@@ -1,13 +1,13 @@
-import { BaseOutput, Utxo } from '../transaction/utxo';
-import { DataSource } from '../query/source';
-import { AddressToPubkeyMap } from '../address';
-import { ErrorCodes, TxBuildError } from '../error';
-import { InitOutput, TxBuilder } from '../transaction/build';
-import { isOpReturnScriptPubkey } from '../transaction/embed';
-import { networkTypeToNetwork } from '../preset/network';
-import { networkTypeToConfig } from '../preset/config';
-import { createSendUtxosBuilder } from './sendUtxos';
-import { bitcoin } from '../bitcoin';
+import { BaseOutput, Utxo } from '../transaction/utxo.js';
+import { DataSource } from '../query/source.js';
+import { AddressToPubkeyMap } from '../address.js';
+import { ErrorCodes, TxBuildError } from '../error.js';
+import { InitOutput, TxBuilder } from '../transaction/build.js';
+import { isOpReturnScriptPubkey } from '../transaction/embed.js';
+import { networkTypeToNetwork } from '../preset/network.js';
+import { networkTypeToConfig } from '../preset/config.js';
+import { createSendUtxosBuilder } from './sendUtxos.js';
+import { bitcoin } from '../bitcoin.js';
 
 export interface SendRbfProps {
   from: string;

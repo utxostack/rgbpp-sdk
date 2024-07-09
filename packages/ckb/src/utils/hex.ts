@@ -1,5 +1,5 @@
-import { hexToBytes, bytesToHex } from './ckb-tx';
-import { Hex } from '../types';
+import { hexToBytes, bytesToHex } from './ckb-tx.js';
+import { Hex } from '../types/index.js';
 
 export const remove0x = (hex: string): string => {
   if (hex.startsWith('0x')) {

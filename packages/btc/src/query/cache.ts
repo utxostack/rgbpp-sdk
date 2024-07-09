@@ -1,4 +1,4 @@
-import { Utxo } from '../transaction/utxo';
+import { Utxo } from '../transaction/utxo.js';
 
 export class DataCache {
   private utxos: Map<string, Utxo[]>; // Map<Key, Utxo[]>

@@ -4,8 +4,13 @@ import {
   AppendWitnessesParams,
   Hex,
   SendCkbTxParams,
-} from '../types';
-import { MIN_CAPACITY, RGBPP_WITNESS_PLACEHOLDER, SECP256K1_WITNESS_LOCK_SIZE, getRgbppLockScript } from '../constants';
+} from '../types/index.js';
+import {
+  MIN_CAPACITY,
+  RGBPP_WITNESS_PLACEHOLDER,
+  SECP256K1_WITNESS_LOCK_SIZE,
+  getRgbppLockScript,
+} from '../constants/index.js';
 import {
   append0x,
   calculateTransactionFee,
@@ -20,10 +25,10 @@ import {
   serializeWitnessArgs,
   blockchain,
   signWitnesses,
-} from '../utils';
-import { InputsCapacityNotEnoughError } from '../error';
-import { buildSpvClientCellDep } from '../utils';
-import { RGBPPUnlock, Uint16 } from '../schemas/generated/rgbpp';
+} from '../utils/index.js';
+import { InputsCapacityNotEnoughError } from '../error/index.js';
+import { buildSpvClientCellDep } from '../utils/index.js';
+import { RGBPPUnlock, Uint16 } from '../schemas/generated/rgbpp.js';
 
 export const buildRgbppUnlockWitness = (
   btcTxBytes: Hex,

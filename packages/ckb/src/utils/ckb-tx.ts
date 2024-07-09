@@ -1,22 +1,24 @@
 import { calculateTransactionFee as calculateTxFee } from '@nervosnetwork/ckb-sdk-utils/lib/calculateTransactionFee.js';
 import { RawClusterData, packRawClusterData, SporeDataProps, packRawSporeData } from '@spore-sdk/core';
-import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses.js';
+import signWitnessesImport from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses.js';
 import * as ckbUtils from '@nervosnetwork/ckb-sdk-utils';
-import { remove0x, u64ToLe } from './hex';
+import ckbSdkCore from '@nervosnetwork/ckb-sdk-core';
+import { remove0x, u64ToLe } from './hex.js';
 import {
   CKB_UNIT,
   UNLOCKABLE_LOCK_SCRIPT,
   getClusterTypeScript,
   getSporeTypeScript,
   getXudtTypeScript,
-} from '../constants';
-import { Hex, RgbppTokenInfo } from '../types';
-import { encodeRgbppTokenInfo, genBtcTimeLockScript } from './rgbpp';
-import { Collector } from '../collector';
-import { NoLiveCellError } from '../error';
+} from '../constants/index.js';
+import { Hex, RgbppTokenInfo } from '../types/index.js';
+import { encodeRgbppTokenInfo, genBtcTimeLockScript } from './rgbpp.js';
+import { Collector } from '../collector/index.js';
+import { NoLiveCellError } from '../error/index.js';
 
 export { blockchain } from '@ckb-lumos/base';
-export { signWitnesses };
+export const CKB = ckbSdkCore.default;
+export const signWitnesses = signWitnessesImport.default;
 export const {
   PERSONAL,
   blake2b,
