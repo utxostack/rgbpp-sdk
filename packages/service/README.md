@@ -161,6 +161,7 @@ interface BaseApiRequestOptions extends RequestInit {
   params?: Record<string, any>;
   method?: 'GET' | 'POST';
   requireToken?: boolean;
+  allow404?: boolean;
 }
 
 interface BtcAssetsApiToken {
@@ -188,7 +189,6 @@ interface BtcApis {
 interface BtcApiBlockchainInfo {
   chain: string;
   blocks: number;
-  headers: number;
   bestblockhash: number;
   difficulty: number;
   mediantime: number;
@@ -222,11 +222,18 @@ interface BtcApiBlockTransactionIds {
   txids: string[];
 }
 
+interface BtcApiRecommendedFeeRates {
+  fastestFee: number;
+  halfHourFee: number;
+  hourFee: number;
+  economyFee: number;
+  minimumFee: number;
+}
+
 interface BtcApiBalanceParams {
   min_satoshi?: number;
   no_cache?: boolean;
 }
-
 interface BtcApiBalance {
   address: string;
   // @deprecated Use available_satoshi instead
@@ -245,7 +252,6 @@ interface BtcApiUtxoParams {
   min_satoshi?: number;
   no_cache?: boolean;
 }
-
 interface BtcApiUtxo {
   txid: string;
   vout: number;
@@ -262,7 +268,7 @@ interface BtcApiSentTransaction {
   txid: string;
 }
 
-export interface BtcApiTransactionParams {
+interface BtcApiTransactionParams {
   after_txid?: string;
 }
 
@@ -312,9 +318,11 @@ interface RgbppApis {
   getRgbppPaymasterInfo(): Promise<RgbppApiPaymasterInfo>;
   getRgbppTransactionHash(btcTxId: string): Promise<RgbppApiCkbTransactionHash>;
   getRgbppTransactionState(btcTxId: string): Promise<RgbppApiTransactionState>;
-  getRgbppAssetsByBtcTxId(btcTxId: string): Promise<Cell[]>;
-  getRgbppAssetsByBtcUtxo(btcTxId: string, vout: number): Promise<Cell[]>;
-  getRgbppAssetsByBtcAddress(btcAddress: string, params?: RgbppApiAssetsByAddressParams): Promise<Cell[]>;
+  getRgbppAssetsByBtcTxId(btcTxId: string): Promise<RgbppCell[]>;
+  getRgbppAssetsByBtcUtxo(btcTxId: string, vout: number): Promise<RgbppCell[]>;
+  getRgbppAssetsByBtcAddress(btcAddress: string, params?: RgbppApiAssetsByAddressParams): Promise<RgbppCell[]>;
+  getRgbppBalanceByBtcAddress(btcAddress: string, params?: RgbppApiBalanceByAddressParams): Promise<RgbppApiBalance>;
+  getRgbppActivityByBtcAddress(btcAddress: string, params?: RgbppApiActivityByAddressParams): Promise<RgbppApiActivity>;
   getRgbppSpvProof(btcTxId: string, confirmations: number): Promise<RgbppApiSpvProof>;
   sendRgbppCkbTransaction(payload: RgbppApiSendCkbTransactionPayload): Promise<RgbppApiTransactionState>;
   retryRgbppCkbTransaction(payload: RgbppApiRetryCkbTransactionPayload): Promise<RgbppApiTransactionRetry>;
@@ -331,13 +339,74 @@ interface RgbppApiCkbTransactionHash {
   txhash: string;
 }
 
+interface RgbppApiTransactionStateParams {
+  with_data?: boolean;
+}
+
 interface RgbppApiTransactionState {
   state: RgbppTransactionState;
+  attempts: number;
+  failedReason?: string;
+  data?: {
+    txid: string;
+    ckbVirtualResult: {
+      ckbRawTx: CKBComponents.RawTransaction;
+      needPaymasterCell: boolean;
+      sumInputsCapacity: string;
+      commitment: string;
+    };
+  };
+}
+
+interface RgbppCell extends Cell {
+  typeHash?: Hash;
 }
 
 interface RgbppApiAssetsByAddressParams {
   type_script?: string;
   no_cache?: boolean;
+}
+
+interface RgbppApiBalanceByAddressParams {
+  type_script?: string;
+  no_cache?: boolean;
+}
+interface RgbppApiBalance {
+  address: string;
+  xudt: RgbppApiXudtBalance[];
+}
+interface RgbppApiXudtBalance {
+  name: string;
+  decimal: number;
+  symbol: string;
+  total_amount: string;
+  available_amount: string;
+  pending_amount: string;
+  type_hash: string;
+  type_script: Script;
+}
+
+interface RgbppApiActivityByAddressParams {
+  rgbpp_only?: boolean;
+  type_script?: string;
+  after_btc_txid?: string;
+}
+interface RgbppApiActivity {
+  address: string;
+  cursor: string;
+  txs: {
+    btcTx: BtcApiTransaction;
+    isRgbpp: boolean;
+    isomorphicTx?: {
+      ckbRawTx?: CKBComponents.RawTransaction;
+      ckbTx?: CKBComponents.Transaction;
+      inputs?: CKBComponents.CellOutput[];
+      outputs?: CKBComponents.CellOutput[];
+      status: {
+        confirmed: boolean;
+      };
+    };
+  }[];
 }
 
 interface RgbppApiSpvProof {
@@ -350,12 +419,14 @@ interface RgbppApiSpvProof {
 
 interface RgbppApiSendCkbTransactionPayload {
   btc_txid: string;
-  ckb_virtual_result: {
-    ckbRawTx: CKBComponents.RawTransaction;
-    needPaymasterCell: boolean;
-    sumInputsCapacity: string;
-    commitment: string;
-  };
+  // Support ckbVirtualTxResult and it's JSON string as request parameter
+  ckb_virtual_result: RgbppApiSendCkbVirtualResult | string;
+}
+interface RgbppApiSendCkbVirtualResult {
+  ckbRawTx: CKBComponents.RawTransaction;
+  needPaymasterCell: boolean;
+  sumInputsCapacity: string;
+  commitment: string;
 }
 
 interface RgbppApiRetryCkbTransactionPayload {
@@ -366,4 +437,5 @@ interface RgbppApiTransactionRetry {
   success: boolean;
   state: RgbppTransactionState;
 }
+
 ```

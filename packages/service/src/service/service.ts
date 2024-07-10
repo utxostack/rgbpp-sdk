@@ -14,6 +14,8 @@ import {
   BtcApiUtxoParams,
   BtcApiTransactionParams,
   BtcApiRecommendedFeeRates,
+  RgbppApiActivityByAddressParams,
+  RgbppApiActivity,
 } from '../types';
 import {
   RgbppApis,
@@ -132,6 +134,12 @@ export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis
 
   getRgbppBalanceByBtcAddress(btcAddress: string, params?: RgbppApiBalanceByAddressParams) {
     return this.request<RgbppApiBalance>(`/rgbpp/v1/address/${btcAddress}/balance`, {
+      params,
+    });
+  }
+
+  getRgbppActivityByBtcAddress(btcAddress: string, params?: RgbppApiActivityByAddressParams) {
+    return this.request<RgbppApiActivity>(`/rgbpp/v1/address/${btcAddress}/activity`, {
       params,
     });
   }
