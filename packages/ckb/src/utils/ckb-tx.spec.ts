@@ -138,8 +138,8 @@ describe('ckb tx utils', () => {
       content: hexToBytes(utf8ToHex('First Spore')),
       clusterId: '0xbc5168a4f90116fada921e185d4b018e784dc0f6266e539a3c092321c932700a',
     };
-    const capacity = calculateRgbppSporeCellCapacity(sporeData);
-    expect(capacity).toBe(BigInt(319_0000_0000));
+    expect(calculateRgbppSporeCellCapacity(sporeData)).toBe(BigInt(319_0000_0000));
+    expect(calculateRgbppSporeCellCapacity(sporeData, false)).toBe(BigInt(224_0000_0000));
   });
 
   it('deduplicateList', () => {
@@ -226,14 +226,8 @@ describe('ckb tx utils', () => {
     };
     expect(true).toBe(isSporeCapacitySufficient(sporeCell));
 
-    const sporeCell1 = {
-      ...sporeCell,
-      output: {
-        ...sporeCell.output,
-        capacity: '0x5e9f53e00', // 254 CKB
-      },
-    };
-    expect(false).toBe(isSporeCapacitySufficient(sporeCell1));
+    sporeCell.output.capacity = '0x5e9f53e00'; // 254 CKB
+    expect(false).toBe(isSporeCapacitySufficient(sporeCell));
   });
 
   it('checkCkbTxInputsCapacitySufficient', { timeout: 20000 }, async () => {
