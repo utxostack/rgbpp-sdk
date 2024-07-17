@@ -169,7 +169,6 @@ export class Collector {
 
   async getLiveCells(outPoints: CKBComponents.OutPoint[], withData = false): Promise<CKBComponents.LiveCell[]> {
     const ckb = new CKB(this.ckbNodeUrl);
-    /* @ts-expect-error The parameters data types of batch request don't support boolean */
     const batch = ckb.rpc.createBatchRequest(outPoints.map((outPoint) => ['getLiveCell', outPoint, withData]));
     return batch.exec().then((liveCells) => liveCells.map((liveCell) => liveCell.cell));
   }
