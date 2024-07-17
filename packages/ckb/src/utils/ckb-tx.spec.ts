@@ -11,11 +11,13 @@ import {
   isScriptEqual,
   isTypeAssetSupported,
   checkCkbTxInputsCapacitySufficient,
+  calculateCellOccupiedCapacity,
 } from './ckb-tx';
 import { hexToBytes } from '@nervosnetwork/ckb-sdk-utils';
 import { Collector } from '../collector';
 import { NoLiveCellError } from '../error';
 import { utf8ToHex } from './hex';
+import { IndexerCell } from '../types';
 
 describe('ckb tx utils', () => {
   it('calculateTransactionFee', () => {
@@ -170,6 +172,32 @@ describe('ckb tx utils', () => {
         '0x123456',
       ),
     );
+  });
+
+  it('calculateCellOccupiedCapacity', () => {
+    const cell: IndexerCell = {
+      output: {
+        capacity: '0x5e9f53e00',
+        lock: {
+          args: '0x6b6a9580fc2aceb920c63adea27a667acfc180f67cf875b36f31b42546ac4920',
+          codeHash: '0x61ca7a4796a4eb19ca4f0d065cb9b10ddcf002f10f7cbb810c706cb6bb5c3248',
+          hashType: 'type',
+        },
+        type: {
+          args: '0x6b6a9580fc2aceb920c63adea27a667acfc180f67cf875b36f31b42546ac4920',
+          codeHash: '0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb',
+          hashType: 'type',
+        },
+      },
+      outPoint: {
+        index: '0x1',
+        txHash: '0x1a6d2b18faed84293b81ada9d00600a3cdb637fa43a5cfa20eb63934757352ea',
+      },
+      blockNumber: '0x0',
+      txIndex: '0x0',
+      outputData: '0x6b6a9580fc2aceb920c63adea27a667acfc180f67cf875b36f31b42546ac4920',
+    };
+    expect(BigInt(17000000000)).toBe(calculateCellOccupiedCapacity(cell));
   });
 
   it('checkCkbTxInputsCapacitySufficient', { timeout: 20000 }, async () => {

@@ -149,8 +149,8 @@ export const calculateRgbppSporeCellCapacity = (sporeData: SporeDataProps, reser
 // Calculate the occupied capacity of the CKB cell
 export const calculateCellOccupiedCapacity = (cell: IndexerCell): bigint => {
   const cellDataSize = remove0x(cell.outputData).length / 2;
-  const lockSize = remove0x(cell.output.lock.args).length / 2 + 33;
-  const typeSize = cell.output.type ? remove0x(cell.output.type.args).length + 1 + 20 : 0;
+  const lockSize = remove0x(cell.output.lock.args).length / 2 + 1 + 32;
+  const typeSize = cell.output.type ? remove0x(cell.output.type.args).length / 2 + 1 + 32 : 0;
   const cellSize = cellDataSize + lockSize + typeSize + CELL_CAPACITY_SIZE;
   return BigInt(cellSize) * CKB_UNIT;
 };
