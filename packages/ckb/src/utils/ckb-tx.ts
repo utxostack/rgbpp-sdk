@@ -8,7 +8,7 @@ import {
   getSporeTypeScript,
   getXudtTypeScript,
 } from '../constants';
-import { Hex, RgbppTokenInfo } from '../types';
+import { Hex, IndexerCell, RgbppTokenInfo } from '../types';
 import { PERSONAL, blake2b, hexToBytes, serializeInput, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { encodeRgbppTokenInfo, genBtcTimeLockScript } from './rgbpp';
 import { Collector } from '../collector';
@@ -138,11 +138,27 @@ export const calculateRgbppClusterCellCapacity = (clusterData: RawClusterData): 
     type: spore_type
     data: sporeData
  */
-export const calculateRgbppSporeCellCapacity = (sporeData: SporeDataProps): bigint => {
+export const calculateRgbppSporeCellCapacity = (sporeData: SporeDataProps, reserveMoreCkb = true): bigint => {
   const sporeDataSize = packRawSporeData(sporeData).length;
   const sporeTypeSize = 32 + 1 + 32;
-  const cellSize = RGBPP_LOCK_SIZE + sporeTypeSize + CELL_CAPACITY_SIZE + sporeDataSize + BTC_TIME_CELL_INCREASED_SIZE;
+  const reservedCapacity = reserveMoreCkb ? BTC_TIME_CELL_INCREASED_SIZE : 0;
+  const cellSize = RGBPP_LOCK_SIZE + sporeTypeSize + CELL_CAPACITY_SIZE + sporeDataSize + reservedCapacity;
   return BigInt(cellSize + 1) * CKB_UNIT;
+};
+
+// Calculate the occupied capacity of the CKB cell
+export const calculateCellOccupiedCapacity = (cell: IndexerCell): bigint => {
+  const cellDataSize = remove0x(cell.outputData).length / 2;
+  const lockSize = remove0x(cell.output.lock.args).length / 2 + 33;
+  const typeSize = cell.output.type ? remove0x(cell.output.type.args).length + 1 + 20 : 0;
+  const cellSize = cellDataSize + lockSize + typeSize + CELL_CAPACITY_SIZE;
+  return BigInt(cellSize) * CKB_UNIT;
+};
+
+export const isSporeCapacitySufficient = (sporeCell: IndexerCell) => {
+  const occupiedCapacity = calculateCellOccupiedCapacity(sporeCell);
+  const capacity = BigInt(sporeCell.output.capacity);
+  return capacity - occupiedCapacity > BTC_TIME_CELL_INCREASED_SIZE;
 };
 
 export const deduplicateList = (rgbppLockArgsList: Hex[]): Hex[] => {
