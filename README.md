@@ -50,9 +50,10 @@ This repository offers utilities for Bitcoin and RGB++ asset integration.
     2. continuously fetch request from the queue through a **cron job**
     3. check whether the **confirmations** of `req.rgbpp_btc_txid` is sufficient
     4. generate the **witnesses for RgbppLocks** in the `rgbpp_ckb_tx_virtual`
-    5. add a **paymaster cell** into `rgbpp_ckb_tx_virtual`.inputs if the CKB capacity is insufficient
+    5. add a **paymaster cell** into `rgbpp_ckb_tx_virtual` inputs if the CKB capacity is insufficient
         1. need to **verify the existence of paymaster UTXO** in the rgbpp_btc_tx
-        2. sign the paymaster cell and the entire transaction if needed
+        2. based on the exchange rates of BTC and CKB, the BTC required to subsidize a paymaster cell is approximately **12,000 satoshi**. 
+        3. sign the paymaster cell and the entire transaction if needed
     6. **finalize** the `rgbpp_ckb_tx_virtual` to a `rgbpp_ckb_tx`
     7. **broadcast** `rgbpp_ckb_tx` and mark the job as completed upon tx-confirmation
 
