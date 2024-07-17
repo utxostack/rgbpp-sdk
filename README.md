@@ -52,7 +52,7 @@ This repository offers utilities for Bitcoin and RGB++ asset integration.
     4. generate the **witnesses for RgbppLocks** in the `rgbpp_ckb_tx_virtual`
     5. add a **paymaster cell** into `rgbpp_ckb_tx_virtual` inputs if the CKB capacity is insufficient
         1. need to **verify the existence of paymaster UTXO** in the rgbpp_btc_tx
-          > based on the exchange rates of BTC and CKB, [the paymaster BTC UTXO's value](https://api.rgbpp.io/docs/static/index.html#/RGB%2B%2B/get_rgbpp_v1_paymaster_info) required to subsidize a paymaster CKB cell is approximately: `paymaster_utxo_sats ~= 316 * ${ckb_price} / ${btc_price} * 100000000`
+           > based on the exchange rates of BTC and CKB, [the paymaster BTC UTXO's value](https://api.rgbpp.io/docs/static/index.html#/RGB%2B%2B/get_rgbpp_v1_paymaster_info) required to subsidize a paymaster CKB cell is approximately: `paymaster_utxo_sats ~= 316 * ${ckb_price} / ${btc_price} * 100000000`
         2. sign the paymaster cell and the entire transaction if needed
 
     6. **finalize** the `rgbpp_ckb_tx_virtual` to a `rgbpp_ckb_tx`
