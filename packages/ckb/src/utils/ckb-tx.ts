@@ -158,7 +158,7 @@ export const calculateCellOccupiedCapacity = (cell: IndexerCell): bigint => {
 export const isSporeCapacitySufficient = (sporeCell: IndexerCell) => {
   const occupiedCapacity = calculateCellOccupiedCapacity(sporeCell);
   const capacity = BigInt(sporeCell.output.capacity);
-  return capacity - occupiedCapacity > BTC_TIME_CELL_INCREASED_SIZE;
+  return capacity - occupiedCapacity > BigInt(BTC_TIME_CELL_INCREASED_SIZE) * CKB_UNIT;
 };
 
 export const deduplicateList = (rgbppLockArgsList: Hex[]): Hex[] => {
