@@ -10,7 +10,7 @@
     "lint:fix": "tsc && eslint --fix --ext .js,.ts . && prettier --write '**/*.{js,ts}'"
   },
   "dependencies": {
-    "@nervosnetwork/ckb-sdk-utils": "^0.109.1",
+    "@nervosnetwork/ckb-sdk-utils": "^0.109.2-alpha.0",
     "rgbpp": "workspace:*"
   },
   "devDependencies": {
