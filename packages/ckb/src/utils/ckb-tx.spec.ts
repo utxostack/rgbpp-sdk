@@ -13,6 +13,7 @@ import {
   checkCkbTxInputsCapacitySufficient,
   calculateCellOccupiedCapacity,
   isSporeCapacitySufficient,
+  increaseSporeCapacity,
 } from './ckb-tx';
 import { hexToBytes } from '@nervosnetwork/ckb-sdk-utils';
 import { Collector } from '../collector';
@@ -140,6 +141,11 @@ describe('ckb tx utils', () => {
     };
     expect(calculateRgbppSporeCellCapacity(sporeData)).toBe(BigInt(319_0000_0000));
     expect(calculateRgbppSporeCellCapacity(sporeData, false)).toBe(BigInt(224_0000_0000));
+  });
+
+  it('increaseSporeCapacity', () => {
+    const sporeCapacity = '0x5e9f53e00';
+    expect(increaseSporeCapacity(sporeCapacity)).toBe('0x82033bd00');
   });
 
   it('deduplicateList', () => {

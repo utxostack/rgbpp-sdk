@@ -1,5 +1,11 @@
 import { BtcTimeCellsParams, RgbppCkbVirtualTx } from '../types/rgbpp';
-import { append0x, calculateTransactionFee, fetchTypeIdCellDeps, isSporeCapacitySufficient } from '../utils';
+import {
+  append0x,
+  calculateTransactionFee,
+  fetchTypeIdCellDeps,
+  increaseSporeCapacity,
+  isSporeCapacitySufficient,
+} from '../utils';
 import {
   btcTxIdFromBtcTimeLockArgs,
   buildSpvClientCellDep,
@@ -77,6 +83,7 @@ export const genLeapSporeFromBtcToCkbVirtualTx = async ({
     {
       ...sporeCell.output,
       lock: genBtcTimeLockScript(toLock, isMainnet, btcTestnetType),
+      capacity: needPaymasterCell ? increaseSporeCapacity(sporeCell.output.capacity) : sporeCell.output.capacity,
     },
   ];
   const outputsData: Hex[] = [sporeCell.outputData];

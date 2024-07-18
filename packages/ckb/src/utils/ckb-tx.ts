@@ -162,6 +162,11 @@ export const isSporeCapacitySufficient = (sporeCell: IndexerCell) => {
   return capacity - occupiedCapacity > BigInt(BTC_TIME_CELL_INCREASED_SIZE) * CKB_UNIT;
 };
 
+// If the spore cell capacity is insufficient, increase it by BTC_TIME_CELL_INCREASED_SIZE
+export const increaseSporeCapacity = (currentSporeCapacity: Hex): Hex => {
+  return `0x${(BigInt(currentSporeCapacity) + BigInt(BTC_TIME_CELL_INCREASED_SIZE) * CKB_UNIT).toString(16)}`;
+};
+
 export const deduplicateList = (rgbppLockArgsList: Hex[]): Hex[] => {
   return Array.from(new Set(rgbppLockArgsList));
 };
