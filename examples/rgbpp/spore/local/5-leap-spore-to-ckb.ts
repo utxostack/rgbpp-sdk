@@ -76,7 +76,10 @@ const leapSpore = async ({ sporeRgbppLockArgs, toCkbAddress, sporeTypeArgs }: Sp
       });
 
       // Replace cobuild witness with the final rgbpp lock script
-      ckbTx.witnesses[ckbTx.witnesses.length - 1] = generateSporeTransferCoBuild([sporeCell], ckbTx.outputs);
+      ckbTx.witnesses[ckbTx.witnesses.length - 1] = generateSporeTransferCoBuild(
+        [sporeCell],
+        ckbTx.outputs.slice(0, 1),
+      );
 
       // console.log('ckbTx: ', JSON.stringify(ckbTx));
 
