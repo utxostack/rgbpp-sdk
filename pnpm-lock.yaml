@@ -127,7 +127,7 @@ importers:
   examples/rgbpp:
     dependencies:
       '@nervosnetwork/ckb-sdk-utils':
-        specifier: ^0.109.1
+        specifier: ^0.109.2-alpha.0
         version: 0.109.1
       rgbpp:
         specifier: ^0.4.0
@@ -149,7 +149,7 @@ importers:
   examples/xudt-on-ckb:
     dependencies:
       '@nervosnetwork/ckb-sdk-utils':
-        specifier: ^0.109.1
+        specifier: ^0.109.2-alpha.0
         version: 0.109.1
       rgbpp:
         specifier: ^0.4.0
@@ -171,7 +171,7 @@ importers:
         specifier: 0.22.2
         version: 0.22.2
       '@nervosnetwork/ckb-types':
-        specifier: ^0.109.1
+        specifier: ^0.109.2-alpha.0
         version: 0.109.1
       '@rgbpp-sdk/ckb':
         specifier: workspace:^
@@ -207,13 +207,13 @@ importers:
         specifier: ^1.0.13
         version: 1.0.13
       '@nervosnetwork/ckb-sdk-core':
-        specifier: ^0.109.1
+        specifier: ^0.109.2-alpha.0
         version: 0.109.1
       '@nervosnetwork/ckb-sdk-utils':
-        specifier: ^0.109.1
+        specifier: ^0.109.2-alpha.0
         version: 0.109.1
       '@nervosnetwork/ckb-types':
-        specifier: ^0.109.1
+        specifier: ^0.109.2-alpha.0
         version: 0.109.1
       '@rgbpp-sdk/service':
         specifier: workspace:^
@@ -238,7 +238,7 @@ importers:
   packages/rgbpp:
     dependencies:
       '@nervosnetwork/ckb-sdk-utils':
-        specifier: ^0.109.1
+        specifier: ^0.109.2-alpha.0
         version: 0.109.1
       '@rgbpp-sdk/btc':
         specifier: workspace:*
@@ -259,7 +259,7 @@ importers:
         specifier: 0.22.2
         version: 0.22.2
       '@nervosnetwork/ckb-types':
-        specifier: ^0.109.1
+        specifier: ^0.109.2-alpha.0
         version: 0.109.1
       lodash:
         specifier: ^4.17.21
@@ -268,7 +268,7 @@ importers:
   tests/rgbpp:
     dependencies:
       '@nervosnetwork/ckb-sdk-utils':
-        specifier: ^0.109.1
+        specifier: ^0.109.2-alpha.0
         version: 0.109.1
       rgbpp:
         specifier: workspace:*
