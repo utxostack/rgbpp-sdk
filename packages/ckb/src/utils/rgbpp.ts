@@ -25,8 +25,14 @@ import {
   isScriptEqual,
   isUDTTypeSupported,
 } from './ckb-tx';
-import { bytesToHex, hexToBytes, serializeOutPoint, serializeOutput, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { blockchain } from '@ckb-lumos/base';
+import {
+  bytesToHex,
+  hexToBytes,
+  serializeOutPoint,
+  serializeOutput,
+  serializeScript,
+} from '@nervosnetwork/ckb-sdk-utils';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean, btcTestnetType?: BTCTestnetType) => {
   return {

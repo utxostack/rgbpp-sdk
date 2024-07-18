@@ -1,4 +1,4 @@
-import { hexToBytes, bytesToHex } from './ckb-tx';
+import { hexToBytes, bytesToHex } from '@nervosnetwork/ckb-sdk-utils';
 import { Hex } from '../types';
 
 export const remove0x = (hex: string): string => {

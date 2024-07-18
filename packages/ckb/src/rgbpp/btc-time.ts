@@ -1,4 +1,12 @@
-import { addressToScript, bytesToHex, getTransactionSize, rawTransactionToHash, scriptToHash, serializeOutPoint, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils';
+import {
+  addressToScript,
+  bytesToHex,
+  getTransactionSize,
+  rawTransactionToHash,
+  scriptToHash,
+  serializeOutPoint,
+  serializeWitnessArgs,
+} from '@nervosnetwork/ckb-sdk-utils';
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
   SECP256K1_WITNESS_LOCK_SIZE,

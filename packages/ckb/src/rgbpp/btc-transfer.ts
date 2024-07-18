@@ -35,8 +35,14 @@ import {
   getSecp256k1CellDep,
 } from '../constants';
 import { blockchain } from '@ckb-lumos/base';
-import { addressToScript, getTransactionSize, rawTransactionToHash, scriptToHash, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils';
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
+import {
+  addressToScript,
+  getTransactionSize,
+  rawTransactionToHash,
+  scriptToHash,
+  serializeWitnessArgs,
+} from '@nervosnetwork/ckb-sdk-utils';
 
 /**
  * Generate the virtual ckb transaction for the btc transfer tx

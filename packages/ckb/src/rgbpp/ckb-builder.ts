@@ -18,8 +18,14 @@ import { InputsCapacityNotEnoughError } from '../error';
 import { buildSpvClientCellDep } from '../utils';
 import { RGBPPUnlock, Uint16 } from '../schemas/generated/rgbpp';
 import { blockchain } from '@ckb-lumos/base';
-import { bytesToHex, getTransactionSize, rawTransactionToHash, scriptToHash, serializeWitnessArgs } from '@nervosnetwork/ckb-sdk-utils';
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
+import {
+  bytesToHex,
+  getTransactionSize,
+  rawTransactionToHash,
+  scriptToHash,
+  serializeWitnessArgs,
+} from '@nervosnetwork/ckb-sdk-utils';
 
 export const buildRgbppUnlockWitness = (
   btcTxBytes: Hex,

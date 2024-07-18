@@ -30,7 +30,7 @@
   "dependencies": {
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@ckb-lumos/codec": "0.22.2",
-    "@nervosnetwork/ckb-types": "0.109.1",
+    "@nervosnetwork/ckb-types": "0.109.2",
     "@rgbpp-sdk/ckb": "workspace:^",
     "@rgbpp-sdk/service": "workspace:^",
     "bip32": "^4.0.0",
