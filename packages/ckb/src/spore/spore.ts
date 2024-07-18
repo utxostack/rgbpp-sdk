@@ -58,6 +58,7 @@ import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
  * @param sporeDataList The spore's data list, including name and description.
  * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
  * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+ * @param reserveMoreCkb(Optional) True is to reserve more CKB to leap from BTC to CKB, otherwise, not to reserve CKB, default value is true
  */
 export const genCreateSporeCkbVirtualTx = async ({
   collector,
@@ -65,6 +66,7 @@ export const genCreateSporeCkbVirtualTx = async ({
   sporeDataList,
   isMainnet,
   btcTestnetType,
+  reserveMoreCkb,
 }: CreateSporeCkbVirtualTxParams): Promise<SporeCreateVirtualTxResult> => {
   const clusterRgbppLock = genRgbppLockScript(clusterRgbppLockArgs, isMainnet, btcTestnetType);
   const clusterCells = await collector.getCells({ lock: clusterRgbppLock, isDataMustBeEmpty: false });
@@ -102,7 +104,7 @@ export const genCreateSporeCkbVirtualTx = async ({
       // The CKB transaction outputs[0] fro cluster and outputs[1]... for spore
       args: generateSporeId(inputs[0], index + 1),
     },
-    capacity: append0x(calculateRgbppSporeCellCapacity(data).toString(16)),
+    capacity: append0x(calculateRgbppSporeCellCapacity(data, reserveMoreCkb).toString(16)),
   }));
   const sporeOutputsData = sporeDataList.map((data) => bytesToHex(packRawSporeData(data)));
 
