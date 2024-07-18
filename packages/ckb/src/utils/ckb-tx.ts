@@ -54,11 +54,11 @@ export const isTypeAssetSupported = (type: CKBComponents.Script, isMainnet: bool
 const CELL_CAPACITY_SIZE = 8;
 const UDT_CELL_DATA_SIZE = 16;
 
-// The BTC_TIME_CELL_INCREASED_SIZE is related to the specific lock script.
-// We assume that the maximum length of lock script args is 26 bytes. If it exceeds, an error will be thrown.
-const LOCK_ARGS_HEX_MAX_SIZE = 26 * 2;
-export const isLockArgsSizeExceeded = (args: Hex) => remove0x(args).length > LOCK_ARGS_HEX_MAX_SIZE;
+// Assume the length of the lock script args cannot exceed 26 bytes. If it exceeds, an error will be thrown.
+const LOCK_ARGS_HEX_MAX_SIZE = 26;
+export const isLockArgsSizeExceeded = (args: Hex) => remove0x(args).length > LOCK_ARGS_HEX_MAX_SIZE * 2;
 
+// The BTC_TIME_CELL_INCREASED_SIZE depends on the receiver lock script args whose length cannot exceed LOCK_ARGS_HEX_MAX_SIZE bytes
 const BTC_TIME_CELL_INCREASED_SIZE = 95;
 
 // For simplicity, we keep the capacity of the RGBPP cell the same as the BTC time cell
