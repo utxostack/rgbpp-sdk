@@ -26,6 +26,7 @@ import {
   RGBPP_TX_WITNESS_MAX_SIZE,
   RGBPP_WITNESS_PLACEHOLDER,
   getRgbppLockScript,
+  getSecp256k1CellDep,
   getSporeTypeDep,
 } from '../constants';
 import { generateSporeTransferCoBuild, throwErrorWhenSporeCellsInvalid } from '../utils/spore';
@@ -91,6 +92,9 @@ export const genLeapSporeFromBtcToCkbVirtualTx = async ({
     ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true }, btcTestnetType)),
     getSporeTypeDep(isMainnet),
   ];
+  if (needPaymasterCell) {
+    cellDeps.push(getSecp256k1CellDep(isMainnet));
+  }
   const sporeCoBuild = generateSporeTransferCoBuild([sporeCell], outputs);
   const witnesses = [RGBPP_WITNESS_PLACEHOLDER, sporeCoBuild];
 
