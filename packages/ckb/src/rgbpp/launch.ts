@@ -7,8 +7,6 @@ import {
   fetchTypeIdCellDeps,
   generateUniqueTypeArgs,
   u128ToLe,
-  getTransactionSize,
-  scriptToHash,
   buildPreLockArgs,
   calculateCommitment,
   encodeRgbppTokenInfo,
@@ -24,6 +22,7 @@ import {
   getUniqueTypeScript,
   UNLOCKABLE_LOCK_SCRIPT,
 } from '../constants';
+import { getTransactionSize, scriptToHash } from '@nervosnetwork/ckb-sdk-utils';
 
 /**
  * Generate the virtual ckb transaction for the btc transfer tx

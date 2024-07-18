@@ -6,12 +6,6 @@ import {
   calculateTransactionFee,
   fetchTypeIdCellDeps,
   isClusterSporeTypeSupported,
-  addressToScript,
-  bytesToHex,
-  getTransactionSize,
-  rawTransactionToHash,
-  scriptToHash,
-  serializeWitnessArgs,
   buildPreLockArgs,
   calculateCommitment,
   genRgbppLockScript,
@@ -48,6 +42,14 @@ import {
   RgbppUtxoBindMultiTypeAssetsError,
   TypeAssetNotSupportedError,
 } from '../error';
+import {
+  addressToScript,
+  bytesToHex,
+  getTransactionSize,
+  rawTransactionToHash,
+  scriptToHash,
+  serializeWitnessArgs,
+} from '@nervosnetwork/ckb-sdk-utils';
 
 /**
  * Generate the virtual ckb transaction for creating spores

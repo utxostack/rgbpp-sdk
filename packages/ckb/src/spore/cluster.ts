@@ -4,8 +4,6 @@ import {
   append0x,
   calculateTransactionFee,
   fetchTypeIdCellDeps,
-  bytesToHex,
-  getTransactionSize,
   buildPreLockArgs,
   calculateCommitment,
   genRgbppLockScript,
@@ -20,6 +18,7 @@ import {
   getClusterTypeScript,
 } from '../constants';
 import { NoRgbppLiveCellError } from '../error';
+import { bytesToHex, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
 /**
  * Generate the virtual ckb transaction for creating cluster

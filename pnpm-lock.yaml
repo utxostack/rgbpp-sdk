@@ -127,8 +127,8 @@ importers:
   examples/rgbpp:
     dependencies:
       '@nervosnetwork/ckb-sdk-utils':
-        specifier: ^0.109.1
-        version: 0.109.1
+        specifier: 0.109.2-alpha.1
+        version: 0.109.2-alpha.1
       rgbpp:
         specifier: ^0.4.0
         version: link:../../packages/rgbpp
@@ -149,8 +149,8 @@ importers:
   examples/xudt-on-ckb:
     dependencies:
       '@nervosnetwork/ckb-sdk-utils':
-        specifier: ^0.109.1
-        version: 0.109.1
+        specifier: 0.109.2-alpha.1
+        version: 0.109.2-alpha.1
       rgbpp:
         specifier: ^0.4.0
         version: link:../../packages/rgbpp
@@ -171,8 +171,8 @@ importers:
         specifier: 0.22.2
         version: 0.22.2
       '@nervosnetwork/ckb-types':
-        specifier: ^0.109.1
-        version: 0.109.1
+        specifier: 0.109.2-alpha.1
+        version: 0.109.2-alpha.1
       '@rgbpp-sdk/ckb':
         specifier: workspace:^
         version: link:../ckb
@@ -207,14 +207,14 @@ importers:
         specifier: ^1.0.13
         version: 1.0.13
       '@nervosnetwork/ckb-sdk-core':
-        specifier: ^0.109.1
-        version: 0.109.1
+        specifier: 0.109.2-alpha.1
+        version: 0.109.2-alpha.1
       '@nervosnetwork/ckb-sdk-utils':
-        specifier: ^0.109.1
-        version: 0.109.1
+        specifier: 0.109.2-alpha.1
+        version: 0.109.2-alpha.1
       '@nervosnetwork/ckb-types':
-        specifier: ^0.109.1
-        version: 0.109.1
+        specifier: 0.109.2-alpha.1
+        version: 0.109.2-alpha.1
       '@rgbpp-sdk/service':
         specifier: workspace:^
         version: link:../service
@@ -238,8 +238,8 @@ importers:
   packages/rgbpp:
     dependencies:
       '@nervosnetwork/ckb-sdk-utils':
-        specifier: ^0.109.1
-        version: 0.109.1
+        specifier: 0.109.2-alpha.1
+        version: 0.109.2-alpha.1
       '@rgbpp-sdk/btc':
         specifier: workspace:*
         version: link:../btc
@@ -259,8 +259,8 @@ importers:
         specifier: 0.22.2
         version: 0.22.2
       '@nervosnetwork/ckb-types':
-        specifier: ^0.109.1
-        version: 0.109.1
+        specifier: 0.109.2-alpha.1
+        version: 0.109.2-alpha.1
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -268,8 +268,8 @@ importers:
   tests/rgbpp:
     dependencies:
       '@nervosnetwork/ckb-sdk-utils':
-        specifier: ^0.109.1
-        version: 0.109.1
+        specifier: 0.109.2-alpha.1
+        version: 0.109.2-alpha.1
       rgbpp:
         specifier: workspace:*
         version: link:../../packages/rgbpp
@@ -1960,39 +1960,39 @@ packages:
       read-yaml-file: 1.1.0
     dev: true
 
-  /@nervosnetwork/ckb-sdk-core@0.109.1:
-    resolution: {integrity: sha512-YU3yJZvz69WU6Bw//vRxzxLGcIj74CwGffdp6GYZbQpZwFaACT6FCojvOMjHIyJ8Rw32r114LhMKHvyBwagWjw==}
+  /@nervosnetwork/ckb-sdk-core@0.109.2-alpha.1:
+    resolution: {integrity: sha512-HlYj9uzQxsXacrgMZ17uWTe3T9a7WuySWBD5k0xu+sBaOkPCjXFIDoQ9i0JgfndyzmDymVYmD/lak//50xWy1Q==}
     dependencies:
-      '@nervosnetwork/ckb-sdk-rpc': 0.109.1
-      '@nervosnetwork/ckb-sdk-utils': 0.109.1
-      '@nervosnetwork/ckb-types': 0.109.1
+      '@nervosnetwork/ckb-sdk-rpc': 0.109.2-alpha.1
+      '@nervosnetwork/ckb-sdk-utils': 0.109.2-alpha.1
+      '@nervosnetwork/ckb-types': 0.109.2-alpha.1
       tslib: 2.3.1
     transitivePeerDependencies:
       - debug
     dev: false
 
-  /@nervosnetwork/ckb-sdk-rpc@0.109.1:
-    resolution: {integrity: sha512-RoUhXmaOm1g7ga1G3guNTzSDit79k7nqj3rYbk2jSlULRo34g9L06juU24hmwwuFZfiCaARI9mgACu0ScW9itw==}
+  /@nervosnetwork/ckb-sdk-rpc@0.109.2-alpha.1:
+    resolution: {integrity: sha512-w36lcqDdvlTOROhh0vXXA7BBpUMALghL8vj+5aTatIrRLg03XeYKZDJH/I+CP3yh4GjeyXVxe5ymBLJ5q1m95A==}
     dependencies:
-      '@nervosnetwork/ckb-sdk-utils': 0.109.1
+      '@nervosnetwork/ckb-sdk-utils': 0.109.2-alpha.1
       axios: 1.6.7
       tslib: 2.3.1
     transitivePeerDependencies:
       - debug
     dev: false
 
-  /@nervosnetwork/ckb-sdk-utils@0.109.1:
-    resolution: {integrity: sha512-KK8w+JZGPt/Gq/Y0b87AuQp8mGR46fBSkqnjwASdBAi2rts9tJ6srEaZ3FVVa9LtjTlThQ120hex+mcyastrkQ==}
+  /@nervosnetwork/ckb-sdk-utils@0.109.2-alpha.1:
+    resolution: {integrity: sha512-a3dT8SExjJNMftVOeuI9/qISvlKeGFoLzHECbgrh3qO2nT6+1zTMoFE+u5aDQG21iP1ZlFXR2s0cDIm1naoR0w==}
     dependencies:
-      '@nervosnetwork/ckb-types': 0.109.1
+      '@nervosnetwork/ckb-types': 0.109.2-alpha.1
       bech32: 2.0.0
       elliptic: 6.5.4
       jsbi: 3.1.3
       tslib: 2.3.1
     dev: false
 
-  /@nervosnetwork/ckb-types@0.109.1:
-    resolution: {integrity: sha512-mD5mOCGa1JertKZekHSUVYwFPW27VJ0/MdwblWvEEK7pNIU6az+dLiIxgvl4TxR+j+7/GqmXNH1U59CM92y/wg==}
+  /@nervosnetwork/ckb-types@0.109.2-alpha.1:
+    resolution: {integrity: sha512-O4rhLuGTpkatdNzYRAOO3nzjyvSMFM4If3TQtDXZ5AM7YXxJRnj7IJBs1Jl/mSZbQn6vCqccqZ/nRM5IMu3etA==}
     dev: false
 
   /@nestjs/cli@10.3.2(esbuild@0.21.5):

@@ -3,10 +3,6 @@ import {
   append0x,
   calculateTransactionFee,
   fetchTypeIdCellDeps,
-  addressToScript,
-  getTransactionSize,
-  serializeOutPoint,
-  serializeWitnessArgs,
   btcTxIdFromBtcTimeLockArgs,
   buildSpvClientCellDep,
   calculateCommitment,
@@ -33,6 +29,12 @@ import {
 } from '../constants';
 import { NoRgbppLiveCellError } from '../error';
 import { buildBtcTimeUnlockWitness } from '../rgbpp';
+import {
+  addressToScript,
+  getTransactionSize,
+  serializeOutPoint,
+  serializeWitnessArgs,
+} from '@nervosnetwork/ckb-sdk-utils';
 
 /**
  * Generate the virtual ckb transaction for leaping spore from BTC to CKB

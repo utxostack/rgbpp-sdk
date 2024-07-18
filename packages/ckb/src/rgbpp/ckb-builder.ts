@@ -13,17 +13,19 @@ import {
   replaceLockArgsWithRealBtcTxId,
   transformSpvProof,
   u8ToHex,
-  bytesToHex,
-  getTransactionSize,
-  rawTransactionToHash,
-  scriptToHash,
-  serializeWitnessArgs,
   blockchain,
   signWitnesses,
 } from '../utils';
 import { InputsCapacityNotEnoughError } from '../error';
 import { buildSpvClientCellDep } from '../utils';
 import { RGBPPUnlock, Uint16 } from '../schemas/generated/rgbpp';
+import {
+  bytesToHex,
+  getTransactionSize,
+  rawTransactionToHash,
+  scriptToHash,
+  serializeWitnessArgs,
+} from '@nervosnetwork/ckb-sdk-utils';
 
 export const buildRgbppUnlockWitness = (
   btcTxBytes: Hex,

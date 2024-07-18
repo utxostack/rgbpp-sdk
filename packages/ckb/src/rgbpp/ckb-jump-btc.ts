@@ -8,12 +8,11 @@ import {
   fetchTypeIdCellDeps,
   isTypeAssetSupported,
   u128ToLe,
-  addressToScript,
-  getTransactionSize,
   genRgbppLockScript,
   blockchain,
 } from '../utils';
 import { MAX_FEE, MIN_CAPACITY, RGBPP_TX_WITNESS_MAX_SIZE } from '../constants';
+import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
 /**
  * Generate the virtual ckb transaction for the jumping tx from CKB to BTC

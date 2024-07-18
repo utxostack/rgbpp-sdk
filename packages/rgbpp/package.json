@@ -61,7 +61,7 @@
     "@rgbpp-sdk/btc": "workspace:*",
     "@rgbpp-sdk/ckb": "workspace:*",
     "@rgbpp-sdk/service": "workspace:*",
-    "@nervosnetwork/ckb-sdk-utils": "^0.109.1"
+    "@nervosnetwork/ckb-sdk-utils": "0.109.2-alpha.1"
   },
   "publishConfig": {
     "access": "public"

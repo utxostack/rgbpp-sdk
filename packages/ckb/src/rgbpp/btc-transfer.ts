@@ -16,11 +16,6 @@ import {
   isScriptEqual,
   isUDTTypeSupported,
   u128ToLe,
-  addressToScript,
-  getTransactionSize,
-  rawTransactionToHash,
-  scriptToHash,
-  serializeWitnessArgs,
   buildPreLockArgs,
   calculateCommitment,
   compareInputs,
@@ -41,6 +36,13 @@ import {
   getRgbppLockScript,
   getSecp256k1CellDep,
 } from '../constants';
+import {
+  addressToScript,
+  getTransactionSize,
+  rawTransactionToHash,
+  scriptToHash,
+  serializeWitnessArgs,
+} from '@nervosnetwork/ckb-sdk-utils';
 
 /**
  * Generate the virtual ckb transaction for the btc transfer tx

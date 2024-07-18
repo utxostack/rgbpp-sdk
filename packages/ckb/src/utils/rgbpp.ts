@@ -21,17 +21,14 @@ import {
   RgbppCkbTxInputsExceededError,
   RgbppUtxoBindMultiTypeAssetsError,
 } from '../error';
+import { calculateRgbppCellCapacity, isScriptEqual, isUDTTypeSupported, blockchain } from './ckb-tx';
 import {
-  calculateRgbppCellCapacity,
-  isScriptEqual,
-  isUDTTypeSupported,
   bytesToHex,
   hexToBytes,
   serializeOutPoint,
   serializeOutput,
   serializeScript,
-  blockchain,
-} from './ckb-tx';
+} from '@nervosnetwork/ckb-sdk-utils';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean, btcTestnetType?: BTCTestnetType) => {
   return {

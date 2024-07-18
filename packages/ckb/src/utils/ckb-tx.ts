@@ -1,7 +1,13 @@
-import { calculateTransactionFee as calculateTxFee } from '@nervosnetwork/ckb-sdk-utils/lib/calculateTransactionFee.js';
+import {
+  calculateTransactionFee as calculateTxFee,
+  PERSONAL,
+  blake2b,
+  hexToBytes,
+  serializeInput,
+  serializeScript,
+} from '@nervosnetwork/ckb-sdk-utils';
 import { RawClusterData, packRawClusterData, SporeDataProps, packRawSporeData } from '@spore-sdk/core';
-import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses.js';
-import * as ckbUtils from '@nervosnetwork/ckb-sdk-utils';
+import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 import { remove0x, u64ToLe } from './hex';
 import {
   CKB_UNIT,
@@ -16,24 +22,7 @@ import { Collector } from '../collector';
 import { NoLiveCellError } from '../error';
 
 export { blockchain } from '@ckb-lumos/base';
-export { signWitnesses };
-export const {
-  PERSONAL,
-  blake2b,
-  hexToBytes,
-  serializeInput,
-  serializeScript,
-  AddressPrefix,
-  addressToScript,
-  privateKeyToAddress,
-  bytesToHex,
-  getTransactionSize,
-  rawTransactionToHash,
-  scriptToHash,
-  serializeOutPoint,
-  serializeOutput,
-  serializeWitnessArgs,
-} = ckbUtils;
+export { signWitnesses, serializeScript };
 
 export const calculateTransactionFee = (txSize: number, feeRate?: bigint): bigint => {
   const rate = feeRate ?? BigInt(1100);

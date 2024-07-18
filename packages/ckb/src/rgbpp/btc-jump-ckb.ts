@@ -10,8 +10,6 @@ import {
   isScriptEqual,
   isUDTTypeSupported,
   u128ToLe,
-  addressToScript,
-  getTransactionSize,
   buildPreLockArgs,
   calculateCommitment,
   throwErrorWhenTxInputsExceeded,
@@ -25,6 +23,7 @@ import {
 } from '../utils';
 import { Hex, IndexerCell } from '../types';
 import { RGBPP_WITNESS_PLACEHOLDER, getSecp256k1CellDep } from '../constants';
+import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
 /**
  * Generate the virtual ckb transaction for the jumping tx from BTC to CKB
