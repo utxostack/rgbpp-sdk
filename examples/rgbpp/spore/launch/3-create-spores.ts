@@ -33,7 +33,7 @@ interface SporeCreateParams {
 
 // Warning: Before runing this file for the first time, please run 2-prepare-cluster.ts
 const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreateParams) => {
-  // True is to reserve more CKB to leap from BTC to CKB, otherwise, not to reserve CKB
+  // True is to reserve more CKB to leap from BTC to CKB, otherwise, not to reserve CKB, default value is true
   const reserveMoreCkbForLeap = true;
   const ckbVirtualTxResult = await genCreateSporeCkbVirtualTx({
     collector,

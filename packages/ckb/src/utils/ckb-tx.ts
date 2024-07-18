@@ -132,6 +132,7 @@ export const calculateRgbppClusterCellCapacity = (clusterData: RawClusterData): 
 // https://docs.spore.pro/recipes/Create/create-clustered-spore
 // For simplicity, we keep the capacity of the RGBPP cell the same as the BTC time cell
 // minimum occupied capacity and 1 ckb for transaction fee
+// The reserveMoreCkb is to reserve more CKB to leap from BTC to CKB, otherwise, not to reserve CKB, default value is true
 /**
  * rgbpp_spore_cell:
     lock: rgbpp_lock
