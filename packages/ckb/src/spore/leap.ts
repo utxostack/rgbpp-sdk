@@ -1,5 +1,5 @@
 import { BtcTimeCellsParams, RgbppCkbVirtualTx } from '../types/rgbpp';
-import { append0x, calculateTransactionFee, fetchTypeIdCellDeps, isSporeCapacitySufficient } from '../utils';
+import { append0x, calculateTransactionFee, fetchTypeIdCellDeps } from '../utils';
 import {
   btcTxIdFromBtcTimeLockArgs,
   buildSpvClientCellDep,
@@ -63,7 +63,6 @@ export const genLeapSporeFromBtcToCkbVirtualTx = async ({
   throwErrorWhenSporeCellsInvalid(sporeCells, sporeTypeBytes, isMainnet);
 
   const sporeCell = sporeCells![0];
-  const needPaymasterCell = !isSporeCapacitySufficient(sporeCell);
 
   const inputs: CKBComponents.CellInput[] = [
     {
@@ -113,7 +112,7 @@ export const genLeapSporeFromBtcToCkbVirtualTx = async ({
     ckbRawTx,
     commitment,
     sporeCell,
-    needPaymasterCell,
+    needPaymasterCell: false,
     sumInputsCapacity: sporeCell.output.capacity,
   };
 };
