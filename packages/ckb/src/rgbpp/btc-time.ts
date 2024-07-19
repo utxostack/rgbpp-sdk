@@ -41,12 +41,14 @@ export const buildBtcTimeUnlockWitness = (btcTxProof: Hex): Hex => {
  * @param btcAssetsApi BTC Assets Api
  * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
  * @param btcTestnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+ * @param btcConfirmationBlocks(Optional)  The BTC confirmation blocks for BTC Time lock args, default value is 6
  */
 export const buildBtcTimeCellsSpentTx = async ({
   btcTimeCells,
   btcAssetsApi,
   isMainnet,
   btcTestnetType,
+  btcConfirmationBlocks,
 }: BtcTimeCellsParams): Promise<CKBComponents.RawTransaction> => {
   const sortedBtcTimeCells = btcTimeCells.sort(compareInputs);
   const inputs: CKBComponents.CellInput[] = sortedBtcTimeCells.map((cell) => ({
@@ -80,7 +82,7 @@ export const buildBtcTimeCellsSpentTx = async ({
     lockArgsSet.add(btcTimeCell.output.lock.args);
     const result = await btcAssetsApi.getRgbppSpvProof(
       btcTxIdFromBtcTimeLockArgs(btcTimeCell.output.lock.args),
-      BTC_JUMP_CONFIRMATION_BLOCKS,
+      btcConfirmationBlocks ?? BTC_JUMP_CONFIRMATION_BLOCKS,
     );
     const { spvClient, proof } = transformSpvProof(result);
 

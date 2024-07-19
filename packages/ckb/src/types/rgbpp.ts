@@ -128,7 +128,7 @@ export interface SendCkbTxParams {
 export interface BtcJumpCkbVirtualTxParams extends BtcTransferVirtualTxParams {
   // The receiver ckb address
   toCkbAddress: Address;
-  // The BTC confirmation blocks for BTC Time lock args
+  // The BTC confirmation blocks for BTC Time lock args, default value is 6
   btcConfirmationBlocks?: number;
 }
 
@@ -143,6 +143,8 @@ export interface BtcTimeCellsParams {
   isMainnet: boolean;
   // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
   btcTestnetType?: BTCTestnetType;
+  // The BTC confirmation blocks for BTC Time lock args, default value is 6
+  btcConfirmationBlocks?: number;
 }
 
 export interface SignBtcTimeCellsTxParams {
