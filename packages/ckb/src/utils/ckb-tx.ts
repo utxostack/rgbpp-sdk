@@ -132,18 +132,16 @@ export const calculateRgbppClusterCellCapacity = (clusterData: RawClusterData): 
 // https://docs.spore.pro/recipes/Create/create-clustered-spore
 // For simplicity, we keep the capacity of the RGBPP cell the same as the BTC time cell
 // minimum occupied capacity and 1 ckb for transaction fee
-// The reserveMoreCkb is to reserve more CKB to leap from BTC to CKB, otherwise, not to reserve CKB, default value is true
 /**
  * rgbpp_spore_cell:
     lock: rgbpp_lock
     type: spore_type
     data: sporeData
  */
-export const calculateRgbppSporeCellCapacity = (sporeData: SporeDataProps, reserveMoreCkb = true): bigint => {
+export const calculateRgbppSporeCellCapacity = (sporeData: SporeDataProps): bigint => {
   const sporeDataSize = packRawSporeData(sporeData).length;
   const sporeTypeSize = 32 + 1 + 32;
-  const reservedCapacity = reserveMoreCkb ? BTC_TIME_CELL_INCREASED_SIZE : 0;
-  const cellSize = RGBPP_LOCK_SIZE + sporeTypeSize + CELL_CAPACITY_SIZE + sporeDataSize + reservedCapacity;
+  const cellSize = RGBPP_LOCK_SIZE + sporeTypeSize + CELL_CAPACITY_SIZE + sporeDataSize + BTC_TIME_CELL_INCREASED_SIZE;
   return BigInt(cellSize + 1) * CKB_UNIT;
 };
 
@@ -154,12 +152,6 @@ export const calculateCellOccupiedCapacity = (cell: IndexerCell): bigint => {
   const typeSize = cell.output.type ? remove0x(cell.output.type.args).length / 2 + 1 + 32 : 0;
   const cellSize = cellDataSize + lockSize + typeSize + CELL_CAPACITY_SIZE;
   return BigInt(cellSize) * CKB_UNIT;
-};
-
-export const isSporeCapacitySufficient = (sporeCell: IndexerCell) => {
-  const occupiedCapacity = calculateCellOccupiedCapacity(sporeCell);
-  const capacity = BigInt(sporeCell.output.capacity);
-  return capacity - occupiedCapacity > BigInt(BTC_TIME_CELL_INCREASED_SIZE) * CKB_UNIT;
 };
 
 export const deduplicateList = (rgbppLockArgsList: Hex[]): Hex[] => {

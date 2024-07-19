@@ -33,8 +33,6 @@ interface SporeCreateParams {
 
 // Warning: Before runing this file for the first time, please run 2-prepare-cluster.ts
 const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreateParams) => {
-  // True is to reserve more CKB to leap from BTC to CKB, otherwise, not to reserve CKB, default value is true
-  const reserveMoreCkbForLeap = true;
   const ckbVirtualTxResult = await genCreateSporeCkbVirtualTx({
     collector,
     sporeDataList: receivers.map((receiver) => receiver.sporeData),
@@ -42,7 +40,6 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
     isMainnet,
     ckbFeeRate: BigInt(2000),
     btcTestnetType: BTC_TESTNET_TYPE,
-    reserveMoreCkb: reserveMoreCkbForLeap,
   });
 
   // Save ckbVirtualTxResult
@@ -76,6 +73,8 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
       // Update CKB transaction with the real BTC txId
       const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet });
       console.log('The new cluster rgbpp lock args: ', newCkbRawTx.outputs[0].lock.args);
+      console.log('The new cluster rgbpp lock args -- btc tx id: ', btcTxId);
+      console.log('The new cluster rgbpp lock args -- btc tx out index: 1');
 
       const ckbTx = await appendCkbTxWitnesses({
         ckbRawTx: newCkbRawTx,

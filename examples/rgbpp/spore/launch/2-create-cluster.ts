@@ -54,6 +54,8 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
       const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet });
 
       console.log('The cluster rgbpp lock args: ', newCkbRawTx.outputs[0].lock.args);
+      console.log('The cluster rgbpp lock args -- btc tx id: ', btcTxId);
+      console.log('The cluster rgbpp lock args -- btc tx out index: 1');
 
       const ckbTx = await appendCkbTxWitnesses({
         ckbRawTx: newCkbRawTx,

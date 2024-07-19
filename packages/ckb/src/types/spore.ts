@@ -46,8 +46,6 @@ export interface CreateSporeCkbVirtualTxParams {
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
-  // True is to reserve more CKB to leap from BTC to CKB, otherwise, not to reserve CKB, default value is true
-  reserveMoreCkb?: boolean;
 }
 
 export interface SporeCreateVirtualTxResult {
