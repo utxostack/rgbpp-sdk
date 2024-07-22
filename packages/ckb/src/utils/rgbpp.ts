@@ -118,9 +118,17 @@ export const lockScriptFromBtcTimeLockArgs = (args: Hex): CKBComponents.Script =
   };
 };
 
-export const btcTxIdFromBtcTimeLockArgs = (args: Hex): Hex => {
+export interface BTCTimeLockArgs {
+  btcTxId: Hex;
+  after: number;
+}
+export const btcTxIdAndAfterFromBtcTimeLockArgs = (args: Hex): BTCTimeLockArgs => {
   const btcTimeLockArgs = BTCTimeLock.unpack(append0x(args));
-  return reverseHex(append0x(btcTimeLockArgs.btcTxid));
+  const btcTxId = reverseHex(append0x(btcTimeLockArgs.btcTxid));
+  return {
+    btcTxId,
+    after: btcTimeLockArgs.after,
+  };
 };
 
 /**

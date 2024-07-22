@@ -21,7 +21,6 @@ const unlockBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string 
     btcAssetsApi: btcService,
     isMainnet,
     btcTestnetType: BTC_TESTNET_TYPE,
-    // btcConfirmationBlocks: 20,   // default value is 6
   });
 
   const signedTx = await signBtcTimeCellSpentTx({
