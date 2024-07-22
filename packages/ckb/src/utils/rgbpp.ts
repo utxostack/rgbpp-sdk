@@ -124,9 +124,8 @@ export interface BTCTimeLockArgs {
 }
 export const btcTxIdAndAfterFromBtcTimeLockArgs = (args: Hex): BTCTimeLockArgs => {
   const btcTimeLockArgs = BTCTimeLock.unpack(append0x(args));
-  const btcTxId = reverseHex(append0x(btcTimeLockArgs.btcTxid));
   return {
-    btcTxId,
+    btcTxId: reverseHex(append0x(btcTimeLockArgs.btcTxid)),
     after: btcTimeLockArgs.after,
   };
 };
