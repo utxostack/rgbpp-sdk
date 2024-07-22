@@ -1,4 +1,3 @@
-import { calculateTransactionFee as calculateTxFee } from '@nervosnetwork/ckb-sdk-utils/lib/calculateTransactionFee';
 import { RawClusterData, packRawClusterData, SporeDataProps, packRawSporeData } from '@spore-sdk/core';
 import { remove0x, u64ToLe } from './hex';
 import {
@@ -16,8 +15,10 @@ import { NoLiveCellError } from '../error';
 
 export const calculateTransactionFee = (txSize: number, feeRate?: bigint): bigint => {
   const rate = feeRate ?? BigInt(1100);
-  const fee = calculateTxFee(BigInt(txSize), rate);
-  return BigInt(fee);
+  const ratio = BigInt(1000);
+  const base = BigInt(txSize) * rate;
+  const fee = base / ratio;
+  return fee * ratio < base ? fee + BigInt(1) : fee;
 };
 
 export const isUDTTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
