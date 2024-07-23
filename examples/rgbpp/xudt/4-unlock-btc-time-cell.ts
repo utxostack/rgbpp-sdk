@@ -38,5 +38,5 @@ const unlockBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string 
 // The btcTimeCellArgs is from the outputs[0].lock.args(BTC Time lock args) of the 3-btc-leap-ckb.ts CKB transaction
 unlockBtcTimeCell({
   btcTimeCellArgs:
-    '0x7d00000010000000590000005d000000490000001000000030000000310000009bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce80114000000f9a9ad51ed14936d33f7bb854aaefa5f47a3ccbd14000000b83a6014c458544360730d97e0ae5f36ecf6335f73afadf8eb10f84487392a27',
+    '0x7d00000010000000590000005d000000490000001000000030000000310000009bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce80114000000f9a9ad51ed14936d33f7bb854aaefa5f47a3ccbd880d0100ffc34d3d23f86df84a23a3b2cf72b45c8a309fec417ab196bee8e7a74483e05f',
 });
