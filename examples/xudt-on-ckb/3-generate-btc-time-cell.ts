@@ -1,7 +1,6 @@
 import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 import {
   getSecp256k1CellDep,
-  RgbppTokenInfo,
   NoLiveCellError,
   calculateUdtCellCapacity,
   MAX_FEE,
@@ -12,24 +11,32 @@ import {
   calculateTransactionFee,
   NoXudtLiveCellError,
   fetchTypeIdCellDeps,
+  calculateRgbppCellCapacity,
+  getBtcTimeLockScript,
+  genBtcTimeLockArgs,
   getXudtTypeScript,
 } from 'rgbpp/ckb';
 import { CKB_PRIVATE_KEY, ckbAddress, collector, isMainnet } from './env';
 
-interface XudtTransferParams {
+interface BtcTimeCellParams {
   xudtType: CKBComponents.Script;
-  receivers: {
-    toAddress: string;
-    transferAmount: bigint;
-  }[];
+  toCkbAddress: string;
+  xudtAmount: bigint;
+  btcTxId: string;
+  after: number;
 }
 
 /**
- * transferXudt can be used to mint xUDT assets or transfer xUDT assets.
- * @param xudtType The xUDT type script that comes from 1-issue-xudt
- * @param receivers The receiver includes toAddress and transferAmount
+ * Generate btc time cell with custom btc txid, after and target lock script
+ * @param xudtType The xUDT type script that comes from 1-issue-xudt or 2-transfer-xudt
+ * BTC time lock args:
+ * table BTCTimeLock {
+    to_lock_script: Script,
+    after: Uint32,
+    btc_txid: Byte32,
+  }
  */
-const transferXudt = async ({ xudtType, receivers }: XudtTransferParams) => {
+const generateBtcTimeCell = async ({ xudtType, toCkbAddress, xudtAmount, btcTxId, after }: BtcTimeCellParams) => {
   const fromLock = addressToScript(ckbAddress);
 
   const xudtCells = await collector.getCells({
@@ -39,13 +46,9 @@ const transferXudt = async ({ xudtType, receivers }: XudtTransferParams) => {
   if (!xudtCells || xudtCells.length === 0) {
     throw new NoXudtLiveCellError('The address has no xudt cells');
   }
-  const sumTransferAmount = receivers
-    .map((receiver) => receiver.transferAmount)
-    .reduce((prev, current) => prev + current, BigInt(0));
 
-  let sumXudtOutputCapacity = receivers
-    .map(({ toAddress }) => calculateUdtCellCapacity(addressToScript(toAddress)))
-    .reduce((prev, current) => prev + current, BigInt(0));
+  const btcTimeOutputCapacity = calculateRgbppCellCapacity(xudtType);
+  let sumXudtOutputCapacity = btcTimeOutputCapacity;
 
   const {
     inputs: udtInputs,
@@ -53,26 +56,31 @@ const transferXudt = async ({ xudtType, receivers }: XudtTransferParams) => {
     sumAmount,
   } = collector.collectUdtInputs({
     liveCells: xudtCells,
-    needAmount: sumTransferAmount,
+    needAmount: xudtAmount,
   });
   let actualInputsCapacity = sumXudtInputsCapacity;
   let inputs = udtInputs;
 
-  const outputs: CKBComponents.CellOutput[] = receivers.map(({ toAddress }) => ({
-    lock: addressToScript(toAddress),
-    type: xudtType,
-    capacity: append0x(calculateUdtCellCapacity(addressToScript(toAddress)).toString(16)),
-  }));
-  const outputsData = receivers.map(({ transferAmount }) => append0x(u128ToLe(transferAmount)));
+  const outputs: CKBComponents.CellOutput[] = [
+    {
+      lock: {
+        ...getBtcTimeLockScript(isMainnet),
+        args: genBtcTimeLockArgs(addressToScript(toCkbAddress), btcTxId, after),
+      },
+      type: xudtType,
+      capacity: append0x(btcTimeOutputCapacity.toString(16)),
+    },
+  ];
+  const outputsData = [append0x(u128ToLe(xudtAmount))];
 
-  if (sumAmount > sumTransferAmount) {
+  if (sumAmount > xudtAmount) {
     const xudtChangeCapacity = calculateUdtCellCapacity(fromLock);
     outputs.push({
       lock: fromLock,
       type: xudtType,
       capacity: append0x(xudtChangeCapacity.toString(16)),
     });
-    outputsData.push(append0x(u128ToLe(sumAmount - sumTransferAmount)));
+    outputsData.push(append0x(u128ToLe(sumAmount - xudtAmount)));
     sumXudtOutputCapacity += xudtChangeCapacity;
   }
 
@@ -128,29 +136,16 @@ const transferXudt = async ({ xudtType, receivers }: XudtTransferParams) => {
   const signedTx = collector.getCkb().signTransaction(CKB_PRIVATE_KEY)(unsignedTx);
   const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
 
-  console.info(`xUDT asset has been minted or transferred and tx hash is ${txHash}`);
+  console.info(`xUDT asset has been transferred to BTC time lock and CKB tx hash is ${txHash}`);
 };
 
-const XUDT_TOKEN_INFO: RgbppTokenInfo = {
-  decimal: 8,
-  name: 'XUDT Test Token',
-  symbol: 'XTT',
-};
-
-transferXudt({
-  // The xudtType comes from 1-issue-xudt
+generateBtcTimeCell({
   xudtType: {
     ...getXudtTypeScript(isMainnet),
     args: '0x562e4e8a2f64a3e9c24beb4b7dd002d0ad3b842d0cc77924328e36ad114e3ebe',
   },
-  receivers: [
-    {
-      toAddress: 'ckt1qrfrwcdnvssswdwpn3s9v8fp87emat306ctjwsm3nmlkjg8qyza2cqgqq92pncevj8c3nwz7f3mlx2fwqn6l44y73yr5swl5',
-      transferAmount: BigInt(1000) * BigInt(10 ** XUDT_TOKEN_INFO.decimal),
-    },
-    {
-      toAddress: 'ckt1qyqpyw8j7tlu3v44am8d54066zrzk4vz5lvqat8fpf',
-      transferAmount: BigInt(2000) * BigInt(10 ** XUDT_TOKEN_INFO.decimal),
-    },
-  ],
+  toCkbAddress: 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq0e4xk4rmg5jdkn8aams492a7jlg73ue0gc0ddfj',
+  xudtAmount: BigInt(1000) * BigInt(10 ** 8),
+  btcTxId: '5fe08344a7e7e8be96b17a41ec9f308a5cb472cfb2a3234af86df8233d4dc3ff',
+  after: 69000,
 });
