@@ -128,6 +128,8 @@ export interface SendCkbTxParams {
 export interface BtcJumpCkbVirtualTxParams extends BtcTransferVirtualTxParams {
   // The receiver ckb address
   toCkbAddress: Address;
+  // The BTC confirmation blocks for BTC Time lock args, default value is 6
+  btcConfirmationBlocks?: number;
 }
 
 export interface BtcJumpCkbVirtualTxResult extends BaseCkbVirtualTxResult {}

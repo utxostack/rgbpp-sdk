@@ -17,7 +17,7 @@ import { BTCTimeUnlock } from '../schemas/generated/rgbpp';
 import { BtcTimeCellStatusParams, BtcTimeCellsParams, Hex, SignBtcTimeCellsTxParams } from '../types';
 import {
   append0x,
-  btcTxIdFromBtcTimeLockArgs,
+  btcTxIdAndAfterFromBtcTimeLockArgs,
   calculateTransactionFee,
   compareInputs,
   fetchTypeIdCellDeps,
@@ -78,10 +78,8 @@ export const buildBtcTimeCellsSpentTx = async ({
       continue;
     }
     lockArgsSet.add(btcTimeCell.output.lock.args);
-    const result = await btcAssetsApi.getRgbppSpvProof(
-      btcTxIdFromBtcTimeLockArgs(btcTimeCell.output.lock.args),
-      BTC_JUMP_CONFIRMATION_BLOCKS,
-    );
+    const { btcTxId, after } = btcTxIdAndAfterFromBtcTimeLockArgs(btcTimeCell.output.lock.args);
+    const result = await btcAssetsApi.getRgbppSpvProof(btcTxId, after);
     const { spvClient, proof } = transformSpvProof(result);
 
     if (!cellDepsSet.has(serializeOutPoint(spvClient))) {
