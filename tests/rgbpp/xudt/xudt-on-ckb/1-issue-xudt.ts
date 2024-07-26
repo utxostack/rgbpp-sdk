@@ -27,6 +27,7 @@ import { writeStepLog } from '../../shared/utils';
  * @param tokenInfo The xUDT token info which includes decimal, name and symbol
  */
 const issueXudt = async ({ xudtTotalAmount, tokenInfo }: { xudtTotalAmount: bigint; tokenInfo: RgbppTokenInfo }) => {
+  console.log(ckbAddress);
   const issueLock = addressToScript(ckbAddress);
 
   let emptyCells = await collector.getCells({

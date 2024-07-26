@@ -11,7 +11,7 @@ import {
   RawSporeData,
 } from 'rgbpp/ckb';
 import { utf8ToBuffer } from 'rgbpp/btc';
-import { readStepLog, writeStepLog } from '../../shared/utils';
+import { getFastestFeeRate, readStepLog, writeStepLog } from '../../shared/utils';
 import { saveCkbVirtualTxResult } from '../../../../examples/rgbpp/shared/utils';
 import { BTC_TESTNET_TYPE, btcAccount } from '../../env';
 import { signAndSendPsbt } from '../../../../examples/rgbpp/shared/btc-account';
@@ -27,6 +27,10 @@ interface SporeCreateParams {
 // Warning: Before runing this file for the first time, please run 2-prepare-cluster.ts
 const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreateParams) => {
   const { retry } = await import('zx');
+
+  const feeRate = await getFastestFeeRate();
+  console.log('feeRate = ', feeRate);
+
   await retry(20, '10s', async () => {
     const ckbVirtualTxResult = await genCreateSporeCkbVirtualTx({
       collector,
@@ -54,7 +58,7 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
       from: btcAccount.from,
       fromPubkey: btcAccount.fromPubkey,
       source: btcDataSource,
-      feeRate: 1,
+      feeRate: feeRate,
     });
 
     const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
@@ -63,7 +67,7 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
       txid: btcTxId,
     });
     console.log('BTC TxId: ', btcTxId);
-    console.log(`explorer: https://mempool.space/signet/tx/${btcTxId}`);
+    console.log(`explorer: https://mempool.space/testnet/tx/${btcTxId}`);
 
     const interval = setInterval(async () => {
       try {

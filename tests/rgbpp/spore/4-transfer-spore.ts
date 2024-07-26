@@ -3,7 +3,7 @@ import { genTransferSporeCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
 import { getSporeTypeScript, Hex } from 'rgbpp/ckb';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { isMainnet, collector, btcDataSource, btcService, btcAccount, BTC_TESTNET_TYPE } from '../env';
-import { readStepLog } from '../shared/utils';
+import { getFastestFeeRate, readStepLog } from '../shared/utils';
 import { saveCkbVirtualTxResult } from '../../../examples/rgbpp/shared/utils';
 import { signAndSendPsbt } from '../../../examples/rgbpp/shared/btc-account';
 
@@ -15,6 +15,10 @@ interface SporeTransferParams {
 
 const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }: SporeTransferParams) => {
   const { retry } = await import('zx');
+
+  const feeRate = await getFastestFeeRate();
+  console.log('feeRate = ', feeRate);
+
   await retry(20, '10s', async () => {
     const sporeTypeBytes = serializeScript({
       ...getSporeTypeScript(isMainnet),
@@ -44,12 +48,12 @@ const transferSpore = async ({ sporeRgbppLockArgs, toBtcAddress, sporeTypeArgs }
       from: btcAccount.from,
       fromPubkey: btcAccount.fromPubkey,
       source: btcDataSource,
-      feeRate: 1,
+      feeRate: feeRate,
     });
 
     const { txId: btcTxId } = await signAndSendPsbt(psbt, btcAccount, btcService);
     console.log('BTC TxId: ', btcTxId);
-    console.log(`explorer: https://mempool.space/signet/tx/${btcTxId}`);
+    console.log(`explorer: https://mempool.space/testnet/tx/${btcTxId}`);
 
     await btcService.sendRgbppCkbTransaction({ btc_txid: btcTxId, ckb_virtual_result: ckbVirtualTxResult });
 
