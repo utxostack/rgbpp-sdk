@@ -55,27 +55,19 @@ export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): P
   const isCkbMainnet = props.source.networkType === NetworkType.MAINNET;
 
   // Batch querying live cells from CkbCollector
-  const ckbLiveCells = await Promise.all(
-    ckbVirtualTx.inputs.map((ckbInput) => {
-      return limitPromiseBatchSize(async () => {
-        const ckbLiveCell = await props.ckbCollector.getLiveCell(ckbInput.previousOutput!);
-        const isRgbppLock = isRgbppLockCell(ckbLiveCell.output, isCkbMainnet);
-        const lockArgs = isRgbppLock ? unpackRgbppLockArgs(ckbLiveCell.output.lock.args) : undefined;
-        return {
-          ckbLiveCell,
-          isRgbppLock,
-          lockArgs,
-        };
-      });
-    }),
+  const rgbppLockArgsList = (
+    await props.ckbCollector.getLiveCells(ckbVirtualTx.inputs.map((input) => input.previousOutput!))
+  ).map((cell) =>
+    isRgbppLockCell(cell.output, isCkbMainnet) ? unpackRgbppLockArgs(cell.output.lock.args) : undefined,
   );
 
   // Batch querying UTXO from BtcAssetsApi
   const btcUtxos = await Promise.all(
-    ckbLiveCells.map(({ ckbLiveCell, isRgbppLock }) => {
-      if (isRgbppLock) {
-        const args = unpackRgbppLockArgs(ckbLiveCell.output.lock.args);
-        return limitPromiseBatchSize(() => props.source.getUtxo(args.btcTxid, args.outIndex, props.onlyConfirmedUtxos));
+    rgbppLockArgsList.map((rgbppLockArgs) => {
+      if (rgbppLockArgs) {
+        return limitPromiseBatchSize(() =>
+          props.source.getUtxo(rgbppLockArgs.btcTxid, rgbppLockArgs.outIndex, props.onlyConfirmedUtxos),
+        );
       }
       return undefined;
     }),
@@ -83,25 +75,25 @@ export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): P
 
   // Handle and check inputs
   for (let i = 0; i < ckbVirtualTx.inputs.length; i++) {
-    const { lockArgs, isRgbppLock } = ckbLiveCells[i];
+    const rgbppLockArgs = rgbppLockArgsList[i];
 
     // Add to inputs if all the following conditions are met:
     // 1. input.lock.args can be unpacked to RgbppLockArgs
     // 2. utxo can be found via the DataSource.getUtxo() API
     // 3. utxo is not duplicated in the inputs
-    if (isRgbppLock) {
-      const args = lockArgs!;
+    if (rgbppLockArgs) {
       const utxo = btcUtxos[i];
       if (!utxo) {
-        throw TxBuildError.withComment(ErrorCodes.CANNOT_FIND_UTXO, `hash: ${args.btcTxid}, index: ${args.outIndex}`);
+        throw TxBuildError.withComment(
+          ErrorCodes.CANNOT_FIND_UTXO,
+          `hash: ${rgbppLockArgs.btcTxid}, index: ${rgbppLockArgs.outIndex}`,
+        );
       }
 
       const foundInInputs = btcInputs.some((v) => v.txid === utxo.txid && v.vout === utxo.vout);
-      if (foundInInputs) {
-        continue;
+      if (!foundInInputs) {
+        btcInputs.push(utxo);
       }
-
-      btcInputs.push(utxo);
     }
   }
 
