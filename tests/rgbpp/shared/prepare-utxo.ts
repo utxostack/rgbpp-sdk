@@ -1,11 +1,12 @@
 import { sendBtc } from 'rgbpp/btc';
-import { writeStepLog } from './utils';
+import { getFastestFeeRate, writeStepLog } from './utils';
 import { BtcAssetsApiError } from 'rgbpp/service';
 import { btcAccount, btcDataSource, btcKeyPair, btcService } from '../env';
 
 const prepareUtxo = async (index: string | number) => {
   console.log(btcAccount.from);
-
+  const feeRate = await getFastestFeeRate();
+  console.log('feeRate = ', feeRate);
   // Send BTC tx
   const psbt = await sendBtc({
     from: btcAccount.from!,
@@ -16,7 +17,7 @@ const prepareUtxo = async (index: string | number) => {
         minUtxoSatoshi: 546,
       },
     ],
-    feeRate: 1,
+    feeRate: feeRate,
     source: btcDataSource,
   });
 
@@ -29,7 +30,7 @@ const prepareUtxo = async (index: string | number) => {
   console.log(tx.toHex());
 
   const { txid: btcTxId } = await btcService.sendBtcTransaction(tx.toHex());
-  console.log(`explorer: https://mempool.space/signet/tx/${btcTxId}`);
+  console.log(`explorer: https://mempool.space/testnet/tx/${btcTxId}`);
 
   writeStepLog(String(index), {
     txid: btcTxId,
