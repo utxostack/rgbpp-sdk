@@ -54,7 +54,6 @@ export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): P
   const config = networkTypeToConfig(props.source.networkType);
   const isCkbMainnet = props.source.networkType === NetworkType.MAINNET;
 
-  // Batch querying live cells from CkbCollector
   const rgbppLockArgsList = (
     await props.ckbCollector.getLiveCells(ckbVirtualTx.inputs.map((input) => input.previousOutput!))
   ).map((cell) =>
