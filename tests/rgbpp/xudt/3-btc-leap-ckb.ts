@@ -33,7 +33,7 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
       toCkbAddress,
       isMainnet,
       btcTestnetType: BTC_TESTNET_TYPE,
-      btcConfirmationBlocks: 20, // default value is 6
+      // btcConfirmationBlocks: 20, // default value is 6
     });
 
     // Save ckbVirtualTxResult
