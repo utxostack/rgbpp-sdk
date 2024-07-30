@@ -3,7 +3,6 @@ import { BTCTestnetType, Hex, IndexerCell, RgbppCkbVirtualTx, RgbppTokenInfo, Sp
 import { append0x, remove0x, reverseHex, u32ToLe, u8ToHex, utf8ToHex } from './hex';
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
-  CKB_UNIT,
   RGBPP_TX_ID_PLACEHOLDER,
   RGBPP_TX_INPUTS_MAX_LENGTH,
   RGBPP_TX_WITNESS_MAX_SIZE,
@@ -286,6 +285,6 @@ export const isRgbppCapacitySufficientForChange = (
   sumUdtInputsCapacity: bigint,
   receiverOutputCapacity: bigint,
 ): boolean => {
-  const rgbppOccupiedCapacity = calculateRgbppCellCapacity() - CKB_UNIT;
+  const rgbppOccupiedCapacity = calculateRgbppCellCapacity();
   return sumUdtInputsCapacity > receiverOutputCapacity + rgbppOccupiedCapacity;
 };
