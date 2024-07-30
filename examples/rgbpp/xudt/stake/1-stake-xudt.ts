@@ -15,6 +15,7 @@ import {
   getBtcTimeLockScript,
   genBtcTimeLockArgs,
   getXudtTypeScript,
+  CKB_UNIT,
 } from 'rgbpp/ckb';
 import { btcService, CKB_PRIVATE_KEY, ckbAddress, collector, isMainnet } from '../../env';
 
@@ -123,7 +124,10 @@ const stakeXudt = async ({ xudtType, toCkbAddress, xudtAmount, lockDurationInSec
       emptyCells,
       needCapacity,
       txFee,
-      { minCapacity: MIN_CAPACITY },
+      {
+        minCapacity: MIN_CAPACITY,
+        errMsg: `At least ${(needCapacity + MIN_CAPACITY / CKB_UNIT + BigInt(1)).toString()}CKB is required.`,
+      },
     );
     inputs = [...inputs, ...emptyInputs];
     actualInputsCapacity += sumEmptyCapacity;
