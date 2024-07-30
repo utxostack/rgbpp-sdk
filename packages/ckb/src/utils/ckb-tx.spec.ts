@@ -43,10 +43,10 @@ describe('ckb tx utils', () => {
       args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
     };
     const capacity = calculateRgbppCellCapacity(xudtType);
-    expect(BigInt(254_0000_0000)).toBe(capacity);
+    expect(BigInt(253_0000_0000)).toBe(capacity);
 
     const actual = calculateRgbppCellCapacity();
-    expect(actual).toBe(BigInt(254_0000_0000));
+    expect(actual).toBe(BigInt(253_0000_0000));
   });
 
   it('isClusterSporeTypeSupported', () => {
@@ -109,7 +109,7 @@ describe('ckb tx utils', () => {
     expect(isTypeAssetSupported(xudtMainnetErrorType, true)).toBe(false);
   });
 
-  it('calculateRgbppCellCapacity', () => {
+  it('generateUniqueTypeArgs', () => {
     const firstInput = {
       previousOutput: {
         txHash: '0x047b6894a0b7a4d7a73b1503d1ae35c51fc5fa6306776dcf22b1fb3daaa32a29',

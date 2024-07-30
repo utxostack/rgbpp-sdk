@@ -63,7 +63,7 @@ export const isLockArgsSizeExceeded = (args: Hex) => remove0x(args).length > LOC
 const BTC_TIME_CELL_INCREASED_SIZE = 95;
 
 // For simplicity, we keep the capacity of the RGBPP cell the same as the BTC time cell
-// minimum occupied capacity and 1 ckb for transaction fee and assume UDT cell data size is 16bytes
+// minimum occupied capacity and assume UDT cell data size is 16bytes
 /**
  * RGB_lock:
     code_hash: 
@@ -77,7 +77,7 @@ export const calculateRgbppCellCapacity = (xudtType?: CKBComponents.Script): big
   const udtTypeSize = 33 + typeArgsSize;
   const cellSize =
     RGBPP_LOCK_SIZE + udtTypeSize + CELL_CAPACITY_SIZE + UDT_CELL_DATA_SIZE + BTC_TIME_CELL_INCREASED_SIZE;
-  return BigInt(cellSize + 1) * CKB_UNIT;
+  return BigInt(cellSize) * CKB_UNIT;
 };
 
 // Minimum occupied capacity and 1 ckb for transaction fee
