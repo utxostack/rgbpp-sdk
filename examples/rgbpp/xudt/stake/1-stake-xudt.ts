@@ -89,6 +89,15 @@ const stakeXudt = async ({ xudtType, toCkbAddress, xudtAmount, lockDurationInSec
   ];
   const outputsData = [append0x(u128ToLe(xudtAmount))];
 
+  // Pay 150CKB to issuer address to mint another xUDT later
+  outputs.push({
+    lock: addressToScript(ISSUER_CKB_ADDRESS),
+    capacity: append0x(ISSUER_CELL_CAPACITY.toString(16)),
+  });
+  outputsData.push('0x');
+  sumOutputCapacity += ISSUER_CELL_CAPACITY;
+
+  // Change output for xUDT
   if (sumAmount > xudtAmount) {
     const xudtChangeCapacity = calculateUdtCellCapacity(fromLock);
     outputs.push({
@@ -99,13 +108,6 @@ const stakeXudt = async ({ xudtType, toCkbAddress, xudtAmount, lockDurationInSec
     outputsData.push(append0x(u128ToLe(sumAmount - xudtAmount)));
     sumOutputCapacity += xudtChangeCapacity;
   }
-  // Pay 150CKB to issuer address to mint another xUDT later
-  outputs.push({
-    lock: addressToScript(ISSUER_CKB_ADDRESS),
-    capacity: append0x(ISSUER_CELL_CAPACITY.toString(16)),
-  });
-  outputsData.push('0x');
-  sumOutputCapacity += ISSUER_CELL_CAPACITY;
 
   const txFee = MAX_FEE;
   if (sumXudtInputsCapacity <= sumOutputCapacity) {
