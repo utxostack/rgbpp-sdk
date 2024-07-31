@@ -1,6 +1,19 @@
 # @rgbpp-sdk/ckb
 
-## 0.4.0
+## v0.5.0
+
+### Minor Changes
+
+- [#258](https://github.com/ckb-cell/rgbpp-sdk/pull/258): Support for arbitrary btc confirmation blocks to unlock btc time cells([@duanyytop](https://github.com/duanyytop))
+
+- [#263](https://github.com/ckb-cell/rgbpp-sdk/pull/263): Remove 1CKB from BTC time cell capacity([@duanyytop](https://github.com/duanyytop))
+
+### Patch Changes
+
+- Updated dependencies [[`9afc2a9`](https://github.com/ckb-cell/rgbpp-sdk/commit/9afc2a911e6a4ba8a200755b01159b5b149e4010)]:
+  - @rgbpp-sdk/service@0.5.0
+
+## v0.4.0
 
 ### Minor Changes
 

@@ -1,6 +1,15 @@
 # rgbpp
 
-## 0.4.0
+## v0.5.0
+
+### Patch Changes
+
+- Updated dependencies [[`9afc2a9`](https://github.com/ckb-cell/rgbpp-sdk/commit/9afc2a911e6a4ba8a200755b01159b5b149e4010), [`8f99429`](https://github.com/ckb-cell/rgbpp-sdk/commit/8f99429de45899e5169771e87e73603318a49ae8), [`475b3c3`](https://github.com/ckb-cell/rgbpp-sdk/commit/475b3c35ab1a25ba3aae28123f2820460101c889), [`1a8bb1c`](https://github.com/ckb-cell/rgbpp-sdk/commit/1a8bb1c8c305ddaba80e139a0730c9c76f8c7784)]:
+  - @rgbpp-sdk/ckb@0.5.0
+  - @rgbpp-sdk/btc@0.5.0
+  - @rgbpp-sdk/service@0.5.0
+
+## v0.4.0
 
 ### Minor Changes
 
