@@ -1,10 +1,4 @@
-import {
-  PERSONAL,
-  blake2b,
-  hexToBytes,
-  serializeInput,
-  serializeScript,
-} from '@nervosnetwork/ckb-sdk-utils';
+import { PERSONAL, blake2b, hexToBytes, serializeInput, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { RawClusterData, packRawClusterData, SporeDataProps, packRawSporeData } from '@spore-sdk/core';
 import { remove0x, u64ToLe } from './hex';
 import {

@@ -20,11 +20,7 @@ import {
   RgbppCkbTxInputsExceededError,
   RgbppUtxoBindMultiTypeAssetsError,
 } from '../error';
-import {
-  calculateRgbppCellCapacity,
-  isScriptEqual,
-  isUDTTypeSupported,
-} from './ckb-tx';
+import { calculateRgbppCellCapacity, isScriptEqual, isUDTTypeSupported } from './ckb-tx';
 import { blockchain } from '@ckb-lumos/base';
 import {
   bytesToHex,

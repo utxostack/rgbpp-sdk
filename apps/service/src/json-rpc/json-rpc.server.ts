@@ -50,7 +50,7 @@ export class JsonRpcServer {
         }
         const name = metadata.name
           ? `${metadata.name}.${methodMetadata.name ?? methodName}`
-          : methodMetadata.name ?? methodName;
+          : (methodMetadata.name ?? methodName);
         const handler = (params: unknown) => {
           const instanceRef = this.moduleRef.get(instance.constructor, { strict: false });
           return instanceRef[methodName](params);
