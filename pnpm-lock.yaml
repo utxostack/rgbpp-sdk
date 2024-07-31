@@ -127,8 +127,8 @@ importers:
   examples/rgbpp:
     dependencies:
       '@nervosnetwork/ckb-sdk-utils':
-        specifier: 0.109.2
-        version: 0.109.2
+        specifier: 0.109.1
+        version: 0.109.1
       rgbpp:
         specifier: workspace:*
         version: link:../../packages/rgbpp
@@ -149,8 +149,8 @@ importers:
   examples/xudt-on-ckb:
     dependencies:
       '@nervosnetwork/ckb-sdk-utils':
-        specifier: 0.109.2-alpha.1
-        version: 0.109.2-alpha.1
+        specifier: 0.109.1
+        version: 0.109.1
       rgbpp:
         specifier: ^0.4.0
         version: 0.4.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
@@ -2017,26 +2017,12 @@ packages:
       tslib: 2.3.1
     dev: false
 
-  /@nervosnetwork/ckb-sdk-utils@0.109.2-alpha.1:
-    resolution: {integrity: sha512-a3dT8SExjJNMftVOeuI9/qISvlKeGFoLzHECbgrh3qO2nT6+1zTMoFE+u5aDQG21iP1ZlFXR2s0cDIm1naoR0w==}
-    dependencies:
-      '@nervosnetwork/ckb-types': 0.109.2-alpha.1
-      bech32: 2.0.0
-      elliptic: 6.5.4
-      jsbi: 3.1.3
-      tslib: 2.3.1
-    dev: false
-
   /@nervosnetwork/ckb-types@0.109.1:
     resolution: {integrity: sha512-mD5mOCGa1JertKZekHSUVYwFPW27VJ0/MdwblWvEEK7pNIU6az+dLiIxgvl4TxR+j+7/GqmXNH1U59CM92y/wg==}
     dev: false
 
   /@nervosnetwork/ckb-types@0.109.2:
     resolution: {integrity: sha512-NAQbUi+j6tWlUYijvHqWIUwrbawIeAeSlxUQm0wkqSKbtAEoiR4L6RZS7cgn7uH+SMsp78mciXP8gixrfH3rEQ==}
-    dev: false
-
-  /@nervosnetwork/ckb-types@0.109.2-alpha.1:
-    resolution: {integrity: sha512-O4rhLuGTpkatdNzYRAOO3nzjyvSMFM4If3TQtDXZ5AM7YXxJRnj7IJBs1Jl/mSZbQn6vCqccqZ/nRM5IMu3etA==}
     dev: false
 
   /@nestjs/cli@10.4.2(esbuild@0.23.0):
