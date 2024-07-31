@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { sha256 } from 'js-sha256';
 import { addressToScript, hexToBytes, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import {
-  btcTxIdFromBtcTimeLockArgs,
+  btcTxIdAndAfterFromBtcTimeLockArgs,
   buildPreLockArgs,
   buildRgbppLockArgs,
   calculateCommitment,
@@ -136,11 +136,15 @@ describe('rgbpp tests', () => {
       hashType: 'type',
     };
     const btcTxId = '018025fb6989eed484774170eefa2bef1074b0c24537f992a64dbc138277bc4a';
-    const after = 0x6;
+    const after = 0x20;
     const args = genBtcTimeLockArgs(toLock, btcTxId, after);
     expect(args).toBe(
-      '0x7f000000100000005b0000005f0000004b000000100000003000000031000000d23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac011600000000016c61f984f12d3c8a4f649e60acda5deda0b8837c060000004abc778213bc4da692f93745c2b07410ef2bfaee70417784d4ee8969fb258001',
+      '0x7f000000100000005b0000005f0000004b000000100000003000000031000000d23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac011600000000016c61f984f12d3c8a4f649e60acda5deda0b8837c200000004abc778213bc4da692f93745c2b07410ef2bfaee70417784d4ee8969fb258001',
     );
+
+    const btcTimeLockArgs = btcTxIdAndAfterFromBtcTimeLockArgs(args);
+    expect(btcTimeLockArgs.after).toBe(after);
+    expect(remove0x(btcTimeLockArgs.btcTxId)).toBe(btcTxId);
   });
 
   it('genBtcTimeLockArgs3', () => {
@@ -155,8 +159,9 @@ describe('rgbpp tests', () => {
     const toLock = lockScriptFromBtcTimeLockArgs(args);
     expect(toLock.args).toBe('0x00016c61f984f12d3c8a4f649e60acda5deda0b8837c');
 
-    const txId = btcTxIdFromBtcTimeLockArgs(args);
-    expect(remove0x(txId)).toBe(btcTxId);
+    const btcTimeLockArgs = btcTxIdAndAfterFromBtcTimeLockArgs(args);
+    expect(btcTimeLockArgs.after).toBe(after);
+    expect(remove0x(btcTimeLockArgs.btcTxId)).toBe(btcTxId);
   });
 
   it('genBtcTimeLockScript', () => {
@@ -169,6 +174,11 @@ describe('rgbpp tests', () => {
     expect(btcTimeLock.args).toBe(
       '0x890000001000000065000000690000005500000010000000300000003100000028e83a1277d48add8e72fadaa9248559e1b632bab2bd60b27955ebc4c03800a50020000000c0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f060000000000000000000000000000000000000000000000000000000000000000000000',
     );
+
+    const btcTimeLockArgs = genBtcTimeLockScript(lock, false, 'Testnet3', 4032).args;
+    expect(btcTimeLockArgs).toBe(
+      '0x890000001000000065000000690000005500000010000000300000003100000028e83a1277d48add8e72fadaa9248559e1b632bab2bd60b27955ebc4c03800a50020000000c0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5fc00f00000000000000000000000000000000000000000000000000000000000000000000',
+    );
   });
 
   it('lockScriptFromBtcTimeLockArgs', () => {
@@ -179,11 +189,12 @@ describe('rgbpp tests', () => {
     expect(lock.args).toBe('0x0202020202020202020202020202020202020202');
   });
 
-  it('btcTxIdFromBtcTimeLockArgs', () => {
+  it('btcTxIdAndAfterFromBtcTimeLockArgs', () => {
     const lockArgs =
       '0x850000001000000061000000650000005100000010000000300000003100000028e83a1277d48add8e72fadaa9248559e1b632bab2bd60b27955ebc4c03800a500c0a45d9d7c024adcc8076c18b3f07c08de7c42120cdb7e6cbc05a28266b15b5f0600000006ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399';
-    const btcTxId = btcTxIdFromBtcTimeLockArgs(lockArgs);
+    const { btcTxId, after } = btcTxIdAndAfterFromBtcTimeLockArgs(lockArgs);
     expect(btcTxId).toBe('0x9993846c9008f0f3a46631bf5171220d499c27ffa195e2a3bb00f1dec222ec06');
+    expect(after).toBe(6);
   });
 
   it('calculateUdtCellCapacity', () => {

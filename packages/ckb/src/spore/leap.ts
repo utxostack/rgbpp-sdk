@@ -1,7 +1,7 @@
 import { BtcTimeCellsParams, RgbppCkbVirtualTx } from '../types/rgbpp';
 import { append0x, calculateTransactionFee, fetchTypeIdCellDeps } from '../utils';
 import {
-  btcTxIdFromBtcTimeLockArgs,
+  btcTxIdAndAfterFromBtcTimeLockArgs,
   buildSpvClientCellDep,
   calculateCommitment,
   compareInputs,
@@ -16,7 +16,6 @@ import {
   SporeLeapVirtualTxResult,
 } from '../types';
 import {
-  BTC_JUMP_CONFIRMATION_BLOCKS,
   RGBPP_TX_WITNESS_MAX_SIZE,
   RGBPP_WITNESS_PLACEHOLDER,
   getRgbppLockScript,
@@ -160,10 +159,8 @@ export const buildSporeBtcTimeCellsSpentTx = async ({
       continue;
     }
     lockArgsSet.add(btcTimeCell.output.lock.args);
-    const result = await btcAssetsApi.getRgbppSpvProof(
-      btcTxIdFromBtcTimeLockArgs(btcTimeCell.output.lock.args),
-      BTC_JUMP_CONFIRMATION_BLOCKS,
-    );
+    const { btcTxId, after } = btcTxIdAndAfterFromBtcTimeLockArgs(btcTimeCell.output.lock.args);
+    const result = await btcAssetsApi.getRgbppSpvProof(btcTxId, after);
     const { spvClient, proof } = transformSpvProof(result);
 
     if (!cellDepsSet.has(serializeOutPoint(spvClient))) {

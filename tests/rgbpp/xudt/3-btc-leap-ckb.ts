@@ -2,7 +2,7 @@ import { buildRgbppLockArgs, getXudtTypeScript } from 'rgbpp/ckb';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { genBtcJumpCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
 import { isMainnet, collector, btcService, btcDataSource, btcAccount, BTC_TESTNET_TYPE } from '../env';
-import { readStepLog } from '../shared/utils';
+import { getFastestFeeRate, readStepLog } from '../shared/utils';
 import { saveCkbVirtualTxResult } from '../../../examples/rgbpp/shared/utils';
 import { signAndSendPsbt } from '../../../examples/rgbpp/shared/btc-account';
 
@@ -15,6 +15,10 @@ interface LeapToCkbParams {
 
 const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs, transferAmount }: LeapToCkbParams) => {
   const { retry } = await import('zx');
+
+  const feeRate = await getFastestFeeRate();
+  console.log('feeRate = ', feeRate);
+
   await retry(120, '10s', async () => {
     const xudtType: CKBComponents.Script = {
       ...getXudtTypeScript(isMainnet),
@@ -29,6 +33,7 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
       toCkbAddress,
       isMainnet,
       btcTestnetType: BTC_TESTNET_TYPE,
+      // btcConfirmationBlocks: 20, // default value is 6
     });
 
     // Save ckbVirtualTxResult
@@ -45,12 +50,12 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
       from: btcAccount.from,
       fromPubkey: btcAccount.fromPubkey,
       source: btcDataSource,
-      feeRate: 1,
+      feeRate: feeRate,
     });
 
     const { txId: btcTxId } = await signAndSendPsbt(psbt, btcAccount, btcService);
     console.log(`BTC ${BTC_TESTNET_TYPE} TxId: ${btcTxId}`);
-    console.log(`explorer: https://mempool.space/signet/tx/${btcTxId}`);
+    console.log(`explorer: https://mempool.space/testnet/tx/${btcTxId}`);
 
     await btcService.sendRgbppCkbTransaction({ btc_txid: btcTxId, ckb_virtual_result: ckbVirtualTxResult });
 

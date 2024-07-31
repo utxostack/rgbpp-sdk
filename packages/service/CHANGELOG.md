@@ -1,6 +1,12 @@
 # @rgbpp-sdk/service
 
-## 0.4.0
+## v0.5.0
+
+### Minor Changes
+
+- [#248](https://github.com/ckb-cell/rgbpp-sdk/pull/248): Add `type_script` to the response of `/rgbpp/v1/address/{btc_address}/balance` API, and add `typeHash` to the response of rgbpp assets-related APIs ([@ShookLyngs](https://github.com/ShookLyngs))
+
+## v0.4.0
 
 ### Minor Changes
 

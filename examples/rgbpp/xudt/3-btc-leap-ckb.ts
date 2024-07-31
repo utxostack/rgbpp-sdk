@@ -26,6 +26,7 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
     toCkbAddress,
     isMainnet,
     btcTestnetType: BTC_TESTNET_TYPE,
+    // btcConfirmationBlocks: 20,   // default value is 6
   });
 
   // Save ckbVirtualTxResult
@@ -74,9 +75,9 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
 
 // rgbppLockArgs: outIndexU32 + btcTxId
 leapFromBtcToCKB({
-  rgbppLockArgsList: [buildRgbppLockArgs(1, '6edd4b9327506fab09fb9a0f5e5f35136a6a94bd4c9dd79af04921618fa6c800')],
-  toCkbAddress: 'ckt1qrfrwcdnvssswdwpn3s9v8fp87emat306ctjwsm3nmlkjg8qyza2cqgqq9kxr7vy7yknezj0vj0xptx6thk6pwyr0sxamv6q',
+  rgbppLockArgsList: [buildRgbppLockArgs(1, '52148de63ddd4dcd8ba1d2e105d43c62adf6ccd7e7098c24616640cd5e485c03')],
+  toCkbAddress: 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq0e4xk4rmg5jdkn8aams492a7jlg73ue0gc0ddfj',
   // Please use your own RGB++ xudt asset's xudtTypeArgs
-  xudtTypeArgs: '0x1ba116c119d1cfd98a53e9d1a615cf2af2bb87d95515c9d217d367054cfc696b',
+  xudtTypeArgs: '0x562e4e8a2f64a3e9c24beb4b7dd002d0ad3b842d0cc77924328e36ad114e3ebe',
   transferAmount: BigInt(800_0000_0000),
 });

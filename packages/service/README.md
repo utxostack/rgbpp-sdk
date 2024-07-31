@@ -32,7 +32,7 @@ $ pnpm add @rgbpp-sdk/service
 
 You can get a testnet access token through the [/token/generate](https://api.testnet.rgbpp.io/docs/static/index.html#/Token/post_token_generate) API directly.
 
-### Signet
+#### Signet
 
 And you can get an access token of BTC Signet network through the [/token/generate](https://api.signet.rgbpp.io/docs/static/index.html#/Token/post_token_generate) API directly.
 

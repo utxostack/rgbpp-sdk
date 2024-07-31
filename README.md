@@ -8,17 +8,20 @@ This repository offers utilities for Bitcoin and RGB++ asset integration.
 - [@rgbpp-sdk/ckb](./packages/ckb): Nervos CKB part of the SDK
 - [@rgbpp-sdk/service](./packages/service): Wrapped interfaces of `Bitcoin/RGB++ Assets Service`
 
+
 ## RGB++ Code Examples
 
 - Find code examples at https://github.com/ckb-cell/rgbpp-sdk/tree/develop/examples/rgbpp
 
-## Related CKB Scripts (Contracts)
-- [CKB Bitcoin SPV Type Script](https://github.com/ckb-cell/ckb-bitcoin-spv-contracts/tree/master/contracts/ckb-bitcoin-spv-type-lock): A [type script](https://docs.nervos.org/docs/basics/glossary#type-script) for [Bitcoin SPV](https://bitcoinwiki.org/wiki/simplified-payment-verification) clients which synchronize [Bitcoin](https://bitcoin.org) state into [CKB](https://github.com/nervosnetwork/ckb)
 
-- [RgbppLockScript and BtcTimeLockScript](https://github.com/ckb-cell/rgbpp-sdk/blob/63df2dcd95b1b735b5d235e156e4361a3c87b0ac/packages/ckb/src/constants/index.ts#L12-L206)
-  * design: https://github.com/ckb-cell/RGBPlusPlus-design/blob/main/docs/light-paper-en.md
-  * testnet: https://pudge.explorer.nervos.org/scripts#RGB++
-  * mainnet: https://explorer.nervos.org/scripts#RGB++
+## Related CKB Scripts (Contracts)
+- [CKB Bitcoin SPV Type Script](https://github.com/ckb-cell/ckb-bitcoin-spv-contracts/tree/master/contracts/ckb-bitcoin-spv-type-lock): A [type script](https://docs-old.nervos.org/docs/basics/glossary#type-script) for [Bitcoin SPV](https://bitcoinwiki.org/wiki/simplified-payment-verification) clients which synchronize [Bitcoin](https://bitcoin.org) state into [CKB](https://github.com/nervosnetwork/ckb)
+
+- **RGB++ scripts/contracts**: [RgbppLockScript](https://github.com/ckb-cell/rgbpp/tree/main/contracts/rgbpp-lock) and [BtcTimeLockScript](https://github.com/ckb-cell/rgbpp/tree/main/contracts/btc-time-lock)
+  * design docs: https://github.com/ckb-cell/RGBPlusPlus-design/blob/main/docs/lockscript-design-prd-en.md
+  * testnet deployment: https://pudge.explorer.nervos.org/scripts#RGB++
+  * mainnet deployment: https://explorer.nervos.org/scripts#RGB++
+
 
 ## RGB++ Asset Workflow Overview
 
@@ -50,9 +53,11 @@ This repository offers utilities for Bitcoin and RGB++ asset integration.
     2. continuously fetch request from the queue through a **cron job**
     3. check whether the **confirmations** of `req.rgbpp_btc_txid` is sufficient
     4. generate the **witnesses for RgbppLocks** in the `rgbpp_ckb_tx_virtual`
-    5. add a **paymaster cell** into `rgbpp_ckb_tx_virtual`.inputs if the CKB capacity is insufficient
+    5. add a **paymaster cell** into `rgbpp_ckb_tx_virtual` inputs if the CKB capacity is insufficient
         1. need to **verify the existence of paymaster UTXO** in the rgbpp_btc_tx
+           > based on the exchange rates of BTC and CKB, [the paymaster BTC UTXO's value](https://api.rgbpp.io/docs/static/index.html#/RGB%2B%2B/get_rgbpp_v1_paymaster_info) required to subsidize a paymaster CKB cell is approximately: `paymaster_utxo_sats ~= 316 * ${ckb_price} / ${btc_price} * 100000000`
         2. sign the paymaster cell and the entire transaction if needed
+
     6. **finalize** the `rgbpp_ckb_tx_virtual` to a `rgbpp_ckb_tx`
     7. **broadcast** `rgbpp_ckb_tx` and mark the job as completed upon tx-confirmation
 

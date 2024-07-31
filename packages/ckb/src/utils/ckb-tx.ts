@@ -1,4 +1,3 @@
-import { calculateTransactionFee as calculateTxFee } from '@nervosnetwork/ckb-sdk-utils/lib/calculateTransactionFee';
 import { RawClusterData, packRawClusterData, SporeDataProps, packRawSporeData } from '@spore-sdk/core';
 import { remove0x, u64ToLe } from './hex';
 import {
@@ -8,7 +7,7 @@ import {
   getSporeTypeScript,
   getXudtTypeScript,
 } from '../constants';
-import { Hex, RgbppTokenInfo } from '../types';
+import { Hex, IndexerCell, RgbppTokenInfo } from '../types';
 import { PERSONAL, blake2b, hexToBytes, serializeInput, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { encodeRgbppTokenInfo, genBtcTimeLockScript } from './rgbpp';
 import { Collector } from '../collector';
@@ -16,8 +15,10 @@ import { NoLiveCellError } from '../error';
 
 export const calculateTransactionFee = (txSize: number, feeRate?: bigint): bigint => {
   const rate = feeRate ?? BigInt(1100);
-  const fee = calculateTxFee(BigInt(txSize), rate);
-  return BigInt(fee);
+  const ratio = BigInt(1000);
+  const base = BigInt(txSize) * rate;
+  const fee = base / ratio;
+  return fee * ratio < base ? fee + BigInt(1) : fee;
 };
 
 export const isUDTTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
@@ -54,15 +55,15 @@ export const isTypeAssetSupported = (type: CKBComponents.Script, isMainnet: bool
 const CELL_CAPACITY_SIZE = 8;
 const UDT_CELL_DATA_SIZE = 16;
 
-// The BTC_TIME_CELL_INCREASED_SIZE is related to the specific lock script.
-// We assume that the maximum length of lock script args is 26 bytes. If it exceeds, an error will be thrown.
-const LOCK_ARGS_HEX_MAX_SIZE = 26 * 2;
-export const isLockArgsSizeExceeded = (args: Hex) => remove0x(args).length > LOCK_ARGS_HEX_MAX_SIZE;
+// Assume the length of the lock script args cannot exceed 26 bytes. If it exceeds, an error will be thrown.
+const LOCK_ARGS_HEX_MAX_SIZE = 26;
+export const isLockArgsSizeExceeded = (args: Hex) => remove0x(args).length > LOCK_ARGS_HEX_MAX_SIZE * 2;
 
+// The BTC_TIME_CELL_INCREASED_SIZE depends on the receiver lock script args whose length cannot exceed LOCK_ARGS_HEX_MAX_SIZE bytes
 const BTC_TIME_CELL_INCREASED_SIZE = 95;
 
 // For simplicity, we keep the capacity of the RGBPP cell the same as the BTC time cell
-// minimum occupied capacity and 1 ckb for transaction fee and assume UDT cell data size is 16bytes
+// minimum occupied capacity and assume UDT cell data size is 16bytes
 /**
  * RGB_lock:
     code_hash: 
@@ -76,7 +77,7 @@ export const calculateRgbppCellCapacity = (xudtType?: CKBComponents.Script): big
   const udtTypeSize = 33 + typeArgsSize;
   const cellSize =
     RGBPP_LOCK_SIZE + udtTypeSize + CELL_CAPACITY_SIZE + UDT_CELL_DATA_SIZE + BTC_TIME_CELL_INCREASED_SIZE;
-  return BigInt(cellSize + 1) * CKB_UNIT;
+  return BigInt(cellSize) * CKB_UNIT;
 };
 
 // Minimum occupied capacity and 1 ckb for transaction fee
@@ -143,6 +144,15 @@ export const calculateRgbppSporeCellCapacity = (sporeData: SporeDataProps): bigi
   const sporeTypeSize = 32 + 1 + 32;
   const cellSize = RGBPP_LOCK_SIZE + sporeTypeSize + CELL_CAPACITY_SIZE + sporeDataSize + BTC_TIME_CELL_INCREASED_SIZE;
   return BigInt(cellSize + 1) * CKB_UNIT;
+};
+
+// Calculate the occupied capacity of the CKB cell
+export const calculateCellOccupiedCapacity = (cell: IndexerCell): bigint => {
+  const cellDataSize = remove0x(cell.outputData).length / 2;
+  const lockSize = remove0x(cell.output.lock.args).length / 2 + 1 + 32;
+  const typeSize = cell.output.type ? remove0x(cell.output.type.args).length / 2 + 1 + 32 : 0;
+  const cellSize = cellDataSize + lockSize + typeSize + CELL_CAPACITY_SIZE;
+  return BigInt(cellSize) * CKB_UNIT;
 };
 
 export const deduplicateList = (rgbppLockArgsList: Hex[]): Hex[] => {

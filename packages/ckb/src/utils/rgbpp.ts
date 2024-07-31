@@ -3,7 +3,6 @@ import { BTCTestnetType, Hex, IndexerCell, RgbppCkbVirtualTx, RgbppTokenInfo, Sp
 import { append0x, remove0x, reverseHex, u32ToLe, u8ToHex, utf8ToHex } from './hex';
 import {
   BTC_JUMP_CONFIRMATION_BLOCKS,
-  CKB_UNIT,
   RGBPP_TX_ID_PLACEHOLDER,
   RGBPP_TX_INPUTS_MAX_LENGTH,
   RGBPP_TX_WITNESS_MAX_SIZE,
@@ -45,6 +44,7 @@ export const genBtcTimeLockArgs = (lock: CKBComponents.Script, btcTxId: Hex, aft
 };
 
 /**
+ * btcTimeLockArgs: 
  * table BTCTimeLock {
     lock_script: Script,
     after: Uint32,
@@ -55,8 +55,13 @@ export const genBtcTimeLockScript = (
   toLock: CKBComponents.Script,
   isMainnet: boolean,
   btcTestnetType?: BTCTestnetType,
+  btcConfirmationBlocks?: number,
 ) => {
-  const args = genBtcTimeLockArgs(toLock, RGBPP_TX_ID_PLACEHOLDER, BTC_JUMP_CONFIRMATION_BLOCKS);
+  const args = genBtcTimeLockArgs(
+    toLock,
+    RGBPP_TX_ID_PLACEHOLDER,
+    btcConfirmationBlocks ?? BTC_JUMP_CONFIRMATION_BLOCKS,
+  );
   return {
     ...getBtcTimeLockScript(isMainnet, btcTestnetType),
     args,
@@ -112,9 +117,16 @@ export const lockScriptFromBtcTimeLockArgs = (args: Hex): CKBComponents.Script =
   };
 };
 
-export const btcTxIdFromBtcTimeLockArgs = (args: Hex): Hex => {
+export interface BTCTimeLockArgs {
+  btcTxId: Hex;
+  after: number;
+}
+export const btcTxIdAndAfterFromBtcTimeLockArgs = (args: Hex): BTCTimeLockArgs => {
   const btcTimeLockArgs = BTCTimeLock.unpack(append0x(args));
-  return reverseHex(append0x(btcTimeLockArgs.btcTxid));
+  return {
+    btcTxId: reverseHex(append0x(btcTimeLockArgs.btcTxid)),
+    after: btcTimeLockArgs.after,
+  };
 };
 
 /**
@@ -273,6 +285,6 @@ export const isRgbppCapacitySufficientForChange = (
   sumUdtInputsCapacity: bigint,
   receiverOutputCapacity: bigint,
 ): boolean => {
-  const rgbppOccupiedCapacity = calculateRgbppCellCapacity() - CKB_UNIT;
+  const rgbppOccupiedCapacity = calculateRgbppCellCapacity();
   return sumUdtInputsCapacity > receiverOutputCapacity + rgbppOccupiedCapacity;
 };

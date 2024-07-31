@@ -1,7 +1,7 @@
 import { buildRgbppLockArgs } from 'rgbpp/ckb';
 import { buildRgbppTransferTx } from 'rgbpp';
 import { isMainnet, collector, btcService, btcDataSource, BTC_TESTNET_TYPE, btcAccount } from '../env';
-import { readStepLog, writeStepLog } from '../shared/utils';
+import { getFastestFeeRate, readStepLog, writeStepLog } from '../shared/utils';
 import { saveCkbVirtualTxResult } from '../../../examples/rgbpp/shared/utils';
 import { bitcoin } from 'rgbpp/btc';
 import { signAndSendPsbt } from '../../../examples/rgbpp/shared/btc-account';
@@ -15,6 +15,10 @@ interface RgbppTransferParams {
 
 const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transferAmount }: RgbppTransferParams) => {
   const { retry } = await import('zx');
+
+  const feeRate = await getFastestFeeRate();
+  console.log('feeRate = ', feeRate);
+
   await retry(120, '10s', async () => {
     const { ckbVirtualTxResult, btcPsbtHex } = await buildRgbppTransferTx({
       ckb: {
@@ -29,7 +33,7 @@ const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transfe
         fromPubkey: btcAccount.fromPubkey,
         dataSource: btcDataSource,
         testnetType: BTC_TESTNET_TYPE,
-        feeRate: 1,
+        feeRate: feeRate,
       },
       isMainnet,
     });
@@ -41,7 +45,7 @@ const transfer = async ({ rgbppLockArgsList, toBtcAddress, xudtTypeArgs, transfe
     const psbt = bitcoin.Psbt.fromHex(btcPsbtHex);
     const { txId: btcTxId } = await signAndSendPsbt(psbt, btcAccount, btcService);
     console.log(`BTC ${BTC_TESTNET_TYPE} TxId: ${btcTxId}`);
-    console.log(`explorer: https://mempool.space/signet/tx/${btcTxId}`);
+    console.log(`explorer: https://mempool.space/testnet/tx/${btcTxId}`);
 
     writeStepLog('transfer-id', {
       txid: btcTxId,

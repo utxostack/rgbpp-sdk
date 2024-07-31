@@ -73,6 +73,8 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
       // Update CKB transaction with the real BTC txId
       const newCkbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId, isMainnet });
       console.log('The new cluster rgbpp lock args: ', newCkbRawTx.outputs[0].lock.args);
+      console.log('The new cluster rgbpp lock args -- btc tx id: ', btcTxId);
+      console.log('The new cluster rgbpp lock args -- btc tx out index: 1');
 
       const ckbTx = await appendCkbTxWitnesses({
         ckbRawTx: newCkbRawTx,

@@ -158,7 +158,7 @@ export const genCreateSporeCkbVirtualTx = async ({
   clusterRgbppLockArgs,
   sporeDataList,
   isMainnet,
-  btcTestnetType
+  btcTestnetType,
 }: CreateSporeCkbVirtualTxParams): Promise<SporeCreateVirtualTxResult>
 ```
 

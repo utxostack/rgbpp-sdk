@@ -8,7 +8,7 @@ import {
   sendCkbTx,
   updateCkbTxWithRealBtcTxId,
 } from 'rgbpp/ckb';
-import { readStepLog, writeStepLog } from '../../shared/utils';
+import { getFastestFeeRate, readStepLog, writeStepLog } from '../../shared/utils';
 import { saveCkbVirtualTxResult } from '../../../../examples/rgbpp/shared/utils';
 import { signAndSendPsbt } from '../../../../examples/rgbpp/shared/btc-account';
 
@@ -16,6 +16,10 @@ import { signAndSendPsbt } from '../../../../examples/rgbpp/shared/btc-account';
 const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: string }) => {
   console.log(btcAccount.from);
   const { retry } = await import('zx');
+
+  const feeRate = await getFastestFeeRate();
+  console.log('feeRate = ', feeRate);
+
   await retry(20, '10s', async () => {
     const ckbVirtualTxResult = await genCreateClusterCkbVirtualTx({
       collector,
@@ -46,7 +50,7 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
       from: btcAccount.from,
       fromPubkey: btcAccount.fromPubkey,
       source: btcDataSource,
-      feeRate: 1,
+      feeRate: feeRate,
     });
 
     const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
@@ -56,7 +60,7 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
       index: 1,
     });
     console.log('BTC TxId: ', btcTxId);
-    console.log(`explorer: https://mempool.space/signet/tx/${btcTxId}`);
+    console.log(`explorer: https://mempool.space/testnet/tx/${btcTxId}`);
 
     const interval = setInterval(async () => {
       try {
