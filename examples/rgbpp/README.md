@@ -79,7 +79,7 @@ VITE_BTC_SERVICE_ORIGIN=https://btc-test.app
 
 ```shell
 # Create a CKB empty rgbpp lock cell to launch RGB++ xUDT assets later
-npx ts-node xudt/launch/1-prepare-launch.ts
+npx tsx xudt/launch/1-prepare-launch.ts
 ```
 #### 2. Launch RGB++ xUDT on BTC
 
@@ -87,7 +87,7 @@ npx ts-node xudt/launch/1-prepare-launch.ts
 > Please make sure the `1-prepare-launch.ts` has been run and the corresponding CKB transaction has been committed.
 
 ```shell
-npx ts-node xudt/launch/2-launch-rgbpp.ts
+npx tsx xudt/launch/2-launch-rgbpp.ts
 ```
 
 When the command is executed successfully, the **RGB++ Asset type script args** will appear in the output log
@@ -99,7 +99,7 @@ When the command is executed successfully, the **RGB++ Asset type script args** 
 > The **RGB++ Asset type script args** in the above should be set to the `xudtTypeArgs`.
 
 ```shell
-npx ts-node xudt/launch/3-distribute-rgbpp.ts
+npx tsx xudt/launch/3-distribute-rgbpp.ts
 ```
 
 ### RGB++ xUDT Transfer and Leap
@@ -107,19 +107,19 @@ npx ts-node xudt/launch/3-distribute-rgbpp.ts
 #### 1. Leap xUDT from CKB to BTC
 
 ```shell
-npx ts-node xudt/1-ckb-leap-btc.ts 
+npx tsx xudt/1-ckb-leap-btc.ts 
 ```
 
 #### 2. Transfer RGB++ xUDT on BTC with Queue Service
 
 ```shell
-npx ts-node xudt/2-btc-transfer.ts 
+npx tsx xudt/2-btc-transfer.ts 
 ```
 
 #### 3. Leap RGB++ xUDT from BTC to CKB with Queue Service
 
 ```shell
-npx ts-node xudt/3-btc-leap-ckb.ts 
+npx tsx xudt/3-btc-leap-ckb.ts 
 ```
 
 #### 4. Unlock xUDT BTC time cells on CKB
@@ -131,7 +131,7 @@ However, you can still manually unlock the spore BTC time cell through the follo
 Warning: Wait at least 6 BTC confirmation blocks to unlock the BTC time cells after 3-btc-leap-ckb.ts
 
 ```shell
-npx ts-node xudt/4-unlock-btc-time.ts 
+npx tsx xudt/4-unlock-btc-time.ts 
 ```
 
 ## RGB++ Spore Examples
@@ -146,10 +146,10 @@ npx ts-node xudt/4-unlock-btc-time.ts
 
 ```shell
 # Create a CKB empty rgbpp lock cell to create cluster later
-npx ts-node spore/launch/1-prepare-cluster.ts
+npx tsx spore/launch/1-prepare-cluster.ts
 
 # Create a cluster cell with rgbpp lock
-npx ts-node spore/launch/2-create-cluster.ts
+npx tsx spore/launch/2-create-cluster.ts
 ```
 
 When the commands are executed successfully, the **clusterId** and **cluster rgbpp lock args** will appear in the output log
@@ -161,7 +161,7 @@ When the commands are executed successfully, the **clusterId** and **cluster rgb
 > The **clusterId** in the above should be set to the `clusterId` and the **cluster rgbpp lock args** should be set to the `clusterRgbppLockArgs`.
 
 ```shell
-npx ts-node spore/launch/3-create-spores.ts
+npx tsx spore/launch/3-create-spores.ts
 ```
 
 ### Transfer and Leap Spore
@@ -169,13 +169,13 @@ npx ts-node spore/launch/3-create-spores.ts
 #### 1. Transfer RGB++ Spore on BTC with Queue Service
 
 ```shell
-npx ts-node spore/4-transfer-spore.ts
+npx tsx spore/4-transfer-spore.ts
 ```
 
 #### 2. Leap RGB++ Spore from BTC to CKB
 
 ```shell
-npx ts-node spore/5-leap-spore-to-ckb.ts
+npx tsx spore/5-leap-spore-to-ckb.ts
 ```
 
 #### 3. Unlock Spore BTC time cells on CKB
@@ -187,13 +187,13 @@ However, you can still manually unlock the spore BTC time cell through the follo
 **Warning: Wait at least 6 BTC confirmation blocks to unlock the BTC time cells after 5-leap-spore-to-ckb.ts**
 
 ```shell
-npx ts-node spore/6-unlock-btc-time-cell.ts
+npx tsx spore/6-unlock-btc-time-cell.ts
 ```
 
 #### 4. Leap Spore from CKB to BTC
 
 ```shell
-npx ts-node spore/7-leap-spore-to-btc.ts
+npx tsx spore/7-leap-spore-to-btc.ts
 ```
 
 ## FAQ

@@ -14,8 +14,6 @@
     "rgbpp": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^20.11.28",
-    "typescript": "^5.4.2",
     "dotenv": "^16.4.5",
     "@types/dotenv": "^8.2.0"
   }

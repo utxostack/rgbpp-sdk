@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2015",
     "lib": ["dom", "esnext"],
-    "module": "NodeNext",
+    "module": "ES2015",
     "composite": false,
     "resolveJsonModule": true,
     "strictNullChecks": true,
@@ -13,7 +13,7 @@
     "forceConsistentCasingInFileNames": true,
     "inlineSources": false,
     "isolatedModules": true,
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "Bundler",
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "preserveWatchOutput": true,

@@ -6,7 +6,7 @@
     "build": "tsup",
     "lint": "tsc && eslint --ext .ts {src,example}/* && prettier --check '{src,example}/**/*.{js,ts}'",
     "lint:fix": "tsc && eslint --fix --ext .ts {src,example}/* && prettier --write '{src,example}/**/*.{js,ts}'",
-    "splitCells": "npx ts-node example/paymaster.ts"
+    "splitCells": "npx tsx example/paymaster.ts"
   },
   "sideEffects": false,
   "main": "./dist/index.js",
