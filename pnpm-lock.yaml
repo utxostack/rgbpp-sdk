@@ -75,8 +75,8 @@ importers:
         specifier: ^0.2.0
         version: 0.2.2
       rgbpp:
-        specifier: ^0.4.0
-        version: 0.4.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
+        specifier: ^0.5.0
+        version: link:../../packages/rgbpp
       rxjs:
         specifier: ^7.8.1
         version: 7.8.1
@@ -2198,16 +2198,6 @@ packages:
       - debug
     dev: false
 
-  /@nervosnetwork/ckb-sdk-utils@0.109.1:
-    resolution: {integrity: sha512-KK8w+JZGPt/Gq/Y0b87AuQp8mGR46fBSkqnjwASdBAi2rts9tJ6srEaZ3FVVa9LtjTlThQ120hex+mcyastrkQ==}
-    dependencies:
-      '@nervosnetwork/ckb-types': 0.109.1
-      bech32: 2.0.0
-      elliptic: 6.5.4
-      jsbi: 3.1.3
-      tslib: 2.3.1
-    dev: false
-
   /@nervosnetwork/ckb-sdk-utils@0.109.2:
     resolution: {integrity: sha512-pXgQvQQA2TuXiAmKGvL9kWjXdCsX+qP8HqHSLt6kwrjFe846d4dZxZ5AunpP+xsQNst+L5V7xcvunaBOkTdD6g==}
     dependencies:
@@ -2216,10 +2206,6 @@ packages:
       elliptic: 6.5.4
       jsbi: 3.1.3
       tslib: 2.3.1
-    dev: false
-
-  /@nervosnetwork/ckb-types@0.109.1:
-    resolution: {integrity: sha512-mD5mOCGa1JertKZekHSUVYwFPW27VJ0/MdwblWvEEK7pNIU6az+dLiIxgvl4TxR+j+7/GqmXNH1U59CM92y/wg==}
     dev: false
 
   /@nervosnetwork/ckb-types@0.109.2:
@@ -2445,53 +2431,6 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
-
-  /@rgbpp-sdk/btc@0.4.0(@ckb-lumos/lumos@0.22.0-next.5):
-    resolution: {integrity: sha512-4Fx/UsN2T1CyhyasK565ChofxRFA1JyCSnUuAPh0fpQ2AAcPzrbKGZS65hpOPa/2qClkzzszdXz1sgkbXUCaPg==}
-    dependencies:
-      '@bitcoinerlab/secp256k1': 1.1.1
-      '@ckb-lumos/codec': 0.22.2
-      '@nervosnetwork/ckb-types': 0.109.2
-      '@rgbpp-sdk/ckb': 0.4.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
-      '@rgbpp-sdk/service': 0.4.0
-      bip32: 4.0.0
-      bitcoinjs-lib: 6.1.6
-      ecpair: 2.1.0
-      lodash: 4.17.21
-      p-limit: 3.1.0
-    transitivePeerDependencies:
-      - '@ckb-lumos/lumos'
-      - debug
-    dev: false
-
-  /@rgbpp-sdk/ckb@0.4.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21):
-    resolution: {integrity: sha512-mqwWL+mnuyzLoGBR58eeNPRITp0fVqf0smU8BiR0Ey4cVpF206mBMscgex8EHwgAMU6cUjBLBDej0HYugpshZw==}
-    dependencies:
-      '@ckb-lumos/base': 0.22.2
-      '@ckb-lumos/codec': 0.22.2
-      '@exact-realty/multipart-parser': 1.0.14
-      '@nervosnetwork/ckb-sdk-core': 0.109.2
-      '@nervosnetwork/ckb-sdk-utils': 0.109.2
-      '@nervosnetwork/ckb-types': 0.109.2
-      '@rgbpp-sdk/service': 0.4.0
-      '@spore-sdk/core': 0.2.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
-      axios: 1.7.2
-      camelcase-keys: 7.0.2
-      js-sha256: 0.11.0
-    transitivePeerDependencies:
-      - '@ckb-lumos/lumos'
-      - debug
-      - lodash
-    dev: false
-
-  /@rgbpp-sdk/service@0.4.0:
-    resolution: {integrity: sha512-OvSNcSAmI7RDbf2bzySmHL0UO/S4dn5LAWrfJ41B2WXZiKAAtZ5IG4ajW6RKz6bxf0t7EcjRtXimdGieoubzyw==}
-    dependencies:
-      '@ckb-lumos/base': 0.22.2
-      '@ckb-lumos/codec': 0.22.2
-      '@nervosnetwork/ckb-types': 0.109.2
-      lodash: 4.17.21
-    dev: false
 
   /@rollup/rollup-android-arm-eabi@4.19.0:
     resolution: {integrity: sha512-JlPfZ/C7yn5S5p0yKk7uhHTTnFlvTgLetl2VxqE518QgyM7C9bSfFTYvB/Q/ftkq0RIPY4ySxTz+/wKJ/dXC0w==}
@@ -6884,19 +6823,6 @@ packages:
 
   /rfdc@1.4.1:
     resolution: {integrity: sha512-q1b3N5QkRUWUl7iyylaaj3kOpIT0N2i9MqIEQXP73GVsN9cw3fdx8X63cEmWhJGi2PPCF23Ijp7ktmd39rawIA==}
-
-  /rgbpp@0.4.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21):
-    resolution: {integrity: sha512-V8a5NV/bjKGYYN8gM7b/ed27hVAhIhZK0MJnpFalaasctZjhjtt8BjK9XWGS2mabSR+feHK/5/ROBEVLNOeFhg==}
-    dependencies:
-      '@nervosnetwork/ckb-sdk-utils': 0.109.1
-      '@rgbpp-sdk/btc': 0.4.0(@ckb-lumos/lumos@0.22.0-next.5)
-      '@rgbpp-sdk/ckb': 0.4.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
-      '@rgbpp-sdk/service': 0.4.0
-    transitivePeerDependencies:
-      - '@ckb-lumos/lumos'
-      - debug
-      - lodash
-    dev: false
 
   /rimraf@3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
