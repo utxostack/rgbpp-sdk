@@ -1,5 +1,4 @@
 import { CkbBatchJumpBtcVirtualTxParams, CkbJumpBtcVirtualTxParams } from '../types/rgbpp';
-import { blockchain } from '@ckb-lumos/base';
 import { NoLiveCellError, NoXudtLiveCellError, TypeAssetNotSupportedError } from '../error';
 import {
   append0x,
@@ -9,9 +8,10 @@ import {
   fetchTypeIdCellDeps,
   isTypeAssetSupported,
   u128ToLe,
+  genRgbppLockScript,
 } from '../utils';
-import { genRgbppLockScript } from '../utils/rgbpp';
 import { MAX_FEE, MIN_CAPACITY, RGBPP_TX_WITNESS_MAX_SIZE } from '../constants';
+import { blockchain } from '@ckb-lumos/base';
 import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
 /**

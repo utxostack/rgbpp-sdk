@@ -6,7 +6,6 @@ import {
   BtcTransferVirtualTxResult,
   RgbppCkbVirtualTx,
 } from '../types/rgbpp';
-import { blockchain } from '@ckb-lumos/base';
 import { NoLiveCellError, NoRgbppLiveCellError, TypeAssetNotSupportedError } from '../error';
 import {
   append0x,
@@ -17,8 +16,6 @@ import {
   isScriptEqual,
   isUDTTypeSupported,
   u128ToLe,
-} from '../utils';
-import {
   buildPreLockArgs,
   calculateCommitment,
   compareInputs,
@@ -27,7 +24,7 @@ import {
   isRgbppCapacitySufficientForChange,
   throwErrorWhenRgbppCellsInvalid,
   throwErrorWhenTxInputsExceeded,
-} from '../utils/rgbpp';
+} from '../utils';
 import { Hex, IndexerCell } from '../types';
 import {
   MAX_FEE,
@@ -37,6 +34,8 @@ import {
   getRgbppLockScript,
   getSecp256k1CellDep,
 } from '../constants';
+import { blockchain } from '@ckb-lumos/base';
+import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 import {
   addressToScript,
   getTransactionSize,
@@ -44,7 +43,6 @@ import {
   scriptToHash,
   serializeWitnessArgs,
 } from '@nervosnetwork/ckb-sdk-utils';
-import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 
 /**
  * Generate the virtual ckb transaction for the btc transfer tx

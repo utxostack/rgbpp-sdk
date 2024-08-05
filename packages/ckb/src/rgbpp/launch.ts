@@ -7,14 +7,12 @@ import {
   fetchTypeIdCellDeps,
   generateUniqueTypeArgs,
   u128ToLe,
-} from '../utils';
-import {
   buildPreLockArgs,
   calculateCommitment,
   encodeRgbppTokenInfo,
   genBtcTimeLockScript,
   genRgbppLockScript,
-} from '../utils/rgbpp';
+} from '../utils';
 import { Hex } from '../types';
 import {
   MAX_FEE,

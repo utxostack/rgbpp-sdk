@@ -1,4 +1,3 @@
-import { PERSONAL, blake2b, hexToBytes, serializeInput } from '@nervosnetwork/ckb-sdk-utils';
 import { Cell as LumosCell } from '@ckb-lumos/base';
 import { UnpackResult } from '@ckb-lumos/codec';
 import {
@@ -8,11 +7,12 @@ import {
   assembleCreateClusterAction,
   assembleCreateSporeAction,
   assembleTransferClusterAction,
-} from '@spore-sdk/core/lib/cobuild';
+} from '@spore-sdk/core/lib/cobuild/index.js';
 import { u64ToLe } from './hex';
 import { Hex, IndexerCell, SporesCreateCobuildParams } from '../types';
 import { NoRgbppLiveCellError, RgbppSporeTypeMismatchError, RgbppUtxoBindMultiTypeAssetsError } from '../error';
 import { isScriptEqual, isSporeTypeSupported } from './ckb-tx';
+import { blake2b, hexToBytes, PERSONAL, serializeInput } from '@nervosnetwork/ckb-sdk-utils';
 
 // Generate type id for cluster id
 export const generateClusterId = (firstInput: CKBComponents.CellInput, firstOutputIndex: number) => {

@@ -8,17 +8,15 @@
     "format": "prettier --write '**/*.{js,ts}'",
     "lint": "tsc && eslint . && prettier --check '**/*.{js,ts}'",
     "lint:fix": "tsc && eslint --fix --ext .js,.ts . && prettier --write '**/*.{js,ts}'",
-    "integration:xudt": "npx ts-node shared/prepare-utxo.ts && npx ts-node xudt/xudt-on-ckb/1-issue-xudt.ts && npx ts-node xudt/xudt-on-ckb/2-transfer-xudt.ts && npx ts-node xudt/1-ckb-leap-btc.ts && npx ts-node xudt/2-btc-transfer.ts && npx ts-node xudt/3-btc-leap-ckb.ts",
-    "integration:spore": "npx ts-node shared/prepare-utxo.ts && npx ts-node spore/launch/1-prepare-cluster.ts && npx ts-node spore/launch/2-create-cluster.ts && npx ts-node spore/launch/3-create-spores.ts && npx ts-node spore/4-transfer-spore.ts && npx ts-node spore/5-leap-spore-to-ckb.ts"
+    "integration:xudt": "npx tsx shared/prepare-utxo.ts && npx tsx xudt/xudt-on-ckb/1-issue-xudt.ts && npx tsx xudt/xudt-on-ckb/2-transfer-xudt.ts && npx tsx xudt/1-ckb-leap-btc.ts && npx tsx xudt/2-btc-transfer.ts && npx tsx xudt/3-btc-leap-ckb.ts",
+    "integration:spore": "npx tsx shared/prepare-utxo.ts && npx tsx spore/launch/1-prepare-cluster.ts && npx tsx spore/launch/2-create-cluster.ts && npx tsx spore/launch/3-create-spores.ts && npx tsx spore/4-transfer-spore.ts && npx tsx spore/5-leap-spore-to-ckb.ts"
   },
   "dependencies": {
-    "@nervosnetwork/ckb-sdk-utils": "0.109.1",
+    "@nervosnetwork/ckb-sdk-utils": "0.109.2",
     "rgbpp": "workspace:*",
     "zx": "^8.0.2"
  },
   "devDependencies": {
-    "@types/node": "^20.11.28",
-    "typescript": "^5.4.2",
     "dotenv": "^16.4.5",
     "@types/dotenv": "^8.2.0"
   }

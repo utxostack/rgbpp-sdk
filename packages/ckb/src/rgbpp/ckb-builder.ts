@@ -1,11 +1,4 @@
 import {
-  bytesToHex,
-  getTransactionSize,
-  rawTransactionToHash,
-  scriptToHash,
-  serializeWitnessArgs,
-} from '@nervosnetwork/ckb-sdk-utils';
-import {
   UpdateCkbTxWithRealBtcTxIdParams,
   AppendPaymasterCellAndSignTxParams,
   AppendWitnessesParams,
@@ -22,10 +15,17 @@ import {
   u8ToHex,
 } from '../utils';
 import { InputsCapacityNotEnoughError } from '../error';
-import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 import { buildSpvClientCellDep } from '../utils';
 import { RGBPPUnlock, Uint16 } from '../schemas/generated/rgbpp';
-import { Bytes } from '@ckb-lumos/base/lib/blockchain';
+import { blockchain } from '@ckb-lumos/base';
+import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
+import {
+  bytesToHex,
+  getTransactionSize,
+  rawTransactionToHash,
+  scriptToHash,
+  serializeWitnessArgs,
+} from '@nervosnetwork/ckb-sdk-utils';
 
 export const buildRgbppUnlockWitness = (
   btcTxBytes: Hex,
@@ -36,14 +36,14 @@ export const buildRgbppUnlockWitness = (
   const inputLen = append0x(u8ToHex(inputsLen));
   const outputLen = append0x(u8ToHex(outputsLen));
 
-  const btcTx = Bytes.pack(append0x(btcTxBytes));
+  const btcTx = blockchain.Bytes.pack(append0x(btcTxBytes));
 
   const version = Uint16.pack([0, 0]);
   const rgbppUnlock = RGBPPUnlock.pack({
     version,
     extraData: { inputLen, outputLen },
     btcTx,
-    btcTxProof: bytesToHex(Bytes.pack(append0x(btcTxProof))),
+    btcTxProof: bytesToHex(blockchain.Bytes.pack(append0x(btcTxProof))),
   });
   return append0x(bytesToHex(rgbppUnlock));
 };
