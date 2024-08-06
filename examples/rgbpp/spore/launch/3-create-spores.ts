@@ -18,10 +18,15 @@ import {
   sendCkbTx,
   updateCkbTxWithRealBtcTxId,
   RawSporeData,
+  remove0x,
+  SporeCreateVirtualTxResult,
 } from 'rgbpp/ckb';
 import { utf8ToBuffer } from 'rgbpp/btc';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
 import { signAndSendPsbt } from '../../shared/btc-account';
+import { serializeRawTransaction } from '@nervosnetwork/ckb-sdk-utils';
+
+const RECOMMENDED_MAX_CKB_TX_SIZE = 60 * 1024;
 
 interface SporeCreateParams {
   clusterRgbppLockArgs: Hex;
@@ -31,7 +36,22 @@ interface SporeCreateParams {
   }[];
 }
 
-// Warning: Before runing this file for the first time, please run 2-prepare-cluster.ts
+const estimateCkbTxSize = (ckbVirtualTxResult: SporeCreateVirtualTxResult) => {
+  const { ckbRawTx, clusterCell } = ckbVirtualTxResult;
+  const rawTxSize = remove0x(serializeRawTransaction(ckbRawTx)).length / 2;
+
+  const coBuild = generateSporeCreateCoBuild({
+    // The first output is cluster cell and the rest of the outputs are spore cells
+    sporeOutputs: ckbRawTx.outputs.slice(1),
+    sporeOutputsData: ckbRawTx.outputsData.slice(1),
+    clusterCell,
+    clusterOutputCell: ckbRawTx.outputs[0],
+  });
+  const coBuildSize = remove0x(coBuild).length / 2;
+  return rawTxSize + coBuildSize;
+};
+
+// Warning: Before running this file for the first time, please run 2-prepare-cluster.ts
 const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreateParams) => {
   const ckbVirtualTxResult = await genCreateSporeCkbVirtualTx({
     collector,
@@ -41,6 +61,13 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
     ckbFeeRate: BigInt(2000),
     btcTestnetType: BTC_TESTNET_TYPE,
   });
+
+  const ckbTxSize = estimateCkbTxSize(ckbVirtualTxResult);
+  if (ckbTxSize > RECOMMENDED_MAX_CKB_TX_SIZE) {
+    throw new Error(
+      `The estimated size(${ckbTxSize} bytes) of the CKB transaction is too large, which may cause the transaction to fail to be properly submitted to the blockchain. It is strongly recommended to reduce the number of Spore receivers to reduce the size of the CKB transaction to below 60K bytes.`,
+    );
+  }
 
   // Save ckbVirtualTxResult
   saveCkbVirtualTxResult(ckbVirtualTxResult, '3-create-spores');
