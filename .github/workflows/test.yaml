@@ -52,6 +52,8 @@ jobs:
       - name: Run tests for packages
         run: pnpm run test:packages
         env:
+          VITE_CKB_NODE_URL: https://mainnet.ckb.dev/rpc
+          VITE_CKB_INDEXER_URL: https://mainnet.ckb.dev/indexer
           VITE_BTC_SERVICE_URL: https://btc-assets-api.testnet.mibao.pro
           VITE_BTC_SERVICE_TOKEN: ${{ secrets.TESTNET_SERVICE_TOKEN }}
           VITE_BTC_SERVICE_ORIGIN: https://btc-assets-api.testnet.mibao.pro
