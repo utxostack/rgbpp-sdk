@@ -5,7 +5,10 @@ import { z } from 'zod';
 
 const EnvSchema = z
   .object({
-    VITE_IS_MAINNET: z.enum(['true', 'false']).transform((v) => v === 'true'),
+    VITE_IS_MAINNET: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((v) => v === 'true'),
     VITE_CKB_NODE_URL: z.string().url(),
     VITE_CKB_INDEXER_URL: z.string().url(),
     VITE_BTC_SERVICE_URL: z.string().url(),
