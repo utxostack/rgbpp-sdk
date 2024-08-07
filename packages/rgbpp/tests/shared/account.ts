@@ -2,6 +2,7 @@ import {
   NetworkType,
   ECPair,
   bitcoin,
+  toXOnly,
   remove0x,
   tweakSigner,
   isP2trScript,
@@ -21,6 +22,22 @@ export function createP2wpkhAccount(privateKey: string, networkType: NetworkType
   const keyPair = ECPair.fromPrivateKey(privateKeyBuffer);
   const payment = bitcoin.payments.p2wpkh({
     pubkey: keyPair.publicKey,
+    network: networkTypeToNetwork(networkType),
+  });
+
+  return {
+    keyPair,
+    payment,
+    address: payment.address!,
+    scriptPubkey: payment.output!.toString('hex'),
+  };
+}
+
+export function createP2trAccount(privateKey: string, networkType: NetworkType): BtcAccount {
+  const privateKeyBuffer = Buffer.from(remove0x(privateKey), 'hex');
+  const keyPair = ECPair.fromPrivateKey(privateKeyBuffer);
+  const payment = bitcoin.payments.p2tr({
+    internalPubkey: toXOnly(keyPair.publicKey),
     network: networkTypeToNetwork(networkType),
   });
 
