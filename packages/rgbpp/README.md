@@ -16,7 +16,7 @@ $ pnpm add rgbpp
 
 ## Transfer RGB++ Assets on BTC
 
-The function `buildRgbppTransferTx` will generate CKB virtual transaction and related BTC transaction with the commitment for the RGB++ assets transfer on BTC. 
+The function `buildRgbppTransferTx` will generate a CKB virtual transaction and a related BTC transaction with the commitment for the RGB++ assets transfer on BTC. 
 
 The `btcPsbtHex` can be used to construct bitcoin PSBT to sign and send BTC transaction with BTC wallet, and then the BTC transaction id and `ckbVirtualTxResult` will be used to post to RGB++ Queue Service to complete the isomorphic CKB transaction.
 
@@ -39,7 +39,7 @@ const { ckbVirtualTxResult, btcPsbtHex } = await buildRgbppTransferTx({
   isMainnet,
 });
 
-// Construct SPBT with btcPsbtHex to sign and send BTC transaction with the BTC key pair
+// Construct PSBT with btcPsbtHex to sign and send BTC transaction with the BTC key pair
 const psbt = bitcoin.Psbt.fromHex(btcPsbtHex);
 psbt.signAllInputs(btcKeyPair);
 psbt.finalizeAllInputs();
@@ -49,4 +49,49 @@ const { txid: btcTxId } = await btcService.sendBtcTransaction(btcTx.toHex());
 
 // Post the BTC txId and ckbVirtualTxResult to the RGB++ Queue Service
 await btcService.sendRgbppCkbTransaction({ btc_txid: btcTxId, ckb_virtual_result: ckbVirtualTxResult });
+```
+
+## Transfer all balance of an RGB++ Asset on BTC
+
+Similar to using the `buildRgbppTransferTx` function, the function `buildRgbppTransferAllTxs` will generate a list of RGB++ transaction groups (a transaction group includes a CKB virtual transaction and a BTC isomorphic transaction).
+
+You should sign all the PSBTs in the `transactions` and send all the BTC transactions, and then post all the BTC txIds and ckbVirtualTxResults to the RGB++ Queue Service. You can also review the transfer details in the `summary` object.
+
+```TypeScript
+const { transactions, summary } = await buildRgbppTransferAllTxs({
+  ckb: {
+    xudtTypeArgs,
+    collector,
+  },
+  btc: {
+    assetAddresses,
+    fromAddress,
+    toAddress,
+    dataSource,
+    feeRate,
+    pubkeyMap,
+  },
+  isMainnet,
+});
+
+// Sign BTC PSBTs with all the related BTC key pairs, and convert them to BTC transactions
+const signedGroups: RgbppTxGroup[] = transactions.map((group) => {
+  const psbt = bitcoin.Psbt.fromHex(group.btc.psbtHex);
+  signPsbt(psbt, keyPair);
+  psbt.finalizeAllInputs();
+
+  return {
+    ckbVirtualTxResult: JSON.stringify(group.ckb.virtualTxResult),
+    btcTxHex: psbt.extractTransaction().toHex(),
+  };
+});
+
+// Post the transaction groups to the RGB++ Queue Service
+const sentResult = await sendRgbppTxGroups({
+  txGroups: signedGroups,
+  btcService: btcSource.service,
+});
+
+// Review the summary of the transfer
+console.log(summary);
 ```
