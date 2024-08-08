@@ -1,3 +1,5 @@
+import { TxBuilder } from './transaction/build';
+
 export enum ErrorCodes {
   UNKNOWN,
 
@@ -30,7 +32,8 @@ export enum ErrorCodes {
 export const ErrorMessages = {
   [ErrorCodes.UNKNOWN]: 'Unknown error',
 
-  [ErrorCodes.MISSING_PUBKEY]: 'Missing a pubkey that pairs with the address',
+  [ErrorCodes.MISSING_PUBKEY]:
+    'Missing a pubkey that pairs with the address, it is required for the P2TR UTXO included in the transaction',
   [ErrorCodes.CANNOT_FIND_UTXO]: 'Cannot find the UTXO, it may not exist or is not live',
   [ErrorCodes.UNCONFIRMED_UTXO]: 'Unconfirmed UTXO',
   [ErrorCodes.INSUFFICIENT_UTXO]: 'Insufficient UTXO to construct the transaction',
@@ -56,16 +59,27 @@ export const ErrorMessages = {
   [ErrorCodes.MEMPOOL_API_RESPONSE_ERROR]: 'Mempool.space API returned an error',
 };
 
+export interface TxBuildErrorContext {
+  tx?: TxBuilder;
+}
+
 export class TxBuildError extends Error {
   public code = ErrorCodes.UNKNOWN;
-  constructor(code: ErrorCodes, message = ErrorMessages[code] || 'Unknown error') {
+  public context?: TxBuildErrorContext;
+
+  constructor(code: ErrorCodes, message = ErrorMessages[code] || 'Unknown error', context?: TxBuildErrorContext) {
     super(message);
     this.code = code;
+    this.context = context;
     Object.setPrototypeOf(this, TxBuildError.prototype);
   }
 
-  static withComment(code: ErrorCodes, comment?: string): TxBuildError {
+  static withComment(code: ErrorCodes, comment?: string, context?: TxBuildErrorContext): TxBuildError {
     const message: string | undefined = ErrorMessages[code];
-    return new TxBuildError(code, comment ? `${message}: ${comment}` : message);
+    return new TxBuildError(code, comment ? `${message}: ${comment}` : message, context);
+  }
+
+  setContext(context: TxBuildErrorContext) {
+    this.context = context;
   }
 }
