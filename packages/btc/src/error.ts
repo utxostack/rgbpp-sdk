@@ -32,7 +32,8 @@ export enum ErrorCodes {
 export const ErrorMessages = {
   [ErrorCodes.UNKNOWN]: 'Unknown error',
 
-  [ErrorCodes.MISSING_PUBKEY]: 'Missing a pubkey that pairs with the address',
+  [ErrorCodes.MISSING_PUBKEY]:
+    'Missing a pubkey that pairs with the address, it is required for the P2TR UTXO included in the transaction',
   [ErrorCodes.CANNOT_FIND_UTXO]: 'Cannot find the UTXO, it may not exist or is not live',
   [ErrorCodes.UNCONFIRMED_UTXO]: 'Unconfirmed UTXO',
   [ErrorCodes.INSUFFICIENT_UTXO]: 'Insufficient UTXO to construct the transaction',
