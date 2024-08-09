@@ -16,13 +16,13 @@ export enum ErrorCodes {
   UNSUPPORTED_OP_RETURN_SCRIPT,
   INVALID_FEE_RATE,
   PAYMASTER_MISMATCH,
+  INVALID_UTXO_ID,
 
   CKB_CANNOT_FIND_OUTPOINT = 40,
   CKB_INVALID_CELL_LOCK,
   CKB_INVALID_INPUTS,
   CKB_INVALID_OUTPUTS,
   CKB_UNMATCHED_COMMITMENT,
-  CKB_RGBPP_LOCK_UNPACK_ERROR,
 
   MEMPOOL_API_RESPONSE_ERROR = 60,
 }
@@ -45,13 +45,13 @@ export const ErrorMessages = {
   [ErrorCodes.UNSUPPORTED_OP_RETURN_SCRIPT]: 'Unsupported OP_RETURN script format',
   [ErrorCodes.INVALID_FEE_RATE]: 'Invalid fee rate provided or recommended',
   [ErrorCodes.PAYMASTER_MISMATCH]: 'Paymaster mismatched',
+  [ErrorCodes.INVALID_UTXO_ID]: 'Invalid UtxoId',
 
   [ErrorCodes.CKB_CANNOT_FIND_OUTPOINT]: 'Cannot find CKB cell by OutPoint, it may not exist or is not live',
   [ErrorCodes.CKB_INVALID_CELL_LOCK]: 'Invalid CKB cell lock, it should be RgbppLock, RgbppTimeLock or null',
   [ErrorCodes.CKB_INVALID_INPUTS]: 'Invalid input(s) found in the CKB VirtualTx',
   [ErrorCodes.CKB_INVALID_OUTPUTS]: 'Invalid output(s) found in the CKB VirtualTx',
   [ErrorCodes.CKB_UNMATCHED_COMMITMENT]: 'Invalid commitment found in the CKB VirtualTx',
-  [ErrorCodes.CKB_RGBPP_LOCK_UNPACK_ERROR]: 'Failed to unpack RgbppLockArgs from the CKB cell lock',
 
   [ErrorCodes.MEMPOOL_API_RESPONSE_ERROR]: 'Mempool.space API returned an error',
 };

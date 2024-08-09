@@ -1,8 +1,7 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
-import { bitcoin } from '@rgbpp-sdk/btc';
+import { bitcoin, encodeUtxoId } from '@rgbpp-sdk/btc';
 import { bytes } from '@ckb-lumos/codec';
 import { blockchain } from '@ckb-lumos/base';
-import { encodeUtxoId } from '../src/rgbpp/utils/btc';
 import { RgbppTxGroup } from '../src/rgbpp/utils/transaction';
 import { buildRgbppTransferAllTxs, sendRgbppTxGroups } from '../src';
 import { createP2trAccount, signPsbt } from './shared/account';

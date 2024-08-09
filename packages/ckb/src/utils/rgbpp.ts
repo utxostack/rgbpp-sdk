@@ -10,9 +10,10 @@ import {
   getBtcTimeLockScript,
   getRgbppLockScript,
 } from '../constants';
+import { RGBPPLock } from '../schemas/generated/rgbpp';
 import { BTCTimeLock } from '../schemas/generated/rgbpp';
 import { Script } from '../schemas/generated/blockchain';
-import { bytes } from '@ckb-lumos/codec';
+import { bytes, BytesLike } from '@ckb-lumos/codec';
 import { toCamelcase } from './case-parser';
 import {
   InputsOrOutputsLenError,
@@ -140,6 +141,18 @@ export const buildRgbppLockArgs = (outIndex: number, btcTxId: Hex): Hex => {
 
 export const buildPreLockArgs = (outIndex: number) => {
   return buildRgbppLockArgs(outIndex, RGBPP_TX_ID_PLACEHOLDER);
+};
+
+export interface RgbppLockArgs {
+  btcTxId: Hex;
+  outIndex: number;
+}
+export const unpackRgbppLockArgs = (source: BytesLike): RgbppLockArgs => {
+  const unpacked = RGBPPLock.unpack(source);
+  return {
+    btcTxId: reverseHex(unpacked.btcTxid),
+    outIndex: unpacked.outIndex,
+  };
 };
 
 export const compareInputs = (a: IndexerCell, b: IndexerCell) => {

@@ -1,6 +1,8 @@
 import limitPromiseConcurrency from 'p-limit';
 import { bitcoin, ecc, ECPair } from './bitcoin';
 import { bytes } from '@ckb-lumos/codec';
+import { BaseOutput } from './transaction/utxo';
+import { ErrorCodes, TxBuildError } from './error';
 
 interface TweakableSigner extends bitcoin.Signer {
   privateKey?: Buffer;
@@ -75,6 +77,44 @@ export function utf8ToBuffer(text: string): Uint8Array {
 export function transactionToHex(tx: bitcoin.Transaction, withWitness?: boolean): string {
   const buffer: Buffer = tx['__toBuffer'](undefined, undefined, withWitness ?? false);
   return buffer.toString('hex');
+}
+
+/**
+ * Encode a UTXO's txid and vout to a string ID of "{txid}:{vout}".
+ */
+export function encodeUtxoId(txid: string, vout: number): string {
+  if (!txid || remove0x(txid).length !== 64) {
+    throw TxBuildError.withComment(ErrorCodes.INVALID_UTXO_ID, `txid=${txid}`);
+  }
+  if (vout < 0 || vout > 0xffffffff) {
+    throw TxBuildError.withComment(ErrorCodes.INVALID_UTXO_ID, `vout=${vout}`);
+  }
+
+  return `${remove0x(txid)}:${vout}`;
+}
+
+/**
+ * Decode a string ID of "{txid}:{vout}" format to a BaseOutput object.
+ */
+export function decodeUtxoId(utxoId: string): BaseOutput {
+  const parts = utxoId.split(':');
+  const txid = parts[0];
+  const vout = parts[1] ? parseInt(parts[1]) : undefined;
+  if (
+    !txid ||
+    txid.startsWith('0x') ||
+    txid.length !== 64 ||
+    typeof vout !== 'number' ||
+    isNaN(vout) ||
+    vout > 0xffffffff
+  ) {
+    throw TxBuildError.withComment(ErrorCodes.INVALID_UTXO_ID, utxoId);
+  }
+
+  return {
+    txid,
+    vout,
+  };
 }
 
 /**

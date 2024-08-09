@@ -17,6 +17,7 @@ import {
   throwErrorWhenTxInputsExceeded,
   throwErrorWhenRgbppCellsInvalid,
   isRgbppCapacitySufficientForChange,
+  unpackRgbppLockArgs,
 } from './rgbpp';
 import { getXudtTypeScript } from '../constants';
 import { IndexerCell, RgbppCkbVirtualTx } from '../types';
@@ -219,6 +220,12 @@ describe('rgbpp tests', () => {
 
   it('buildPreLockArgs', () => {
     expect('0x020000000000000000000000000000000000000000000000000000000000000000000000').toBe(buildPreLockArgs(2));
+  });
+
+  it('unpackRgbppLockArgs', () => {
+    const unpacked = unpackRgbppLockArgs('0x0200000006ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399');
+    expect('0x9993846c9008f0f3a46631bf5171220d499c27ffa195e2a3bb00f1dec222ec06').toBe(unpacked.btcTxId);
+    expect(2).toBe(unpacked.outIndex);
   });
 
   it('replaceRealBtcTxId', () => {

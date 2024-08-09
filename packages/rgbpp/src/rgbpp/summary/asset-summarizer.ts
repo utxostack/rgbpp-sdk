@@ -1,8 +1,6 @@
 import { Cell } from '@ckb-lumos/base';
-import { Utxo } from '@rgbpp-sdk/btc';
-import { leToU128 } from '@rgbpp-sdk/ckb';
-import { encodeCellId } from '../utils/ckb';
-import { encodeUtxoId } from '../utils/btc';
+import { Utxo, encodeUtxoId } from '@rgbpp-sdk/btc';
+import { leToU128, encodeCellId } from '@rgbpp-sdk/ckb';
 
 export interface AssetSummary {
   amount: bigint;

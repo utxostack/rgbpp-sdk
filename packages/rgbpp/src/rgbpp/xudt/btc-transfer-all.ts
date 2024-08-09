@@ -1,14 +1,23 @@
 import {
-  buildRgbppLockArgs,
-  genBtcTransferCkbVirtualTx,
+  encodeCellId,
   isScriptEqual,
+  getXudtTypeScript,
+  buildRgbppLockArgs,
+  unpackRgbppLockArgs,
+  genBtcTransferCkbVirtualTx,
   RGBPP_TX_INPUTS_MAX_LENGTH,
 } from '@rgbpp-sdk/ckb';
-import { BaseOutput, Utxo, createSendRgbppUtxosBuilder, limitPromiseBatchSize } from '@rgbpp-sdk/btc';
-import { Cell } from '@ckb-lumos/base';
-import { decodeUtxoId, encodeUtxoId } from '../utils/btc';
+import {
+  Utxo,
+  BaseOutput,
+  encodeUtxoId,
+  decodeUtxoId,
+  limitPromiseBatchSize,
+  createSendRgbppUtxosBuilder,
+} from '@rgbpp-sdk/btc';
+import { bytes } from '@ckb-lumos/codec';
+import { blockchain, Cell } from '@ckb-lumos/base';
 import { groupNumbersBySum, mapGroupsByIndices } from '../utils/group';
-import { buildXudtTypeScriptHex, encodeCellId, unpackRgbppLockArgs } from '../utils/ckb';
 import { RgbppTransferAllTxGroup, RgbppTransferAllTxsParams, RgbppTransferAllTxsResult } from '../types/xudt';
 import { AssetSummarizer } from '../summary/asset-summarizer';
 import { RgbppError, RgbppErrorCodes } from '../error';
@@ -25,7 +34,12 @@ export async function buildRgbppTransferAllTxs(params: RgbppTransferAllTxsParams
   const btcSource = params.btc.dataSource;
   const btcService = btcSource.service;
   const ckbCollector = params.ckb.collector;
-  const xudtTypeHex = buildXudtTypeScriptHex(params.ckb.xudtTypeArgs, isMainnet);
+  const xudtTypeHex = bytes.hexify(
+    blockchain.Script.pack({
+      ...getXudtTypeScript(isMainnet),
+      args: params.ckb.xudtTypeArgs,
+    }),
+  );
 
   // Get L2 Cells own by the assetAccounts,
   // and build L1 UTXO IDs (`${txid}:${vout}`) from each cell.cellOutput.lock.args
@@ -41,7 +55,7 @@ export async function buildRgbppTransferAllTxs(params: RgbppTransferAllTxsParams
   const utxoIds = new Set<string>(
     accountCells.flat().map((rgbppCell) => {
       const lockArgs = unpackRgbppLockArgs(rgbppCell.cellOutput.lock.args);
-      return encodeUtxoId(lockArgs.btcTxid, lockArgs.outIndex);
+      return encodeUtxoId(lockArgs.btcTxId, lockArgs.outIndex);
     }),
   );
 
