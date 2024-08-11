@@ -1,14 +1,12 @@
 export enum RgbppErrorCodes {
   UNKNOWN,
 
-  CANNOT_DECODE_UTXO_ID = 20,
-  UNEXPECTED_CKB_VTX_OUTPUTS_LENGTH,
+  UNEXPECTED_CKB_VTX_OUTPUTS_LENGTH = 20,
 }
 
 export const RgbppErrorMessages = {
   [RgbppErrorCodes.UNKNOWN]: 'Unknown error',
 
-  [RgbppErrorCodes.CANNOT_DECODE_UTXO_ID]: 'Cannot decode UtxoId',
   [RgbppErrorCodes.UNEXPECTED_CKB_VTX_OUTPUTS_LENGTH]: 'Unexpected length of the CkbVirtualTx outputs',
 };
 
