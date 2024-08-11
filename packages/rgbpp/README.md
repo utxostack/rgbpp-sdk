@@ -60,17 +60,35 @@ You should sign all the PSBTs in the `transactions` and send all the BTC transac
 ```TypeScript
 const { transactions, summary } = await buildRgbppTransferAllTxs({
   ckb: {
+    // The type script args of the target RGB++ xUDT
     xudtTypeArgs,
+    // The collector that collects CKB live cells and transactions
     collector,
+    // The CKB transaction fee rate, default value is 1100
+    feeRate,
   },
   btc: {
+    // The list of BTC addresses to provide RGB++ xUDT assets
+    // All available amounts of the target asset (specified by ckb.xudtTypeArgs) will be included in the transfers
+    // However, if more than 40 cells are bound to the same UTXO, the amounts within those 40 cells are excluded
     assetAddresses,
+    // The BTC address for paying all the transaction costs, but not provide any RGB++ xUDT assets
     fromAddress,
+    // The BTC address for receiving all the RGB++ xUDT assets
     toAddress,
+    // The data source for collecting Bitcoin-related info
     dataSource,
-    feeRate,
+    // The public key of sender BTC address, must fill if the fromAddress is a P2TR address
+    fromPubkey,
+    // The map helps find the corresponding public key of a BTC address,
+    // note that you must specify a pubkey for each P2TR address in assetAddresses/fromAddress
     pubkeyMap,
+    // The BTC address to return change satoshi, default value is fromAddress
+    changeAddress,
+    // The fee rate of the BTC transactions, will use the fastest fee rate if not specified
+    feeRate,
   },
+  // True is for BTC and CKB Mainnet, false is for BTC Testnet3/Signet and CKB Testnet
   isMainnet,
 });
 

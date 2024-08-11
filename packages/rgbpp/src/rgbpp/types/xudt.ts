@@ -53,9 +53,11 @@ export interface RgbppTransferAllTxsParams {
     feeRate?: bigint;
   };
   btc: {
-    // The BTC addresses to transfer all the RGB++ assets from
+    // The list of BTC addresses to provide RGB++ xUDT assets
+    // All available amounts of the target asset (specified by ckb.xudtTypeArgs) will be included in the transfers
+    // However, if more than 40 cells are bound to the same UTXO, the amounts within those 40 cells are excluded
     assetAddresses: string[];
-    // The BTC address for paying all the transaction fees
+    // The BTC address for paying all the transaction costs, but not provide any RGB++ assets
     fromAddress: string;
     // The BTC address for receiving all the RGB++ assets
     toAddress: string;
@@ -68,7 +70,7 @@ export interface RgbppTransferAllTxsParams {
     pubkeyMap?: AddressToPubkeyMap;
     // The BTC address to return change satoshi, default value is fromAddress
     changeAddress?: string;
-    // The fee rate of the BTC transactions
+    // The fee rate of the BTC transactions, will use the fastest fee rate if not specified
     feeRate?: number;
     // The BTC Testnet to use, supports "Testnet3" and "Signet", default value is "Testnet3",
     // the param helps find the targeting version of rgbpp-lock script on CKB Testnet
