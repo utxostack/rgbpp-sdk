@@ -106,6 +106,7 @@ export function decodeUtxoId(utxoId: string): BaseOutput {
     txid.length !== 64 ||
     typeof vout !== 'number' ||
     isNaN(vout) ||
+    vout < 0 ||
     vout > 0xffffffff
   ) {
     throw TxBuildError.withComment(ErrorCodes.INVALID_UTXO_ID, utxoId);
