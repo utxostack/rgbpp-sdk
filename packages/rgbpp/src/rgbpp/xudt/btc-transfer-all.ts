@@ -182,6 +182,7 @@ export async function buildRgbppTransferAllTxs(params: RgbppTransferAllTxsParams
       tos: [params.btc.toAddress, ...nonTargetTos],
       // BTC
       from: params.btc.fromAddress,
+      fromPubkey: params.btc.fromPubkey,
       changeAddress: params.btc.changeAddress,
       pubkeyMap: params.btc.pubkeyMap,
       feeRate: params.btc.feeRate,

@@ -20,8 +20,9 @@ export interface RgbppTransferBtcParams {
   fromAddress: string;
   // The receiver BTC address
   toAddress: string;
+  // The data source for collecting Bitcoin-related info
   dataSource: DataSource;
-  // The public key of sender BTC address
+  // The public key of sender BTC address, must fill if the fromAddress is a P2TR address
   fromPubkey?: Hex;
   // The fee rate of the BTC transaction
   feeRate?: number;
@@ -32,7 +33,7 @@ export interface RgbppTransferBtcParams {
 export interface RgbppTransferTxParams {
   ckb: RgbppTransferCkbParams;
   btc: RgbppTransferBtcParams;
-  // True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
+  // True is for BTC and CKB Mainnet, false is for BTC Testnet3/Signet and CKB Testnet
   isMainnet: boolean;
 }
 
@@ -60,6 +61,8 @@ export interface RgbppTransferAllTxsParams {
     toAddress: string;
     // The data source for collecting Bitcoin-related info
     dataSource: DataSource;
+    // The public key of sender BTC address, must fill if the fromAddress is a P2TR address
+    fromPubkey?: string;
     // The map helps find the corresponding public key of a BTC address,
     // note that you must specify a pubkey for each P2TR address in assetAddresses/fromAddress
     pubkeyMap?: AddressToPubkeyMap;
