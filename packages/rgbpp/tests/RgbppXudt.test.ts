@@ -102,12 +102,12 @@ describe('RgbppXudt', () => {
       console.log('result.summary.excluded.assets', result.summary.excluded.assets);
 
       expect(result.summary.included.assets).toHaveProperty(xudtTypeArgs);
-      expect(result.summary.included.assets[xudtTypeArgs].cells).toEqual(50);
-      expect(result.summary.included.assets[xudtTypeArgs].utxos).toEqual(50);
+      expect(result.summary.included.assets[xudtTypeArgs].cellCount).toEqual(50);
+      expect(result.summary.included.assets[xudtTypeArgs].utxoCount).toEqual(50);
 
       expect(result.summary.excluded.assets).toHaveProperty(xudtTypeArgs);
-      expect(result.summary.excluded.assets[xudtTypeArgs].cells).toEqual(41);
-      expect(result.summary.excluded.assets[xudtTypeArgs].utxos).toEqual(1);
+      expect(result.summary.excluded.assets[xudtTypeArgs].cellCount).toEqual(41);
+      expect(result.summary.excluded.assets[xudtTypeArgs].utxoCount).toEqual(1);
 
       expect(result.transactions).toHaveLength(2);
       expect(result).toMatchSnapshot();

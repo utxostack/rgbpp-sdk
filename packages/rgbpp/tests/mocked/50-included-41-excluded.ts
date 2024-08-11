@@ -9152,8 +9152,8 @@ const buildResult: RgbppTransferAllTxsResult = {
       assets: {
         '0xc3fcf12ef840771b1eac4709d61d93be7b13424c16fefd0b2071c204bdeb9f4e': {
           amount: BigInt('4100000000'),
-          cells: 41,
-          utxos: 1,
+          cellCount: 41,
+          utxoCount: 1,
         },
       },
       cellIds: [
@@ -9199,16 +9199,16 @@ const buildResult: RgbppTransferAllTxsResult = {
         '0x3e7a84ff71358d30b6e4213cd5f5cf56bae03053a665bed68277a6fb5c852818:0x0',
         '0xb0ffef5e6998ddc86019de4d90a035c3aceb17fbfcaabb6a225dd27533e8673b:0x0',
       ],
-      cells: 41,
+      cellCount: 41,
       utxoIds: ['69eea91d69b850abd92338fa4f0c9a11d0ed68f74bf5201cb7424dc49506af38:0'],
-      utxos: 1,
+      utxoCount: 1,
     },
     included: {
       assets: {
         '0xc3fcf12ef840771b1eac4709d61d93be7b13424c16fefd0b2071c204bdeb9f4e': {
           amount: BigInt('50000000000'),
-          cells: 50,
-          utxos: 50,
+          cellCount: 50,
+          utxoCount: 50,
         },
       },
       cellIds: [
@@ -9263,7 +9263,7 @@ const buildResult: RgbppTransferAllTxsResult = {
         '0xa75bca0eaa472a83b9a155d4c75dbc3c0e846b7a841fd143ac051c2c07e4aa38:0x0',
         '0x5860c0a6a834e0bb2dfbc8d5f4c1885cbbe3367285f5dfb7d464fa042031d17c:0x0',
       ],
-      cells: 50,
+      cellCount: 50,
       utxoIds: [
         'fd16aafb86ef05a373e59d2b812fcb117c65b647aa899085136913961127efca:0',
         '1007a173f8ace6567758d309fb7a281c1f19c5961ff69fa32789c9a83ddfac10:0',
@@ -9316,7 +9316,7 @@ const buildResult: RgbppTransferAllTxsResult = {
         'f1ee2c32debdbca6e0bdd654f3356501951e9fda7f288df62144583b38c5d6b6:0',
         'f6ce37f9d89597172566ae0b3e18edcb1c92011add8190e0b53b5caf9566aea1:0',
       ],
-      utxos: 50,
+      utxoCount: 50,
     },
   },
   transactions: [
@@ -9705,8 +9705,8 @@ const buildResult: RgbppTransferAllTxsResult = {
         assets: {
           '0xc3fcf12ef840771b1eac4709d61d93be7b13424c16fefd0b2071c204bdeb9f4e': {
             amount: BigInt('40000000000'),
-            cells: 40,
-            utxos: 40,
+            cellCount: 40,
+            utxoCount: 40,
           },
         },
         cellIds: [
@@ -9751,7 +9751,7 @@ const buildResult: RgbppTransferAllTxsResult = {
           '0x6fb324d629f69d1d011015325559bd1a3f58cd2bd0e2dce23b006ea85eade376:0x0',
           '0xb5c70400545feef1c591c072b386e663805d984ecc90c9ebd282f39990a7cf17:0x0',
         ],
-        cells: 40,
+        cellCount: 40,
         utxoIds: [
           'fd16aafb86ef05a373e59d2b812fcb117c65b647aa899085136913961127efca:0',
           '1007a173f8ace6567758d309fb7a281c1f19c5961ff69fa32789c9a83ddfac10:0',
@@ -9794,7 +9794,7 @@ const buildResult: RgbppTransferAllTxsResult = {
           '8a81a8dc324d22499562e416a884e7bf9a55f5de7b28ee454ad3e76fa6597283:0',
           'ce808ec46872008364568e931b4fe484e0e8ea3c154770adb10f5c6b2b3ec286:0',
         ],
-        utxos: 40,
+        utxoCount: 40,
       },
     },
     {
@@ -9931,8 +9931,8 @@ const buildResult: RgbppTransferAllTxsResult = {
         assets: {
           '0xc3fcf12ef840771b1eac4709d61d93be7b13424c16fefd0b2071c204bdeb9f4e': {
             amount: BigInt('10000000000'),
-            cells: 10,
-            utxos: 10,
+            cellCount: 10,
+            utxoCount: 10,
           },
         },
         cellIds: [
@@ -9947,7 +9947,7 @@ const buildResult: RgbppTransferAllTxsResult = {
           '0xa75bca0eaa472a83b9a155d4c75dbc3c0e846b7a841fd143ac051c2c07e4aa38:0x0',
           '0x5860c0a6a834e0bb2dfbc8d5f4c1885cbbe3367285f5dfb7d464fa042031d17c:0x0',
         ],
-        cells: 10,
+        cellCount: 10,
         utxoIds: [
           '2c5d749dc3451230f2497384c02dc0e07efc5743bce02faf47db4a191095c5d8:0',
           '4418969debbb39c1ff3e82ba90375106ba471ffc66f87dd004ce216e3bd3d8a4:0',
@@ -9960,7 +9960,7 @@ const buildResult: RgbppTransferAllTxsResult = {
           'f1ee2c32debdbca6e0bdd654f3356501951e9fda7f288df62144583b38c5d6b6:0',
           'f6ce37f9d89597172566ae0b3e18edcb1c92011add8190e0b53b5caf9566aea1:0',
         ],
-        utxos: 10,
+        utxoCount: 10,
       },
     },
   ],

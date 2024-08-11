@@ -4,19 +4,20 @@ import { leToU128, encodeCellId } from '@rgbpp-sdk/ckb';
 
 export interface AssetSummary {
   amount: bigint;
-  utxos: number;
-  cells: number;
+  utxoCount: number;
+  cellCount: number;
 }
 
 export interface AssetGroupSummary {
   utxoId: string;
   cellIds: string[];
-  assets: Record<string, AssetSummary>;
+  // The key of the assets record is the `xudtTypeArgs` (the unique identifier for the asset type)
+  assets: Record<string, AssetSummary>; // Record<xudtTypeAgs, AssetSummary>
 }
 
 export interface TransactionGroupSummary {
-  utxos: number;
-  cells: number;
+  utxoCount: number;
+  cellCount: number;
   utxoIds: string[];
   cellIds: string[];
   assets: Record<string, AssetSummary>;
@@ -29,7 +30,7 @@ export class AssetSummarizer {
 
   addGroup(utxo: Utxo, cells: Cell[]): AssetGroupSummary {
     const utxoId = encodeUtxoId(utxo.txid, utxo.vout);
-    const assets: Record<string, Omit<AssetSummary, 'xudtTypeArgs'>> = {};
+    const assets: Record<string, AssetSummary> = {};
     const cellIds: string[] = [];
 
     for (const cell of cells) {
@@ -38,13 +39,13 @@ export class AssetSummarizer {
       const amount = leToU128(cell.data.substring(0, 34));
       if (assets[xudtTypeArgs] === undefined) {
         assets[xudtTypeArgs] = {
-          utxos: 1,
-          cells: 0,
+          utxoCount: 1,
+          cellCount: 0,
           amount: 0n,
         };
       }
 
-      assets[xudtTypeArgs]!.cells += 1;
+      assets[xudtTypeArgs]!.cellCount += 1;
       assets[xudtTypeArgs]!.amount += amount;
     }
 
@@ -63,6 +64,14 @@ export class AssetSummarizer {
     return this.summarizeGroups(groupResults);
   }
 
+  /**
+   * Summarizes asset information across multiple AssetGroupSummary objects.
+   * If no groups are provided, it summarizes the internally stored groups.
+   *
+   * @param groups - Optional array of AssetGroupSummary objects to summarize.
+   * @returns TransactionGroupSummary - A summary of all assets across the specified groups,
+   *          including total UTXO and cell counts, UTXO and cell IDs, and aggregated asset information.
+   */
   summarizeGroups(groups?: AssetGroupSummary[]): TransactionGroupSummary {
     const targetGroups = groups ?? this.groups;
     const utxoIds = targetGroups.map((summary) => summary.utxoId);
@@ -72,24 +81,24 @@ export class AssetSummarizer {
         for (const xudtTypeArgs in summary.assets) {
           if (result[xudtTypeArgs] === undefined) {
             result[xudtTypeArgs] = {
-              utxos: 0,
-              cells: 0,
+              utxoCount: 0,
+              cellCount: 0,
               amount: 0n,
             };
           }
 
-          result[xudtTypeArgs]!.utxos += summary.assets[xudtTypeArgs]!.utxos;
-          result[xudtTypeArgs]!.cells += summary.assets[xudtTypeArgs]!.cells;
+          result[xudtTypeArgs]!.utxoCount += summary.assets[xudtTypeArgs]!.utxoCount;
+          result[xudtTypeArgs]!.cellCount += summary.assets[xudtTypeArgs]!.cellCount;
           result[xudtTypeArgs]!.amount += summary.assets[xudtTypeArgs]!.amount;
         }
         return result;
       },
-      {} as Record<string, Omit<AssetSummary, 'xudtTypeArgs'>>,
+      {} as Record<string, AssetSummary>,
     );
 
     return {
-      utxos: utxoIds.length,
-      cells: cellIds.length,
+      utxoCount: utxoIds.length,
+      cellCount: cellIds.length,
       utxoIds,
       cellIds,
       assets,
