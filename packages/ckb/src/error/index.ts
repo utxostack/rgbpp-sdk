@@ -11,6 +11,7 @@ enum ErrorCode {
   RgbppCkbTxInputsExceeded = 109,
   RgbppUtxoBindMultiTypeAssets = 110,
   RgbppSporeTypeMismatch = 111,
+  InvalidCellId = 112,
 }
 
 export class CapacityNotEnoughError extends Error {
@@ -92,6 +93,13 @@ export class RgbppUtxoBindMultiTypeAssetsError extends Error {
 
 export class RgbppSporeTypeMismatchError extends Error {
   code = ErrorCode.RgbppSporeTypeMismatch;
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+export class InvalidCellIdError extends Error {
+  code = ErrorCode.InvalidCellId;
   constructor(message: string) {
     super(message);
   }

@@ -58,5 +58,13 @@ export type { SendBtcProps, SendUtxosProps, SendRgbppUtxosProps } from '@rgbpp-s
 /**
  * RGB++
  */
-export { buildRgbppTransferTx } from './rgbpp/xudt';
-export type { RgbppTransferTxParams, RgbppTransferTxResult } from './rgbpp/types';
+export type {
+  RgbppTransferTxParams,
+  RgbppTransferTxResult,
+  RgbppTransferAllTxsParams,
+  RgbppTransferAllTxsResult,
+} from './rgbpp/types/xudt';
+export { RgbppError, RgbppErrorCodes } from './rgbpp/error';
+export { buildRgbppTransferTx } from './rgbpp/xudt/btc-transfer';
+export { buildRgbppTransferAllTxs } from './rgbpp/xudt/btc-transfer-all';
+export { sendRgbppTxGroups } from './rgbpp/utils/transaction';
