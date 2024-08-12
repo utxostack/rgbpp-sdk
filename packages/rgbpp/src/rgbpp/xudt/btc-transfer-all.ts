@@ -125,7 +125,7 @@ export async function buildRgbppTransferAllTxs(params: RgbppTransferAllTxsParams
   const groupedAssetGroups = mapGroupsByIndices(groupedByInputs.indices, (index) => rgbppGroups[index]!);
 
   // Construct transaction groups
-  const summarizer = new AssetSummarizer();
+  const summarizer = new AssetSummarizer(isMainnet);
   const usedBtcUtxos: BaseOutput[] = [];
   const transactionGroups: RgbppTransferAllTxGroup[] = [];
   for (const assetGroups of groupedAssetGroups) {
@@ -138,7 +138,7 @@ export async function buildRgbppTransferAllTxs(params: RgbppTransferAllTxsParams
     );
 
     // Props for constructing CKB_VTX
-    const xudtAmount = groupSummary.assets[params.ckb.xudtTypeArgs]!.amount;
+    const xudtAmount = groupSummary.xudtAssets[params.ckb.xudtTypeArgs]!.amount;
     const lockArgsList = groupSummary.utxoIds.map((utxoId) => {
       const output = decodeUtxoId(utxoId)!;
       return buildRgbppLockArgs(output.vout, output.txid);
@@ -221,7 +221,7 @@ export async function buildRgbppTransferAllTxs(params: RgbppTransferAllTxsParams
   }
 
   // Generate result
-  const excludedSummarizer = new AssetSummarizer();
+  const excludedSummarizer = new AssetSummarizer(isMainnet);
   excludedSummarizer.addGroups(
     [...invalidUtxoIds].map((utxoId) => ({
       utxo: utxoMap.get(utxoId)!,
