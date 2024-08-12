@@ -2,6 +2,7 @@ import {
   encodeCellId,
   isScriptEqual,
   getXudtTypeScript,
+  isUDTTypeSupported,
   buildRgbppLockArgs,
   unpackRgbppLockArgs,
   genBtcTransferCkbVirtualTx,
@@ -96,7 +97,10 @@ export async function buildRgbppTransferAllTxs(params: RgbppTransferAllTxsParams
           cellsMap.set(utxoId, cells);
         }
         const utxo = utxoMap.get(utxoId);
-        if (!utxo || !cells || cells.length > maxRgbppCellsPerCkbTx) {
+        const hasUnsupportedTypeCell = cells.some((cell) => {
+          return cell.cellOutput.type && !isUDTTypeSupported(cell.cellOutput.type, isMainnet);
+        });
+        if (!utxo || !cells || cells.length > maxRgbppCellsPerCkbTx || hasUnsupportedTypeCell) {
           invalidUtxoIds.add(utxoId);
           return;
         }
