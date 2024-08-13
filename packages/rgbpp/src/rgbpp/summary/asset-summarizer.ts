@@ -1,8 +1,13 @@
 import { Cell } from '@ckb-lumos/base';
 import { Utxo, encodeUtxoId } from '@rgbpp-sdk/btc';
-import { leToU128, encodeCellId } from '@rgbpp-sdk/ckb';
+import { leToU128, encodeCellId, isUDTTypeSupported } from '@rgbpp-sdk/ckb';
 
-export interface AssetSummary {
+export interface AssetGroup {
+  utxo: Utxo;
+  cells: Cell[];
+}
+
+export interface XudtAssetSummary {
   amount: bigint;
   utxoCount: number;
   cellCount: number;
@@ -11,55 +16,68 @@ export interface AssetSummary {
 export interface AssetGroupSummary {
   utxoId: string;
   cellIds: string[];
-  // The key of the assets record is the `xudtTypeArgs` (the unique identifier for the asset type)
-  assets: Record<string, AssetSummary>; // Record<xudtTypeAgs, AssetSummary>
+  xudtCellIds: string[];
+  xudtAssets: Record<string, XudtAssetSummary>; // Record<xudtTypeArgs, AssetSummary>
 }
 
 export interface TransactionGroupSummary {
   utxoCount: number;
   cellCount: number;
+  xudtCellCount: number;
   utxoIds: string[];
   cellIds: string[];
-  assets: Record<string, AssetSummary>;
+  xudtCellIds: string[];
+  xudtAssets: Record<string, XudtAssetSummary>; // Record<xudtTypeArgs, AssetSummary>
 }
 
 export class AssetSummarizer {
   groups: AssetGroupSummary[] = [];
 
-  constructor() {}
+  constructor(public isMainnet: boolean) {}
 
   addGroup(utxo: Utxo, cells: Cell[]): AssetGroupSummary {
     const utxoId = encodeUtxoId(utxo.txid, utxo.vout);
-    const assets: Record<string, AssetSummary> = {};
+
     const cellIds: string[] = [];
-
+    const xudtCellIds: string[] = [];
+    const xudtAssets: Record<string, XudtAssetSummary> = {};
     for (const cell of cells) {
-      cellIds.push(encodeCellId(cell.outPoint!.txHash, cell.outPoint!.index));
-      const xudtTypeArgs = cell.cellOutput.type?.args ?? 'empty';
-      const amount = leToU128(cell.data.substring(0, 34));
-      if (assets[xudtTypeArgs] === undefined) {
-        assets[xudtTypeArgs] = {
-          utxoCount: 1,
-          cellCount: 0,
-          amount: 0n,
-        };
-      }
+      const cellId = encodeCellId(cell.outPoint!.txHash, cell.outPoint!.index);
+      cellIds.push(cellId);
 
-      assets[xudtTypeArgs]!.cellCount += 1;
-      assets[xudtTypeArgs]!.amount += amount;
+      const isXudt = !!cell.cellOutput.type && isUDTTypeSupported(cell.cellOutput.type, this.isMainnet);
+      if (isXudt) {
+        // If the cell type is a supported xUDT type, record its asset information
+        const xudtTypeArgs = cell.cellOutput.type?.args ?? 'empty';
+        const amount = leToU128(cell.data.substring(0, 34));
+        if (xudtAssets[xudtTypeArgs] === undefined) {
+          xudtAssets[xudtTypeArgs] = {
+            utxoCount: 1,
+            cellCount: 0,
+            amount: 0n,
+          };
+        }
+
+        xudtCellIds.push(cellId);
+        xudtAssets[xudtTypeArgs]!.cellCount += 1;
+        xudtAssets[xudtTypeArgs]!.amount += amount;
+      } else {
+        // TODO: if the cell type is empty or is not xUDT, how to handle/record its info?
+      }
     }
 
     const result: AssetGroupSummary = {
       utxoId,
       cellIds,
-      assets,
+      xudtCellIds,
+      xudtAssets,
     };
 
     this.groups.push(result);
     return result;
   }
 
-  addGroups(groups: { utxo: Utxo; cells: Cell[] }[]): TransactionGroupSummary {
+  addGroups(groups: AssetGroup[]): TransactionGroupSummary {
     const groupResults = groups.map((group) => this.addGroup(group.utxo, group.cells));
     return this.summarizeGroups(groupResults);
   }
@@ -76,10 +94,11 @@ export class AssetSummarizer {
     const targetGroups = groups ?? this.groups;
     const utxoIds = targetGroups.map((summary) => summary.utxoId);
     const cellIds = targetGroups.flatMap((summary) => summary.cellIds);
-    const assets = targetGroups.reduce(
+    const xudtCellIds = targetGroups.flatMap((summary) => summary.xudtCellIds);
+    const xudtAssets = targetGroups.reduce(
       (result, summary) => {
-        for (const xudtTypeArgs in summary.assets) {
-          if (result[xudtTypeArgs] === undefined) {
+        for (const xudtTypeArgs in summary.xudtAssets) {
+          if (!result[xudtTypeArgs]) {
             result[xudtTypeArgs] = {
               utxoCount: 0,
               cellCount: 0,
@@ -87,21 +106,23 @@ export class AssetSummarizer {
             };
           }
 
-          result[xudtTypeArgs]!.utxoCount += summary.assets[xudtTypeArgs]!.utxoCount;
-          result[xudtTypeArgs]!.cellCount += summary.assets[xudtTypeArgs]!.cellCount;
-          result[xudtTypeArgs]!.amount += summary.assets[xudtTypeArgs]!.amount;
+          result[xudtTypeArgs]!.utxoCount += summary.xudtAssets[xudtTypeArgs]!.utxoCount;
+          result[xudtTypeArgs]!.cellCount += summary.xudtAssets[xudtTypeArgs]!.cellCount;
+          result[xudtTypeArgs]!.amount += summary.xudtAssets[xudtTypeArgs]!.amount;
         }
         return result;
       },
-      {} as Record<string, AssetSummary>,
+      {} as Record<string, XudtAssetSummary>,
     );
 
     return {
       utxoCount: utxoIds.length,
       cellCount: cellIds.length,
+      xudtCellCount: xudtCellIds.length,
       utxoIds,
       cellIds,
-      assets,
+      xudtCellIds,
+      xudtAssets,
     };
   }
 }

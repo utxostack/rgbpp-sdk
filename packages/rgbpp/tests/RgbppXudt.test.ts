@@ -98,16 +98,16 @@ describe('RgbppXudt', () => {
       });
 
       console.log('result.transactions.length', result.transactions.length);
-      console.log('result.summary.included.assets', result.summary.included.assets);
-      console.log('result.summary.excluded.assets', result.summary.excluded.assets);
+      console.log('result.summary.included.assets', result.summary.included.xudtAssets);
+      console.log('result.summary.excluded.assets', result.summary.excluded.xudtAssets);
 
-      expect(result.summary.included.assets).toHaveProperty(xudtTypeArgs);
-      expect(result.summary.included.assets[xudtTypeArgs].cellCount).toEqual(50);
-      expect(result.summary.included.assets[xudtTypeArgs].utxoCount).toEqual(50);
+      expect(result.summary.included.xudtAssets).toHaveProperty(xudtTypeArgs);
+      expect(result.summary.included.xudtAssets[xudtTypeArgs].cellCount).toEqual(50);
+      expect(result.summary.included.xudtAssets[xudtTypeArgs].utxoCount).toEqual(50);
 
-      expect(result.summary.excluded.assets).toHaveProperty(xudtTypeArgs);
-      expect(result.summary.excluded.assets[xudtTypeArgs].cellCount).toEqual(41);
-      expect(result.summary.excluded.assets[xudtTypeArgs].utxoCount).toEqual(1);
+      expect(result.summary.excluded.xudtAssets).toHaveProperty(xudtTypeArgs);
+      expect(result.summary.excluded.xudtAssets[xudtTypeArgs].cellCount).toEqual(41);
+      expect(result.summary.excluded.xudtAssets[xudtTypeArgs].utxoCount).toEqual(1);
 
       expect(result.transactions).toHaveLength(2);
       expect(result).toMatchSnapshot();
