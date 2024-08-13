@@ -1,6 +1,6 @@
 # RGB++ Examples
 
-- xUDT directory: The examples for RGB++ UDT issuance, transfer, and leap
+- xUDT directory: The examples for RGB++ UDT issuance, transfer, transferAll and leap
 - Spore directory: The examples for RGB++ Spore creation, transfer and leap
 
 > [!TIP]
@@ -116,13 +116,19 @@ npx tsx xudt/1-ckb-leap-btc.ts
 npx tsx xudt/2-btc-transfer.ts 
 ```
 
-#### 3. Leap RGB++ xUDT from BTC to CKB with Queue Service
+#### 3. Transfer all RGB++ xUDT on BTC using a queue service
+
+```shell
+npx tsx xudt/btc-transfer-all/1-btc-transfer-all.ts 
+```
+
+#### 4. Leap RGB++ xUDT from BTC to CKB with Queue Service
 
 ```shell
 npx tsx xudt/3-btc-leap-ckb.ts 
 ```
 
-#### 4. Unlock xUDT BTC time cells on CKB
+#### 5. Unlock xUDT BTC time cells on CKB
 
 A cron job in RGB++ Queue service will construct a transaction unlocking the mature BTC time cells to the their `target_ckb_address`.
 
