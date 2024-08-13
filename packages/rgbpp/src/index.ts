@@ -63,7 +63,9 @@ export type {
   RgbppTransferTxResult,
   RgbppTransferAllTxsParams,
   RgbppTransferAllTxsResult,
+  RgbppTransferAllTxGroup,
 } from './rgbpp/types/xudt';
+export type { TransactionGroupSummary } from './rgbpp/summary/asset-summarizer';
 export { RgbppError, RgbppErrorCodes } from './rgbpp/error';
 export { buildRgbppTransferTx } from './rgbpp/xudt/btc-transfer';
 export { buildRgbppTransferAllTxs } from './rgbpp/xudt/btc-transfer-all';
