@@ -1,11 +1,12 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { BtcAssetsApi } from 'rgbpp/service';
+import { DataSource, NetworkType } from 'rgbpp/btc';
+import { BTCTestnetType, Collector } from 'rgbpp/ckb';
 import JsonRpcModule from './json-rpc/json-rpc.module';
 import { RgbppModule } from './rgbpp/rgbpp.module';
 import { AppService } from './app.service';
 import { envSchema } from './env';
-import { BTCTestnetType, Collector } from 'rgbpp/ckb';
-import { BtcAssetsApi } from 'rgbpp';
 
 @Global()
 @Module({
@@ -31,7 +32,7 @@ import { BtcAssetsApi } from 'rgbpp';
       inject: [ConfigService],
     },
     {
-      provide: 'COLLECTOR',
+      provide: 'CKB_COLLECTOR',
       useFactory: (configService: ConfigService) => {
         const ckbRpcUrl = configService.get('CKB_RPC_URL');
         return new Collector({
@@ -51,7 +52,17 @@ import { BtcAssetsApi } from 'rgbpp';
       },
       inject: [ConfigService],
     },
+    {
+      provide: 'BTC_DATA_SOURCE',
+      useFactory: (configService: ConfigService) => {
+        const isMainnet = configService.get('IS_MAINNET');
+        const networkType = isMainnet ? NetworkType.MAINNET : NetworkType.TESTNET;
+        const btcAssetsApi = configService.get('BTC_ASSETS_API');
+        return new DataSource(btcAssetsApi, networkType);
+      },
+      inject: [ConfigService],
+    },
   ],
-  exports: ['IS_MAINNET', 'COLLECTOR', 'BTC_ASSETS_API', 'BTC_TESTNET_TYPE'],
+  exports: ['IS_MAINNET', 'CKB_COLLECTOR', 'BTC_ASSETS_API', 'BTC_DATA_SOURCE', 'BTC_TESTNET_TYPE'],
 })
 export class AppModule {}

@@ -75,8 +75,8 @@ importers:
         specifier: ^0.2.0
         version: 0.2.2
       rgbpp:
-        specifier: ^0.5.0
-        version: 0.5.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
+        specifier: 0.0.0-snap-20240813014620
+        version: 0.0.0-snap-20240813014620(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
       rxjs:
         specifier: ^7.8.1
         version: 7.8.1
@@ -120,6 +120,9 @@ importers:
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
+      type-fest:
+        specifier: ^4.24.0
+        version: 4.24.0
       typescript:
         specifier: ^5.1.3
         version: 5.5.3
@@ -1223,26 +1226,14 @@ packages:
   '@manypkg/get-packages@1.1.3':
     resolution: {integrity: sha512-fo+QhuU3qE/2TQMQmbVMqaQ6EWbMhi4ABWP+O4AM1NqPBuy0OrApV5LO6BrrgnhtAHS2NH6RrVk9OL181tTi8A==}
 
-  '@nervosnetwork/ckb-sdk-core@0.109.1':
-    resolution: {integrity: sha512-YU3yJZvz69WU6Bw//vRxzxLGcIj74CwGffdp6GYZbQpZwFaACT6FCojvOMjHIyJ8Rw32r114LhMKHvyBwagWjw==}
-
   '@nervosnetwork/ckb-sdk-core@0.109.2':
     resolution: {integrity: sha512-56oOneHQCM0IEyNQswCIF8Xs1PXj4TGuBQA6iKfRKvHyXQiEGeVJ1q4FJzVk8dz5tRLguoMYWs6HuXy02bKIVg==}
-
-  '@nervosnetwork/ckb-sdk-rpc@0.109.1':
-    resolution: {integrity: sha512-RoUhXmaOm1g7ga1G3guNTzSDit79k7nqj3rYbk2jSlULRo34g9L06juU24hmwwuFZfiCaARI9mgACu0ScW9itw==}
 
   '@nervosnetwork/ckb-sdk-rpc@0.109.2':
     resolution: {integrity: sha512-6RHLMXIzyV8XKkV19SnYvnRqCs3B3BVHwVFHk6G0Eq71bmKwLjgEoc8pYnXoQK1P4v31ZCvIhdjynSvjh0Jv1w==}
 
-  '@nervosnetwork/ckb-sdk-utils@0.109.1':
-    resolution: {integrity: sha512-KK8w+JZGPt/Gq/Y0b87AuQp8mGR46fBSkqnjwASdBAi2rts9tJ6srEaZ3FVVa9LtjTlThQ120hex+mcyastrkQ==}
-
   '@nervosnetwork/ckb-sdk-utils@0.109.2':
     resolution: {integrity: sha512-pXgQvQQA2TuXiAmKGvL9kWjXdCsX+qP8HqHSLt6kwrjFe846d4dZxZ5AunpP+xsQNst+L5V7xcvunaBOkTdD6g==}
-
-  '@nervosnetwork/ckb-types@0.109.1':
-    resolution: {integrity: sha512-mD5mOCGa1JertKZekHSUVYwFPW27VJ0/MdwblWvEEK7pNIU6az+dLiIxgvl4TxR+j+7/GqmXNH1U59CM92y/wg==}
 
   '@nervosnetwork/ckb-types@0.109.2':
     resolution: {integrity: sha512-NAQbUi+j6tWlUYijvHqWIUwrbawIeAeSlxUQm0wkqSKbtAEoiR4L6RZS7cgn7uH+SMsp78mciXP8gixrfH3rEQ==}
@@ -1355,14 +1346,14 @@ packages:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
 
-  '@rgbpp-sdk/btc@0.5.0':
-    resolution: {integrity: sha512-udqocY2ZonGtNa2q9QEr6EZX/WaW/lnqbFQbp6dHyVT22qchtpZt+Ef92X+XGLIwqWd2fqKIv4oejHhn2S9ncA==}
+  '@rgbpp-sdk/btc@0.0.0-snap-20240813014620':
+    resolution: {integrity: sha512-T9nmegGrUf4wEfioX612Om1EYqL1QVPrldF3x2J18QtKlYW/Bli6eMOzDPeF0d8tAysgpCJEpkRtwoh/CRC8UA==}
 
-  '@rgbpp-sdk/ckb@0.5.0':
-    resolution: {integrity: sha512-GVkz1tq+HT8do77bmcWH/oN5BsWfIVTXfnlTpocKZ86OhIEj+2z5cBwECIjdZ5MKe3h49xH81bCn0jFWqa7yhQ==}
+  '@rgbpp-sdk/ckb@0.0.0-snap-20240813014620':
+    resolution: {integrity: sha512-IE0+vQAaR1FdiUesdrOzLedAtgczChR7bPRiJkfufMGJMaPpPoimHdySqe1hkp8kyVRiIp8xL5BxyfAvl4dyrA==}
 
-  '@rgbpp-sdk/service@0.5.0':
-    resolution: {integrity: sha512-hcgWltNE7aeQXXfCcysj2TXf3J/IodpP9nEXis1MrT3MTTNnEm2PpRh0URLOVEZOkpeSxAw2Nyb9Eu9dWzDdiw==}
+  '@rgbpp-sdk/service@0.0.0-snap-20240813014620':
+    resolution: {integrity: sha512-xyaJmU/DbdBCk3KoVAtJqMANHMa7fEkz9FKmFrogPPlQMpUwKbUoh2TLBkf0MMDBCoBcPAhtPxrMxH2CrKFoZw==}
 
   '@rollup/rollup-android-arm-eabi@4.19.0':
     resolution: {integrity: sha512-JlPfZ/C7yn5S5p0yKk7uhHTTnFlvTgLetl2VxqE518QgyM7C9bSfFTYvB/Q/ftkq0RIPY4ySxTz+/wKJ/dXC0w==}
@@ -3695,8 +3686,8 @@ packages:
   rfdc@1.4.1:
     resolution: {integrity: sha512-q1b3N5QkRUWUl7iyylaaj3kOpIT0N2i9MqIEQXP73GVsN9cw3fdx8X63cEmWhJGi2PPCF23Ijp7ktmd39rawIA==}
 
-  rgbpp@0.5.0:
-    resolution: {integrity: sha512-+Gtf1QAeJo/oI+3Jdf4UBYHQy0cesRj5duA9liUCWVXrPE3y0aJlppDouXXCairfHqBOY/7KzQVQJ122NlL8qA==}
+  rgbpp@0.0.0-snap-20240813014620:
+    resolution: {integrity: sha512-1jTgucS9QQAkFjH5xHWFvphU3ovM6/jOMbUAYqoN2IdfPNbrkxrbInewu5IgFQuEGNib47t0sFoFFTS0Q4A6cw==}
 
   rimraf@3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
@@ -4153,6 +4144,10 @@ packages:
   type-fest@1.4.0:
     resolution: {integrity: sha512-yGSza74xk0UG8k+pLh5oeoYirvIiWo5t0/o3zHHAO2tRDiZcxWP7fywNlXhqb6/r6sWvwi+RsyQMWhVLe4BVuA==}
     engines: {node: '>=10'}
+
+  type-fest@4.24.0:
+    resolution: {integrity: sha512-spAaHzc6qre0TlZQQ2aA/nGMe+2Z/wyGk5Z+Ru2VUfdNwT6kWO6TjevOlpebsATEG1EIQ2sOiDszud3lO5mt/Q==}
+    engines: {node: '>=16'}
 
   typeforce@1.18.0:
     resolution: {integrity: sha512-7uc1O8h1M1g0rArakJdf0uLRSSgFcYexrVoKo+bzJd32gd4gDy2L/Z+8/FjPnU9ydY3pEnVPtr9FyscYY60K1g==}
@@ -5493,28 +5488,11 @@ snapshots:
       globby: 11.1.0
       read-yaml-file: 1.1.0
 
-  '@nervosnetwork/ckb-sdk-core@0.109.1':
-    dependencies:
-      '@nervosnetwork/ckb-sdk-rpc': 0.109.1
-      '@nervosnetwork/ckb-sdk-utils': 0.109.1
-      '@nervosnetwork/ckb-types': 0.109.1
-      tslib: 2.3.1
-    transitivePeerDependencies:
-      - debug
-
   '@nervosnetwork/ckb-sdk-core@0.109.2':
     dependencies:
       '@nervosnetwork/ckb-sdk-rpc': 0.109.2
       '@nervosnetwork/ckb-sdk-utils': 0.109.2
       '@nervosnetwork/ckb-types': 0.109.2
-      tslib: 2.3.1
-    transitivePeerDependencies:
-      - debug
-
-  '@nervosnetwork/ckb-sdk-rpc@0.109.1':
-    dependencies:
-      '@nervosnetwork/ckb-sdk-utils': 0.109.1
-      axios: 1.6.7
       tslib: 2.3.1
     transitivePeerDependencies:
       - debug
@@ -5527,14 +5505,6 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@nervosnetwork/ckb-sdk-utils@0.109.1':
-    dependencies:
-      '@nervosnetwork/ckb-types': 0.109.1
-      bech32: 2.0.0
-      elliptic: 6.5.4
-      jsbi: 3.1.3
-      tslib: 2.3.1
-
   '@nervosnetwork/ckb-sdk-utils@0.109.2':
     dependencies:
       '@nervosnetwork/ckb-types': 0.109.2
@@ -5542,8 +5512,6 @@ snapshots:
       elliptic: 6.5.4
       jsbi: 3.1.3
       tslib: 2.3.1
-
-  '@nervosnetwork/ckb-types@0.109.1': {}
 
   '@nervosnetwork/ckb-types@0.109.2': {}
 
@@ -5670,13 +5638,13 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
-  '@rgbpp-sdk/btc@0.5.0(@ckb-lumos/lumos@0.22.0-next.5)':
+  '@rgbpp-sdk/btc@0.0.0-snap-20240813014620(@ckb-lumos/lumos@0.22.0-next.5)':
     dependencies:
       '@bitcoinerlab/secp256k1': 1.1.1
       '@ckb-lumos/codec': 0.22.2
-      '@nervosnetwork/ckb-types': 0.109.1
-      '@rgbpp-sdk/ckb': 0.5.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
-      '@rgbpp-sdk/service': 0.5.0
+      '@nervosnetwork/ckb-types': 0.109.2
+      '@rgbpp-sdk/ckb': 0.0.0-snap-20240813014620(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
+      '@rgbpp-sdk/service': 0.0.0-snap-20240813014620
       bip32: 4.0.0
       bitcoinjs-lib: 6.1.6
       ecpair: 2.1.0
@@ -5686,15 +5654,15 @@ snapshots:
       - '@ckb-lumos/lumos'
       - debug
 
-  '@rgbpp-sdk/ckb@0.5.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)':
+  '@rgbpp-sdk/ckb@0.0.0-snap-20240813014620(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)':
     dependencies:
       '@ckb-lumos/base': 0.22.2
       '@ckb-lumos/codec': 0.22.2
       '@exact-realty/multipart-parser': 1.0.14
-      '@nervosnetwork/ckb-sdk-core': 0.109.1
-      '@nervosnetwork/ckb-sdk-utils': 0.109.1
-      '@nervosnetwork/ckb-types': 0.109.1
-      '@rgbpp-sdk/service': 0.5.0
+      '@nervosnetwork/ckb-sdk-core': 0.109.2
+      '@nervosnetwork/ckb-sdk-utils': 0.109.2
+      '@nervosnetwork/ckb-types': 0.109.2
+      '@rgbpp-sdk/service': 0.0.0-snap-20240813014620
       '@spore-sdk/core': 0.2.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
       axios: 1.7.2
       camelcase-keys: 7.0.2
@@ -5704,11 +5672,11 @@ snapshots:
       - debug
       - lodash
 
-  '@rgbpp-sdk/service@0.5.0':
+  '@rgbpp-sdk/service@0.0.0-snap-20240813014620':
     dependencies:
       '@ckb-lumos/base': 0.22.2
       '@ckb-lumos/codec': 0.22.2
-      '@nervosnetwork/ckb-types': 0.109.1
+      '@nervosnetwork/ckb-types': 0.109.2
       lodash: 4.17.21
 
   '@rollup/rollup-android-arm-eabi@4.19.0':
@@ -8360,12 +8328,14 @@ snapshots:
 
   rfdc@1.4.1: {}
 
-  rgbpp@0.5.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21):
+  rgbpp@0.0.0-snap-20240813014620(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21):
     dependencies:
-      '@nervosnetwork/ckb-sdk-utils': 0.109.1
-      '@rgbpp-sdk/btc': 0.5.0(@ckb-lumos/lumos@0.22.0-next.5)
-      '@rgbpp-sdk/ckb': 0.5.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
-      '@rgbpp-sdk/service': 0.5.0
+      '@ckb-lumos/base': 0.22.2
+      '@ckb-lumos/codec': 0.22.2
+      '@nervosnetwork/ckb-sdk-utils': 0.109.2
+      '@rgbpp-sdk/btc': 0.0.0-snap-20240813014620(@ckb-lumos/lumos@0.22.0-next.5)
+      '@rgbpp-sdk/ckb': 0.0.0-snap-20240813014620(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
+      '@rgbpp-sdk/service': 0.0.0-snap-20240813014620
     transitivePeerDependencies:
       - '@ckb-lumos/lumos'
       - debug
@@ -8826,6 +8796,8 @@ snapshots:
   type-fest@0.21.3: {}
 
   type-fest@1.4.0: {}
+
+  type-fest@4.24.0: {}
 
   typeforce@1.18.0: {}
 
