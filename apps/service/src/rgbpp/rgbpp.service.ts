@@ -1,10 +1,11 @@
 import { Inject } from '@nestjs/common';
-import { DataSource } from 'rgbpp/btc';
+import { DataSource, NetworkType } from 'rgbpp/btc';
 import { BtcAssetsApi, RgbppApiTransactionState } from 'rgbpp/service';
 import { BTCTestnetType, Collector, Hex, append0x } from 'rgbpp/ckb';
 import { buildRgbppTransferTx, buildRgbppTransferAllTxs } from 'rgbpp';
-import { RpcHandler, RpcMethodHandler } from 'src/json-rpc/json-rpc.decorators';
-import { toSnakeCase, toCamelCase, SnakeCased } from 'src/utils/case';
+import { RpcHandler, RpcMethodHandler } from '../json-rpc/json-rpc.decorators.js';
+import { toSnakeCase, toCamelCase, SnakeCased } from '../utils/case.js';
+import { ensureSafeJson } from '../utils/json.js';
 import {
   RgbppTransferReq,
   RgbppCkbBtcTransaction,
@@ -14,17 +15,21 @@ import {
   BtcTxSendReq,
   RgbppTransferAllReq,
   RgbppTransferAllRes,
-} from './types';
+} from './types.js';
 
 @RpcHandler()
 export class RgbppService {
+  private readonly btcDataSource: DataSource;
+
   constructor(
     @Inject('IS_MAINNET') private isMainnet: boolean,
-    @Inject('BTC_TESTNET_TYPE') private btcTestnetType: BTCTestnetType,
-    @Inject('BTC_DATA_SOURCE') private btcDataSource: DataSource,
-    @Inject('BTC_ASSETS_API') private btcAssetsApi: BtcAssetsApi,
     @Inject('CKB_COLLECTOR') private ckbCollector: Collector,
-  ) {}
+    @Inject('BTC_ASSETS_API') private btcAssetsApi: BtcAssetsApi,
+    @Inject('BTC_TESTNET_TYPE') private btcTestnetType: BTCTestnetType,
+  ) {
+    const networkType = isMainnet ? NetworkType.MAINNET : NetworkType.TESTNET;
+    this.btcDataSource = new DataSource(btcAssetsApi, networkType);
+  }
 
   @RpcMethodHandler({ name: 'generate_rgbpp_transfer_tx' })
   public async generateRgbppTransferTx(request: [RgbppTransferReq]): Promise<SnakeCased<RgbppCkbBtcTransaction>> {
@@ -58,7 +63,7 @@ export class RgbppService {
       ckb: {
         collector: this.ckbCollector,
         xudtTypeArgs: params.ckb.xudtTypeArgs,
-        feeRate: BigInt(append0x(params.ckb.feeRate)),
+        feeRate: params.ckb.feeRate ? BigInt(append0x(params.ckb.feeRate)) : undefined,
       },
       btc: {
         assetAddresses: params.btc.assetAddresses,
@@ -73,18 +78,20 @@ export class RgbppService {
       isMainnet: this.isMainnet,
     });
 
-    return toSnakeCase<RgbppTransferAllRes>({
-      ...result,
-      transactions: result.transactions.map((group) => {
-        return {
-          ...group,
-          ckb: {
-            ...group.ckb,
-            virtualTxResult: JSON.stringify(group.ckb.virtualTxResult),
-          },
-        };
+    return ensureSafeJson<SnakeCased<RgbppTransferAllRes>>(
+      toSnakeCase<RgbppTransferAllRes>({
+        ...result,
+        transactions: result.transactions.map((group) => {
+          return {
+            ...group,
+            ckb: {
+              ...group.ckb,
+              virtualTxResult: JSON.stringify(group.ckb.virtualTxResult),
+            },
+          };
+        }),
       }),
-    });
+    );
   }
 
   @RpcMethodHandler({ name: 'report_rgbpp_ckb_tx_btc_txid' })

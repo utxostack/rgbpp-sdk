@@ -71,12 +71,15 @@ importers:
       json-rpc-2.0:
         specifier: ^1.7.0
         version: 1.7.0
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       reflect-metadata:
         specifier: ^0.2.0
         version: 0.2.2
       rgbpp:
-        specifier: 0.0.0-snap-20240813014620
-        version: 0.0.0-snap-20240813014620(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
+        specifier: 0.0.0-snap-20240813134030
+        version: 0.0.0-snap-20240813134030(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
       rxjs:
         specifier: ^7.8.1
         version: 7.8.1
@@ -1346,14 +1349,14 @@ packages:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
 
-  '@rgbpp-sdk/btc@0.0.0-snap-20240813014620':
-    resolution: {integrity: sha512-T9nmegGrUf4wEfioX612Om1EYqL1QVPrldF3x2J18QtKlYW/Bli6eMOzDPeF0d8tAysgpCJEpkRtwoh/CRC8UA==}
+  '@rgbpp-sdk/btc@0.0.0-snap-20240813134030':
+    resolution: {integrity: sha512-LLG49/LevH03mcCcB/+f3Wjx+RQhCZ3BQCbvX0bDCMNboH5+R4I6bLMIvofiNfOBkJYYO6NBaJ2AqioaJyIFmg==}
 
-  '@rgbpp-sdk/ckb@0.0.0-snap-20240813014620':
-    resolution: {integrity: sha512-IE0+vQAaR1FdiUesdrOzLedAtgczChR7bPRiJkfufMGJMaPpPoimHdySqe1hkp8kyVRiIp8xL5BxyfAvl4dyrA==}
+  '@rgbpp-sdk/ckb@0.0.0-snap-20240813134030':
+    resolution: {integrity: sha512-xa0qeYIRryJDMcKGUXnHXYSb3lmybTk6H8It4h4PNpKQ1DK21tuTeXnC9MeWkFozE8K7qLVlkuVYvwTPn5kh7Q==}
 
-  '@rgbpp-sdk/service@0.0.0-snap-20240813014620':
-    resolution: {integrity: sha512-xyaJmU/DbdBCk3KoVAtJqMANHMa7fEkz9FKmFrogPPlQMpUwKbUoh2TLBkf0MMDBCoBcPAhtPxrMxH2CrKFoZw==}
+  '@rgbpp-sdk/service@0.0.0-snap-20240813134030':
+    resolution: {integrity: sha512-qiImHNGhshbO3JXlWW1VbBhY63uELcwhn0+/JnXZt50MF3A+BanTwZT7gZlNhhk9nN4CPiNnaCqGj/iI8FEYOg==}
 
   '@rollup/rollup-android-arm-eabi@4.19.0':
     resolution: {integrity: sha512-JlPfZ/C7yn5S5p0yKk7uhHTTnFlvTgLetl2VxqE518QgyM7C9bSfFTYvB/Q/ftkq0RIPY4ySxTz+/wKJ/dXC0w==}
@@ -3686,8 +3689,8 @@ packages:
   rfdc@1.4.1:
     resolution: {integrity: sha512-q1b3N5QkRUWUl7iyylaaj3kOpIT0N2i9MqIEQXP73GVsN9cw3fdx8X63cEmWhJGi2PPCF23Ijp7ktmd39rawIA==}
 
-  rgbpp@0.0.0-snap-20240813014620:
-    resolution: {integrity: sha512-1jTgucS9QQAkFjH5xHWFvphU3ovM6/jOMbUAYqoN2IdfPNbrkxrbInewu5IgFQuEGNib47t0sFoFFTS0Q4A6cw==}
+  rgbpp@0.0.0-snap-20240813134030:
+    resolution: {integrity: sha512-idnzre1ESuiBLzy9c7cHtilb1g7GQY/wTSGpBl9Lv2DRX4F2w3duTRnrPwIX5gMfdaYGueHLzn/Y2xV+3lX42g==}
 
   rimraf@3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
@@ -5638,13 +5641,13 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
-  '@rgbpp-sdk/btc@0.0.0-snap-20240813014620(@ckb-lumos/lumos@0.22.0-next.5)':
+  '@rgbpp-sdk/btc@0.0.0-snap-20240813134030(@ckb-lumos/lumos@0.22.0-next.5)':
     dependencies:
       '@bitcoinerlab/secp256k1': 1.1.1
       '@ckb-lumos/codec': 0.22.2
       '@nervosnetwork/ckb-types': 0.109.2
-      '@rgbpp-sdk/ckb': 0.0.0-snap-20240813014620(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
-      '@rgbpp-sdk/service': 0.0.0-snap-20240813014620
+      '@rgbpp-sdk/ckb': 0.0.0-snap-20240813134030(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
+      '@rgbpp-sdk/service': 0.0.0-snap-20240813134030
       bip32: 4.0.0
       bitcoinjs-lib: 6.1.6
       ecpair: 2.1.0
@@ -5654,7 +5657,7 @@ snapshots:
       - '@ckb-lumos/lumos'
       - debug
 
-  '@rgbpp-sdk/ckb@0.0.0-snap-20240813014620(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)':
+  '@rgbpp-sdk/ckb@0.0.0-snap-20240813134030(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)':
     dependencies:
       '@ckb-lumos/base': 0.22.2
       '@ckb-lumos/codec': 0.22.2
@@ -5662,7 +5665,7 @@ snapshots:
       '@nervosnetwork/ckb-sdk-core': 0.109.2
       '@nervosnetwork/ckb-sdk-utils': 0.109.2
       '@nervosnetwork/ckb-types': 0.109.2
-      '@rgbpp-sdk/service': 0.0.0-snap-20240813014620
+      '@rgbpp-sdk/service': 0.0.0-snap-20240813134030
       '@spore-sdk/core': 0.2.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
       axios: 1.7.2
       camelcase-keys: 7.0.2
@@ -5672,7 +5675,7 @@ snapshots:
       - debug
       - lodash
 
-  '@rgbpp-sdk/service@0.0.0-snap-20240813014620':
+  '@rgbpp-sdk/service@0.0.0-snap-20240813134030':
     dependencies:
       '@ckb-lumos/base': 0.22.2
       '@ckb-lumos/codec': 0.22.2
@@ -8328,14 +8331,14 @@ snapshots:
 
   rfdc@1.4.1: {}
 
-  rgbpp@0.0.0-snap-20240813014620(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21):
+  rgbpp@0.0.0-snap-20240813134030(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21):
     dependencies:
       '@ckb-lumos/base': 0.22.2
       '@ckb-lumos/codec': 0.22.2
       '@nervosnetwork/ckb-sdk-utils': 0.109.2
-      '@rgbpp-sdk/btc': 0.0.0-snap-20240813014620(@ckb-lumos/lumos@0.22.0-next.5)
-      '@rgbpp-sdk/ckb': 0.0.0-snap-20240813014620(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
-      '@rgbpp-sdk/service': 0.0.0-snap-20240813014620
+      '@rgbpp-sdk/btc': 0.0.0-snap-20240813134030(@ckb-lumos/lumos@0.22.0-next.5)
+      '@rgbpp-sdk/ckb': 0.0.0-snap-20240813134030(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
+      '@rgbpp-sdk/service': 0.0.0-snap-20240813134030
     transitivePeerDependencies:
       - '@ckb-lumos/lumos'
       - debug

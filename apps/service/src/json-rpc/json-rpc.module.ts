@@ -1,5 +1,5 @@
 import { Inject, Logger, Module, OnModuleInit } from '@nestjs/common';
-import { JsonRpcServer } from './json-rpc.server';
+import { JsonRpcServer } from './json-rpc.server.js';
 
 export const JSON_RPC_OPTIONS = '__JSON_RPC_OPTIONS__';
 
