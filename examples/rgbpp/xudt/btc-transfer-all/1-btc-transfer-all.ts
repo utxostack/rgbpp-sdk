@@ -9,7 +9,6 @@ interface TestParams {
   fromAddress: string;
   toAddress: string;
 }
-const SEND_TX_GROUPS = false;
 
 const rgbppTransferAllTxs = async ({ xudtTypeArgs, fromAddress, toAddress }: TestParams) => {
   const result = await buildRgbppTransferAllTxs({
@@ -39,7 +38,6 @@ const rgbppTransferAllTxs = async ({ xudtTypeArgs, fromAddress, toAddress }: Tes
       await signPsbt(psbt, btcAccount);
 
       psbt.finalizeAllInputs();
-      psbt.extractTransaction();
 
       return {
         ckbVirtualTxResult: JSON.stringify(group.ckb.virtualTxResult),
@@ -48,16 +46,12 @@ const rgbppTransferAllTxs = async ({ xudtTypeArgs, fromAddress, toAddress }: Tes
     }),
   );
 
-  const ckbVirtualTxResult = JSON.parse(JSON.stringify(signedGroups, null, 2));
+  const signedGroupsData = JSON.parse(JSON.stringify(signedGroups, null, 2));
 
-  // Save ckbVirtualTxResult
-  saveCkbVirtualTxResult(ckbVirtualTxResult, '1-btc-transfer-all');
+  // Save signedGroupsData
+  saveCkbVirtualTxResult(signedGroupsData, '1-btc-transfer-all');
 
-  console.log('signedGroups', ckbVirtualTxResult);
-
-  if (!SEND_TX_GROUPS) {
-    return;
-  }
+  console.log('signedGroups', signedGroupsData);
 
   // Send transactions
   const sentGroups = await sendRgbppTxGroups({
