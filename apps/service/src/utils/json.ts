@@ -6,12 +6,8 @@ export function ensureSafeJson<Input extends object, Output = Input>(json: Input
   }
 
   const obj = Array.isArray(json) ? [] : {};
-  for (let key of Object.keys(json)) {
+  for (const key of Object.keys(json)) {
     const value = json[key];
-    // XXX: Remove underscores from hex strings due to toSnakeCase() transformation issue
-    if (key.startsWith('0_x')) {
-      key = key.replaceAll('_', '');
-    }
     if (isPlainObject(value) || Array.isArray(value)) {
       obj[key] = ensureSafeJson(value);
     } else {

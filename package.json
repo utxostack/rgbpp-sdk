@@ -7,8 +7,9 @@
   "scripts": {
     "prepare": "husky",
     "build": "pnpm run --r --filter \"./{packages,apps,examples,tests}/**\" build",
-    "test:packages": "pnpm run --r --filter \"./packages/**\" test",
     "build:packages": "pnpm run --r --filter \"./packages/**\" build",
+    "test:packages": "pnpm run --r --filter \"./packages/**\" test",
+    "test:service": "pnpm run --r --filter=./apps/service test",
     "dev:service": "pnpm run --r --filter=./apps/service dev",
     "lint": "eslint {packages,apps,examples,tests}/**/*.ts && prettier --check '{packages,apps,examples,tests}/**/*.ts'",
     "lint:fix": "eslint --fix {packages,apps,examples,tests}/**/*.ts",
