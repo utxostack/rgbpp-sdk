@@ -11,7 +11,8 @@ The `@rgbpp-sdk/service` package provides a wrapped class to interact with `Bitc
 - More detailed API documentation can be found on [Testnet](https://api.testnet.rgbpp.io/docs), [Signet](https://api.signet.rgbpp.io/docs) and [Mainnet](https://api.rgbpp.io/docs)
 
 > [!NOTE]
-> `Bitcoin/RGB++ Assets Service` is designed to streamline the transaction workflow. Developers have the option to implement its features by themselves without limitation.
+> [`Bitcoin/RGB++ Assets Service`](https://github.com/ckb-cell/btc-assets-api) is an open-source project designed to streamline the transaction workflow for RGB++ Assets. Developers have the option to enhance it by implementing its features by themselves without limitations. 
+> For those who prefer to deploy their own `Bitcoin/RGB++ Assets Service`, the documentation for deployment can be found at: [Deployment - ckb-cell/btc-assets-api](https://github.com/ckb-cell/btc-assets-api#deployment).
 
 ## Installation
 
