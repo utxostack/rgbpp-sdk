@@ -4,6 +4,7 @@
     "declaration": true,
     "resolveJsonModule": true,
     "removeComments": true,
+    "esModuleInterop": true,
     "moduleResolution": "Bundler",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
