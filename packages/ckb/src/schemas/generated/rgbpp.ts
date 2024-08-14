@@ -34,12 +34,9 @@ import {
   BlockV1,
 } from './blockchain';
 
-const { array, vector, union, option, struct, table } = molecule;
+const { array, vector, union, option, struct, table, byteVecOf } = molecule;
 
-const fallbackBytesCodec = createBytesCodec({
-  pack: bytes.bytify,
-  unpack: bytes.hexify,
-});
+const fallbackBytesCodec = byteVecOf({ pack: bytes.bytify, unpack: bytes.hexify });
 
 function createFallbackFixedBytesCodec(byteLength: number) {
   return createFixedBytesCodec({
