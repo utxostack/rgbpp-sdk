@@ -1,5 +1,5 @@
 import { RpcHandler, RpcMethodHandler } from './json-rpc/json-rpc.decorators.js';
-import pkg from '../package.json' with { type: 'json' };
+import pkg from '../package.json';
 
 @RpcHandler()
 export class AppService {

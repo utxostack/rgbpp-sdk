@@ -2,7 +2,6 @@
   "name": "rgbpp-sdk-service",
   "version": "0.0.1",
   "private": true,
-  "type": "module",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\"",
@@ -26,7 +25,7 @@
     "json-rpc-2.0": "^1.7.0",
     "lodash": "^4.17.21",
     "reflect-metadata": "^0.2.0",
-    "rgbpp": "0.0.0-snap-20240813134030",
+    "rgbpp": "workspace:*",
     "rxjs": "^7.8.1",
     "snakecase-keys": "^8.0.1",
     "zod": "^3.23.8"

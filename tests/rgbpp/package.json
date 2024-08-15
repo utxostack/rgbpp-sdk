@@ -12,7 +12,7 @@
     "integration:spore": "npx tsx shared/prepare-utxo.ts && npx tsx spore/launch/1-prepare-cluster.ts && npx tsx spore/launch/2-create-cluster.ts && npx tsx spore/launch/3-create-spores.ts && npx tsx spore/4-transfer-spore.ts && npx tsx spore/5-leap-spore-to-ckb.ts"
   },
   "dependencies": {
-    "@nervosnetwork/ckb-sdk-utils": "0.109.2",
+    "@nervosnetwork/ckb-sdk-utils": "0.109.3",
     "rgbpp": "workspace:*",
     "zx": "^8.0.2"
  },
