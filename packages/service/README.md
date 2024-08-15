@@ -2,7 +2,7 @@
 
 ## About
 
-The `@rgbpp-sdk/service` package provides a wrapped class to interact with `Bitcoin/RGB++ Assets Service` (BtcAssetsApi). It offers various features for interacting with Bitcoin and RGB++ assets:
+The `@rgbpp-sdk/service` package provides a wrapped class to interact with [`Bitcoin/RGB++ Assets Service`](https://github.com/ckb-cell/btc-assets-api) (BtcAssetsApi). It offers various features for interacting with Bitcoin and RGB++ assets:
 
 - **Retrieve Blockchain Information** including Bitcoin chain info, blocks, headers, transactions, addresses, and RGB++ assets
 - **Handle transactions** by posting to `/bitcoin/v1/transaction` or `/rgbpp/v1/transaction/ckb-tx`
@@ -11,7 +11,7 @@ The `@rgbpp-sdk/service` package provides a wrapped class to interact with `Bitc
 - More detailed API documentation can be found on [Testnet](https://api.testnet.rgbpp.io/docs), [Signet](https://api.signet.rgbpp.io/docs) and [Mainnet](https://api.rgbpp.io/docs)
 
 > [!NOTE]
-> `Bitcoin/RGB++ Assets Service` is designed to streamline the transaction workflow. Developers have the option to implement its features by themselves without limitation.
+> [`Bitcoin/RGB++ Assets Service`](https://github.com/ckb-cell/btc-assets-api) is an open-source project designed to streamline the transaction workflow for Bitcoin and RGB++ Assets. Developers have the option to enhance it by implementing its features by themselves without limitations. For those who prefer to deploy their own `Bitcoin/RGB++ Assets Service`, please follow the instructions at the [Deployment](https://github.com/ckb-cell/btc-assets-api#deployment) section in the btc-assets-api repository.
 
 ## Installation
 
@@ -26,49 +26,46 @@ $ pnpm add @rgbpp-sdk/service
 
 ## Get started
 
+### Get a service URL
+
+You can start using the `Bitcoin/RGB++ Assets Service` by accessing one of our deployed services. For those who prefer to deploy their own `Bitcoin/RGB++ Assets Service`, the documentation for deployment can be found at: [Deployment - ckb-cell/btc-assets-api](https://github.com/ckb-cell/btc-assets-api#deployment).
+
+- Testnet: https://api.testnet.rgbpp.io
+- Signet: https://api.signet.rgbpp.io
+- Mainnet: https://api.rgbpp.io
+
 ### Get an access token
 
-#### Testnet
+You need an access token to interact with the service. The testnet/signet services are currently free to access, you can get an access token of the target network through the following documentation URLs:
 
-You can get a testnet access token through the [/token/generate](https://api.testnet.rgbpp.io/docs/static/index.html#/Token/post_token_generate) API directly.
+- Testnet: [/token/generate](https://api.testnet.rgbpp.io/docs/static/index.html#/Token/post_token_generate)
+- Signet: [/token/generate](https://api.signet.rgbpp.io/docs/static/index.html#/Token/post_token_generate)
 
-#### Signet
+As to the mainnet service, it's currently limited to verified apps only. When your app development is ready on testnet, and requires a mainnet access token, please email us at `f@cell.studio` to request a mainnet JWT token. In the email, please provide the following information about your app:
 
-And you can get an access token of BTC Signet network through the [/token/generate](https://api.signet.rgbpp.io/docs/static/index.html#/Token/post_token_generate) API directly.
-
-#### Mainnet
-
-The mainnet BtcAssetsApi is currently limited to verified apps only.
-
-When your app development is ready on testnet, and requires a mainnet access token,
-please email us at f@cell.studio to request a mainnet JWT token.
-
-In the email, please provide the following information about your app:
-
-- `name`: Your app name, e.g. "rgbpp-app"
-- `domain`: Your app domain, e.g. "rgbpp.app" (without protocol prefix and port suffix)
-
+- Name: Your app name, e.g. "rgbpp-app"
+- Domain: Your app domain, e.g. "rgbpp.app"
 
 ### Initialize the service
 
 #### Browser
 
-Initialize BtcAssetsApi service with your access token:
+Initialize the service with the URL and your access token in browser environment:
 
 ```typescript
 import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
-const service = BtcAssetsApi.fromToken('https://your-btc-assets-api.url', 'your_access_token');
+const service = BtcAssetsApi.fromToken('https://api.testnet.rgbpp.io', 'your_access_token');
 ```
 
 #### Node.js
 
-You should pass `origin` when initializing BtcAssetsApi service in Node.js:
+When initializing the service in Node.js, you should also pass the `origin` prop:
 
 ```typescript
 import { BtcAssetsApi } from '@rgbpp-sdk/service';
 
-const service = BtcAssetsApi.fromToken('https://your-btc-assets-api.url', 'your_access_token', 'https://your.app');
+const service = BtcAssetsApi.fromToken('https://api.testnet.rgbpp.io', 'your_access_token', 'https://your_app.origin');
 ```
 
 The `origin` prop is used to verify your token's corresponding `domain`.
@@ -81,9 +78,9 @@ Note the format difference `domain` and `origin`:
 - `domain`: `your.app`, without protocol (`https://`, `http://`, etc.)
 - `origin`: `https://your.app`, with protocol `https://`
 
-### Start using the service
+### Interact with the service
 
-Once the initialization is complete, you can query from the service:
+Once initialized, you can start accessing the service:
 
 ```typescript
 // Query the balance of an address
@@ -98,7 +95,7 @@ console.log(res);
 // }
 ```
 
-All available APIs in the [BtcAssetsApi](#types) section.
+All available APIs can be found in the [Types](#types) section.
 
 ### Handling service errors
 
