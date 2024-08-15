@@ -13,7 +13,7 @@ import {
 import { RGBPPLock } from '../schemas/generated/rgbpp';
 import { BTCTimeLock } from '../schemas/generated/rgbpp';
 import { Script } from '../schemas/generated/blockchain';
-import { bytes, BytesLike } from '@ckb-lumos/codec';
+import { BytesLike } from '@ckb-lumos/codec';
 import { toCamelcase } from './case-parser';
 import {
   InputsOrOutputsLenError,
@@ -30,6 +30,7 @@ import {
   serializeOutput,
   serializeScript,
 } from '@nervosnetwork/ckb-sdk-utils';
+import { HashType } from '../schemas/customized';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean, btcTestnetType?: BTCTestnetType) => {
   return {
@@ -114,7 +115,7 @@ export const lockScriptFromBtcTimeLockArgs = (args: Hex): CKBComponents.Script =
   const { lockScript } = BTCTimeLock.unpack(append0x(args));
   return {
     ...lockScript,
-    args: bytes.hexify(blockchain.Bytes.unpack(lockScript.args)),
+    hashType: HashType.unpack(lockScript.hashType),
   };
 };
 
@@ -123,10 +124,12 @@ export interface BTCTimeLockArgs {
   after: number;
 }
 export const btcTxIdAndAfterFromBtcTimeLockArgs = (args: Hex): BTCTimeLockArgs => {
-  const btcTimeLockArgs = BTCTimeLock.unpack(append0x(args));
+  const { btcTxid, after } = BTCTimeLock.unpack(append0x(args));
+  console.log(btcTxid);
+  console.log(after);
   return {
-    btcTxId: reverseHex(append0x(btcTimeLockArgs.btcTxid)),
-    after: btcTimeLockArgs.after,
+    btcTxId: reverseHex(append0x(btcTxid)),
+    after,
   };
 };
 

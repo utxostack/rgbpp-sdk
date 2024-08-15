@@ -226,8 +226,8 @@ importers:
         version: 0.11.0
     devDependencies:
       '@ckb-lumos/molecule':
-        specifier: ^0.22.2
-        version: 0.22.2
+        specifier: 0.0.0-canary-66bbbfd-20240805132534
+        version: 0.0.0-canary-66bbbfd-20240805132534
 
   packages/rgbpp:
     dependencies:
@@ -558,6 +558,10 @@ packages:
     resolution: {integrity: sha512-nosUCSa5rTV2IzxbEpqzrvUeQNXB66mgA0h40+QEdnE/gV/s4ke83AScrTAxWkErJy1G/sToIHCc2kWwO95DfQ==}
     engines: {node: '>=12.0.0'}
 
+  '@ckb-lumos/bi@0.0.0-canary-66bbbfd-20240805132534':
+    resolution: {integrity: sha512-0eEPkaZ7WOXIkHbRx/vD2kynn4b5TRT8Xo3DGFPKDd/9ZQJX07fPvaCRdCV9/fyEZXC4aVv0XskWySKbrWDDLw==}
+    engines: {node: '>=12.0.0'}
+
   '@ckb-lumos/bi@0.22.0-next.5':
     resolution: {integrity: sha512-hfh9PQDLJeZedlJ6qBVxx2MR9ndU0XyIl53vh1I+S4SGmvl/z2PGEY06vN34nkjmZ/1c87/KW+sL2Cpii0IxGg==}
     engines: {node: '>=12.0.0'}
@@ -568,6 +572,10 @@ packages:
 
   '@ckb-lumos/ckb-indexer@0.22.0-next.5':
     resolution: {integrity: sha512-1UZ0whrn9k18wrvIIvsdAYRCGInNA4qcrMcxsqSV7ADQnPsw8c+ARkIyzQrqaM2bzvPa3O+aVXnZ7g2oTrhtFA==}
+    engines: {node: '>=12.0.0'}
+
+  '@ckb-lumos/codec@0.0.0-canary-66bbbfd-20240805132534':
+    resolution: {integrity: sha512-/9RY2SfviZtWkSQbmgNxMHoora0vv6hCFB09n/RXF1jyfmmVNKuhtcbDKAiTl4WwWmxdJd1DhgPP0ARvM7VKfg==}
     engines: {node: '>=12.0.0'}
 
   '@ckb-lumos/codec@0.22.0-next.5':
@@ -602,8 +610,8 @@ packages:
     resolution: {integrity: sha512-Dv+MKa664zsD9Nxrnor04Hb52MNcwgtEutgzdlE+qtAB/skp6P0NVnU9uQF7RiYHNpdmUe8PROlkzB4jaKz9NA==}
     engines: {node: '>=12.0.0'}
 
-  '@ckb-lumos/molecule@0.22.2':
-    resolution: {integrity: sha512-9XwQUP/LCV+B+N4hWKiGZ2Di23chYTzKi9iWjCYCoVpjer2b19AZwEyJF/43pu9bw1C586LhtzQG6swSvKYLFA==}
+  '@ckb-lumos/molecule@0.0.0-canary-66bbbfd-20240805132534':
+    resolution: {integrity: sha512-YvUQUctRuRWoeiohjq+KNpXQ3FAuJHpiJxlFNbn+WoBX7TlIgIR69B/cRRvoa7gD5QuoA8q5zf9+0l4eYmm1Qw==}
     engines: {node: '>=12.0.0'}
     hasBin: true
 
@@ -4833,6 +4841,10 @@ snapshots:
       js-xxhash: 1.0.4
       lodash.isequal: 4.5.0
 
+  '@ckb-lumos/bi@0.0.0-canary-66bbbfd-20240805132534':
+    dependencies:
+      jsbi: 4.3.0
+
   '@ckb-lumos/bi@0.22.0-next.5':
     dependencies:
       jsbi: 4.3.0
@@ -4852,6 +4864,10 @@ snapshots:
       events: 3.3.0
     transitivePeerDependencies:
       - encoding
+
+  '@ckb-lumos/codec@0.0.0-canary-66bbbfd-20240805132534':
+    dependencies:
+      '@ckb-lumos/bi': 0.0.0-canary-66bbbfd-20240805132534
 
   '@ckb-lumos/codec@0.22.0-next.5':
     dependencies:
@@ -4936,10 +4952,10 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  '@ckb-lumos/molecule@0.22.2':
+  '@ckb-lumos/molecule@0.0.0-canary-66bbbfd-20240805132534':
     dependencies:
-      '@ckb-lumos/bi': 0.22.2
-      '@ckb-lumos/codec': 0.22.2
+      '@ckb-lumos/bi': 0.0.0-canary-66bbbfd-20240805132534
+      '@ckb-lumos/codec': 0.0.0-canary-66bbbfd-20240805132534
       '@types/moo': 0.5.9
       '@types/nearley': 2.11.5
       glob: 10.4.5
