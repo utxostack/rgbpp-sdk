@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { HttpAdapterHost, ModuleRef, ModulesContainer } from '@nestjs/core';
 import { JSONRPCServer, SimpleJSONRPCMethod } from 'json-rpc-2.0';
-import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper';
-import { JsonRpcMetadataKey, JsonRpcMethodMetadataKey } from './json-rpc.decorators';
-import { JsonRpcConfig } from './json-rpc.module';
+import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper.js';
+import { JsonRpcMetadataKey, JsonRpcMethodMetadataKey } from './json-rpc.decorators.js';
+import { JsonRpcConfig } from './json-rpc.module.js';
 
 class JsonRpcServerError extends Error {
   constructor(message: string) {

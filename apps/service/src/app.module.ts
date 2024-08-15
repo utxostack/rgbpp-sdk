@@ -1,17 +1,18 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import JsonRpcModule from './json-rpc/json-rpc.module';
-import { RgbppModule } from './rgbpp/rgbpp.module';
-import { AppService } from './app.service';
-import { envSchema } from './env';
+import { BtcAssetsApi } from 'rgbpp/service';
 import { BTCTestnetType, Collector } from 'rgbpp/ckb';
-import { BtcAssetsApi } from 'rgbpp';
+import JsonRpcModule from './json-rpc/json-rpc.module.js';
+import { RgbppModule } from './rgbpp/rgbpp.module.js';
+import { AppService } from './app.service.js';
+import { envSchema } from './env.js';
 
 @Global()
 @Module({
   imports: [
     ConfigModule.forRoot({
       validate: envSchema.parse,
+      envFilePath: ['.env', '.env.local'],
     }),
     JsonRpcModule.forRoot({
       path: '/json-rpc',
@@ -31,7 +32,7 @@ import { BtcAssetsApi } from 'rgbpp';
       inject: [ConfigService],
     },
     {
-      provide: 'COLLECTOR',
+      provide: 'CKB_COLLECTOR',
       useFactory: (configService: ConfigService) => {
         const ckbRpcUrl = configService.get('CKB_RPC_URL');
         return new Collector({
@@ -52,6 +53,6 @@ import { BtcAssetsApi } from 'rgbpp';
       inject: [ConfigService],
     },
   ],
-  exports: ['IS_MAINNET', 'COLLECTOR', 'BTC_ASSETS_API', 'BTC_TESTNET_TYPE'],
+  exports: ['IS_MAINNET', 'CKB_COLLECTOR', 'BTC_ASSETS_API', 'BTC_TESTNET_TYPE'],
 })
 export class AppModule {}
