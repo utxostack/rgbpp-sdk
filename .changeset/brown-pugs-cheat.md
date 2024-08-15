@@ -1,7 +1,7 @@
 ---
-'rgbpp': major
-'@rgbpp-sdk/btc': major
-'@rgbpp-sdk/ckb': major
+'rgbpp': minor
+'@rgbpp-sdk/btc': minor
+'@rgbpp-sdk/ckb': minor
 '@rgbpp-sdk/service': minor
 ---
 
