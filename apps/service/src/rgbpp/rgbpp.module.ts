@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { RgbppService } from './rgbpp.service.js';
+import { RgbppService } from './rgbpp.service';
 
 @Module({
   imports: [],

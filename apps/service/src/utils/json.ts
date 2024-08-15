@@ -1,4 +1,4 @@
-import isPlainObject from 'lodash/isPlainObject.js';
+import isPlainObject from 'lodash/isPlainObject';
 
 export function ensureSafeJson<Input extends object, Output = Input>(json: Input): Output {
   if (!isPlainObject(json) && !Array.isArray(json)) {

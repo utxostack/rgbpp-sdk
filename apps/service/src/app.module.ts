@@ -2,10 +2,10 @@ import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BtcAssetsApi } from 'rgbpp/service';
 import { BTCTestnetType, Collector } from 'rgbpp/ckb';
-import JsonRpcModule from './json-rpc/json-rpc.module.js';
-import { RgbppModule } from './rgbpp/rgbpp.module.js';
-import { AppService } from './app.service.js';
-import { envSchema } from './env.js';
+import JsonRpcModule from './json-rpc/json-rpc.module';
+import { RgbppModule } from './rgbpp/rgbpp.module';
+import { AppService } from './app.service';
+import { envSchema } from './env';
 
 @Global()
 @Module({
