@@ -2,7 +2,13 @@ import { Inject } from '@nestjs/common';
 import { DataSource, NetworkType } from 'rgbpp/btc';
 import { BtcAssetsApi, RgbppApiTransactionState } from 'rgbpp/service';
 import { BTCTestnetType, Collector, Hex, append0x } from 'rgbpp/ckb';
-import { buildRgbppTransferTx, buildRgbppTransferAllTxs } from 'rgbpp';
+import {
+  buildRgbppTransferTx,
+  buildRgbppTransferAllTxs,
+  sendRgbppTxGroups,
+  RgbppTxGroup,
+  SentRgbppTxGroup,
+} from 'rgbpp';
 import { RpcHandler, RpcMethodHandler } from '../json-rpc/json-rpc.decorators.js';
 import { toSnakeCase, toCamelCase, SnakeCased } from '../utils/case.js';
 import { ensureSafeJson } from '../utils/json.js';
@@ -126,5 +132,13 @@ export class RgbppService {
     const { txHex } = toCamelCase(request[0]);
     const { txid } = await this.btcAssetsApi.sendBtcTransaction(txHex);
     return txid;
+  }
+
+  @RpcMethodHandler({ name: 'send_rgbpp_group_txs' })
+  public async sendRgbppGroupTxs(request: [RgbppTxGroup[]]): Promise<SnakeCased<SentRgbppTxGroup>[]> {
+    const txGroups = toCamelCase(request[0]);
+    const sentGroups = await sendRgbppTxGroups({ txGroups, btcService: this.btcAssetsApi });
+    const result = sentGroups.map((group) => toSnakeCase<SentRgbppTxGroup>(group));
+    return result;
   }
 }
