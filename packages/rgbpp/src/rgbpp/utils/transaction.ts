@@ -25,6 +25,7 @@ export async function sendRgbppTxGroups(props: {
       });
       results.push({ btcTxId: txid });
     } catch (e) {
+      console.error(e);
       if (e instanceof BtcAssetsApiError) {
         results.push({ error: e.message });
       } else {
