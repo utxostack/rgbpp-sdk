@@ -88,7 +88,7 @@ export class RgbppService {
     return transactions.map(({ ckb, btc }) =>
       toSnakeCase<RgbppTransferAllResp>({
         ckbVirtualTxResult: JSON.stringify(ckb.virtualTxResult),
-        psbtHex: btc.psbtHex,
+        btcPsbtHex: btc.psbtHex,
         btcFeeRate: btc.feeRate,
         btcFee: btc.fee,
       }),
