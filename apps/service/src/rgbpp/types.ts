@@ -73,7 +73,7 @@ export interface RgbppTransferAllReq {
 
 export interface RgbppTransferAllResp {
   ckbVirtualTxResult: string;
-  psbtHex: string;
+  btcPsbtHex: string;
   btcFeeRate: number;
   btcFee: number;
 }
