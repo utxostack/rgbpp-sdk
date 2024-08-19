@@ -1,5 +1,31 @@
 # @rgbpp-sdk/ckb
 
+## 0.6.0
+
+### Minor Changes
+
+- [#281](https://github.com/ckb-cell/rgbpp-sdk/pull/281): Upgrade ckb-sdk-js to fix esm and commonjs issues ([@duanyytop](https://github.com/duanyytop))
+
+- [#246](https://github.com/ckb-cell/rgbpp-sdk/pull/246): Export ESM packages ([@duanyytop](https://github.com/duanyytop))
+
+- [#270](https://github.com/ckb-cell/rgbpp-sdk/pull/270): Support for batch transferring of RGBPP XUDT assets ([@ShookLyngs](https://github.com/ShookLyngs))
+
+  - Add `buildRgbppTransferAllTxs()` API in the rgbpp lib for generating one or more BTC/CKB transaction groups for transferring the entire amount of a specific type of RGBPP XUDT asset from one or more BTC addresses to a recipient
+  - Add `sendRgbppTxGroups()` API in the rgbpp lib for sending BTC/CKB transaction groups to the `BtcAssetsApi`
+  - Add `unpackRgbppLockArgs()` API in the ckb lib for unpacking the lock script args of an RGBPP Cell
+  - Add `encodeCellId()` and `decodeCellId()` APIs in the ckb lib for handling the ID of a CKB Cell
+  - Add `encodeUtxoId()` and `decodeUtxoId()` APIs in the btc lib for handling the ID of a BTC UTXO
+
+### Patch Changes
+
+- [#279](https://github.com/ckb-cell/rgbpp-sdk/pull/279): fix: Update molecule codegen, packing and unpacking ([@duanyytop](https://github.com/duanyytop))
+
+  - Generate molecule code with latest lumos/molecule
+  - Update RGB++ witness and BTC time lock args packing and unpacking
+
+- Updated dependencies [[`82d37ab`](https://github.com/ckb-cell/rgbpp-sdk/commit/82d37ab56fc2c2c1dd0437f44966380bae6c9b42), [`a2722c5`](https://github.com/ckb-cell/rgbpp-sdk/commit/a2722c535efa04c9a9a8147228c82957fe33143d)]:
+  - @rgbpp-sdk/service@0.6.0
+
 ## v0.5.0
 
 ### Minor Changes
