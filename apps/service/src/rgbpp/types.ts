@@ -1,4 +1,3 @@
-import { RgbppTransferAllTxGroup, RgbppTransferAllTxsResult } from 'rgbpp';
 import { AddressToPubkeyMap } from 'rgbpp/btc';
 import { Hex } from 'rgbpp/ckb';
 
@@ -72,12 +71,9 @@ export interface RgbppTransferAllReq {
   };
 }
 
-export interface RgbppTransferAllRes extends Omit<RgbppTransferAllTxsResult, 'transactions'> {
-  transactions: RgbppTransferAllGroupWithStringCkbVtx[];
-}
-
-export interface RgbppTransferAllGroupWithStringCkbVtx extends Omit<RgbppTransferAllTxGroup, 'ckb'> {
-  ckb: Omit<RgbppTransferAllTxGroup['ckb'], 'virtualTxResult'> & {
-    virtualTxResult: string;
-  };
+export interface RgbppTransferAllResp {
+  ckbVirtualTxResult: string;
+  btcPsbtHex: string;
+  btcFeeRate: number;
+  btcFee: number;
 }

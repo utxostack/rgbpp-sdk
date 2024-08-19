@@ -1,5 +1,5 @@
 import { BaseCkbVirtualTxResult } from '@rgbpp-sdk/ckb';
-import { BtcAssetsApi } from '@rgbpp-sdk/service';
+import { BtcAssetsApi, BtcAssetsApiError } from '@rgbpp-sdk/service';
 
 export interface RgbppTxGroup {
   ckbVirtualTxResult: BaseCkbVirtualTxResult | string;
@@ -7,13 +7,8 @@ export interface RgbppTxGroup {
 }
 
 export interface SentRgbppTxGroup {
-  btc: {
-    txId?: string;
-    error?: Error | unknown;
-  };
-  ckb: {
-    error?: Error | unknown;
-  };
+  btcTxId?: string;
+  error?: string;
 }
 
 export async function sendRgbppTxGroups(props: {
@@ -22,25 +17,21 @@ export async function sendRgbppTxGroups(props: {
 }): Promise<SentRgbppTxGroup[]> {
   const results: SentRgbppTxGroup[] = [];
   for (const group of props.txGroups) {
-    const result: SentRgbppTxGroup = {
-      ckb: {},
-      btc: {},
-    };
     try {
-      const sent = await props.btcService.sendBtcTransaction(group.btcTxHex);
-      result.btc.txId = sent.txid;
-    } catch (e) {
-      result.btc.error = e;
-    }
-    try {
+      const { txid } = await props.btcService.sendBtcTransaction(group.btcTxHex);
       await props.btcService.sendRgbppCkbTransaction({
-        btc_txid: result.btc.txId!,
+        btc_txid: txid,
         ckb_virtual_result: group.ckbVirtualTxResult,
       });
+      results.push({ btcTxId: txid });
     } catch (e) {
-      result.ckb.error = e;
+      console.error(e);
+      if (e instanceof BtcAssetsApiError) {
+        results.push({ error: e.message });
+      } else {
+        results.push({ error: 'Sending the RGB++ group transactions failed' });
+      }
     }
-    results.push(result);
   }
 
   return results;

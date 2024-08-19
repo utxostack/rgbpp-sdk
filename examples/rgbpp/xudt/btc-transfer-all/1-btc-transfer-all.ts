@@ -35,7 +35,7 @@ const rgbppTransferAllTxs = async ({ xudtTypeArgs, fromAddress, toAddress }: Tes
       const psbt = bitcoin.Psbt.fromHex(group.btc.psbtHex);
 
       // Sign transactions
-      await signPsbt(psbt, btcAccount);
+      signPsbt(psbt, btcAccount);
 
       psbt.finalizeAllInputs();
 
