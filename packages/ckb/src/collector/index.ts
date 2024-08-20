@@ -1,10 +1,9 @@
 import axios from 'axios';
 import CKB from '@nervosnetwork/ckb-sdk-core';
-import { toCamelcase } from '../utils/case-parser';
 import { CollectConfig, CollectResult, CollectUdtResult, IndexerCell } from '../types/collector';
 import { MIN_CAPACITY } from '../constants';
 import { CapacityNotEnoughError, IndexerError, UdtAmountNotEnoughError } from '../error';
-import { isRgbppLockCellIgnoreChain, leToU128, remove0x } from '../utils';
+import { isRgbppLockCellIgnoreChain, leToU128, remove0x, toCamelcase } from '../utils';
 import { Hex } from '../types';
 
 interface IndexerScript {
@@ -169,7 +168,6 @@ export class Collector {
 
   async getLiveCells(outPoints: CKBComponents.OutPoint[], withData = false): Promise<CKBComponents.LiveCell[]> {
     const ckb = new CKB(this.ckbNodeUrl);
-    /* @ts-expect-error The parameters data types of batch request don't support boolean */
     const batch = ckb.rpc.createBatchRequest(outPoints.map((outPoint) => ['getLiveCell', outPoint, withData]));
     return batch.exec().then((liveCells) => liveCells.map((liveCell) => liveCell.cell));
   }

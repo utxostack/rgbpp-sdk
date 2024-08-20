@@ -1,34 +1,20 @@
 {
-  "ts-node": {
-    // these options are overrides used only by ts-node
-    // same as the --compilerOptions flag and the TS_NODE_COMPILER_OPTIONS environment variable
-    "compilerOptions": {
-      "module": "CommonJS"
-    }
-  },
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "target": "ES2015",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "module": "ES2020",
-    "outDir": "./lib",
-    "composite": false,
-    "resolveJsonModule": true,
-    "strictNullChecks": true,
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "strict": true,
     "noEmit": true,
-    "declaration": true,
-    "declarationMap": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "inlineSources": false,
-    "isolatedModules": true,
-    "moduleResolution": "node",
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "preserveWatchOutput": true,
+    "allowJs": true,
+    "sourceMap": true,
     "skipLibCheck": true,
-    "strict": true
+    "esModuleInterop": true,
+    "strictNullChecks": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "**/*.spec.ts", "example"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "**/*.spec.ts", "example"],
 }

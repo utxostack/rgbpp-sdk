@@ -30,7 +30,7 @@ CKB_INDEXER_URL=https://testnet.ckb.dev/indexer
 ### Issue xUDT on CKB
 
 ```shell
-npx ts-node 1-issue-xudt.ts 
+npx tsx 1-issue-xudt.ts 
 ```
 
 ### Mint/Transfer xUDT on CKB
@@ -38,5 +38,5 @@ npx ts-node 1-issue-xudt.ts
 You can use this command to mint or transfer xUDT assets
 
 ```shell
-npx ts-node 2-transfer-xudt.ts 
+npx tsx 2-transfer-xudt.ts 
 ```

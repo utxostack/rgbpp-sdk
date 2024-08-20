@@ -1,4 +1,5 @@
 import { sha256 } from 'js-sha256';
+import { RgbppApiSpvProof } from '@rgbpp-sdk/service';
 import { BTCTestnetType, Hex, IndexerCell, RgbppCkbVirtualTx, RgbppTokenInfo, SpvClientCellTxProof } from '../types';
 import { append0x, remove0x, reverseHex, u32ToLe, u8ToHex, utf8ToHex } from './hex';
 import {
@@ -9,18 +10,10 @@ import {
   getBtcTimeLockScript,
   getRgbppLockScript,
 } from '../constants';
-import {
-  bytesToHex,
-  hexToBytes,
-  serializeOutPoint,
-  serializeOutput,
-  serializeScript,
-} from '@nervosnetwork/ckb-sdk-utils';
+import { RGBPPLock } from '../schemas/generated/rgbpp';
 import { BTCTimeLock } from '../schemas/generated/rgbpp';
 import { Script } from '../schemas/generated/blockchain';
-import { blockchain } from '@ckb-lumos/base';
-import { bytes } from '@ckb-lumos/codec';
-import { RgbppApiSpvProof } from '@rgbpp-sdk/service';
+import { BytesLike } from '@ckb-lumos/codec';
 import { toCamelcase } from './case-parser';
 import {
   InputsOrOutputsLenError,
@@ -29,6 +22,15 @@ import {
   RgbppUtxoBindMultiTypeAssetsError,
 } from '../error';
 import { calculateRgbppCellCapacity, isScriptEqual, isUDTTypeSupported } from './ckb-tx';
+import { blockchain } from '@ckb-lumos/base';
+import {
+  bytesToHex,
+  hexToBytes,
+  serializeOutPoint,
+  serializeOutput,
+  serializeScript,
+} from '@nervosnetwork/ckb-sdk-utils';
+import { HashType } from '../schemas/customized';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean, btcTestnetType?: BTCTestnetType) => {
   return {
@@ -113,7 +115,7 @@ export const lockScriptFromBtcTimeLockArgs = (args: Hex): CKBComponents.Script =
   const { lockScript } = BTCTimeLock.unpack(append0x(args));
   return {
     ...lockScript,
-    args: bytes.hexify(blockchain.Bytes.unpack(lockScript.args)),
+    hashType: HashType.unpack(lockScript.hashType),
   };
 };
 
@@ -122,10 +124,12 @@ export interface BTCTimeLockArgs {
   after: number;
 }
 export const btcTxIdAndAfterFromBtcTimeLockArgs = (args: Hex): BTCTimeLockArgs => {
-  const btcTimeLockArgs = BTCTimeLock.unpack(append0x(args));
+  const { btcTxid, after } = BTCTimeLock.unpack(append0x(args));
+  console.log(btcTxid);
+  console.log(after);
   return {
-    btcTxId: reverseHex(append0x(btcTimeLockArgs.btcTxid)),
-    after: btcTimeLockArgs.after,
+    btcTxId: reverseHex(append0x(btcTxid)),
+    after,
   };
 };
 
@@ -140,6 +144,18 @@ export const buildRgbppLockArgs = (outIndex: number, btcTxId: Hex): Hex => {
 
 export const buildPreLockArgs = (outIndex: number) => {
   return buildRgbppLockArgs(outIndex, RGBPP_TX_ID_PLACEHOLDER);
+};
+
+export interface RgbppLockArgs {
+  btcTxId: Hex;
+  outIndex: number;
+}
+export const unpackRgbppLockArgs = (source: BytesLike): RgbppLockArgs => {
+  const unpacked = RGBPPLock.unpack(source);
+  return {
+    btcTxId: reverseHex(unpacked.btcTxid),
+    outIndex: unpacked.outIndex,
+  };
 };
 
 export const compareInputs = (a: IndexerCell, b: IndexerCell) => {

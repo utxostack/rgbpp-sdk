@@ -1,5 +1,11 @@
-import { Collector, checkCkbTxInputsCapacitySufficient } from '@rgbpp-sdk/ckb';
-import { isRgbppLockCell, isBtcTimeLockCell, calculateCommitment } from '@rgbpp-sdk/ckb';
+import {
+  Collector,
+  isRgbppLockCell,
+  isBtcTimeLockCell,
+  calculateCommitment,
+  unpackRgbppLockArgs,
+  checkCkbTxInputsCapacitySufficient,
+} from '@rgbpp-sdk/ckb';
 import { bitcoin } from '../bitcoin';
 import { BaseOutput, Utxo } from '../transaction/utxo';
 import { AddressToPubkeyMap } from '../address';
@@ -8,7 +14,6 @@ import { NetworkType } from '../preset/types';
 import { ErrorCodes, TxBuildError } from '../error';
 import { InitOutput, TxAddressOutput, TxBuilder } from '../transaction/build';
 import { networkTypeToConfig } from '../preset/config';
-import { unpackRgbppLockArgs } from '../ckb/molecule';
 import { createSendUtxosBuilder } from './sendUtxos';
 import { limitPromiseBatchSize } from '../utils';
 
@@ -65,7 +70,7 @@ export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): P
     rgbppLockArgsList.map((rgbppLockArgs) => {
       if (rgbppLockArgs) {
         return limitPromiseBatchSize(() =>
-          props.source.getUtxo(rgbppLockArgs.btcTxid, rgbppLockArgs.outIndex, props.onlyConfirmedUtxos),
+          props.source.getUtxo(rgbppLockArgs.btcTxId, rgbppLockArgs.outIndex, props.onlyConfirmedUtxos),
         );
       }
       return undefined;
@@ -85,7 +90,7 @@ export async function createSendRgbppUtxosBuilder(props: SendRgbppUtxosProps): P
       if (!utxo) {
         throw TxBuildError.withComment(
           ErrorCodes.CANNOT_FIND_UTXO,
-          `hash: ${rgbppLockArgs.btcTxid}, index: ${rgbppLockArgs.outIndex}`,
+          `hash: ${rgbppLockArgs.btcTxId}, index: ${rgbppLockArgs.outIndex}`,
         );
       }
 

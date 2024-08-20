@@ -24,13 +24,12 @@ import {
   genBtcTimeLockArgs,
   lockScriptFromBtcTimeLockArgs,
   transformSpvProof,
+  buildSpvClientCellDep,
 } from '../utils';
-import { buildSpvClientCellDep } from '../utils';
-import { blockchain } from '@ckb-lumos/base';
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 
 export const buildBtcTimeUnlockWitness = (btcTxProof: Hex): Hex => {
-  const btcTimeUnlock = BTCTimeUnlock.pack({ btcTxProof: blockchain.Bytes.pack(btcTxProof) });
+  const btcTimeUnlock = BTCTimeUnlock.pack({ btcTxProof });
   return append0x(bytesToHex(btcTimeUnlock));
 };
 

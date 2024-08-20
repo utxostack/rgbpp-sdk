@@ -19,12 +19,12 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 21
 
       - uses: pnpm/action-setup@v3
         name: Install -g pnpm
         with:
-          version: 8
+          version: 9
           run_install: false
 
       - name: Get pnpm store directory
@@ -47,11 +47,16 @@ jobs:
         run: pnpm run build:packages
 
       - name: Lint packages
-        run: pnpm run lint:packages
+        run: pnpm run lint
         
-      - name: Run tests for packages
+      - name: Run unit tests for the packages
         run: pnpm run test:packages
         env:
+          VITE_CKB_NODE_URL: https://testnet.ckb.dev/rpc
+          VITE_CKB_INDEXER_URL: https://testnet.ckb.dev/indexer
           VITE_BTC_SERVICE_URL: https://btc-assets-api.testnet.mibao.pro
           VITE_BTC_SERVICE_TOKEN: ${{ secrets.TESTNET_SERVICE_TOKEN }}
           VITE_BTC_SERVICE_ORIGIN: https://btc-assets-api.testnet.mibao.pro
+
+      - name: Run unit tests for the rgbpp-sdk-service
+        run: pnpm run test:service

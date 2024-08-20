@@ -6,8 +6,14 @@ import {
   calculateTransactionFee,
   fetchTypeIdCellDeps,
   isClusterSporeTypeSupported,
+  buildPreLockArgs,
+  calculateCommitment,
+  genRgbppLockScript,
+  generateSporeCreateCoBuild,
+  generateSporeId,
+  generateSporeTransferCoBuild,
+  throwErrorWhenSporeCellsInvalid,
 } from '../utils';
-import { buildPreLockArgs, calculateCommitment, genRgbppLockScript } from '../utils/rgbpp';
 import {
   AppendIssuerCellToSporeCreate,
   BuildAppendingIssuerCellTxParams,
@@ -30,17 +36,12 @@ import {
   getSporeTypeScript,
 } from '../constants';
 import {
-  generateSporeCreateCoBuild,
-  generateSporeId,
-  generateSporeTransferCoBuild,
-  throwErrorWhenSporeCellsInvalid,
-} from '../utils/spore';
-import {
   NoLiveCellError,
   NoRgbppLiveCellError,
   RgbppUtxoBindMultiTypeAssetsError,
   TypeAssetNotSupportedError,
 } from '../error';
+import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 import {
   addressToScript,
   bytesToHex,
@@ -49,7 +50,6 @@ import {
   scriptToHash,
   serializeWitnessArgs,
 } from '@nervosnetwork/ckb-sdk-utils';
-import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 
 /**
  * Generate the virtual ckb transaction for creating spores

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { accounts, config, network, service, source } from './shared/env';
 import { expectPsbtFeeInRange, signAndBroadcastPsbt, waitFor } from './shared/utils';
-import { bitcoin, ErrorMessages, ErrorCodes, AddressType } from '../src';
+import { bitcoin, ErrorMessages, ErrorCodes, AddressType, TxBuilder, TxBuildError } from '../src';
 import { createSendUtxosBuilder, createSendBtcBuilder, sendBtc, sendUtxos, sendRbf, tweakSigner } from '../src';
 
 const STATIC_FEE_RATE = 1;
@@ -148,6 +148,25 @@ describe('Transaction', () => {
       // const tx = psbt.extractTransaction();
       // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
+    });
+    it('Try insufficient-balance transfer, and check error.context', async () => {
+      try {
+        await createSendBtcBuilder({
+          from: accounts.charlie.p2wpkh.address,
+          tos: [
+            {
+              address: accounts.charlie.p2wpkh.address,
+              value: 1_0000_0000_0000,
+            },
+          ],
+          feeRate: STATIC_FEE_RATE,
+          source,
+        });
+      } catch (e) {
+        expect(e).toBeInstanceOf(TxBuildError);
+        expect(e.context).toBeDefined();
+        expect(e.context.tx).toBeInstanceOf(TxBuilder);
+      }
     });
   });
 

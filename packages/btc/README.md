@@ -17,7 +17,7 @@ $ yarn add @rgbpp-sdk/btc
 $ pnpm add @rgbpp-sdk/btc
 ```
 
-## Transaction
+## Transactions
 
 ### Transfer BTC from a `P2WPKH` address
 
@@ -247,6 +247,22 @@ const psbt = await sendRbf({
   requireGreaterFeeAndRate: true, // optional, default to true, require the fee rate&amount to be greater than the original transction
   source,
 });
+```
+
+## Errors
+
+### Visit context of the TxBuildError
+
+When you catch a `TxBuildError` error after calling the BTC Builder APIs (`sendBtc`, `sendUtxos`, etc), you can access the `e.context` object for error tracing, where it should contain a `tx` property that is a `TxBuilder` object:
+
+```typescript
+try {
+  await sendBtc({ ... });
+} catch (e) {
+  if (e instanceof TxBuildError) {
+    console.log(e.context.tx); // TxBuilder object for error tracing
+  }
+}
 ```
 
 ## Types

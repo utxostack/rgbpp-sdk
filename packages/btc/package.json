@@ -1,24 +1,36 @@
 {
   "name": "@rgbpp-sdk/btc",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "scripts": {
     "test": "vitest",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsup",
     "lint": "tsc && eslint '{src,tests}/**/*.{js,ts}' && prettier --check '{src,tests}/**/*.{js,ts}'",
-    "lint:fix": "tsc && eslint --fix '{src,tests}/**/*.{js,ts}' && prettier --write '{src,tests}/**/*.{js,ts}'",
-    "clean": "pnpm run clean:cache & pnpm run clean:build",
-    "clean:build": "rimraf lib && pnpm run clean:buildinfo",
-    "clean:buildinfo": "rimraf tsconfig.*tsbuildinfo",
-    "clean:cache": "rimraf .turbo"
+    "lint:fix": "tsc && eslint --fix '{src,tests}/**/*.{js,ts}' && prettier --write '{src,tests}/**/*.{js,ts}'"
   },
-  "main": "lib",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.js",
+        "default": "./dist/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
-    "lib"
+    "src",
+    "dist"
   ],
   "dependencies": {
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@ckb-lumos/codec": "0.22.2",
-    "@nervosnetwork/ckb-types": "0.109.1",
+    "@nervosnetwork/ckb-types": "0.109.3",
     "@rgbpp-sdk/ckb": "workspace:^",
     "@rgbpp-sdk/service": "workspace:^",
     "bip32": "^4.0.0",
@@ -26,10 +38,6 @@
     "ecpair": "^2.1.0",
     "lodash": "^4.17.21",
     "p-limit": "^3.1.0"
-  },
-  "devDependencies": {
-    "@types/lodash": "^4.17.0",
-    "vitest": "^1.4.0"
   },
   "publishConfig": {
     "access": "public"

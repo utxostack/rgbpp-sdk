@@ -63,7 +63,8 @@ This repository offers utilities for Bitcoin and RGB++ asset integration.
 
 ### Notes
 
-- `Bitcoin/RGB++ Assets Service` is designed to streamline the transaction workflow. Developers have the option to implement its features by themselves without limitation.
+- [`Bitcoin/RGB++ Assets Service`](https://github.com/ckb-cell/btc-assets-api) is an open-source project designed to streamline the transaction workflow for Bitcoin and RGB++ Assets. Developers have the option to enhance it by implementing its features by themselves without limitations. 
+- For those who prefer to deploy their own `Bitcoin/RGB++ Assets Service`, please follow the instructions at the [Deployment](https://github.com/ckb-cell/btc-assets-api#deployment) section in the btc-assets-api repository.
 
 
 ## FAQ

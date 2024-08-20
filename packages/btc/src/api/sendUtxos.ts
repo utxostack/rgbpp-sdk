@@ -3,6 +3,7 @@ import { DataSource } from '../query/source';
 import { TxBuilder, InitOutput } from '../transaction/build';
 import { BaseOutput, Utxo, prepareUtxoInputs } from '../transaction/utxo';
 import { AddressToPubkeyMap, addAddressToPubkeyMap } from '../address';
+import { TxBuildError } from '../error';
 
 export interface SendUtxosProps {
   inputs: Utxo[];
@@ -34,34 +35,43 @@ export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
     onlyConfirmedUtxos: props.onlyConfirmedUtxos,
   });
 
-  // Prepare the UTXO inputs:
-  // 1. Fill pubkey for each P2TR UTXO, and throw if the corresponding pubkey is not found
-  // 2. Throw if unconfirmed UTXOs are found (if onlyConfirmedUtxos == true && skipInputsValidation == false)
-  const pubkeyMap = addAddressToPubkeyMap(props.pubkeyMap ?? {}, props.from, props.fromPubkey);
-  const inputs = await prepareUtxoInputs({
-    utxos: props.inputs,
-    source: props.source,
-    requireConfirmed: props.onlyConfirmedUtxos && !props.skipInputsValidation,
-    requirePubkey: true,
-    pubkeyMap,
-  });
+  try {
+    // Prepare the UTXO inputs:
+    // 1. Fill pubkey for each P2TR UTXO, and throw if the corresponding pubkey is not found
+    // 2. Throw if unconfirmed UTXOs are found (if onlyConfirmedUtxos == true && skipInputsValidation == false)
+    const pubkeyMap = addAddressToPubkeyMap(props.pubkeyMap ?? {}, props.from, props.fromPubkey);
+    const inputs = await prepareUtxoInputs({
+      utxos: props.inputs,
+      source: props.source,
+      requireConfirmed: props.onlyConfirmedUtxos && !props.skipInputsValidation,
+      requirePubkey: true,
+      pubkeyMap,
+    });
 
-  tx.addInputs(inputs);
-  tx.addOutputs(props.outputs);
+    tx.addInputs(inputs);
+    tx.addOutputs(props.outputs);
 
-  const paid = await tx.payFee({
-    address: props.from,
-    publicKey: pubkeyMap[props.from],
-    changeAddress: props.changeAddress,
-    excludeUtxos: props.excludeUtxos,
-  });
+    const paid = await tx.payFee({
+      address: props.from,
+      publicKey: pubkeyMap[props.from],
+      changeAddress: props.changeAddress,
+      excludeUtxos: props.excludeUtxos,
+    });
 
-  return {
-    builder: tx,
-    fee: paid.fee,
-    feeRate: paid.feeRate,
-    changeIndex: paid.changeIndex,
-  };
+    return {
+      builder: tx,
+      fee: paid.fee,
+      feeRate: paid.feeRate,
+      changeIndex: paid.changeIndex,
+    };
+  } catch (e) {
+    // When caught TxBuildError, add TxBuilder as the context
+    if (e instanceof TxBuildError) {
+      e.setContext({ tx });
+    }
+
+    throw e;
+  }
 }
 
 export async function sendUtxos(props: SendUtxosProps): Promise<bitcoin.Psbt> {

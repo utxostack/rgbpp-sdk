@@ -3,12 +3,9 @@
 import { bytes, createBytesCodec, createFixedBytesCodec, molecule } from '@ckb-lumos/codec';
 import { Uint32, Uint64, Uint128, DepType, HashType } from '../customized';
 
-const { array, vector, union, option, struct, table } = molecule;
+const { array, vector, union, option, struct, table, byteVecOf } = molecule;
 
-const fallbackBytesCodec = createBytesCodec({
-  pack: bytes.bytify,
-  unpack: bytes.hexify,
-});
+const fallbackBytesCodec = byteVecOf({ pack: bytes.bytify, unpack: bytes.hexify });
 
 function createFallbackFixedBytesCodec(byteLength: number) {
   return createFixedBytesCodec({
@@ -41,7 +38,7 @@ export const ProposalShortIdVec = vector(ProposalShortId);
 export const Script = table(
   {
     codeHash: Byte32,
-    hashType: HashType,
+    hashType: byte,
     args: Bytes,
   },
   ['codeHash', 'hashType', 'args'],
@@ -66,7 +63,7 @@ export const CellInput = struct(
 export const CellDep = struct(
   {
     outPoint: OutPoint,
-    depType: DepType,
+    depType: byte,
   },
   ['outPoint', 'depType'],
 );

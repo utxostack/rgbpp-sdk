@@ -1,5 +1,13 @@
 # @rgbpp-sdk/service
 
+## 0.6.0
+
+### Minor Changes
+
+- [#281](https://github.com/ckb-cell/rgbpp-sdk/pull/281): Upgrade ckb-sdk-js to fix esm and commonjs issues ([@duanyytop](https://github.com/duanyytop))
+
+- [#246](https://github.com/ckb-cell/rgbpp-sdk/pull/246): Export ESM packages ([@duanyytop](https://github.com/duanyytop))
+
 ## v0.5.0
 
 ### Minor Changes
