@@ -398,7 +398,7 @@ interface RgbppApiActivity {
     btcTx: BtcApiTransaction;
     isRgbpp: boolean;
     isomorphicTx?: {
-      ckbRawTx?: CKBComponents.RawTransaction;
+      ckbVirtualTx?: CKBComponents.RawTransaction;
       ckbTx?: CKBComponents.Transaction;
       inputs?: CKBComponents.CellOutput[];
       outputs?: CKBComponents.CellOutput[];
