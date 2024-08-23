@@ -15,7 +15,7 @@ export interface BtcApis {
 export interface BtcApiBlockchainInfo {
   chain: string;
   blocks: number;
-  bestblockhash: number;
+  bestblockhash: string;
   difficulty: number;
   mediantime: number;
 }
