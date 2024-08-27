@@ -8,7 +8,7 @@
     "format": "prettier --write '**/*.{js,ts}'",
     "lint": "tsc && eslint . && prettier --check '**/*.{js,ts}'",
     "lint:fix": "tsc && eslint --fix --ext .js,.ts . && prettier --write '**/*.{js,ts}'",
-    "integration:xudt": "npx tsx shared/prepare-utxo.ts && npx tsx xudt/xudt-on-ckb/1-issue-xudt.ts && npx tsx xudt/xudt-on-ckb/2-transfer-xudt.ts && npx tsx xudt/1-ckb-leap-btc.ts && npx tsx xudt/2-btc-transfer.ts && npx tsx xudt/3-btc-leap-ckb.ts",
+    "integration:xudt": "npx tsx shared/prepare-utxo.ts && npx tsx xudt/xudt-on-ckb/1-issue-xudt.ts && npx tsx xudt/xudt-on-ckb/2-transfer-xudt.ts && npx tsx xudt/1-ckb-leap-btc.ts && npx tsx xudt/2-btc-transfer.ts && npx tsx xudt/3-btc-leap-ckb.ts $$ npx tsx xudt/btc-transfer-all/1-btc-transfer-all.ts",
     "integration:spore": "npx tsx shared/prepare-utxo.ts && npx tsx spore/launch/1-prepare-cluster.ts && npx tsx spore/launch/2-create-cluster.ts && npx tsx spore/launch/3-create-spores.ts && npx tsx spore/4-transfer-spore.ts && npx tsx spore/5-leap-spore-to-ckb.ts"
   },
   "dependencies": {
