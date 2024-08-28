@@ -1,4 +1,5 @@
 import { Cell, Hash, Script } from '@ckb-lumos/base';
+import { BtcApiTransaction } from './btc';
 
 export interface RgbppApis {
   getRgbppPaymasterInfo(): Promise<RgbppApiPaymasterInfo>;
@@ -8,6 +9,7 @@ export interface RgbppApis {
   getRgbppAssetsByBtcUtxo(btcTxId: string, vout: number): Promise<RgbppCell[]>;
   getRgbppAssetsByBtcAddress(btcAddress: string, params?: RgbppApiAssetsByAddressParams): Promise<RgbppCell[]>;
   getRgbppBalanceByBtcAddress(btcAddress: string, params?: RgbppApiBalanceByAddressParams): Promise<RgbppApiBalance>;
+  getRgbppActivityByBtcAddress(btcAddress: string, params?: RgbppApiActivityByAddressParams): Promise<RgbppApiActivity>;
   getRgbppSpvProof(btcTxId: string, confirmations: number): Promise<RgbppApiSpvProof>;
   sendRgbppCkbTransaction(payload: RgbppApiSendCkbTransactionPayload): Promise<RgbppApiTransactionState>;
   retryRgbppCkbTransaction(payload: RgbppApiRetryCkbTransactionPayload): Promise<RgbppApiTransactionRetry>;
@@ -71,6 +73,29 @@ export interface RgbppApiXudtBalance {
   type_script: Script;
 }
 
+export interface RgbppApiActivityByAddressParams {
+  rgbpp_only?: boolean;
+  type_script?: string;
+  after_btc_txid?: string;
+}
+export interface RgbppApiActivity {
+  address: string;
+  cursor: string;
+  txs: {
+    btcTx: BtcApiTransaction;
+    isRgbpp: boolean;
+    isomorphicTx?: {
+      ckbVirtualTx?: CKBComponents.RawTransaction;
+      ckbTx?: CKBComponents.Transaction;
+      inputs?: CKBComponents.CellOutput[];
+      outputs?: CKBComponents.CellOutput[];
+      status: {
+        confirmed: boolean;
+      };
+    };
+  }[];
+}
+
 export interface RgbppApiSpvProof {
   proof: string;
   spv_client: {
@@ -81,15 +106,14 @@ export interface RgbppApiSpvProof {
 
 export interface RgbppApiSendCkbTransactionPayload {
   btc_txid: string;
-  // Support ckbVirtaulTxResult and it's JSON string as request parameter
-  ckb_virtual_result:
-    | {
-        ckbRawTx: CKBComponents.RawTransaction;
-        needPaymasterCell: boolean;
-        sumInputsCapacity: string;
-        commitment: string;
-      }
-    | string;
+  // Support ckbVirtualTxResult and it's JSON string as request parameter
+  ckb_virtual_result: RgbppApiSendCkbVirtualResult | string;
+}
+export interface RgbppApiSendCkbVirtualResult {
+  ckbRawTx: CKBComponents.RawTransaction;
+  needPaymasterCell: boolean;
+  sumInputsCapacity: string;
+  commitment: string;
 }
 
 export interface RgbppApiRetryCkbTransactionPayload {

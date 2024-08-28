@@ -146,7 +146,6 @@ describe(
       });
       it('getBtcTransactions()', async () => {
         const res = await service.getBtcTransactions(btcAddress);
-        console.log(res.map((tx) => tx.txid));
         expect(Array.isArray(res)).toBe(true);
         expect(res.length).toBeGreaterThan(0);
         res.forEach((transaction) => {
@@ -275,6 +274,30 @@ describe(
           expect(xudt.pending_amount).toBeTypeOf('string');
           expect(xudt.type_hash).toBeTypeOf('string');
           expectScript(xudt.type_script);
+        }
+      });
+      it('getRgbppActivityByBtcAddress()', async () => {
+        const res = await service.getRgbppActivityByBtcAddress(rgbppBtcAddress, {
+          type_script: rgbppCellType,
+        });
+        expect(res).toBeDefined();
+        expect(res.address).toBeTypeOf('string');
+        expect(res.cursor).toBeTypeOf('string');
+        expect(res.txs).toHaveProperty('length');
+        if (res.txs.length > 0) {
+          for (const tx of res.txs) {
+            expect(tx.btcTx).toBeDefined();
+            expect(tx.isRgbpp).toBeTypeOf('boolean');
+            if (tx.isRgbpp) {
+              expect(tx.isomorphicTx).toBeDefined();
+              expect(tx.isomorphicTx.status.confirmed).toBeTypeOf('boolean');
+              const hasTxOrVirtualTx = tx.isomorphicTx.ckbVirtualTx ?? tx.isomorphicTx.ckbTx;
+              if (hasTxOrVirtualTx) {
+                expect(tx.isomorphicTx.inputs).toBeDefined();
+                expect(tx.isomorphicTx.outputs).toBeDefined();
+              }
+            }
+          }
         }
       });
       it('getRgbppSpvProof()', async () => {
