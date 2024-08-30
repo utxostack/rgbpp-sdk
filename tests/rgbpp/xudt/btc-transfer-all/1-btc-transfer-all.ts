@@ -68,30 +68,38 @@ const rgbppTransferAllTxs = async ({ xudtTypeArgs, fromAddress, toAddress }: Tes
   console.log('Successful Transactions:', successfulTxIds.join('\n'));
 
   try {
-    for (const group of sentGroups) {
-      if (group.btcTxId) {
-        const btcTxId = group.btcTxId;
+    const interval = setInterval(async () => {
+      try {
+        const states = await Promise.all(
+          sentGroups
+            .filter((group) => group.btcTxId)
+            .map(async (group) => {
+              const btcTxId = group.btcTxId!;
+              const { state, failedReason } = await btcDataSource.service.getRgbppTransactionState(btcTxId);
+              return { btcTxId, state, failedReason };
+            }),
+        );
 
-        const interval = setInterval(async () => {
-          try {
-            const { state, failedReason } = await btcDataSource.service.getRgbppTransactionState(btcTxId);
-            console.log(`State for transaction ${btcTxId}: ${state}`);
-            if (state === 'completed' || state === 'failed') {
-              clearInterval(interval);
-              if (state === 'completed') {
-                const { txhash: txHash } = await btcDataSource.service.getRgbppTransactionHash(btcTxId);
-                console.info(`Rgbpp asset has been transferred on BTC and the related CKB tx hash is ${txHash}`);
-                console.info(`Explorer: https://pudge.explorer.nervos.org/transaction/${txHash}`);
-              } else {
-                console.warn(`Rgbpp CKB transaction failed and the reason is ${failedReason}`);
-              }
+        for (const { btcTxId, state, failedReason } of states) {
+          console.log(`State for transaction ${btcTxId}: ${state}`);
+          if (state === 'completed' || state === 'failed') {
+            if (state === 'completed') {
+              const { txhash: txHash } = await btcDataSource.service.getRgbppTransactionHash(btcTxId);
+              console.info(`Rgbpp asset has been transferred on BTC and the related CKB tx hash is ${txHash}`);
+              console.info(`Explorer: https://pudge.explorer.nervos.org/transaction/${txHash}`);
+            } else {
+              console.warn(`Rgbpp CKB transaction failed and the reason is ${failedReason}`);
             }
-          } catch (error) {
-            console.error(`Error checking state for transaction ${btcTxId}:`, error);
           }
-        }, 30 * 1000);
+        }
+
+        if (states.every(({ state }) => state === 'completed' || state === 'failed')) {
+          clearInterval(interval);
+        }
+      } catch (error) {
+        console.error('Error during transaction state tracking:', error);
       }
-    }
+    }, 30 * 1000);
   } catch (error) {
     console.error('Error during transaction state tracking:', error);
   }
