@@ -140,6 +140,7 @@ export class TxBuilder {
     address: string;
     publicKey?: string;
     changeAddress?: string;
+    noAssetsApiCache?: boolean;
     deductFromOutputs?: boolean;
     excludeUtxos?: BaseOutput[];
     feeRate?: number;
@@ -148,7 +149,7 @@ export class TxBuilder {
     feeRate: number;
     changeIndex: number;
   }> {
-    const { address, publicKey, feeRate, changeAddress, deductFromOutputs, excludeUtxos } = props;
+    const { address, publicKey, feeRate, changeAddress, noAssetsApiCache, deductFromOutputs, excludeUtxos } = props;
     const originalInputs = cloneDeep(this.inputs);
     const originalOutputs = cloneDeep(this.outputs);
 
@@ -189,6 +190,7 @@ export class TxBuilder {
           amount: returnAmount,
           fromAddress: address,
           fromPublicKey: publicKey,
+          noAssetsApiCache,
           internalCacheKey,
           excludeUtxos,
         });
@@ -205,6 +207,7 @@ export class TxBuilder {
           targetAmount,
           changeAddress,
           deductFromOutputs,
+          noAssetsApiCache,
           internalCacheKey,
           excludeUtxos,
         });
@@ -239,6 +242,7 @@ export class TxBuilder {
     changeAddress?: string;
     injectCollected?: boolean;
     deductFromOutputs?: boolean;
+    noAssetsApiCache?: boolean;
     internalCacheKey?: string;
     excludeUtxos?: BaseOutput[];
   }): Promise<{
@@ -271,7 +275,7 @@ export class TxBuilder {
         address: props.address,
         targetAmount: _targetAmount,
         allowInsufficient: true,
-        noAssetsApiCache: true,
+        noAssetsApiCache: props.noAssetsApiCache ?? true,
         internalCacheKey: props.internalCacheKey,
         minUtxoSatoshi: this.minUtxoSatoshi,
         onlyNonRgbppUtxos: this.onlyNonRgbppUtxos,
@@ -399,12 +403,13 @@ export class TxBuilder {
     address: string;
     fromAddress: string;
     fromPublicKey?: string;
+    noAssetsApiCache?: boolean;
     internalCacheKey?: string;
     excludeUtxos?: BaseOutput[];
   }): Promise<{
     changeIndex: number;
   }> {
-    const { address, fromAddress, fromPublicKey, amount, excludeUtxos, internalCacheKey } = props;
+    const { address, fromAddress, fromPublicKey, amount, noAssetsApiCache, excludeUtxos, internalCacheKey } = props;
 
     // If any (output.fixed != true) is found in the outputs (search in ASC order),
     // return the change value to the first matched output.
@@ -439,6 +444,7 @@ export class TxBuilder {
         changeAddress: address,
         injectCollected: true,
         deductFromOutputs: false,
+        noAssetsApiCache,
         internalCacheKey,
         excludeUtxos,
       });
