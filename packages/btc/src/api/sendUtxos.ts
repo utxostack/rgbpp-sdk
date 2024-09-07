@@ -14,6 +14,7 @@ export interface SendUtxosProps {
   fromPubkey?: string;
   changeAddress?: string;
   minUtxoSatoshi?: number;
+  noAssetsApiCache?: boolean;
   onlyConfirmedUtxos?: boolean;
   excludeUtxos?: BaseOutput[];
 
@@ -56,6 +57,7 @@ export async function createSendUtxosBuilder(props: SendUtxosProps): Promise<{
       publicKey: pubkeyMap[props.from],
       changeAddress: props.changeAddress,
       excludeUtxos: props.excludeUtxos,
+      noAssetsApiCache: props.noAssetsApiCache,
     });
 
     return {
