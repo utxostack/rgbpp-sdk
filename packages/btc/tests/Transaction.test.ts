@@ -981,6 +981,49 @@ describe('Transaction', () => {
       ).rejects.toHaveProperty('code', ErrorCodes.MISSING_PUBKEY);
     });
 
+    it('Transfer P2WPKH, fee > feeRange', async () => {
+      const expectFeeRate = 1.8;
+
+      const { builder, fee, feeRate } = await createSendUtxosBuilder({
+        from: accounts.charlie.p2wpkh.address,
+        inputs: new Array(30).fill(null).map((_, index) => {
+          return {
+            txid: '4e1e9f8ff4bf245793c05bf2da58bff812c332a296d93c6935fbc980d906e567',
+            vout: index,
+            value: 1000,
+            addressType: AddressType.P2WPKH,
+            address: accounts.charlie.p2wpkh.address,
+            scriptPk: accounts.charlie.p2wpkh.scriptPubkey.toString('hex'),
+          };
+        }),
+        outputs: [
+          {
+            address: accounts.charlie.p2wpkh.address,
+            value: 1000,
+            fixed: true,
+          },
+        ],
+        source,
+        feeRate: expectFeeRate,
+      });
+
+      // Get expected fee range (min and max)
+      const expectFee = await builder.calculateFee(feeRate);
+      const expectFeeRange = await builder.calculateFeeRange(feeRate);
+
+      // Sign & finalize inputs
+      const psbt = builder.toPsbt();
+      psbt.signAllInputs(accounts.charlie.keyPair);
+      psbt.finalizeAllInputs();
+
+      const paidFee = psbt.getFee();
+      expect(fee).toEqual(paidFee);
+      expect(fee).toEqual(expectFee);
+      expect(fee).toEqual(expectFeeRange.max);
+      expect(fee).toBeGreaterThanOrEqual(expectFeeRange.min);
+      expect(expectFeeRate).toBeGreaterThanOrEqual(feeRate);
+    });
+
     it('Try transfer non-existence UTXO', async () => {
       await expect(() =>
         sendUtxos({
