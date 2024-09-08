@@ -8,6 +8,7 @@ import { dataToOpReturnScriptPubkey, isOpReturnScriptPubkey } from './embed';
 import { networkTypeToConfig } from '../preset/config';
 import { BaseOutput, Utxo, utxoToInput } from './utxo';
 import { limitPromiseBatchSize } from '../utils';
+import { isP2wpkhScript } from '../script';
 import { FeeEstimator } from './fee';
 
 export interface TxInput {
@@ -212,11 +213,13 @@ export class TxBuilder {
         currentChangeIndex = changeIndex;
       }
 
-      // Calculate network fee
-      currentFee = await this.calculateFee(currentFeeRate);
+      // Calculate the worst case of the network fee range
+      const acceptableFees = await this.calculateFeeRange(currentFeeRate);
+      currentFee = acceptableFees.max;
 
-      // If (fee = previousFee ±1), the fee is considered acceptable/expected.
-      isFeeExpected = [-1, 0, 1].includes(currentFee - previousFee);
+      // If paid enough fee, the process is considered done
+      const paidFee = this.summary().inputsRemaining;
+      isFeeExpected = paidFee >= currentFee;
       if (!isLoopedOnce) {
         isLoopedOnce = true;
       }
@@ -471,20 +474,58 @@ export class TxBuilder {
   }
 
   async calculateFee(feeRate?: number): Promise<number> {
-    if (!feeRate && !this.feeRate) {
-      throw TxBuildError.withComment(ErrorCodes.INVALID_FEE_RATE, `${feeRate ?? this.feeRate}`);
-    }
-
-    const currentFeeRate = feeRate ?? this.feeRate!;
-
     const psbt = await this.createEstimatedPsbt();
     const tx = psbt.extractTransaction(true);
 
-    const inputs = tx.ins.length;
-    const weightWithWitness = tx.byteLength(true);
-    const weightWithoutWitness = tx.byteLength(false);
+    const withWitnessSize = tx.byteLength(true);
+    const withoutWitnessSize = tx.byteLength(false);
+    const witnessSize = withWitnessSize - withoutWitnessSize;
+    return this.calculateFeeWithSizes(withoutWitnessSize, witnessSize, feeRate);
+  }
 
-    const weight = weightWithoutWitness * 3 + weightWithWitness + inputs;
+  async calculateFeeRange(feeRate?: number): Promise<{
+    min: number;
+    max: number;
+  }> {
+    const psbt = await this.createEstimatedPsbt();
+    const tx = psbt.extractTransaction(true);
+
+    let derEncodings = 0;
+    let witnessSizeShift = 0;
+    this.inputs.forEach((input, index) => {
+      const script = input.utxo.scriptPk;
+      // https://learnmeabitcoin.com/technical/keys/signature/#:~:text=DER%20Encoding-,%23,-DER%20Signature
+      // https://github.com/bitcoinerlab/descriptors/blob/main/src/descriptors.ts#L987-L1002
+      if (isP2wpkhScript(script)) {
+        derEncodings += 1;
+        const witness = tx.ins[index].witness;
+        if (witness[0].byteLength > 71) {
+          witnessSizeShift -= 1;
+        }
+      }
+    });
+
+    const withWitnessSize = tx.byteLength(true);
+    const withoutWitnessSize = tx.byteLength(false);
+    const witnessSize = withWitnessSize - withoutWitnessSize;
+
+    const minWitnessSize = witnessSize + witnessSizeShift;
+    const maxWitnessSize = witnessSize + witnessSizeShift + derEncodings;
+    const minFeeRate = this.calculateFeeWithSizes(withoutWitnessSize, minWitnessSize, feeRate);
+    const maxFeeRate = this.calculateFeeWithSizes(withoutWitnessSize, maxWitnessSize, feeRate);
+    return {
+      min: minFeeRate,
+      max: maxFeeRate,
+    };
+  }
+
+  calculateFeeWithSizes(withoutWitnessSize: number, witnessSize: number, feeRate?: number) {
+    if (!feeRate && !this.feeRate) {
+      throw TxBuildError.withComment(ErrorCodes.INVALID_FEE_RATE, `${feeRate ?? this.feeRate}`);
+    }
+    const currentFeeRate = feeRate ?? this.feeRate!;
+
+    const weight = withoutWitnessSize * 4 + witnessSize;
     const virtualSize = Math.ceil(weight / 4);
     return Math.ceil(virtualSize * currentFeeRate);
   }

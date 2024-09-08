@@ -471,6 +471,45 @@ describe('Transaction', () => {
       // const res = await service.sendBtcTransaction(tx.toHex());
       // console.log(`explorer: https://mempool.space/testnet/tx/${res.txid}`);
     });
+    it('Transfer fixed P2WPKH UTXOs, fee > feeRange', async () => {
+      const { builder, fee, feeRate } = await createSendUtxosBuilder({
+        from: accounts.charlie.p2wpkh.address,
+        inputs: new Array(30).fill(null).map((_, index) => {
+          return {
+            txid: '4e1e9f8ff4bf245793c05bf2da58bff812c332a296d93c6935fbc980d906e567',
+            vout: index,
+            value: 1000,
+            addressType: AddressType.P2WPKH,
+            address: accounts.charlie.p2wpkh.address,
+            scriptPk: accounts.charlie.p2wpkh.scriptPubkey.toString('hex'),
+          };
+        }),
+        outputs: [
+          {
+            address: accounts.charlie.p2wpkh.address,
+            value: 1000,
+            fixed: true,
+          },
+        ],
+        source,
+        feeRate: 1.8,
+      });
+
+      // Get expected fee range (min and max)
+      const feeRange = await builder.calculateFeeRange(feeRate);
+
+      // Sign & finalize inputs
+      const psbt = builder.toPsbt();
+      psbt.signAllInputs(accounts.charlie.keyPair);
+      psbt.finalizeAllInputs();
+
+      const paidFee = psbt.getFee();
+      const paidFeeRate = psbt.getFeeRate();
+      expect(fee).toBeGreaterThanOrEqual(paidFee);
+      expect(fee).toBeGreaterThanOrEqual(feeRange.min);
+      expect(fee).toBeGreaterThanOrEqual(feeRange.max);
+      expect(feeRate).toBeGreaterThanOrEqual(paidFeeRate);
+    });
 
     it('Transfer protected UTXO, sum(ins) = sum(outs)', async () => {
       const psbt = await sendUtxos({
