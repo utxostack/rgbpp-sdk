@@ -30,7 +30,7 @@ const prepareUtxo = async (index: string | number) => {
   console.log(tx.toHex());
 
   const { txid: btcTxId } = await btcService.sendBtcTransaction(tx.toHex());
-  console.log(`explorer: https://mempool.space/testnet/tx/${btcTxId}`);
+  console.log(`explorer: https://mempool.space/signet/tx/${btcTxId}`);
 
   writeStepLog(String(index), {
     txid: btcTxId,

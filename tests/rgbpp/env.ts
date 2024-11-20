@@ -15,7 +15,7 @@ dotenv.config({ path: __dirname + '/.env' });
 
 export const isMainnet = false;
 
-export const BTC_TESTNET_TYPE = 'Testnet3';
+export const BTC_TESTNET_TYPE = 'Signet';
 
 export const collector = new Collector({
   ckbNodeUrl: 'https://testnet.ckb.dev/rpc',

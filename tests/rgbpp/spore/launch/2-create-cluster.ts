@@ -60,7 +60,7 @@ const createCluster = async ({ ownerRgbppLockArgs }: { ownerRgbppLockArgs: strin
       index: 1,
     });
     console.log('BTC TxId: ', btcTxId);
-    console.log(`explorer: https://mempool.space/testnet/tx/${btcTxId}`);
+    console.log(`explorer: https://mempool.space/signet/tx/${btcTxId}`);
 
     const interval = setInterval(async () => {
       try {
