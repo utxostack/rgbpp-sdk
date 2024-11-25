@@ -3,7 +3,7 @@ import { buildRgbppTransferAllTxs, sendRgbppTxGroups } from 'rgbpp';
 import { btcDataSource, isMainnet, collector, btcAccount } from '../../env';
 import { signPsbt } from '../../../../examples/rgbpp/shared/btc-account';
 import { saveCkbVirtualTxResult } from '../../../../examples/rgbpp/shared/utils';
-import { readStepLog } from '../../shared/utils';
+import { getFastestFeeRate, readStepLog } from '../../shared/utils';
 
 interface TestParams {
   xudtTypeArgs: string;
@@ -12,6 +12,9 @@ interface TestParams {
 }
 
 const rgbppTransferAllTxs = async ({ xudtTypeArgs, fromAddress, toAddress }: TestParams) => {
+  const feeRate = await getFastestFeeRate();
+  console.log('feeRate = ', feeRate);
+
   const result = await buildRgbppTransferAllTxs({
     ckb: {
       xudtTypeArgs,
@@ -22,7 +25,7 @@ const rgbppTransferAllTxs = async ({ xudtTypeArgs, fromAddress, toAddress }: Tes
       fromAddress: fromAddress,
       toAddress: toAddress,
       dataSource: btcDataSource,
-      feeRate: 5,
+      feeRate: feeRate,
     },
     isMainnet,
   });
@@ -63,7 +66,7 @@ const rgbppTransferAllTxs = async ({ xudtTypeArgs, fromAddress, toAddress }: Tes
 
   const successfulTxIds = sentGroups
     .filter((group) => group.btcTxId)
-    .map((group) => `https://mempool.space/testnet/tx/${group.btcTxId}`);
+    .map((group) => `https://mempool.space/signet/tx/${group.btcTxId}`);
 
   console.log('Successful Transactions:', successfulTxIds.join('\n'));
 
