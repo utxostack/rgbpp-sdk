@@ -19,3 +19,5 @@ export * from './api/sendBtc';
 export * from './api/sendRbf';
 export * from './api/sendUtxos';
 export * from './api/sendRgbppUtxos';
+
+export * from './query/offline-source';
