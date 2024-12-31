@@ -9,6 +9,7 @@ import {
   isTypeAssetSupported,
   u128ToLe,
   genRgbppLockScript,
+  isStandardUDTTypeSupported,
 } from '../utils';
 import { MAX_FEE, MIN_CAPACITY, RGBPP_TX_WITNESS_MAX_SIZE } from '../constants';
 import { blockchain } from '@ckb-lumos/base';
@@ -100,7 +101,11 @@ export const genCkbJumpBtcVirtualTx = async ({
   });
   outputsData.push('0x');
 
-  const cellDeps = await fetchTypeIdCellDeps(isMainnet, { xudt: true });
+  const isStandardUDT = isStandardUDTTypeSupported(xudtType, isMainnet);
+  const cellDeps = await fetchTypeIdCellDeps(isMainnet, {
+    xudt: isStandardUDT,
+    compatibleXudtCodeHash: isStandardUDT ? '' : xudtType.codeHash,
+  });
   const witnesses = inputs.map(() => '0x');
 
   const ckbRawTx: CKBComponents.RawTransaction = {

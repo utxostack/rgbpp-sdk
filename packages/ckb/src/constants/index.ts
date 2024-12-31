@@ -66,6 +66,15 @@ const TestnetInfo = {
     depType: 'code',
   } as CKBComponents.CellDep,
 
+  CompatibleXUDTTypeScripts: [
+    // RUSD
+    {
+      codeHash: '0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb',
+      hashType: 'type',
+      args: '',
+    },
+  ] as CKBComponents.Script[],
+
   UniqueTypeScript: {
     codeHash: '0x8e341bcfec6393dcd41e635733ff2dca00a6af546949f70c57a706c0f344df8b',
     hashType: 'type',
@@ -197,6 +206,15 @@ const MainnetInfo = {
     depType: 'code',
   } as CKBComponents.CellDep,
 
+  CompatibleXUDTTypeScripts: [
+    // RUSD
+    {
+      codeHash: '0x26a33e0815888a4a0614a0b7d09fa951e0993ff21e55905510104a0b1312032b',
+      hashType: 'type',
+      args: '',
+    },
+  ] as CKBComponents.Script[],
+
   UniqueTypeScript: {
     codeHash: '0x2c8c11c985da60b0a330c61a85507416d6382c130ba67f0c47ab071e00aec628',
     hashType: 'data1',
@@ -308,3 +326,6 @@ export const getSporeTypeScript = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.SporeTypeScript : TestnetInfo.SporeTypeScript;
 export const getSporeTypeDep = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.SporeTypeDep : TestnetInfo.SporeTypeDep;
+
+export const getCompatibleXudtTypeScripts = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.CompatibleXUDTTypeScripts : TestnetInfo.CompatibleXUDTTypeScripts;

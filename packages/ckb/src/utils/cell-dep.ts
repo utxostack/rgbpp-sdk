@@ -19,6 +19,9 @@ interface CellDepsObject {
   unique: {
     testnet: CKBComponents.CellDep;
   };
+  compatibleXudt: {
+    [codeHash: string]: CKBComponents.CellDep;
+  };
 }
 const GITHUB_CELL_DEPS_JSON_URL =
   'https://raw.githubusercontent.com/ckb-cell/typeid-contract-cell-deps/main/deployment/cell-deps.json';
@@ -42,6 +45,7 @@ export interface CellDepsSelected {
   btcTime?: boolean;
   xudt?: boolean;
   unique?: boolean;
+  compatibleXudtCodeHash?: string;
 }
 
 export const fetchTypeIdCellDeps = async (
@@ -49,6 +53,8 @@ export const fetchTypeIdCellDeps = async (
   selected: CellDepsSelected,
   btcTestnetType?: BTCTestnetType,
 ): Promise<CKBComponents.CellDep[]> => {
+  let cellDeps: CKBComponents.CellDep[] = [];
+
   let rgbppLockDep = getRgbppLockDep(isMainnet, btcTestnetType);
   let btcTimeDep = getBtcTimeLockDep(isMainnet, btcTestnetType);
   let xudtDep = getXudtDep(isMainnet);
@@ -68,7 +74,7 @@ export const fetchTypeIdCellDeps = async (
       uniqueDep = cellDepsObj.unique.testnet;
     }
   }
-  let cellDeps: CKBComponents.CellDep[] = [];
+
   if (selected.rgbpp) {
     // RGB++ config cell is deployed together with the RGB++ lock contract
     //
@@ -115,6 +121,32 @@ export const fetchTypeIdCellDeps = async (
 
   if (selected.unique) {
     cellDeps = [...cellDeps, uniqueDep] as CKBComponents.CellDep[];
+  }
+
+  /**
+   * "compatibleXudt": {
+    "0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb": {
+      "outPoint": {
+        "index": "0x0",
+        "txHash": "0xed7d65b9ad3d99657e37c4285d585fea8a5fcaf58165d54dacf90243f911548b"
+      },
+      "depType": "code"
+    },
+    "0x26a33e0815888a4a0614a0b7d09fa951e0993ff21e55905510104a0b1312032b": {
+      "outPoint": {
+        "index": "0x0",
+        "txHash": "0x8ec1081bd03e5417bb4467e96f4cec841acdd35924538a35e7547fe320118977"
+      },
+      "depType": "code"
+    }
+  }
+   */
+  if (selected.compatibleXudtCodeHash) {
+    if (cellDepsObj?.compatibleXudt === undefined) {
+      throw new Error('Compatible xUDT cell deps are not found');
+    }
+    const cellDep = cellDepsObj.compatibleXudt[selected.compatibleXudtCodeHash];
+    cellDeps = [...cellDeps, cellDep] as CKBComponents.CellDep[];
   }
 
   return cellDeps;
