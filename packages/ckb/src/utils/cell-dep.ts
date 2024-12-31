@@ -45,7 +45,7 @@ export interface CellDepsSelected {
   btcTime?: boolean;
   xudt?: boolean;
   unique?: boolean;
-  compatibleXudtCodeHash?: string;
+  compatibleXudtCodeHashes?: string[];
 }
 
 export const fetchTypeIdCellDeps = async (
@@ -141,12 +141,14 @@ export const fetchTypeIdCellDeps = async (
     }
   }
    */
-  if (selected.compatibleXudtCodeHash) {
+  if (selected.compatibleXudtCodeHashes && selected.compatibleXudtCodeHashes?.length > 0) {
     if (cellDepsObj?.compatibleXudt === undefined) {
       throw new Error('Compatible xUDT cell deps are not found');
     }
-    const cellDep = cellDepsObj.compatibleXudt[selected.compatibleXudtCodeHash];
-    cellDeps = [...cellDeps, cellDep] as CKBComponents.CellDep[];
+    const compatibleCellDeps = selected.compatibleXudtCodeHashes.map(
+      (codeHash) => cellDepsObj.compatibleXudt[codeHash],
+    );
+    cellDeps = [...cellDeps, ...compatibleCellDeps] as CKBComponents.CellDep[];
   }
 
   return cellDeps;

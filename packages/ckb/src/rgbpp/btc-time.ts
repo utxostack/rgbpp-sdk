@@ -25,6 +25,8 @@ import {
   lockScriptFromBtcTimeLockArgs,
   transformSpvProof,
   buildSpvClientCellDep,
+  isStandardUDTTypeSupported,
+  isCompatibleUDTTypesSupported,
 } from '../utils';
 import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 
@@ -61,9 +63,17 @@ export const buildBtcTimeCellsSpentTx = async ({
 
   const outputsData = sortedBtcTimeCells.map((cell) => cell.outputData);
 
-  const cellDeps: CKBComponents.CellDep[] = await fetchTypeIdCellDeps(
+  const hasStandardUDT = outputs.some((output) => isStandardUDTTypeSupported(output.type!, isMainnet));
+  const compatibleXudtCodeHashes = outputs
+    .filter((output) => isCompatibleUDTTypesSupported(output.type!, isMainnet))
+    .map((output) => output.type!.codeHash);
+  const cellDeps = await fetchTypeIdCellDeps(
     isMainnet,
-    { btcTime: true, xudt: true },
+    {
+      btcTime: true,
+      xudt: hasStandardUDT,
+      compatibleXudtCodeHashes,
+    },
     btcTestnetType,
   );
 
