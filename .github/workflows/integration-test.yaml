@@ -65,3 +65,14 @@ jobs:
           VITE_SERVICE_ORIGIN: https://api.signet.rgbpp.io
           INTEGRATION_CKB_PRIVATE_KEY: ${{ secrets.INTEGRATION_CKB_SPORE_PRIVATE_KEY }}
           INTEGRATION_BTC_PRIVATE_KEY: ${{ secrets.INTEGRATION_BTC_SPORE_PRIVATE_KEY }}
+
+      - name: Run integration:compatible-xudt script
+        working-directory: ./tests/rgbpp
+        if: ${{ matrix.env_set == 'compatible-xudt' }}
+        run: pnpm run integration:compatible-xudt
+        env:
+          VITE_SERVICE_URL: https://api.testnet.rgbpp.io
+          VITE_SERVICE_TOKEN: ${{ secrets.TESTNET_SERVICE_TOKEN }}
+          VITE_SERVICE_ORIGIN: https://api.testnet.rgbpp.io
+          INTEGRATION_CKB_PRIVATE_KEY: ${{ secrets.INTEGRATION_CKB_PRIVATE_KEY }}
+          INTEGRATION_BTC_PRIVATE_KEY: ${{ secrets.INTEGRATION_BTC_PRIVATE_KEY }}
