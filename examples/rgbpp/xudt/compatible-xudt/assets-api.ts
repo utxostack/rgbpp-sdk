@@ -19,4 +19,13 @@ import { btcService } from '../../env';
     }),
   });
   console.log('RUSD Activities: ', JSON.stringify(activities));
+
+  const info = await btcService.getRgbppAssetInfoByTypeScript(
+    serializeScript({
+      codeHash: '0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb',
+      hashType: 'type',
+      args: '0x661cfbe2124b3e79e50e505c406be5b2dcf9da15d8654b749ec536fa4c2eaaae',
+    }),
+  );
+  console.log('Standard xUDT info: ', JSON.stringify(info));
 })();
