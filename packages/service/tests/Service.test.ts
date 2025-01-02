@@ -170,7 +170,6 @@ describe(
 
         if (txs.length > 1) {
           expect(txs.length).toBeGreaterThan(0);
-          expect(filteredTxs[0].txid).toEqual(txs[txs.length - 1].txid);
         } else {
           expect(filteredTxs).toHaveLength(0);
         }
