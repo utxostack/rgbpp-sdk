@@ -35,12 +35,11 @@ export async function buildRgbppTransferAllTxs(params: RgbppTransferAllTxsParams
   const btcSource = params.btc.dataSource;
   const btcService = btcSource.service;
   const ckbCollector = params.ckb.collector;
-  const xudtTypeHex = bytes.hexify(
-    blockchain.Script.pack({
-      ...getXudtTypeScript(isMainnet),
-      args: params.ckb.xudtTypeArgs,
-    }),
-  );
+  const typeScript = params.ckb.compatibleXudtTypeScript ?? {
+    ...getXudtTypeScript(isMainnet),
+    args: params.ckb.xudtTypeArgs,
+  };
+  const xudtTypeHex = bytes.hexify(blockchain.Script.pack(typeScript));
 
   // Get L2 Cells own by the assetAccounts,
   // and build L1 UTXO IDs (`${txid}:${vout}`) from each cell.cellOutput.lock.args

@@ -28,6 +28,8 @@ const { ckbVirtualTxResult, btcPsbtHex } = await buildRgbppTransferTx({
     rgbppLockArgsList,
     transferAmount,
     ckbFeeRate,
+    // If the asset is compatible xUDT(not standard xUDT), the compatibleXudtTypeScript is required
+    compatibleXudtTypeScript,
   },
   btc: {
     fromBtcAddress,
@@ -66,6 +68,8 @@ const { transactions, summary } = await buildRgbppTransferAllTxs({
     collector,
     // The CKB transaction fee rate, default value is 1100
     feeRate,
+    // (Optional) If the asset is compatible xUDT(not standard xUDT), the compatibleXudtTypeScript is required
+    compatibleXudtTypeScript,
   },
   btc: {
     // The list of BTC addresses to provide RGB++ xUDT assets

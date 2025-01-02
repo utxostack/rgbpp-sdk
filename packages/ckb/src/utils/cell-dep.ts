@@ -24,16 +24,18 @@ interface CellDepsObject {
   };
 }
 const GITHUB_CELL_DEPS_JSON_URL =
-  'https://raw.githubusercontent.com/ckb-cell/typeid-contract-cell-deps/main/deployment/cell-deps.json';
+  'https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/deployment/cell-deps.json';
 
+// If the CDN has cache issue, please clear the cache by visiting
+// https://www.jsdelivr.com/tools/purge?path=/gh/utxostack/typeid-contract-cell-deps@main
 const CDN_GITHUB_CELL_DEPS_JSON_URL =
-  'https://cdn.jsdelivr.net/gh/ckb-cell/typeid-contract-cell-deps@main/deployment/cell-deps.json';
+  'https://cdn.jsdelivr.net/gh/utxostack/typeid-contract-cell-deps@main/deployment/cell-deps.json';
 
-const request = (url: string) => axios.get(url, { timeout: 6000 });
+const request = (url: string) => axios.get(url, { timeout: 5000 });
 
 const fetchCellDepsJson = async () => {
   try {
-    const response = await Promise.any([request(GITHUB_CELL_DEPS_JSON_URL), request(CDN_GITHUB_CELL_DEPS_JSON_URL)]);
+    const response = await Promise.any([request(CDN_GITHUB_CELL_DEPS_JSON_URL), request(GITHUB_CELL_DEPS_JSON_URL)]);
     return response.data as CellDepsObject;
   } catch (error) {
     // console.error('Error fetching cell deps:', error);
@@ -143,11 +145,14 @@ export const fetchTypeIdCellDeps = async (
    */
   if (selected.compatibleXudtCodeHashes && selected.compatibleXudtCodeHashes?.length > 0) {
     if (cellDepsObj?.compatibleXudt === undefined) {
-      throw new Error('Compatible xUDT cell deps are not found');
+      throw new Error('Compatible xUDT cell deps are null');
     }
     const compatibleCellDeps = selected.compatibleXudtCodeHashes.map(
       (codeHash) => cellDepsObj.compatibleXudt[codeHash],
     );
+    if (compatibleCellDeps.length === 0) {
+      throw new Error('The specific compatible xUDT cell deps are not found');
+    }
     cellDeps = [...cellDeps, ...compatibleCellDeps] as CKBComponents.CellDep[];
   }
 
