@@ -1,7 +1,7 @@
 import { Cell, blockchain, Script } from '@ckb-lumos/base';
 import { bytes } from '@ckb-lumos/codec';
 import { describe, expect, it } from 'vitest';
-import { BtcAssetsApiError, BtcAssetsApi, ErrorCodes, ErrorMessages, RgbppCell, RgbppXudtAssetInfo } from '../src';
+import { BtcAssetsApiError, BtcAssetsApi, ErrorCodes, ErrorMessages, RgbppCell, RgbppApiXudtAssetInfo } from '../src';
 
 describe(
   'BtcServiceApi',
@@ -304,13 +304,13 @@ describe(
         const res = await service.getRgbppAssetInfoByTypeScript(rgbppCellType);
         expect(res).toBeDefined();
         expect(res.type).toBe('xudt');
-        expect((res as RgbppXudtAssetInfo).symbol).toBe('UBBQT');
-        expect((res as RgbppXudtAssetInfo).name).toBe('Unique BBQ TEST');
-        expect((res as RgbppXudtAssetInfo).decimal).toBe(8);
-        expect((res as RgbppXudtAssetInfo).type_hash).toBe(
+        expect((res as RgbppApiXudtAssetInfo).symbol).toBe('UBBQT');
+        expect((res as RgbppApiXudtAssetInfo).name).toBe('Unique BBQ TEST');
+        expect((res as RgbppApiXudtAssetInfo).decimal).toBe(8);
+        expect((res as RgbppApiXudtAssetInfo).type_hash).toBe(
           '0x5e122c1523318c3437362aa8e39d9a79af604669b7e38f8d45489516895006e0',
         );
-        expect((res as RgbppXudtAssetInfo).type_script.args).toBe(
+        expect((res as RgbppApiXudtAssetInfo).type_script.args).toBe(
           '0x661cfbe2124b3e79e50e505c406be5b2dcf9da15d8654b749ec536fa4c2eaaae',
         );
       });

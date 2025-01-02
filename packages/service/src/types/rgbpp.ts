@@ -125,7 +125,7 @@ export interface RgbppApiTransactionRetry {
   state: RgbppTransactionState;
 }
 
-export interface RgbppXudtAssetInfo {
+export interface RgbppApiXudtAssetInfo {
   type: string; //  'xudt'
   type_hash: string;
   type_script: Script;
@@ -134,7 +134,7 @@ export interface RgbppXudtAssetInfo {
   decimal: number;
 }
 
-export interface RgbppSporeAssetInfo {
+export interface RgbppApiSporeAssetInfo {
   type: string; //  'spore'
   content_type: string;
   cluster: {
@@ -144,4 +144,4 @@ export interface RgbppSporeAssetInfo {
   };
 }
 
-export type RgbppAssetInfo = RgbppXudtAssetInfo | RgbppSporeAssetInfo;
+export type RgbppApiAssetInfo = RgbppApiXudtAssetInfo | RgbppApiSporeAssetInfo;
