@@ -69,7 +69,7 @@ const TestnetInfo = {
   CompatibleXUDTTypeScripts: [
     // RUSD
     {
-      codeHash: '0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb',
+      codeHash: '0x1142755a044bf2ee358cba9f2da187ce928c91cd4dc8692ded0337efa677d21a',
       hashType: 'type',
       args: '',
     },

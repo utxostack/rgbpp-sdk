@@ -29,7 +29,7 @@ const GITHUB_CELL_DEPS_JSON_URL =
 const CDN_GITHUB_CELL_DEPS_JSON_URL =
   'https://cdn.jsdelivr.net/gh/ckb-cell/typeid-contract-cell-deps@main/deployment/cell-deps.json';
 
-const request = (url: string) => axios.get(url, { timeout: 2000 });
+const request = (url: string) => axios.get(url, { timeout: 6000 });
 
 const fetchCellDepsJson = async () => {
   try {
@@ -75,7 +75,7 @@ export const fetchTypeIdCellDeps = async (
     }
   }
 
-  if (selected.rgbpp) {
+  if (selected.rgbpp === true) {
     // RGB++ config cell is deployed together with the RGB++ lock contract
     //
     // contract_deployment_transaction:
@@ -95,7 +95,7 @@ export const fetchTypeIdCellDeps = async (
     ] as CKBComponents.CellDep[];
   }
 
-  if (selected.btcTime) {
+  if (selected.btcTime === true) {
     // BTC Time config cell is deployed together with the BTC Time lock contract
     //
     // contract_deployment_transaction:
@@ -115,17 +115,17 @@ export const fetchTypeIdCellDeps = async (
     ] as CKBComponents.CellDep[];
   }
 
-  if (selected.xudt) {
+  if (selected.xudt === true) {
     cellDeps = [...cellDeps, xudtDep] as CKBComponents.CellDep[];
   }
 
-  if (selected.unique) {
+  if (selected.unique === true) {
     cellDeps = [...cellDeps, uniqueDep] as CKBComponents.CellDep[];
   }
 
   /**
    * "compatibleXudt": {
-    "0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb": {
+    "0x1142755a044bf2ee358cba9f2da187ce928c91cd4dc8692ded0337efa677d21a": {
       "outPoint": {
         "index": "0x0",
         "txHash": "0xed7d65b9ad3d99657e37c4285d585fea8a5fcaf58165d54dacf90243f911548b"
