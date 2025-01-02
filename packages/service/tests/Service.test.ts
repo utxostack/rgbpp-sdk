@@ -1,7 +1,7 @@
 import { Cell, blockchain, Script } from '@ckb-lumos/base';
 import { bytes } from '@ckb-lumos/codec';
 import { describe, expect, it } from 'vitest';
-import { BtcAssetsApiError, BtcAssetsApi, ErrorCodes, ErrorMessages, RgbppCell } from '../src';
+import { BtcAssetsApiError, BtcAssetsApi, ErrorCodes, ErrorMessages, RgbppCell, RgbppXudtAssetInfo } from '../src';
 
 describe(
   'BtcServiceApi',
@@ -290,15 +290,29 @@ describe(
             expect(tx.isRgbpp).toBeTypeOf('boolean');
             if (tx.isRgbpp) {
               expect(tx.isomorphicTx).toBeDefined();
-              expect(tx.isomorphicTx.status.confirmed).toBeTypeOf('boolean');
-              const hasTxOrVirtualTx = tx.isomorphicTx.ckbVirtualTx ?? tx.isomorphicTx.ckbTx;
+              expect(tx.isomorphicTx?.status.confirmed).toBeTypeOf('boolean');
+              const hasTxOrVirtualTx = tx.isomorphicTx?.ckbVirtualTx ?? tx.isomorphicTx?.ckbTx;
               if (hasTxOrVirtualTx) {
-                expect(tx.isomorphicTx.inputs).toBeDefined();
-                expect(tx.isomorphicTx.outputs).toBeDefined();
+                expect(tx.isomorphicTx?.inputs).toBeDefined();
+                expect(tx.isomorphicTx?.outputs).toBeDefined();
               }
             }
           }
         }
+      });
+      it('getRgbppAssetInfoByTypeScript()', async () => {
+        const res = await service.getRgbppAssetInfoByTypeScript(rgbppCellType);
+        expect(res).toBeDefined();
+        expect(res.type).toBe('xudt');
+        expect((res as RgbppXudtAssetInfo).symbol).toBe('UBBQT');
+        expect((res as RgbppXudtAssetInfo).name).toBe('Unique BBQ TEST');
+        expect((res as RgbppXudtAssetInfo).decimal).toBe(8);
+        expect((res as RgbppXudtAssetInfo).type_hash).toBe(
+          '0x5e122c1523318c3437362aa8e39d9a79af604669b7e38f8d45489516895006e0',
+        );
+        expect((res as RgbppXudtAssetInfo).type_script.args).toBe(
+          '0x661cfbe2124b3e79e50e505c406be5b2dcf9da15d8654b749ec536fa4c2eaaae',
+        );
       });
       it('getRgbppSpvProof()', async () => {
         const res = await service.getRgbppSpvProof(rgbppBtcTxId, 6);
