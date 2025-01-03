@@ -87,7 +87,7 @@ const transfer = async ({
 // rgbppLockArgs: outIndexU32 + btcTxId
 transfer({
   rgbppLockArgsList: [buildRgbppLockArgs(readStepLog('prepare-utxo').index, readStepLog('prepare-utxo').txid)],
-  toBtcAddress: 'tb1qtt2vh9q8xam35xxsy35ec6majad8lz8fep8w04',
+  toBtcAddress: 'tb1q6jf0qguvjz65e4xxdvsltugf4d673hh8nj32gq',
   compatibleXudtTypeScript: {
     codeHash: '0x1142755a044bf2ee358cba9f2da187ce928c91cd4dc8692ded0337efa677d21a',
     hashType: 'type',
