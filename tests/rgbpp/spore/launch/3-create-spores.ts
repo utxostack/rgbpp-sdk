@@ -67,7 +67,7 @@ const createSpores = async ({ clusterRgbppLockArgs, receivers }: SporeCreatePara
       txid: btcTxId,
     });
     console.log('BTC TxId: ', btcTxId);
-    console.log(`explorer: https://mempool.space/signet/tx/${btcTxId}`);
+    console.log(`explorer: https://mempool.space/testnet/tx/${btcTxId}`);
 
     const interval = setInterval(async () => {
       try {

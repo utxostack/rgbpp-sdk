@@ -59,4 +59,14 @@ describe('dynamic fetch cell dep', () => {
     const cellDeps = await fetchTypeIdCellDeps(isMainnet, {});
     expect(cellDeps.length).toBe(0);
   });
+
+  it('fetchTypeIdCellDeps with RUSD', async () => {
+    const isMainnet = false;
+    const cellDeps = await fetchTypeIdCellDeps(isMainnet, {
+      xudt: false,
+      compatibleXudtCodeHashes: ['0x1142755a044bf2ee358cba9f2da187ce928c91cd4dc8692ded0337efa677d21a'],
+    });
+    expect(cellDeps[0].outPoint?.txHash).toBe('0xed7d65b9ad3d99657e37c4285d585fea8a5fcaf58165d54dacf90243f911548b');
+    expect(cellDeps[0].outPoint?.index).toBe('0x0');
+  });
 });

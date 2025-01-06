@@ -24,6 +24,7 @@ import {
   isRgbppCapacitySufficientForChange,
   throwErrorWhenRgbppCellsInvalid,
   throwErrorWhenTxInputsExceeded,
+  isStandardUDTTypeSupported,
 } from '../utils';
 import { Hex, IndexerCell } from '../types';
 import {
@@ -170,7 +171,16 @@ export const genBtcTransferCkbVirtualTx = async ({
     handleNonTargetRgbppCells(outputs.length);
   }
 
-  const cellDeps = await fetchTypeIdCellDeps(isMainnet, { rgbpp: true, xudt: true }, btcTestnetType);
+  const isStandardUDT = isStandardUDTTypeSupported(xudtType, isMainnet);
+  const cellDeps = await fetchTypeIdCellDeps(
+    isMainnet,
+    {
+      rgbpp: true,
+      xudt: isStandardUDT,
+      compatibleXudtCodeHashes: isStandardUDT ? [] : [xudtType.codeHash],
+    },
+    btcTestnetType,
+  );
   if (needPaymasterCell) {
     cellDeps.push(getSecp256k1CellDep(isMainnet));
   }
@@ -286,10 +296,18 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
     outputsData.push(append0x(u128ToLe(sumAmount - sumTransferAmount)));
   }
 
-  const cellDeps = [
-    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true, xudt: true }, btcTestnetType)),
-    getSecp256k1CellDep(isMainnet),
-  ];
+  const isStandardUDT = isStandardUDTTypeSupported(xudtType, isMainnet);
+  let cellDeps = await fetchTypeIdCellDeps(
+    isMainnet,
+    {
+      rgbpp: true,
+      xudt: isStandardUDT,
+      compatibleXudtCodeHashes: isStandardUDT ? [] : [xudtType.codeHash],
+    },
+    btcTestnetType,
+  );
+  cellDeps = [...cellDeps, getSecp256k1CellDep(isMainnet)];
+
   const witnesses: Hex[] = [];
   const lockArgsSet: Set<string> = new Set();
   for (const cell of rgbppCells) {

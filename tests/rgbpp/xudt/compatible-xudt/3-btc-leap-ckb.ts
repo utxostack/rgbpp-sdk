@@ -1,34 +1,34 @@
-import { buildRgbppLockArgs, getXudtTypeScript } from 'rgbpp/ckb';
+import { buildRgbppLockArgs } from 'rgbpp/ckb';
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { genBtcJumpCkbVirtualTx, sendRgbppUtxos } from 'rgbpp';
-import { isMainnet, collector, btcService, btcDataSource, btcAccount, BTC_TESTNET_TYPE } from '../env';
-import { getFastestFeeRate, readStepLog } from '../shared/utils';
-import { saveCkbVirtualTxResult } from '../../../examples/rgbpp/shared/utils';
-import { signAndSendPsbt } from '../../../examples/rgbpp/shared/btc-account';
+import { isMainnet, collector, btcService, btcDataSource, btcAccount, BTC_TESTNET_TYPE } from '../../env';
+import { getFastestFeeRate, readStepLog } from '../../shared/utils';
+import { saveCkbVirtualTxResult } from '../../../../examples/rgbpp/shared/utils';
+import { signAndSendPsbt } from '../../../../examples/rgbpp/shared/btc-account';
 
 interface LeapToCkbParams {
   rgbppLockArgsList: string[];
   toCkbAddress: string;
-  xudtTypeArgs: string;
+  compatibleXudtTypeScript: CKBComponents.Script;
   transferAmount: bigint;
 }
 
-const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs, transferAmount }: LeapToCkbParams) => {
+const leapFromBtcToCKB = async ({
+  rgbppLockArgsList,
+  toCkbAddress,
+  compatibleXudtTypeScript,
+  transferAmount,
+}: LeapToCkbParams) => {
   const { retry } = await import('zx');
 
   const feeRate = await getFastestFeeRate();
   console.log('feeRate = ', feeRate);
 
   await retry(120, '10s', async () => {
-    const xudtType: CKBComponents.Script = {
-      ...getXudtTypeScript(isMainnet),
-      args: xudtTypeArgs,
-    };
-
     const ckbVirtualTxResult = await genBtcJumpCkbVirtualTx({
       collector,
       rgbppLockArgsList,
-      xudtTypeBytes: serializeScript(xudtType),
+      xudtTypeBytes: serializeScript(compatibleXudtTypeScript),
       transferAmount,
       toCkbAddress,
       isMainnet,
@@ -67,7 +67,9 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
           clearInterval(interval);
           if (state === 'completed') {
             const { txhash: txHash } = await btcService.getRgbppTransactionHash(btcTxId);
-            console.info(`Rgbpp asset has been jumped from BTC to CKB and the related CKB tx hash is ${txHash}`);
+            console.info(
+              `Rgbpp compatible xUDT asset has been jumped from BTC to CKB and the related CKB tx hash is ${txHash}`,
+            );
             console.info(`explorer: https://pudge.explorer.nervos.org/transaction/${txHash}`);
           } else {
             console.warn(`Rgbpp CKB transaction failed and the reason is ${failedReason} `);
@@ -84,6 +86,10 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
 leapFromBtcToCKB({
   rgbppLockArgsList: [buildRgbppLockArgs(readStepLog('transfer-id').index, readStepLog('transfer-id').txid)],
   toCkbAddress: 'ckt1qrfrwcdnvssswdwpn3s9v8fp87emat306ctjwsm3nmlkjg8qyza2cqgqq9kxr7vy7yknezj0vj0xptx6thk6pwyr0sxamv6q',
-  xudtTypeArgs: readStepLog('xUDT-type-script').args,
-  transferAmount: BigInt(300_0000_0000),
+  compatibleXudtTypeScript: {
+    codeHash: '0x1142755a044bf2ee358cba9f2da187ce928c91cd4dc8692ded0337efa677d21a',
+    hashType: 'type',
+    args: '0x878fcc6f1f08d48e87bb1c3b3d5083f23f8a39c5d5c764f253b55b998526439b',
+  },
+  transferAmount: BigInt(100_0000),
 });

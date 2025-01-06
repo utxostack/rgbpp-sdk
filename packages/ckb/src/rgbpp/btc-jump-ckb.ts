@@ -19,6 +19,7 @@ import {
   genRgbppLockScript,
   throwErrorWhenRgbppCellsInvalid,
   isRgbppCapacitySufficientForChange,
+  isStandardUDTTypeSupported,
 } from '../utils';
 import { Hex, IndexerCell } from '../types';
 import { RGBPP_WITNESS_PLACEHOLDER, getSecp256k1CellDep } from '../constants';
@@ -135,7 +136,16 @@ export const genBtcJumpCkbVirtualTx = async ({
     outputsData.push(otherRgbppCell.outputData);
   }
 
-  const cellDeps = await fetchTypeIdCellDeps(isMainnet, { rgbpp: true, xudt: true }, btcTestnetType);
+  const isStandardUDT = isStandardUDTTypeSupported(xudtType, isMainnet);
+  const cellDeps = await fetchTypeIdCellDeps(
+    isMainnet,
+    {
+      rgbpp: true,
+      xudt: isStandardUDT,
+      compatibleXudtCodeHashes: isStandardUDT ? [] : [xudtType.codeHash],
+    },
+    btcTestnetType,
+  );
   if (needPaymasterCell) {
     cellDeps.push(getSecp256k1CellDep(isMainnet));
   }

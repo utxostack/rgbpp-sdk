@@ -13,6 +13,8 @@ export interface RgbppTransferCkbParams {
   transferAmount: bigint;
   // The CKB transaction fee rate, default value is 1100
   feeRate?: bigint;
+  // If the asset is compatible xUDT(not standard xUDT), the compatibleXudtTypeScript is required
+  compatibleXudtTypeScript?: CKBComponents.Script;
 }
 
 export interface RgbppTransferBtcParams {
@@ -51,6 +53,8 @@ export interface RgbppTransferAllTxsParams {
     xudtTypeArgs: Hex;
     // The CKB transaction fee rate, default value is 1100
     feeRate?: bigint;
+    // If the asset is compatible xUDT(not standard xUDT), the compatibleXudtTypeScript is required
+    compatibleXudtTypeScript?: CKBComponents.Script;
   };
   btc: {
     // The list of BTC addresses to provide RGB++ xUDT assets

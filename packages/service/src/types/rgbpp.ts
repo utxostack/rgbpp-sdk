@@ -124,3 +124,24 @@ export interface RgbppApiTransactionRetry {
   success: boolean;
   state: RgbppTransactionState;
 }
+
+export interface RgbppApiXudtAssetInfo {
+  type: string; //  'xudt'
+  type_hash: string;
+  type_script: Script;
+  symbol: string;
+  name: string;
+  decimal: number;
+}
+
+export interface RgbppApiSporeAssetInfo {
+  type: string; //  'spore'
+  content_type: string;
+  cluster: {
+    id: string;
+    name: string;
+    description: string;
+  };
+}
+
+export type RgbppApiAssetInfo = RgbppApiXudtAssetInfo | RgbppApiSporeAssetInfo;

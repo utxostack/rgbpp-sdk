@@ -5,6 +5,7 @@ import {
   CKB_UNIT,
   UNLOCKABLE_LOCK_SCRIPT,
   getClusterTypeScript,
+  getCompatibleXudtTypeScripts,
   getSporeTypeScript,
   getXudtTypeScript,
 } from '../constants';
@@ -23,13 +24,26 @@ export const calculateTransactionFee = (txSize: number, feeRate?: bigint): bigin
   return fee * ratio < base ? fee + BigInt(1) : fee;
 };
 
-export const isUDTTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
+export const isCompatibleUDTTypesSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
+  const compatibleXudtTypeBytes = getCompatibleXudtTypeScripts(isMainnet).map((script) => serializeScript(script));
+  const typeAsset = serializeScript({
+    ...type,
+    args: '',
+  });
+  return compatibleXudtTypeBytes.includes(typeAsset);
+};
+
+export const isStandardUDTTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
   const xudtType = serializeScript(getXudtTypeScript(isMainnet));
   const typeAsset = serializeScript({
     ...type,
     args: '',
   });
   return xudtType === typeAsset;
+};
+
+export const isUDTTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
+  return isStandardUDTTypeSupported(type, isMainnet) || isCompatibleUDTTypesSupported(type, isMainnet);
 };
 
 export const isSporeTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {

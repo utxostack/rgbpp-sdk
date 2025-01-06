@@ -210,8 +210,8 @@ describe('ckb tx utils', () => {
       inputs: [
         {
           previousOutput: {
-            index: '0x1',
-            txHash: '0x1a6d2b18faed84293b81ada9d00600a3cdb637fa43a5cfa20eb63934757352ea',
+            index: '0x0',
+            txHash: '0x8f8c79eb6671709633fe6a46de93c0fedc9c1b8a6527a18d3983879542635c9f',
           },
           since: '0x0',
         },
@@ -251,14 +251,7 @@ describe('ckb tx utils', () => {
         {
           previousOutput: {
             index: '0x0',
-            txHash: '0xeb6ea53459efc83755e4ede6ff54b7698913379e678c6018e1eac87241f964f2',
-          },
-          since: '0x0',
-        },
-        {
-          previousOutput: {
-            index: '0x0',
-            txHash: '0x80314ab559ddc7b2f9e523f968b2d930b1a7b53f690091e6666570b46f54b804',
+            txHash: '0x8f8c79eb6671709633fe6a46de93c0fedc9c1b8a6527a18d3983879542635c9f',
           },
           since: '0x0',
         },
@@ -290,8 +283,8 @@ describe('ckb tx utils', () => {
       inputs: [
         {
           previousOutput: {
-            index: '0x0',
-            txHash: '0xeb6ea53459efc83755e4ede6ff54b7698913379e678c6018e1eac87241f964f2',
+            index: '0x1',
+            txHash: '0x8f8c79eb6671709633fe6a46de93c0fedc9c1b8a6527a18d3983879542635c9f',
           },
           since: '0x0',
         },

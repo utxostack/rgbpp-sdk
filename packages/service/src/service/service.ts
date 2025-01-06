@@ -16,6 +16,7 @@ import {
   BtcApiRecommendedFeeRates,
   RgbppApiActivityByAddressParams,
   RgbppApiActivity,
+  RgbppApiAssetInfo,
 } from '../types';
 import {
   RgbppApis,
@@ -124,6 +125,14 @@ export class BtcAssetsApi extends BtcAssetsApiBase implements BtcApis, RgbppApis
 
   getRgbppAssetsByBtcUtxo(btcTxId: string, vout: number) {
     return this.request<RgbppCell[]>(`/rgbpp/v1/assets/${btcTxId}/${vout}`);
+  }
+
+  getRgbppAssetInfoByTypeScript(typeScript: string) {
+    return this.request<RgbppApiAssetInfo>('/rgbpp/v1/assets/type', {
+      params: {
+        type_script: typeScript,
+      },
+    });
   }
 
   getRgbppAssetsByBtcAddress(btcAddress: string, params?: RgbppApiAssetsByAddressParams) {

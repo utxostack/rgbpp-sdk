@@ -66,7 +66,7 @@ const rgbppTransferAllTxs = async ({ xudtTypeArgs, fromAddress, toAddress }: Tes
 
   const successfulTxIds = sentGroups
     .filter((group) => group.btcTxId)
-    .map((group) => `https://mempool.space/signet/tx/${group.btcTxId}`);
+    .map((group) => `https://mempool.space/testnet/tx/${group.btcTxId}`);
 
   console.log('Successful Transactions:', successfulTxIds.join('\n'));
 

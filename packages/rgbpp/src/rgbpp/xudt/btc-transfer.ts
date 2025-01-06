@@ -10,6 +10,7 @@ import { RgbppTransferTxParams, RgbppTransferTxResult } from '../types/xudt';
  * @param rgbppLockArgsList The RGB++ assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
  * @param transferAmount The XUDT amount to be transferred, if the noMergeOutputCells is true, the transferAmount will be ignored
  * @param feeRate The CKB transaction fee rate, default value is 1100
+ * @param compatibleXudtTypeScript(Optional) If the asset is compatible xUDT(not standard xUDT), the compatibleXudtTypeScript is required
  *
  * BTC parameters
  * @param fromAddress The sender BTC address
@@ -21,11 +22,11 @@ import { RgbppTransferTxParams, RgbppTransferTxResult } from '../types/xudt';
  * @param testnetType(Optional) The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
  */
 export const buildRgbppTransferTx = async ({
-  ckb: { collector, xudtTypeArgs, rgbppLockArgsList, transferAmount, feeRate: ckbFeeRate },
+  ckb: { collector, xudtTypeArgs, rgbppLockArgsList, transferAmount, feeRate: ckbFeeRate, compatibleXudtTypeScript },
   btc,
   isMainnet,
 }: RgbppTransferTxParams): Promise<RgbppTransferTxResult> => {
-  const xudtType: CKBComponents.Script = {
+  const xudtType: CKBComponents.Script = compatibleXudtTypeScript ?? {
     ...getXudtTypeScript(isMainnet),
     args: xudtTypeArgs,
   };
