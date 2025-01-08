@@ -2,15 +2,11 @@ import { IndexerCell } from '../types/collector';
 import { Collector } from './index';
 import { isScriptEqual } from '../utils/ckb-tx';
 import { Hex } from '../types';
-export interface CellWithStatus extends IndexerCell {
-  status?: 'live';
-  outputDataHash?: Hex;
-}
 
 export class OfflineCollector extends Collector {
-  private cells: CellWithStatus[];
+  private cells: IndexerCell[];
 
-  constructor(cells: CellWithStatus[]) {
+  constructor(cells: IndexerCell[]) {
     super({ ckbNodeUrl: '', ckbIndexerUrl: '' });
     this.cells = cells;
   }
@@ -30,7 +26,7 @@ export class OfflineCollector extends Collector {
     isDataMustBeEmpty?: boolean;
     outputCapacityRange?: Hex[];
   }): Promise<IndexerCell[]> {
-    let cells: CellWithStatus[] = [];
+    let cells: IndexerCell[] = [];
 
     if (lock) {
       cells = this.cells.filter((cell) => isScriptEqual(cell.output.lock, lock));
@@ -70,15 +66,8 @@ export class OfflineCollector extends Collector {
   // https://github.com/nervosnetwork/ckb/blob/master/rpc/README.md#method-get_live_cell
   async getLiveCell(outPoint: CKBComponents.OutPoint, withData = true): Promise<CKBComponents.LiveCell> {
     const cell = this.cells.find((cell) => {
-      if (cell.status === undefined) {
-        return false;
-      }
-
-      return (
-        outPoint.txHash === cell.outPoint.txHash && outPoint.index === cell.outPoint.index && cell.status === 'live'
-      );
+      return outPoint.txHash === cell.outPoint.txHash && outPoint.index === cell.outPoint.index;
     });
-
     if (!cell) {
       throw new Error(
         `Cell corresponding to the outPoint: {txHash: ${outPoint.txHash}, index: ${outPoint.index}} not found`,
@@ -90,7 +79,7 @@ export class OfflineCollector extends Collector {
       data: withData
         ? {
             content: cell.outputData,
-            hash: cell.outputDataHash ?? '',
+            hash: '', // not used, leave it empty for now
           }
         : undefined,
     };

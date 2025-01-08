@@ -54,6 +54,7 @@ export const btcAccount = createBtcAccount(BTC_PRIVATE_KEY, addressType, network
 export const btcService = BtcAssetsApi.fromToken(BTC_SERVICE_URL, BTC_SERVICE_TOKEN, BTC_SERVICE_ORIGIN);
 export const btcDataSource = new DataSource(btcService, networkType);
 
+// offline data source
 export const initOfflineCkbCollector = async (
   queries: {
     lock?: CKBComponents.Script;
@@ -68,24 +69,15 @@ export const initOfflineCkbCollector = async (
       queries.map(async (query) => {
         let cells = await collector.getCells(query);
         if (!cells || cells.length === 0) {
-          throw new Error(`No cells found for query: ${JSON.stringify(query)}`);
+          throw new Error(`No cells found for query ${JSON.stringify(query)}`);
         }
         if (query.withEmptyType) {
           cells = cells.filter((cell) => !cell.output.type);
         }
         if (cells.length === 0) {
-          throw new Error(`No empty cells found for query: ${JSON.stringify(query)} with empty type`);
+          throw new Error(`No cells found for query ${JSON.stringify(query)} with type ${query.type}`);
         }
-        return Promise.all(
-          cells.map(async (cell) => {
-            const liveCell = await collector.getLiveCell(cell.outPoint);
-            return {
-              ...cell,
-              status: 'live' as const,
-              outputDataHash: liveCell.data?.hash,
-            };
-          }),
-        );
+        return cells;
       }),
     )
   ).flat();
