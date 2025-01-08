@@ -8,6 +8,7 @@ import {
   ckbAddress,
   BTC_TESTNET_TYPE,
   initOfflineCkbCollector,
+  vendorCellDeps,
 } from '../../env';
 
 interface LeapToBtcParams {
@@ -38,6 +39,7 @@ const leapFromCkbToBtc = async ({ outIndex, btcTxId, xudtTypeArgs, transferAmoun
     xudtTypeBytes: serializeScript(xudtType),
     transferAmount,
     btcTestnetType: BTC_TESTNET_TYPE,
+    vendorCellDeps,
   });
 
   const emptyWitness = { lock: '', inputType: '', outputType: '' };
@@ -60,7 +62,7 @@ leapFromCkbToBtc({
   outIndex: 0,
   btcTxId: 'c1db31abe6bab345b5d5ab4a19c8f34c8cfe23efa4ec6bfa7b05c8e7b4f965b8',
   // Please use your own RGB++ xudt asset's xudtTypeArgs
-  xudtTypeArgs: '0x2db4e32c353afc0dfc9ddd8e19b2c79dc10f81e6f90fa27d57a60179ffbf3cd4',
+  xudtTypeArgs: '0x2682c5ed0d63f641bb8801fceded0f5fcfb55854f4507888643da47fbc10a9ce',
   transferAmount: BigInt(10_0000_0000),
 });
 

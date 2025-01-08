@@ -48,6 +48,7 @@ export const genBtcJumpCkbVirtualTx = async ({
   ckbFeeRate,
   btcTestnetType,
   btcConfirmationBlocks,
+  vendorCellDeps,
 }: BtcJumpCkbVirtualTxParams): Promise<BtcJumpCkbVirtualTxResult> => {
   const isMainnet = toCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
@@ -145,6 +146,7 @@ export const genBtcJumpCkbVirtualTx = async ({
       compatibleXudtCodeHashes: isStandardUDT ? [] : [xudtType.codeHash],
     },
     btcTestnetType,
+    vendorCellDeps,
   );
   if (needPaymasterCell) {
     cellDeps.push(getSecp256k1CellDep(isMainnet));

@@ -82,8 +82,8 @@ const prepareLaunchCell = async ({
 };
 
 prepareLaunchCell({
-  outIndex: 6,
-  btcTxId: 'a67a7c8a0e202119a035266f4bdd74b1b02552048543556f798e34d48306ea1f',
+  outIndex: 2,
+  btcTxId: '8ae0e7c4834ee409815a56774ec4cf9dc9d14851f3587c01e67f6086f07454ac',
   rgbppTokenInfo: RGBPP_TOKEN_INFO,
 });
 

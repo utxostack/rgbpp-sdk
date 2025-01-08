@@ -55,6 +55,7 @@ export const genLeapSporeFromBtcToCkbVirtualTx = async ({
   witnessLockPlaceholderSize,
   ckbFeeRate,
   btcTestnetType,
+  vendorCellDeps,
 }: LeapSporeFromBtcToCkbVirtualTxParams): Promise<SporeLeapVirtualTxResult> => {
   const sporeRgbppLock = {
     ...getRgbppLockScript(isMainnet, btcTestnetType),
@@ -82,7 +83,7 @@ export const genLeapSporeFromBtcToCkbVirtualTx = async ({
   ];
   const outputsData: Hex[] = [sporeCell.outputData];
   const cellDeps = [
-    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true }, btcTestnetType)),
+    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true }, btcTestnetType, vendorCellDeps)),
     getSporeTypeDep(isMainnet),
   ];
   const sporeCoBuild = generateSporeTransferCoBuild([sporeCell], outputs);
@@ -132,6 +133,7 @@ export const buildSporeBtcTimeCellsSpentTx = async ({
   btcAssetsApi,
   isMainnet,
   btcTestnetType,
+  vendorCellDeps,
 }: BtcTimeCellsParams): Promise<CKBComponents.RawTransaction> => {
   const sortedBtcTimeCells = btcTimeCells.sort(compareInputs);
   const inputs: CKBComponents.CellInput[] = sortedBtcTimeCells.map((cell) => ({
@@ -148,7 +150,7 @@ export const buildSporeBtcTimeCellsSpentTx = async ({
   const outputsData = sortedBtcTimeCells.map((cell) => cell.outputData);
 
   const cellDeps: CKBComponents.CellDep[] = [
-    ...(await fetchTypeIdCellDeps(isMainnet, { btcTime: true }, btcTestnetType)),
+    ...(await fetchTypeIdCellDeps(isMainnet, { btcTime: true }, btcTestnetType, vendorCellDeps)),
     getSporeTypeDep(isMainnet),
   ];
 

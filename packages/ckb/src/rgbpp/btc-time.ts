@@ -48,6 +48,7 @@ export const buildBtcTimeCellsSpentTx = async ({
   btcAssetsApi,
   isMainnet,
   btcTestnetType,
+  vendorCellDeps,
 }: BtcTimeCellsParams): Promise<CKBComponents.RawTransaction> => {
   const sortedBtcTimeCells = btcTimeCells.sort(compareInputs);
   const inputs: CKBComponents.CellInput[] = sortedBtcTimeCells.map((cell) => ({
@@ -75,6 +76,7 @@ export const buildBtcTimeCellsSpentTx = async ({
       compatibleXudtCodeHashes,
     },
     btcTestnetType,
+    vendorCellDeps,
   );
 
   const witnesses: Hex[] = [];

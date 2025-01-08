@@ -2,6 +2,7 @@ import { BtcAssetsApi, RgbppApiSpvProof } from '@rgbpp-sdk/service';
 import { Collector } from '../collector';
 import { IndexerCell } from './collector';
 import { Address, Hex, BTCTestnetType } from './common';
+import { CellDepsObject } from '../utils/cell-dep';
 
 export interface ConstructPaymasterParams {
   // The collector that collects CKB live cells and transactions
@@ -35,6 +36,9 @@ export interface BtcTransferVirtualTxParams {
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
+
+  // The vendor cell deps
+  vendorCellDeps?: CellDepsObject;
 }
 
 export interface RgbppBtcAddressReceiver {
@@ -57,6 +61,9 @@ export interface BtcBatchTransferVirtualTxParams {
   isMainnet: boolean;
   // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
   btcTestnetType?: BTCTestnetType;
+
+  // The vendor cell deps
+  vendorCellDeps?: CellDepsObject;
 }
 
 export interface RgbppCkbVirtualTx {
@@ -143,6 +150,9 @@ export interface BtcTimeCellsParams {
   isMainnet: boolean;
   // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
   btcTestnetType?: BTCTestnetType;
+
+  // The vendor cell deps
+  vendorCellDeps?: CellDepsObject;
 }
 
 export interface SignBtcTimeCellsTxParams {
@@ -179,6 +189,9 @@ export interface CkbJumpBtcVirtualTxParams {
   ckbFeeRate?: bigint;
   // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
   btcTestnetType?: BTCTestnetType;
+
+  // The vendor cell deps
+  vendorCellDeps?: CellDepsObject;
 }
 
 export interface UpdateCkbTxWithRealBtcTxIdParams {
@@ -223,6 +236,9 @@ export interface CkbBatchJumpBtcVirtualTxParams {
   ckbFeeRate?: bigint;
   // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
   btcTestnetType?: BTCTestnetType;
+
+  // The vendor cell deps
+  vendorCellDeps?: CellDepsObject;
 }
 
 export interface AppendIssuerCellToBtcBatchTransfer {
@@ -271,4 +287,7 @@ export interface RgbppLaunchCkbVirtualTxParams {
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
+
+  // The vendor cell deps
+  vendorCellDeps?: CellDepsObject;
 }

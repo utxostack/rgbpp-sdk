@@ -67,6 +67,7 @@ export const genBtcTransferCkbVirtualTx = async ({
   witnessLockPlaceholderSize,
   ckbFeeRate,
   btcTestnetType,
+  vendorCellDeps,
 }: BtcTransferVirtualTxParams): Promise<BtcTransferVirtualTxResult> => {
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
 
@@ -180,6 +181,7 @@ export const genBtcTransferCkbVirtualTx = async ({
       compatibleXudtCodeHashes: isStandardUDT ? [] : [xudtType.codeHash],
     },
     btcTestnetType,
+    vendorCellDeps,
   );
   if (needPaymasterCell) {
     cellDeps.push(getSecp256k1CellDep(isMainnet));
@@ -244,6 +246,7 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
   rgbppReceivers,
   isMainnet,
   btcTestnetType,
+  vendorCellDeps,
 }: BtcBatchTransferVirtualTxParams): Promise<BtcBatchTransferVirtualTxResult> => {
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
 
@@ -305,6 +308,7 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
       compatibleXudtCodeHashes: isStandardUDT ? [] : [xudtType.codeHash],
     },
     btcTestnetType,
+    vendorCellDeps,
   );
   cellDeps = [...cellDeps, getSecp256k1CellDep(isMainnet)];
 

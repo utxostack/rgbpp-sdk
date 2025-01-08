@@ -35,6 +35,7 @@ export const genCkbJumpBtcVirtualTx = async ({
   witnessLockPlaceholderSize,
   ckbFeeRate,
   btcTestnetType,
+  vendorCellDeps,
 }: CkbJumpBtcVirtualTxParams): Promise<CKBComponents.RawTransaction> => {
   const isMainnet = fromCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
@@ -102,10 +103,15 @@ export const genCkbJumpBtcVirtualTx = async ({
   outputsData.push('0x');
 
   const isStandardUDT = isStandardUDTTypeSupported(xudtType, isMainnet);
-  const cellDeps = await fetchTypeIdCellDeps(isMainnet, {
-    xudt: isStandardUDT,
-    compatibleXudtCodeHashes: isStandardUDT ? [] : [xudtType.codeHash],
-  });
+  const cellDeps = await fetchTypeIdCellDeps(
+    isMainnet,
+    {
+      xudt: isStandardUDT,
+      compatibleXudtCodeHashes: isStandardUDT ? [] : [xudtType.codeHash],
+    },
+    btcTestnetType,
+    vendorCellDeps,
+  );
   const witnesses = inputs.map(() => '0x');
 
   const ckbRawTx: CKBComponents.RawTransaction = {
@@ -146,6 +152,7 @@ export const genCkbBatchJumpBtcVirtualTx = async ({
   witnessLockPlaceholderSize,
   ckbFeeRate,
   btcTestnetType,
+  vendorCellDeps,
 }: CkbBatchJumpBtcVirtualTxParams): Promise<CKBComponents.RawTransaction> => {
   const isMainnet = fromCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
@@ -215,10 +222,15 @@ export const genCkbBatchJumpBtcVirtualTx = async ({
   outputsData.push('0x');
 
   const isStandardUDT = isStandardUDTTypeSupported(xudtType, isMainnet);
-  const cellDeps = await fetchTypeIdCellDeps(isMainnet, {
-    xudt: isStandardUDT,
-    compatibleXudtCodeHashes: isStandardUDT ? [] : [xudtType.codeHash],
-  });
+  const cellDeps = await fetchTypeIdCellDeps(
+    isMainnet,
+    {
+      xudt: isStandardUDT,
+      compatibleXudtCodeHashes: isStandardUDT ? [] : [xudtType.codeHash],
+    },
+    btcTestnetType,
+    vendorCellDeps,
+  );
   const witnesses = inputs.map(() => '0x');
 
   const ckbRawTx: CKBComponents.RawTransaction = {

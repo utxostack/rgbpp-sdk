@@ -22,6 +22,7 @@ import {
   CKB_PRIVATE_KEY,
   ckbAddress,
   initOfflineCkbCollector,
+  vendorCellDeps,
 } from '../../env';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
 import { signAndSendPsbt } from '../../shared/btc-account';
@@ -55,6 +56,7 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
     toCkbAddress,
     isMainnet,
     btcTestnetType: BTC_TESTNET_TYPE,
+    vendorCellDeps,
   });
 
   // Save ckbVirtualTxResult
@@ -86,7 +88,7 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
     fromPubkey: btcAccount.fromPubkey,
     source: btcOfflineDataSource,
     needPaymaster: false,
-    feeRate: 2048,
+    feeRate: 6000,
   });
 
   const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
@@ -131,10 +133,10 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
 
 // rgbppLockArgs: outIndexU32 + btcTxId
 leapFromBtcToCKB({
-  rgbppLockArgsList: [buildRgbppLockArgs(5, 'e0e28898677a1b04617469531084bfff43d3c1aca113a054487f37106197cc50')],
+  rgbppLockArgsList: [buildRgbppLockArgs(5, '1119178bd233bea78a61b05b52b6e30fd074fca9c1d8ca584a74ea1ec6a51465')],
   toCkbAddress: 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqfpu7pwavwf3yang8khrsklumayj6nyxhqpmh7fq',
   // Please use your own RGB++ xudt asset's xudtTypeArgs
-  xudtTypeArgs: '0x2db4e32c353afc0dfc9ddd8e19b2c79dc10f81e6f90fa27d57a60179ffbf3cd4',
+  xudtTypeArgs: '0x2682c5ed0d63f641bb8801fceded0f5fcfb55854f4507888643da47fbc10a9ce',
   transferAmount: BigInt(233_0000_0000),
 });
 

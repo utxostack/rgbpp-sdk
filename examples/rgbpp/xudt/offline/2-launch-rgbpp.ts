@@ -16,6 +16,7 @@ import {
   initOfflineBtcDataSource,
   initOfflineCkbCollector,
   isMainnet,
+  vendorCellDeps,
 } from '../../env';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
 import { signAndSendPsbt } from '../../shared/btc-account';
@@ -38,6 +39,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
     launchAmount,
     isMainnet,
     btcTestnetType: BTC_TESTNET_TYPE,
+    vendorCellDeps,
   });
 
   // Save ckbVirtualTxResult
@@ -59,7 +61,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
     from: btcAccount.from,
     fromPubkey: btcAccount.fromPubkey,
     source: btcOfflineDataSource,
-    feeRate: 2048,
+    feeRate: 6000,
   });
 
   const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
@@ -94,7 +96,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
 
 // rgbppLockArgs: outIndexU32 + btcTxId
 launchRgppAsset({
-  ownerRgbppLockArgs: buildRgbppLockArgs(6, 'a67a7c8a0e202119a035266f4bdd74b1b02552048543556f798e34d48306ea1f'),
+  ownerRgbppLockArgs: buildRgbppLockArgs(2, '8ae0e7c4834ee409815a56774ec4cf9dc9d14851f3587c01e67f6086f07454ac'),
   rgbppTokenInfo: RGBPP_TOKEN_INFO,
   // The total issuance amount of RGBPP Token, the decimal is determined by RGBPP Token info
   launchAmount: BigInt(2100_0000) * BigInt(10 ** RGBPP_TOKEN_INFO.decimal),

@@ -8,7 +8,15 @@ import {
 } from '@nervosnetwork/ckb-sdk-utils';
 import { NetworkType, AddressType, DataSource, OfflineDataSource, Utxo } from 'rgbpp/btc';
 import { BtcApiUtxoParams, BtcAssetsApi } from 'rgbpp/service';
-import { BTCTestnetType, Collector, Hex, OfflineCollector, remove0x, unpackRgbppLockArgs } from 'rgbpp/ckb';
+import {
+  BTCTestnetType,
+  Collector,
+  Hex,
+  OfflineCollector,
+  remove0x,
+  unpackRgbppLockArgs,
+  fetchCellDepsJson,
+} from 'rgbpp/ckb';
 import { createBtcAccount } from './shared/btc-account';
 
 dotenv.config({ path: __dirname + '/.env' });
@@ -114,3 +122,12 @@ export const initOfflineBtcDataSource = async (
     feeUtxos,
   });
 };
+
+let vendorCellDeps: Awaited<ReturnType<typeof fetchCellDepsJson>>;
+(async () => {
+  vendorCellDeps = await fetchCellDepsJson();
+  if (!vendorCellDeps) {
+    throw new Error('Failed to fetch vendor cell deps');
+  }
+})();
+export { vendorCellDeps };

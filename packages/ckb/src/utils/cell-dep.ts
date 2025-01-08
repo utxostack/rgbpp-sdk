@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getBtcTimeLockDep, getRgbppLockDep, getUniqueTypeDep, getXudtDep } from '../constants';
 import { BTCTestnetType } from '../types';
 
-interface CellDepsObject {
+export interface CellDepsObject {
   rgbpp: {
     mainnet: CKBComponents.CellDep;
     testnet: CKBComponents.CellDep;
@@ -33,7 +33,7 @@ const CDN_GITHUB_CELL_DEPS_JSON_URL =
 
 const request = (url: string) => axios.get(url, { timeout: 5000 });
 
-const fetchCellDepsJson = async () => {
+export const fetchCellDepsJson = async () => {
   try {
     const response = await Promise.any([request(CDN_GITHUB_CELL_DEPS_JSON_URL), request(GITHUB_CELL_DEPS_JSON_URL)]);
     return response.data as CellDepsObject;
@@ -54,6 +54,7 @@ export const fetchTypeIdCellDeps = async (
   isMainnet: boolean,
   selected: CellDepsSelected,
   btcTestnetType?: BTCTestnetType,
+  vendorCellDeps?: CellDepsObject,
 ): Promise<CKBComponents.CellDep[]> => {
   let cellDeps: CKBComponents.CellDep[] = [];
 
@@ -62,7 +63,13 @@ export const fetchTypeIdCellDeps = async (
   let xudtDep = getXudtDep(isMainnet);
   let uniqueDep = getUniqueTypeDep(isMainnet);
 
-  const cellDepsObj = await fetchCellDepsJson();
+  let cellDepsObj;
+  if (vendorCellDeps) {
+    cellDepsObj = vendorCellDeps;
+  } else {
+    cellDepsObj = await fetchCellDepsJson();
+  }
+
   if (cellDepsObj) {
     if (btcTestnetType === 'Signet') {
       rgbppLockDep = cellDepsObj.rgbpp.signet;
