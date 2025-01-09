@@ -268,7 +268,7 @@ const MainnetInfo = {
     depType: 'code',
   } as CKBComponents.CellDep,
 
-  // TODO: Update the UtxoAirdropBadgeTypeScript code hash after the mainnet deployment
+  // TODO: Update the UtxoAirdropBadgeTypeScript and UtxoAirdropBadgeTypeDep after the mainnet deployment
   UtxoAirdropBadgeTypeScript: {
     codeHash: '0xf5da9003e31fa9301a3915fe304de9bdb80524b5f0d8fc325fb699317998ee7a',
     hashType: 'type',
