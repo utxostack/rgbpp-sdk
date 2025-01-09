@@ -29,7 +29,12 @@ export class OfflineCollector extends Collector {
     let cells: IndexerCell[] = [];
 
     if (lock) {
-      cells = this.cells.filter((cell) => isScriptEqual(cell.output.lock, lock));
+      cells = this.cells.filter((cell) => {
+        if (type) {
+          return isScriptEqual(cell.output.lock, lock) && cell.output.type && isScriptEqual(cell.output.type, type);
+        }
+        return isScriptEqual(cell.output.lock, lock);
+      });
     } else if (type) {
       cells = this.cells.filter((cell) => {
         if (!cell.output.type) {
