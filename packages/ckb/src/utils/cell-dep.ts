@@ -45,7 +45,7 @@ const VERCEL_CELL_DEPS_JSON_STATIC_URL = 'https://typeid-contract-cell-deps.verc
 
 const VERCEL_SERVER_CELL_DEPS_JSON_URL = 'https://typeid-contract-cell-deps.vercel.app/api/cell-deps';
 
-const request = (url: string) => axios.get(url, { timeout: 5000 });
+const request = (url: string) => axios.get(url, { timeout: 10000 });
 
 const fetchCellDepsJsonFromStaticSource = async () => {
   try {
