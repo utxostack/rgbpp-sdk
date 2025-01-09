@@ -160,6 +160,12 @@ const TestnetInfo = {
     outPoint: { txHash: '0xfa0a6821293cc1ef4ee67a900862208e27f67b98237c9b13bf93c84607c5cd33', index: '0x2' },
     depType: 'code',
   } as CKBComponents.CellDep,
+
+  TokenMetadataTypeScript: {
+    codeHash: '0x0c7dc8caec145b51b142e13f47fe4262c80628213d1b6c3d9c1aa6a62088804e',
+    hashType: 'type',
+    args: '',
+  } as CKBComponents.Script,
 };
 
 const MainnetInfo = {
@@ -279,6 +285,13 @@ const MainnetInfo = {
     outPoint: { txHash: '0xfa0a6821293cc1ef4ee67a900862208e27f67b98237c9b13bf93c84607c5cd33', index: '0x2' },
     depType: 'code',
   } as CKBComponents.CellDep,
+
+  // TODO: Update the TokenMetadataTypeScript after the mainnet deployment
+  TokenMetadataTypeScript: {
+    codeHash: '0x0c7dc8caec145b51b142e13f47fe4262c80628213d1b6c3d9c1aa6a62088804e',
+    hashType: 'type',
+    args: '',
+  } as CKBComponents.Script,
 };
 
 export const UNLOCKABLE_LOCK_SCRIPT = {
@@ -357,3 +370,6 @@ export const getUtxoAirdropBadgeTypeScript = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.UtxoAirdropBadgeTypeScript : TestnetInfo.UtxoAirdropBadgeTypeScript;
 export const getUtxoAirdropBadgeTypeDep = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.UtxoAirdropBadgeTypeDep : TestnetInfo.UtxoAirdropBadgeTypeDep;
+
+export const getTokenMetadataTypeScript = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.TokenMetadataTypeScript : TestnetInfo.TokenMetadataTypeScript;

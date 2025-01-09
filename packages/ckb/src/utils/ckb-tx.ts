@@ -7,6 +7,7 @@ import {
   getClusterTypeScript,
   getCompatibleXudtTypeScripts,
   getSporeTypeScript,
+  getTokenMetadataTypeScript,
   getUtxoAirdropBadgeTypeScript,
   getXudtTypeScript,
 } from '../constants';
@@ -32,6 +33,15 @@ export const isUtxoAirdropBadgeType = (type: CKBComponents.Script, isMainnet: bo
     args: '',
   });
   return utxoAirdropBadgeType === typeAsset;
+};
+
+export const isTokenMetadataType = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
+  const tokenMetadataType = serializeScript(getTokenMetadataTypeScript(isMainnet));
+  const typeAsset = serializeScript({
+    ...type,
+    args: '',
+  });
+  return tokenMetadataType === typeAsset;
 };
 
 export const isCompatibleUDTTypesSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
