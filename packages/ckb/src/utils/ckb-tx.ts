@@ -7,6 +7,7 @@ import {
   getClusterTypeScript,
   getCompatibleXudtTypeScripts,
   getSporeTypeScript,
+  getUtxoAirdropBadgeTypeScript,
   getXudtTypeScript,
 } from '../constants';
 import { Hex, IndexerCell, RgbppTokenInfo } from '../types';
@@ -22,6 +23,15 @@ export const calculateTransactionFee = (txSize: number, feeRate?: bigint): bigin
   const base = BigInt(txSize) * rate;
   const fee = base / ratio;
   return fee * ratio < base ? fee + BigInt(1) : fee;
+};
+
+export const isUtxoAirdropBadgeType = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
+  const utxoAirdropBadgeType = serializeScript(getUtxoAirdropBadgeTypeScript(isMainnet));
+  const typeAsset = serializeScript({
+    ...type,
+    args: '',
+  });
+  return utxoAirdropBadgeType === typeAsset;
 };
 
 export const isCompatibleUDTTypesSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
