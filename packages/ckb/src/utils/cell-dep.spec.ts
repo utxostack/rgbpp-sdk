@@ -69,4 +69,13 @@ describe('dynamic fetch cell dep', () => {
     expect(cellDeps[0].outPoint?.txHash).toBe('0xed7d65b9ad3d99657e37c4285d585fea8a5fcaf58165d54dacf90243f911548b');
     expect(cellDeps[0].outPoint?.index).toBe('0x0');
   });
+
+  it('fetchTypeIdCellDeps with UTXOAirdropBadge', async () => {
+    const isMainnet = false;
+    const cellDeps = await fetchTypeIdCellDeps(isMainnet, {
+      utxoAirdropBadge: true,
+    });
+    expect(cellDeps[0].outPoint?.txHash).toBe('0xfa0a6821293cc1ef4ee67a900862208e27f67b98237c9b13bf93c84607c5cd33');
+    expect(cellDeps[0].outPoint?.index).toBe('0x2');
+  });
 });
