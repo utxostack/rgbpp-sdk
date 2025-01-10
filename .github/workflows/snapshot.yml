@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - develop
+      - feat/utxo-airdrop-badge
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
