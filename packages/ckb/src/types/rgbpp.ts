@@ -37,7 +37,12 @@ export interface BtcTransferVirtualTxParams {
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
 
-  // The vendor cell deps
+  /*
+   * Vendor cell deps provided by the caller.
+   * These cell deps belong to scripts that may be upgraded in the future.
+   * Please ensure the cell dep information is up to date. The latest cell dep information is maintained at:
+   * https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/deployment/cell-deps.json.
+   */
   vendorCellDeps?: CellDepsObject;
 }
 
@@ -62,7 +67,12 @@ export interface BtcBatchTransferVirtualTxParams {
   // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
   btcTestnetType?: BTCTestnetType;
 
-  // The vendor cell deps
+  /*
+   * Vendor cell deps provided by the caller.
+   * These cell deps belong to scripts that may be upgraded in the future.
+   * Please ensure the cell dep information is up to date. The latest cell dep information is maintained at:
+   * https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/deployment/cell-deps.json.
+   */
   vendorCellDeps?: CellDepsObject;
 }
 
@@ -151,7 +161,12 @@ export interface BtcTimeCellsParams {
   // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
   btcTestnetType?: BTCTestnetType;
 
-  // The vendor cell deps
+  /*
+   * Vendor cell deps provided by the caller.
+   * These cell deps belong to scripts that may be upgraded in the future.
+   * Please ensure the cell dep information is up to date. The latest cell dep information is maintained at:
+   * https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/deployment/cell-deps.json.
+   */
   vendorCellDeps?: CellDepsObject;
 }
 
@@ -190,7 +205,12 @@ export interface CkbJumpBtcVirtualTxParams {
   // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
   btcTestnetType?: BTCTestnetType;
 
-  // The vendor cell deps
+  /*
+   * Vendor cell deps provided by the caller.
+   * These cell deps belong to scripts that may be upgraded in the future.
+   * Please ensure the cell dep information is up to date. The latest cell dep information is maintained at:
+   * https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/deployment/cell-deps.json.
+   */
   vendorCellDeps?: CellDepsObject;
 }
 
@@ -237,7 +257,12 @@ export interface CkbBatchJumpBtcVirtualTxParams {
   // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
   btcTestnetType?: BTCTestnetType;
 
-  // The vendor cell deps
+  /*
+   * Vendor cell deps provided by the caller.
+   * These cell deps belong to scripts that may be upgraded in the future.
+   * Please ensure the cell dep information is up to date. The latest cell dep information is maintained at:
+   * https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/deployment/cell-deps.json.
+   */
   vendorCellDeps?: CellDepsObject;
 }
 
@@ -288,6 +313,11 @@ export interface RgbppLaunchCkbVirtualTxParams {
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
 
-  // The vendor cell deps
+  /*
+   * Vendor cell deps provided by the caller.
+   * These cell deps belong to scripts that may be upgraded in the future.
+   * Please ensure the cell dep information is up to date. The latest cell dep information is maintained at:
+   * https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/deployment/cell-deps.json.
+   */
   vendorCellDeps?: CellDepsObject;
 }

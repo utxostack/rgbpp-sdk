@@ -63,12 +63,7 @@ export const fetchTypeIdCellDeps = async (
   let xudtDep = getXudtDep(isMainnet);
   let uniqueDep = getUniqueTypeDep(isMainnet);
 
-  let cellDepsObj;
-  if (vendorCellDeps) {
-    cellDepsObj = vendorCellDeps;
-  } else {
-    cellDepsObj = await fetchCellDepsJson();
-  }
+  const cellDepsObj = vendorCellDeps ?? (await fetchCellDepsJson());
 
   if (cellDepsObj) {
     if (btcTestnetType === 'Signet') {
