@@ -66,9 +66,7 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers, xudtTyp
   // Rgbpp change utxo position depends on the number of distributions, if 50 addresses are distributed, then the change utxo position is 51
   console.log('RGB++ asset change utxo out index: ', rgbppChangeOutIndex);
 
-  const btcOfflineDataSource = await initOfflineBtcDataSource(rgbppLockArgsList, btcAccount.from, {
-    only_non_rgbpp_utxos: true,
-  });
+  const btcOfflineDataSource = await initOfflineBtcDataSource(rgbppLockArgsList, btcAccount.from);
 
   // Send BTC tx
   const psbt = await sendRgbppUtxos({
@@ -80,7 +78,7 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers, xudtTyp
     from: btcAccount.from,
     fromPubkey: btcAccount.fromPubkey,
     source: btcOfflineDataSource,
-    feeRate: 6000,
+    feeRate: 4096,
   });
 
   const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
@@ -125,9 +123,9 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers, xudtTyp
 // rgbppLockArgs: outIndexU32 + btcTxId
 distributeRgbppAssetOnBtc({
   // Warning: If rgbpp assets are distributed continuously, then the position of the current rgbpp asset utxo depends on the position of the previous change utxo distributed
-  rgbppLockArgsList: [buildRgbppLockArgs(1, '8b892dcddc2726b70213d10759448c88e9d68c706463ec61b0320ed4d854e424')],
+  rgbppLockArgsList: [buildRgbppLockArgs(1, 'a2bcca7807f8543d71e85e772335fa7eec2d812ca3250fed96a9d406aa1a9827')],
   // The xudtTypeArgs comes from the logs "RGB++ Asset type script args" of 2-launch-rgbpp.ts
-  xudtTypeArgs: '0x2682c5ed0d63f641bb8801fceded0f5fcfb55854f4507888643da47fbc10a9ce',
+  xudtTypeArgs: '0x13ce1d60ec65d693724006086568645aa24c019510ebc9af7cf6b993c2d7bffb',
   receivers: [
     {
       toBtcAddress: 'tb1qeq27se73d0e6zkh53e3xrj90vqzv8g7ja3nm85',

@@ -62,7 +62,7 @@ leapFromCkbToBtc({
   outIndex: 0,
   btcTxId: 'c1db31abe6bab345b5d5ab4a19c8f34c8cfe23efa4ec6bfa7b05c8e7b4f965b8',
   // Please use your own RGB++ xudt asset's xudtTypeArgs
-  xudtTypeArgs: '0x2682c5ed0d63f641bb8801fceded0f5fcfb55854f4507888643da47fbc10a9ce',
+  xudtTypeArgs: '0x13ce1d60ec65d693724006086568645aa24c019510ebc9af7cf6b993c2d7bffb',
   transferAmount: BigInt(10_0000_0000),
 });
 

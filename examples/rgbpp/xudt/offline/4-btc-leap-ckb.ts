@@ -2,8 +2,6 @@ import {
   buildRgbppLockArgs,
   getXudtTypeScript,
   genRgbppLockScript,
-  unpackRgbppLockArgs,
-  remove0x,
   appendIssuerCellToBtcBatchTransfer,
   appendCkbTxWitnesses,
   updateCkbTxWithRealBtcTxId,
@@ -15,19 +13,16 @@ import {
   isMainnet,
   collector,
   btcService,
-  btcDataSource,
   btcAccount,
   BTC_TESTNET_TYPE,
-  networkType,
   CKB_PRIVATE_KEY,
   ckbAddress,
   initOfflineCkbCollector,
   vendorCellDeps,
+  initOfflineBtcDataSource,
 } from '../../env';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
 import { signAndSendPsbt } from '../../shared/btc-account';
-import { BtcApiTransaction } from 'rgbpp/dist/service.js';
-import { OfflineDataSource } from 'rgbpp/btc';
 
 interface LeapToCkbParams {
   rgbppLockArgsList: string[];
@@ -64,19 +59,7 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
 
   const { commitment, ckbRawTx, sumInputsCapacity } = ckbVirtualTxResult;
 
-  const rgbppBtcTxs: BtcApiTransaction[] = [];
-  for await (const rgbppLockArgs of rgbppLockArgsList) {
-    const tx = await btcService.getBtcTransaction(remove0x(unpackRgbppLockArgs(rgbppLockArgs).btcTxId));
-    if (!tx) {
-      throw new Error('BTC tx not found');
-    }
-    rgbppBtcTxs.push(tx);
-  }
-  const feeUtxos = await btcDataSource.getUtxos(btcAccount.from, { only_non_rgbpp_utxos: true });
-  const btcOfflineDataSource = new OfflineDataSource(networkType, {
-    txs: rgbppBtcTxs,
-    feeUtxos,
-  });
+  const btcOfflineDataSource = await initOfflineBtcDataSource(rgbppLockArgsList, btcAccount.from);
 
   // Send BTC tx
   const psbt = await sendRgbppUtxos({
@@ -133,10 +116,10 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
 
 // rgbppLockArgs: outIndexU32 + btcTxId
 leapFromBtcToCKB({
-  rgbppLockArgsList: [buildRgbppLockArgs(5, '1119178bd233bea78a61b05b52b6e30fd074fca9c1d8ca584a74ea1ec6a51465')],
+  rgbppLockArgsList: [buildRgbppLockArgs(5, '316267e33808ae437c9870c3538ec5d46361e6474ace0e150442b10c41a1cb21')],
   toCkbAddress: 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqfpu7pwavwf3yang8khrsklumayj6nyxhqpmh7fq',
   // Please use your own RGB++ xudt asset's xudtTypeArgs
-  xudtTypeArgs: '0x2682c5ed0d63f641bb8801fceded0f5fcfb55854f4507888643da47fbc10a9ce',
+  xudtTypeArgs: '0x13ce1d60ec65d693724006086568645aa24c019510ebc9af7cf6b993c2d7bffb',
   transferAmount: BigInt(233_0000_0000),
 });
 

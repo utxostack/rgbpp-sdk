@@ -6,8 +6,8 @@ import {
   scriptToAddress,
   systemScripts,
 } from '@nervosnetwork/ckb-sdk-utils';
-import { NetworkType, AddressType, DataSource, OfflineDataSource, Utxo } from 'rgbpp/btc';
-import { BtcApiUtxoParams, BtcAssetsApi } from 'rgbpp/service';
+import { NetworkType, AddressType, DataSource } from 'rgbpp/btc';
+import { BtcAssetsApi, OfflineBtcAssetsDataSource, OfflineBtcUtxo, BtcApiUtxo } from 'rgbpp/service';
 import {
   BTCTestnetType,
   Collector,
@@ -96,11 +96,7 @@ export const initOfflineCkbCollector = async (
   };
 };
 
-export const initOfflineBtcDataSource = async (
-  rgbppLockArgsList: string[],
-  feePayer?: string,
-  params?: BtcApiUtxoParams,
-) => {
+export const initOfflineBtcDataSource = async (rgbppLockArgsList: string[], address: string) => {
   const btcTxIds = rgbppLockArgsList.map((rgbppLockArgs) => remove0x(unpackRgbppLockArgs(rgbppLockArgs).btcTxId));
   const btcTxs = await Promise.all(
     btcTxIds.map(async (btcTxId) => {
@@ -112,15 +108,31 @@ export const initOfflineBtcDataSource = async (
     }),
   );
 
-  let feeUtxos: Utxo[] = [];
-  if (feePayer) {
-    feeUtxos = await btcDataSource.getUtxos(feePayer, params);
-  }
-
-  return new OfflineDataSource(networkType, {
-    txs: btcTxs,
-    feeUtxos,
+  const utxoMap = new Map<string, OfflineBtcUtxo>();
+  const keyOf = (utxo: BtcApiUtxo) => `${utxo.txid}:${utxo.vout}`;
+  (await btcService.getBtcUtxos(address)).forEach((utxo) => {
+    utxoMap.set(keyOf(utxo), {
+      ...utxo,
+      address,
+      nonRgbpp: false,
+    });
   });
+  (
+    await btcService.getBtcUtxos(address, {
+      only_non_rgbpp_utxos: true,
+    })
+  ).forEach((utxo) => {
+    utxoMap.set(keyOf(utxo), {
+      ...utxo,
+      address,
+      nonRgbpp: true,
+    });
+  });
+
+  return new DataSource(
+    new OfflineBtcAssetsDataSource({ txs: btcTxs, utxos: Array.from(utxoMap.values()) }),
+    networkType,
+  );
 };
 
 let vendorCellDeps: Awaited<ReturnType<typeof fetchCellDepsJson>>;

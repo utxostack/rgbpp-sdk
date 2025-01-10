@@ -1,4 +1,10 @@
-import { BtcApiUtxoParams, BtcAssetsApi, BtcAssetsApiError, ErrorCodes as ServiceErrorCodes } from '@rgbpp-sdk/service';
+import {
+  BtcApiUtxoParams,
+  BtcAssetsApi,
+  BtcAssetsApiError,
+  ErrorCodes as ServiceErrorCodes,
+  OfflineBtcAssetsDataSourceError,
+} from '@rgbpp-sdk/service';
 import { BaseOutput, Output, Utxo } from '../transaction/utxo';
 import { NetworkType } from '../preset/types';
 import { ErrorCodes, TxBuildError } from '../error';
@@ -168,6 +174,11 @@ export class DataSource {
       };
     } catch (err) {
       if (err instanceof BtcAssetsApiError && err.code === ServiceErrorCodes.ASSETS_API_RESOURCE_NOT_FOUND) {
+        return undefined;
+      } else if (
+        err instanceof OfflineBtcAssetsDataSourceError &&
+        err.code === ServiceErrorCodes.OFFLINE_DATA_SOURCE_METHOD_NOT_AVAILABLE
+      ) {
         return undefined;
       }
       throw err;

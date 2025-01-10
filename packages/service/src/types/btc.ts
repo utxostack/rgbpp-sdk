@@ -90,6 +90,11 @@ export interface BtcApiUtxo {
   };
 }
 
+export interface OfflineBtcUtxo extends BtcApiUtxo {
+  address: string;
+  nonRgbpp: boolean;
+}
+
 export interface BtcApiSentTransaction {
   txid: string;
 }

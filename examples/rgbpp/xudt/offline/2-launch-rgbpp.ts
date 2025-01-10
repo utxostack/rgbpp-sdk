@@ -49,7 +49,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
 
   console.log('RGB++ Asset type script args: ', ckbRawTx.outputs[0].type?.args);
 
-  const btcOfflineDataSource = await initOfflineBtcDataSource([ownerRgbppLockArgs]);
+  const btcOfflineDataSource = await initOfflineBtcDataSource([ownerRgbppLockArgs], btcAccount.from);
 
   // Send BTC tx
   const psbt = await sendRgbppUtxos({
@@ -61,7 +61,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
     from: btcAccount.from,
     fromPubkey: btcAccount.fromPubkey,
     source: btcOfflineDataSource,
-    feeRate: 6000,
+    feeRate: 4096,
   });
 
   const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
@@ -96,7 +96,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
 
 // rgbppLockArgs: outIndexU32 + btcTxId
 launchRgppAsset({
-  ownerRgbppLockArgs: buildRgbppLockArgs(2, '8ae0e7c4834ee409815a56774ec4cf9dc9d14851f3587c01e67f6086f07454ac'),
+  ownerRgbppLockArgs: buildRgbppLockArgs(6, '692a88b83d7dee2a77b5ab3372115a311aa503b1632d3ecdd2e77ffbafd94bdf'),
   rgbppTokenInfo: RGBPP_TOKEN_INFO,
   // The total issuance amount of RGBPP Token, the decimal is determined by RGBPP Token info
   launchAmount: BigInt(2100_0000) * BigInt(10 ** RGBPP_TOKEN_INFO.decimal),
