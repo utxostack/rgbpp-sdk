@@ -4,6 +4,7 @@ import {
   BtcAssetsApiError,
   ErrorCodes as ServiceErrorCodes,
   OfflineBtcAssetsDataSourceError,
+  BtcApiRecommendedFeeRates,
 } from '@rgbpp-sdk/service';
 import { BaseOutput, Output, Utxo } from '../transaction/utxo';
 import { NetworkType } from '../preset/types';
@@ -183,5 +184,9 @@ export class DataSource {
       }
       throw err;
     }
+  }
+
+  async getBtcRecommendedFeeRates(): Promise<BtcApiRecommendedFeeRates> {
+    return this.service.getBtcRecommendedFeeRates();
   }
 }
