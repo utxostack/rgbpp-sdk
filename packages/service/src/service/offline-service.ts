@@ -15,6 +15,7 @@ import {
   RgbppApiSendCkbTransactionPayload,
   RgbppApiRetryCkbTransactionPayload,
   OfflineBtcUtxo,
+  BtcApiRecommendedFeeRates,
 } from '../types';
 
 export interface OfflineBtcData {
@@ -23,15 +24,19 @@ export interface OfflineBtcData {
 }
 
 /*
- * Currently, the offline mode is only suitable for scenarios where you prefer to manually provide transactions and UTXOs data to build BTC transactions,
- * as its implemented methods are limited. If you require access to the full range of functionalities, such as advanced queries or sending transactions,
- * consider switching to BtcAssetsApi instead.
+ * The offline mode is currently suitable for scenarios where you prefer to manually provide transaction and UTXO data to build BTC transactions.
+ * Note that the implemented methods are limited, and the default fee rate is set to 1 sat/vB. It is strongly recommended to provide a real-time
+ * BTC fee rate for smoother transaction processing.
+ *
+ * For access to the full range of functionalities, such as advanced queries or sending transactions, consider switching to BtcAssetsApi.
  */
 export class OfflineBtcAssetsDataSource extends BtcAssetsApi {
   // txid -> tx
   private txs: Record<string, BtcApiTransaction>;
   // address -> utxos
   private utxos: Record<string, OfflineBtcUtxo[]>;
+
+  private defaultFee = 1;
 
   constructor(offlineData: OfflineBtcData) {
     super({ url: 'DUMMY_URL' });
@@ -71,18 +76,19 @@ export class OfflineBtcAssetsDataSource extends BtcAssetsApi {
     );
   }
 
+  getBtcRecommendedFeeRates(): Promise<BtcApiRecommendedFeeRates> {
+    return Promise.resolve({
+      fastestFee: this.defaultFee,
+      halfHourFee: this.defaultFee,
+      hourFee: this.defaultFee,
+      economyFee: this.defaultFee,
+      minimumFee: this.defaultFee,
+    });
+  }
+
   /*
    * The following methods are not available in offline mode.
    */
-
-  getBtcRecommendedFeeRates() {
-    return Promise.reject(
-      new OfflineBtcAssetsDataSourceError(
-        ErrorCodes.OFFLINE_DATA_SOURCE_METHOD_NOT_AVAILABLE,
-        'Recommended fee rate is not available in offline mode. You must explicitly provide a fee rate.',
-      ),
-    );
-  }
 
   getRgbppPaymasterInfo() {
     return Promise.reject(new OfflineBtcAssetsDataSourceError(ErrorCodes.OFFLINE_DATA_SOURCE_METHOD_NOT_AVAILABLE));

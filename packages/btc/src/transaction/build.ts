@@ -159,12 +159,6 @@ export class TxBuilder {
     // Fill a default recommended fee rate if props.feeRate is not provided
     let defaultFeeRate: number | undefined;
     if (!feeRate && !this.feeRate) {
-      /*
-       * `DataSource` uses its `BtcAssetsApi` field to retrieve the BTC fee rate if it is not provided.
-       * However, when using `OfflineBtcAssetsDataSource`, a simplified offline version of `BtcAssetsApi`, retrieving
-       * the BTC fee rate is not applicable. In such cases, the fee rate must be explicitly provided by the caller,
-       * even though it remains optional at the API level.
-       */
       const feeRates = await this.source.getBtcRecommendedFeeRates();
       defaultFeeRate = feeRates.fastestFee;
     }
