@@ -87,7 +87,7 @@ export async function signAndSendPsbt(
   signPsbt(psbt, account);
   psbt.finalizeAllInputs();
 
-  const tx = psbt.extractTransaction();
+  const tx = psbt.extractTransaction(true);
   const txHex = tx.toHex();
 
   const { txid } = await service.sendBtcTransaction(txHex);
