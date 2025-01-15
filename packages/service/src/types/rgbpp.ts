@@ -132,6 +132,10 @@ export interface RgbppApiXudtAssetInfo {
   symbol: string;
   name: string;
   decimal: number;
+  total_supply?: string;
+  issuer?: string;
+  circulating_supply?: string;
+  token_info_cell_type_hash?: string;
 }
 
 export interface RgbppApiSporeAssetInfo {
