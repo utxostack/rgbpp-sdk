@@ -66,7 +66,7 @@ export const buildBtcTimeCellsSpentTx = async ({
 
   const hasStandardUDT = outputs.some((output) => isStandardUDTTypeSupported(output.type!, isMainnet));
   const compatibleXudtCodeHashes = outputs
-    .filter((output) => isCompatibleUDTTypesSupported(output.type!, isMainnet))
+    .filter(async (output) => await isCompatibleUDTTypesSupported(output.type!))
     .map((output) => output.type!.codeHash);
   const cellDeps = await fetchTypeIdCellDeps(
     isMainnet,

@@ -39,7 +39,7 @@ export const genCkbJumpBtcVirtualTx = async ({
 }: CkbJumpBtcVirtualTxParams): Promise<CKBComponents.RawTransaction> => {
   const isMainnet = fromCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
-  if (!isTypeAssetSupported(xudtType, isMainnet)) {
+  if (!(await isTypeAssetSupported(xudtType, isMainnet))) {
     throw new TypeAssetNotSupportedError('The type script asset is not supported now');
   }
 
@@ -156,7 +156,7 @@ export const genCkbBatchJumpBtcVirtualTx = async ({
 }: CkbBatchJumpBtcVirtualTxParams): Promise<CKBComponents.RawTransaction> => {
   const isMainnet = fromCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
-  if (!isTypeAssetSupported(xudtType, isMainnet)) {
+  if (!(await isTypeAssetSupported(xudtType, isMainnet))) {
     throw new TypeAssetNotSupportedError('The type script asset is not supported now');
   }
 

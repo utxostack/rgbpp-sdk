@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {
   getBtcTimeLockDep,
+  COMPATIBLE_XUDT_TYPE_SCRIPTS,
   getRgbppLockDep,
   getUniqueTypeDep,
   getUtxoAirdropBadgeTypeDep,
@@ -29,9 +30,7 @@ export interface CellDepsObject {
     testnet: CKBComponents.CellDep;
     mainnet: CKBComponents.CellDep;
   };
-  compatibleXudt: {
-    [codeHash: string]: CKBComponents.CellDep;
-  };
+  compatibleXudt: Record<string, CKBComponents.CellDep>;
 }
 const GITHUB_CELL_DEPS_JSON_URL =
   'https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/deployment/cell-deps.json';
@@ -55,10 +54,11 @@ const fetchCellDepsJsonFromStaticSource = async () => {
       request(VERCEL_CELL_DEPS_JSON_STATIC_URL),
     ]);
     return response.data as CellDepsObject;
-  } catch (error) {
-    // for (const e of error.errors) {
-    //   console.error('Error fetching cell deps from static source:', e);
-    // }
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+  } catch (error: any) {
+    for (const e of error.errors) {
+      console.error('Error fetching cell deps from static source:', e);
+    }
   }
 };
 
@@ -70,7 +70,7 @@ const fetchCellDepsJson = async () => {
     }
     return await fetchCellDepsJsonFromStaticSource();
   } catch (error) {
-    // console.error('Error fetching cell deps from vercel server:', error);
+    console.error('Error fetching cell deps from vercel server:', error);
     return await fetchCellDepsJsonFromStaticSource();
   }
 };
@@ -196,6 +196,7 @@ export const fetchTypeIdCellDeps = async (
   }
    */
   if (selected.compatibleXudtCodeHashes && selected.compatibleXudtCodeHashes?.length > 0) {
+    console.log(cellDepsObj);
     if (cellDepsObj?.compatibleXudt === undefined) {
       throw new Error('Compatible xUDT cell deps are null');
     }
@@ -209,4 +210,38 @@ export const fetchTypeIdCellDeps = async (
   }
 
   return cellDeps;
+};
+
+const GITHUB_COMPATIBLE_XUDT_CELL_DEPS_JSON_URL =
+  'https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/compatible-udt.json';
+// If the CDN has cache issue, please clear the cache by visiting
+// https://www.jsdelivr.com/tools/purge?path=/gh/utxostack/typeid-contract-cell-deps@main
+const CDN_GITHUB_COMPATIBLE_XUDT_CELL_DEPS_JSON_URL =
+  'https://cdn.jsdelivr.net/gh/utxostack/typeid-contract-cell-deps@main/compatible-udt.json';
+
+export const fetchCompatibleXudtScripts = async (): Promise<CKBComponents.Script[]> => {
+  try {
+    const response = await Promise.any([
+      request(CDN_GITHUB_COMPATIBLE_XUDT_CELL_DEPS_JSON_URL),
+      request(GITHUB_COMPATIBLE_XUDT_CELL_DEPS_JSON_URL),
+    ]);
+    if (response && response.data) {
+      const list = response.data as {
+        codeHash: string;
+      }[];
+      const codeHashes: CKBComponents.Script[] = list.map((script) => ({
+        codeHash: script.codeHash,
+        hashType: 'type',
+        args: '',
+      }));
+      return codeHashes;
+    }
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+  } catch (error: any) {
+    for (const e of error.errors) {
+      console.error('fetchCompatibleXudtScripts error:', e);
+    }
+    return COMPATIBLE_XUDT_TYPE_SCRIPTS;
+  }
+  return COMPATIBLE_XUDT_TYPE_SCRIPTS;
 };

@@ -5,7 +5,6 @@ import {
   CKB_UNIT,
   UNLOCKABLE_LOCK_SCRIPT,
   getClusterTypeScript,
-  getCompatibleXudtTypeScripts,
   getSporeTypeScript,
   getTokenMetadataTypeScript,
   getUtxoAirdropBadgeTypeScript,
@@ -15,6 +14,7 @@ import { Hex, IndexerCell, RgbppTokenInfo } from '../types';
 import { encodeRgbppTokenInfo, genBtcTimeLockScript } from './rgbpp';
 import { Collector } from '../collector';
 import { NoLiveCellError } from '../error';
+import { fetchCompatibleXudtScripts } from './cell-dep';
 
 export { serializeScript };
 
@@ -44,8 +44,8 @@ export const isTokenMetadataType = (type: CKBComponents.Script, isMainnet: boole
   return tokenMetadataType === typeAsset;
 };
 
-export const isCompatibleUDTTypesSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
-  const compatibleXudtTypeBytes = getCompatibleXudtTypeScripts(isMainnet).map((script) => serializeScript(script));
+export const isCompatibleUDTTypesSupported = async (type: CKBComponents.Script): Promise<boolean> => {
+  const compatibleXudtTypeBytes = (await fetchCompatibleXudtScripts()).map((script) => serializeScript(script));
   const typeAsset = serializeScript({
     ...type,
     args: '',
@@ -62,8 +62,8 @@ export const isStandardUDTTypeSupported = (type: CKBComponents.Script, isMainnet
   return xudtType === typeAsset;
 };
 
-export const isUDTTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
-  return isStandardUDTTypeSupported(type, isMainnet) || isCompatibleUDTTypesSupported(type, isMainnet);
+export const isUDTTypeSupported = async (type: CKBComponents.Script, isMainnet: boolean): Promise<boolean> => {
+  return isStandardUDTTypeSupported(type, isMainnet) || (await isCompatibleUDTTypesSupported(type));
 };
 
 export const isSporeTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
@@ -84,8 +84,8 @@ export const isClusterSporeTypeSupported = (type: CKBComponents.Script, isMainne
   return isSporeTypeSupported(type, isMainnet) || clusterType === typeAsset;
 };
 
-export const isTypeAssetSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
-  return isUDTTypeSupported(type, isMainnet) || isClusterSporeTypeSupported(type, isMainnet);
+export const isTypeAssetSupported = async (type: CKBComponents.Script, isMainnet: boolean): Promise<boolean> => {
+  return (await isUDTTypeSupported(type, isMainnet)) || isClusterSporeTypeSupported(type, isMainnet);
 };
 
 const CELL_CAPACITY_SIZE = 8;

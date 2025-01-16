@@ -71,7 +71,7 @@ export const genBtcTransferCkbVirtualTx = async ({
 }: BtcTransferVirtualTxParams): Promise<BtcTransferVirtualTxResult> => {
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
 
-  if (!isUDTTypeSupported(xudtType, isMainnet)) {
+  if (!(await isUDTTypeSupported(xudtType, isMainnet))) {
     throw new TypeAssetNotSupportedError('The type script asset is not supported now');
   }
 
@@ -250,7 +250,7 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
 }: BtcBatchTransferVirtualTxParams): Promise<BtcBatchTransferVirtualTxResult> => {
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
 
-  if (!isUDTTypeSupported(xudtType, isMainnet)) {
+  if (!(await isUDTTypeSupported(xudtType, isMainnet))) {
     throw new TypeAssetNotSupportedError('The type script asset is not supported now');
   }
 

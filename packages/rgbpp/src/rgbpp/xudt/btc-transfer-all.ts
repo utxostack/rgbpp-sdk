@@ -96,9 +96,11 @@ export async function buildRgbppTransferAllTxs(params: RgbppTransferAllTxsParams
           cellsMap.set(utxoId, cells);
         }
         const utxo = utxoMap.get(utxoId);
-        const hasUnsupportedTypeCell = cells.some((cell) => {
-          return cell.cellOutput.type && !isUDTTypeSupported(cell.cellOutput.type, isMainnet);
-        });
+        const hasUnsupportedTypeCell = await Promise.any(
+          cells.map(async (cell) => {
+            return cell.cellOutput.type && !(await isUDTTypeSupported(cell.cellOutput.type, isMainnet));
+          }),
+        );
         if (!utxo || !cells || cells.length > maxRgbppCellsPerCkbTx || hasUnsupportedTypeCell) {
           invalidUtxoIds.add(utxoId);
           return;
@@ -129,7 +131,7 @@ export async function buildRgbppTransferAllTxs(params: RgbppTransferAllTxsParams
   const transactionGroups: RgbppTransferAllTxGroup[] = [];
   for (const assetGroups of groupedAssetGroups) {
     // Collect summary of the assets group, including XUDT amounts
-    const groupSummary = summarizer.addGroups(
+    const groupSummary = await summarizer.addGroups(
       assetGroups.map((group) => ({
         utxo: utxoMap.get(group.id)!,
         cells: cellsMap.get(group.id)!,

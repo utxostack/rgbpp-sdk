@@ -35,17 +35,17 @@ export class AssetSummarizer {
 
   constructor(public isMainnet: boolean) {}
 
-  addGroup(utxo: Utxo, cells: Cell[]): AssetGroupSummary {
+  async addGroup(utxo: Utxo, cells: Cell[]): Promise<AssetGroupSummary> {
     const utxoId = encodeUtxoId(utxo.txid, utxo.vout);
 
     const cellIds: string[] = [];
     const xudtCellIds: string[] = [];
     const xudtAssets: Record<string, XudtAssetSummary> = {};
-    for (const cell of cells) {
+    for await (const cell of cells) {
       const cellId = encodeCellId(cell.outPoint!.txHash, cell.outPoint!.index);
       cellIds.push(cellId);
 
-      const isXudt = !!cell.cellOutput.type && isUDTTypeSupported(cell.cellOutput.type, this.isMainnet);
+      const isXudt = !!cell.cellOutput.type && (await isUDTTypeSupported(cell.cellOutput.type, this.isMainnet));
       if (isXudt) {
         // If the cell type is a supported xUDT type, record its asset information
         const xudtTypeArgs = cell.cellOutput.type?.args ?? 'empty';
@@ -77,8 +77,8 @@ export class AssetSummarizer {
     return result;
   }
 
-  addGroups(groups: AssetGroup[]): TransactionGroupSummary {
-    const groupResults = groups.map((group) => this.addGroup(group.utxo, group.cells));
+  async addGroups(groups: AssetGroup[]): Promise<TransactionGroupSummary> {
+    const groupResults = await Promise.all(groups.map(async (group) => await this.addGroup(group.utxo, group.cells)));
     return this.summarizeGroups(groupResults);
   }
 

@@ -53,7 +53,7 @@ export const genBtcJumpCkbVirtualTx = async ({
   const isMainnet = toCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
 
-  if (!isUDTTypeSupported(xudtType, isMainnet)) {
+  if (!(await isUDTTypeSupported(xudtType, isMainnet))) {
     throw new TypeAssetNotSupportedError('The type script asset is not supported now');
   }
 

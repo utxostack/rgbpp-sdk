@@ -278,7 +278,7 @@ export const throwErrorWhenRgbppCellsInvalid = (
   }
 
   const isUDTTypeNotSupported = typeCells.some(
-    (cell) => cell.output.type && !isUDTTypeSupported(cell.output.type, isMainnet),
+    async (cell) => cell.output.type && !(await isUDTTypeSupported(cell.output.type, isMainnet)),
   );
   if (isUDTTypeNotSupported) {
     throw new RgbppUtxoBindMultiTypeAssetsError(

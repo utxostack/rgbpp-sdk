@@ -12,6 +12,7 @@ import {
   isTypeAssetSupported,
   checkCkbTxInputsCapacitySufficient,
   calculateCellOccupiedCapacity,
+  isCompatibleUDTTypesSupported,
 } from './ckb-tx';
 import { hexToBytes } from '@nervosnetwork/ckb-sdk-utils';
 import { Collector } from '../collector';
@@ -49,7 +50,7 @@ describe('ckb tx utils', () => {
     expect(actual).toBe(BigInt(253_0000_0000));
   });
 
-  it('isClusterSporeTypeSupported', () => {
+  it('isClusterSporeTypeSupported', async () => {
     const clusterTestnetType: CKBComponents.Script = {
       codeHash: '0x0bbe768b519d8ea7b96d58f1182eb7e6ef96c541fbd9526975077ee09f049058',
       hashType: 'data1',
@@ -76,37 +77,37 @@ describe('ckb tx utils', () => {
       hashType: 'data1',
       args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
     };
-    expect(isTypeAssetSupported(sporeMainnetType, true)).toBe(true);
+    expect(await isTypeAssetSupported(sporeMainnetType, true)).toBe(true);
 
     const sporeMainnetErrorType: CKBComponents.Script = {
       codeHash: '0x50bd8d6680b8b9cf98b73f3c08faf8b2a21914311954118ad6609be6e78a1b95',
       hashType: 'type',
       args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
     };
-    expect(isTypeAssetSupported(sporeMainnetErrorType, true)).toBe(false);
+    expect(await isTypeAssetSupported(sporeMainnetErrorType, true)).toBe(false);
   });
 
-  it('isTypeAssetSupported', () => {
+  it('isTypeAssetSupported', async () => {
     const xudtTestnetType: CKBComponents.Script = {
       codeHash: '0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb',
       hashType: 'type',
       args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
     };
-    expect(isTypeAssetSupported(xudtTestnetType, false)).toBe(true);
+    expect(await isTypeAssetSupported(xudtTestnetType, false)).toBe(true);
 
     const xudtMainnetType: CKBComponents.Script = {
       codeHash: '0x50bd8d6680b8b9cf98b73f3c08faf8b2a21914311954118ad6609be6e78a1b95',
       hashType: 'data1',
       args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
     };
-    expect(isTypeAssetSupported(xudtMainnetType, true)).toBe(true);
+    expect(await isTypeAssetSupported(xudtMainnetType, true)).toBe(true);
 
     const xudtMainnetErrorType: CKBComponents.Script = {
       codeHash: '0x50bd8d6680b8b9cf98b73f3c08faf8b2a21914311954118ad6609be6e78a1b95',
       hashType: 'type',
       args: '0x06ec22c2def100bba3e295a1ff279c490d227151bf3166a4f3f008906c849399',
     };
-    expect(isTypeAssetSupported(xudtMainnetErrorType, true)).toBe(false);
+    expect(await isTypeAssetSupported(xudtMainnetErrorType, true)).toBe(false);
   });
 
   it('generateUniqueTypeArgs', () => {
@@ -310,4 +311,17 @@ describe('ckb tx utils', () => {
     };
     expect(true).toBe(await checkCkbTxInputsCapacitySufficient(ckbTx, collector));
   });
+
+  it(
+    'isCompatibleUDTTypesSupported',
+    async () => {
+      const actual = await isCompatibleUDTTypesSupported({
+        codeHash: '0x1142755a044bf2ee358cba9f2da187ce928c91cd4dc8692ded0337efa677d21a',
+        hashType: 'type',
+        args: '0x878fcc6f1f08d48e87bb1c3b3d5083f23f8a39c5d5c764f253b55b998526439b',
+      });
+      expect(actual).toBe(true);
+    },
+    { timeout: 10000 },
+  );
 });
