@@ -1,4 +1,5 @@
 ---
+'@rgbpp-sdk/service': minor
 '@rgbpp-sdk/ckb': minor
 ---
 
