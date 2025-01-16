@@ -109,8 +109,8 @@ describe('dynamic fetch cell dep', () => {
       const cellDeps = await fetchTypeIdCellDeps(isMainnet, {
         utxoAirdropBadge: true,
       });
-      expect(cellDeps[0].outPoint?.txHash).toBe('0xfa0a6821293cc1ef4ee67a900862208e27f67b98237c9b13bf93c84607c5cd33');
-      expect(cellDeps[0].outPoint?.index).toBe('0x2');
+      expect(cellDeps[0].outPoint?.txHash).toBe('0xbbbb73972ac260a0f7204bea707288c3970688fe8714c3246a5e9a538168a42a');
+      expect(cellDeps[0].outPoint?.index).toBe('0x0');
     },
     { timeout: 10000 },
   );

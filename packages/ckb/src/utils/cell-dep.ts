@@ -36,11 +36,6 @@ export interface CellDepsObject {
 const GITHUB_CELL_DEPS_JSON_URL =
   'https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/deployment/cell-deps.json';
 
-// If the CDN has cache issue, please clear the cache by visiting
-// https://www.jsdelivr.com/tools/purge?path=/gh/utxostack/typeid-contract-cell-deps@main
-const CDN_GITHUB_CELL_DEPS_JSON_URL =
-  'https://cdn.jsdelivr.net/gh/utxostack/typeid-contract-cell-deps@main/deployment/cell-deps.json';
-
 const VERCEL_CELL_DEPS_JSON_STATIC_URL = 'https://typeid-contract-cell-deps.vercel.app/deployment/cell-deps.json';
 
 const VERCEL_SERVER_CELL_DEPS_JSON_URL = 'https://typeid-contract-cell-deps.vercel.app/api/cell-deps';
@@ -49,11 +44,7 @@ const request = (url: string) => axios.get(url, { timeout: 10000 });
 
 const fetchCellDepsJsonFromStaticSource = async () => {
   try {
-    const response = await Promise.any([
-      request(CDN_GITHUB_CELL_DEPS_JSON_URL),
-      request(GITHUB_CELL_DEPS_JSON_URL),
-      request(VERCEL_CELL_DEPS_JSON_STATIC_URL),
-    ]);
+    const response = await Promise.any([request(VERCEL_CELL_DEPS_JSON_STATIC_URL), request(GITHUB_CELL_DEPS_JSON_URL)]);
     return response.data as CellDepsObject;
   } catch (error) {
     // for (const e of error.errors) {
