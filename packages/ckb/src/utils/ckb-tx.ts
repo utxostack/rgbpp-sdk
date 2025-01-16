@@ -5,7 +5,7 @@ import {
   CKB_UNIT,
   UNLOCKABLE_LOCK_SCRIPT,
   getClusterTypeScript,
-  getCompatibleXudtTypeScripts,
+  COMPATIBLE_XUDT_TYPE_SCRIPTS,
   getSporeTypeScript,
   getTokenMetadataTypeScript,
   getUtxoAirdropBadgeTypeScript,
@@ -44,8 +44,8 @@ export const isTokenMetadataType = (type: CKBComponents.Script, isMainnet: boole
   return tokenMetadataType === typeAsset;
 };
 
-export const isCompatibleUDTTypesSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
-  const compatibleXudtTypeBytes = getCompatibleXudtTypeScripts(isMainnet).map((script) => serializeScript(script));
+export const isCompatibleUDTTypesSupported = (type: CKBComponents.Script): boolean => {
+  const compatibleXudtTypeBytes = COMPATIBLE_XUDT_TYPE_SCRIPTS.map((script) => serializeScript(script));
   const typeAsset = serializeScript({
     ...type,
     args: '',
@@ -63,7 +63,7 @@ export const isStandardUDTTypeSupported = (type: CKBComponents.Script, isMainnet
 };
 
 export const isUDTTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
-  return isStandardUDTTypeSupported(type, isMainnet) || isCompatibleUDTTypesSupported(type, isMainnet);
+  return isStandardUDTTypeSupported(type, isMainnet) || isCompatibleUDTTypesSupported(type);
 };
 
 export const isSporeTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {

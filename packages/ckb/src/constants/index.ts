@@ -66,15 +66,6 @@ const TestnetInfo = {
     depType: 'code',
   } as CKBComponents.CellDep,
 
-  CompatibleXUDTTypeScripts: [
-    // RUSD
-    {
-      codeHash: '0x1142755a044bf2ee358cba9f2da187ce928c91cd4dc8692ded0337efa677d21a',
-      hashType: 'type',
-      args: '',
-    },
-  ] as CKBComponents.Script[],
-
   UniqueTypeScript: {
     codeHash: '0x8e341bcfec6393dcd41e635733ff2dca00a6af546949f70c57a706c0f344df8b',
     hashType: 'type',
@@ -223,15 +214,6 @@ const MainnetInfo = {
     depType: 'code',
   } as CKBComponents.CellDep,
 
-  CompatibleXUDTTypeScripts: [
-    // RUSD
-    {
-      codeHash: '0x26a33e0815888a4a0614a0b7d09fa951e0993ff21e55905510104a0b1312032b',
-      hashType: 'type',
-      args: '',
-    },
-  ] as CKBComponents.Script[],
-
   UniqueTypeScript: {
     codeHash: '0x2c8c11c985da60b0a330c61a85507416d6382c130ba67f0c47ab071e00aec628',
     hashType: 'data1',
@@ -293,6 +275,33 @@ const MainnetInfo = {
     args: '',
   } as CKBComponents.Script,
 };
+
+export const COMPATIBLE_XUDT_TYPE_SCRIPTS: CKBComponents.Script[] = [
+  // RUSD Mainnet
+  {
+    codeHash: '0x26a33e0815888a4a0614a0b7d09fa951e0993ff21e55905510104a0b1312032b',
+    hashType: 'type',
+    args: '',
+  },
+  // RUSD Testnet
+  {
+    codeHash: '0x1142755a044bf2ee358cba9f2da187ce928c91cd4dc8692ded0337efa677d21a',
+    hashType: 'type',
+    args: '',
+  },
+  // USDI Mainnet
+  {
+    codeHash: '0xbfa35a9c38a676682b65ade8f02be164d48632281477e36f8dc2f41f79e56bfc',
+    hashType: 'type',
+    args: '',
+  },
+  // USDI Testnet
+  {
+    codeHash: '0xcc9dc33ef234e14bc788c43a4848556a5fb16401a04662fc55db9bb201987037',
+    hashType: 'type',
+    args: '',
+  },
+];
 
 export const UNLOCKABLE_LOCK_SCRIPT = {
   codeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -362,9 +371,6 @@ export const getSporeTypeScript = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.SporeTypeScript : TestnetInfo.SporeTypeScript;
 export const getSporeTypeDep = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.SporeTypeDep : TestnetInfo.SporeTypeDep;
-
-export const getCompatibleXudtTypeScripts = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.CompatibleXUDTTypeScripts : TestnetInfo.CompatibleXUDTTypeScripts;
 
 export const getUtxoAirdropBadgeTypeScript = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.UtxoAirdropBadgeTypeScript : TestnetInfo.UtxoAirdropBadgeTypeScript;
