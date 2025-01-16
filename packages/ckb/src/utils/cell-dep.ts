@@ -1,5 +1,11 @@
 import axios from 'axios';
-import { getBtcTimeLockDep, getRgbppLockDep, getUniqueTypeDep, getXudtDep } from '../constants';
+import {
+  getBtcTimeLockDep,
+  getRgbppLockDep,
+  getUniqueTypeDep,
+  getUtxoAirdropBadgeTypeDep,
+  getXudtDep,
+} from '../constants';
 import { BTCTestnetType } from '../types';
 
 export interface CellDepsObject {
@@ -19,6 +25,10 @@ export interface CellDepsObject {
   unique: {
     testnet: CKBComponents.CellDep;
   };
+  utxoAirdropBadge: {
+    testnet: CKBComponents.CellDep;
+    mainnet: CKBComponents.CellDep;
+  };
   compatibleXudt: {
     [codeHash: string]: CKBComponents.CellDep;
   };
@@ -31,14 +41,37 @@ const GITHUB_CELL_DEPS_JSON_URL =
 const CDN_GITHUB_CELL_DEPS_JSON_URL =
   'https://cdn.jsdelivr.net/gh/utxostack/typeid-contract-cell-deps@main/deployment/cell-deps.json';
 
-const request = (url: string) => axios.get(url, { timeout: 5000 });
+const VERCEL_CELL_DEPS_JSON_STATIC_URL = 'https://typeid-contract-cell-deps.vercel.app/deployment/cell-deps.json';
 
-export const fetchCellDepsJson = async () => {
+const VERCEL_SERVER_CELL_DEPS_JSON_URL = 'https://typeid-contract-cell-deps.vercel.app/api/cell-deps';
+
+const request = (url: string) => axios.get(url, { timeout: 10000 });
+
+const fetchCellDepsJsonFromStaticSource = async () => {
   try {
-    const response = await Promise.any([request(CDN_GITHUB_CELL_DEPS_JSON_URL), request(GITHUB_CELL_DEPS_JSON_URL)]);
+    const response = await Promise.any([
+      request(CDN_GITHUB_CELL_DEPS_JSON_URL),
+      request(GITHUB_CELL_DEPS_JSON_URL),
+      request(VERCEL_CELL_DEPS_JSON_STATIC_URL),
+    ]);
     return response.data as CellDepsObject;
   } catch (error) {
-    // console.error('Error fetching cell deps:', error);
+    // for (const e of error.errors) {
+    //   console.error('Error fetching cell deps from static source:', e);
+    // }
+  }
+};
+
+const fetchCellDepsJson = async () => {
+  try {
+    const response = await request(VERCEL_SERVER_CELL_DEPS_JSON_URL);
+    if (response && response.data) {
+      return response.data as CellDepsObject;
+    }
+    return await fetchCellDepsJsonFromStaticSource();
+  } catch (error) {
+    // console.error('Error fetching cell deps from vercel server:', error);
+    return await fetchCellDepsJsonFromStaticSource();
   }
 };
 
@@ -48,6 +81,7 @@ export interface CellDepsSelected {
   xudt?: boolean;
   unique?: boolean;
   compatibleXudtCodeHashes?: string[];
+  utxoAirdropBadge?: boolean;
 }
 
 export const fetchTypeIdCellDeps = async (
@@ -62,24 +96,19 @@ export const fetchTypeIdCellDeps = async (
   let btcTimeDep = getBtcTimeLockDep(isMainnet, btcTestnetType);
   let xudtDep = getXudtDep(isMainnet);
   let uniqueDep = getUniqueTypeDep(isMainnet);
+  let utxoAirdropBadgeDep = getUtxoAirdropBadgeTypeDep(isMainnet);
 
   const cellDepsObj = vendorCellDeps ?? (await fetchCellDepsJson());
 
-  if (cellDepsObj) {
-    if (btcTestnetType === 'Signet') {
-      rgbppLockDep = cellDepsObj.rgbpp.signet;
-      btcTimeDep = cellDepsObj.btcTime.signet;
-    } else {
-      rgbppLockDep = isMainnet ? cellDepsObj.rgbpp.mainnet : cellDepsObj.rgbpp.testnet;
-      btcTimeDep = isMainnet ? cellDepsObj.btcTime.mainnet : cellDepsObj.btcTime.testnet;
-    }
-    if (!isMainnet) {
-      xudtDep = cellDepsObj.xudt.testnet;
-      uniqueDep = cellDepsObj.unique.testnet;
-    }
-  }
-
   if (selected.rgbpp === true) {
+    if (cellDepsObj?.rgbpp) {
+      const { signet, testnet, mainnet } = cellDepsObj.rgbpp;
+      if (btcTestnetType === 'Signet') {
+        rgbppLockDep = signet;
+      } else {
+        rgbppLockDep = isMainnet ? mainnet : testnet;
+      }
+    }
     // RGB++ config cell is deployed together with the RGB++ lock contract
     //
     // contract_deployment_transaction:
@@ -100,6 +129,14 @@ export const fetchTypeIdCellDeps = async (
   }
 
   if (selected.btcTime === true) {
+    if (cellDepsObj?.btcTime) {
+      const { signet, testnet, mainnet } = cellDepsObj.btcTime;
+      if (btcTestnetType === 'Signet') {
+        btcTimeDep = signet;
+      } else {
+        btcTimeDep = isMainnet ? mainnet : testnet;
+      }
+    }
     // BTC Time config cell is deployed together with the BTC Time lock contract
     //
     // contract_deployment_transaction:
@@ -120,11 +157,24 @@ export const fetchTypeIdCellDeps = async (
   }
 
   if (selected.xudt === true) {
+    if (!isMainnet && cellDepsObj?.xudt) {
+      xudtDep = cellDepsObj.xudt.testnet;
+    }
     cellDeps = [...cellDeps, xudtDep] as CKBComponents.CellDep[];
   }
 
   if (selected.unique === true) {
+    if (!isMainnet && cellDepsObj?.unique) {
+      uniqueDep = cellDepsObj.unique.testnet;
+    }
     cellDeps = [...cellDeps, uniqueDep] as CKBComponents.CellDep[];
+  }
+
+  if (selected.utxoAirdropBadge === true) {
+    if (cellDepsObj?.utxoAirdropBadge) {
+      utxoAirdropBadgeDep = isMainnet ? cellDepsObj.utxoAirdropBadge.mainnet : cellDepsObj.utxoAirdropBadge.testnet;
+    }
+    cellDeps = [...cellDeps, utxoAirdropBadgeDep] as CKBComponents.CellDep[];
   }
 
   /**

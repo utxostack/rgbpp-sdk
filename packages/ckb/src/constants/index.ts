@@ -149,6 +149,23 @@ const TestnetInfo = {
     outPoint: { txHash: '0x5364b3535965e9eac9a35dd7af8e9e45a61d30a16e115923c032f80b28783e21', index: '0x1' },
     depType: 'code',
   } as CKBComponents.CellDep,
+
+  UtxoAirdropBadgeTypeScript: {
+    codeHash: '0xf5da9003e31fa9301a3915fe304de9bdb80524b5f0d8fc325fb699317998ee7a',
+    hashType: 'type',
+    args: '',
+  } as CKBComponents.Script,
+
+  UtxoAirdropBadgeTypeDep: {
+    outPoint: { txHash: '0xfa0a6821293cc1ef4ee67a900862208e27f67b98237c9b13bf93c84607c5cd33', index: '0x2' },
+    depType: 'code',
+  } as CKBComponents.CellDep,
+
+  TokenMetadataTypeScript: {
+    codeHash: '0x0c7dc8caec145b51b142e13f47fe4262c80628213d1b6c3d9c1aa6a62088804e',
+    hashType: 'type',
+    args: '',
+  } as CKBComponents.Script,
 };
 
 const MainnetInfo = {
@@ -256,6 +273,25 @@ const MainnetInfo = {
     },
     depType: 'code',
   } as CKBComponents.CellDep,
+
+  // TODO: Update the UtxoAirdropBadgeTypeScript and UtxoAirdropBadgeTypeDep after the mainnet deployment
+  UtxoAirdropBadgeTypeScript: {
+    codeHash: '0xf5da9003e31fa9301a3915fe304de9bdb80524b5f0d8fc325fb699317998ee7a',
+    hashType: 'type',
+    args: '',
+  } as CKBComponents.Script,
+
+  UtxoAirdropBadgeTypeDep: {
+    outPoint: { txHash: '0xfa0a6821293cc1ef4ee67a900862208e27f67b98237c9b13bf93c84607c5cd33', index: '0x2' },
+    depType: 'code',
+  } as CKBComponents.CellDep,
+
+  // TODO: Update the TokenMetadataTypeScript after the mainnet deployment
+  TokenMetadataTypeScript: {
+    codeHash: '0x0c7dc8caec145b51b142e13f47fe4262c80628213d1b6c3d9c1aa6a62088804e',
+    hashType: 'type',
+    args: '',
+  } as CKBComponents.Script,
 };
 
 export const UNLOCKABLE_LOCK_SCRIPT = {
@@ -329,3 +365,11 @@ export const getSporeTypeDep = (isMainnet: boolean) =>
 
 export const getCompatibleXudtTypeScripts = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.CompatibleXUDTTypeScripts : TestnetInfo.CompatibleXUDTTypeScripts;
+
+export const getUtxoAirdropBadgeTypeScript = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.UtxoAirdropBadgeTypeScript : TestnetInfo.UtxoAirdropBadgeTypeScript;
+export const getUtxoAirdropBadgeTypeDep = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.UtxoAirdropBadgeTypeDep : TestnetInfo.UtxoAirdropBadgeTypeDep;
+
+export const getTokenMetadataTypeScript = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.TokenMetadataTypeScript : TestnetInfo.TokenMetadataTypeScript;
