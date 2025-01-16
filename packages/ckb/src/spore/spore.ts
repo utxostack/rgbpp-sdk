@@ -65,6 +65,7 @@ export const genCreateSporeCkbVirtualTx = async ({
   sporeDataList,
   isMainnet,
   btcTestnetType,
+  vendorCellDeps,
 }: CreateSporeCkbVirtualTxParams): Promise<SporeCreateVirtualTxResult> => {
   const clusterRgbppLock = genRgbppLockScript(clusterRgbppLockArgs, isMainnet, btcTestnetType);
   const clusterCells = await collector.getCells({ lock: clusterRgbppLock, isDataMustBeEmpty: false });
@@ -116,7 +117,7 @@ export const genCreateSporeCkbVirtualTx = async ({
   ];
   const outputsData: Hex[] = [clusterCell.outputData, ...sporeOutputsData];
   const cellDeps = [
-    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true }, btcTestnetType)),
+    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true }, btcTestnetType, vendorCellDeps)),
     getClusterTypeDep(isMainnet),
     getSporeTypeDep(isMainnet),
     clusterCellDep,
@@ -298,6 +299,7 @@ export const genTransferSporeCkbVirtualTx = async ({
   witnessLockPlaceholderSize,
   ckbFeeRate,
   btcTestnetType,
+  vendorCellDeps,
 }: TransferSporeCkbVirtualTxParams): Promise<SporeTransferVirtualTxResult> => {
   const sporeRgbppLock = genRgbppLockScript(sporeRgbppLockArgs, isMainnet, btcTestnetType);
   const sporeCells = await collector.getCells({ lock: sporeRgbppLock, isDataMustBeEmpty: false });
@@ -322,7 +324,7 @@ export const genTransferSporeCkbVirtualTx = async ({
   ];
   const outputsData: Hex[] = [sporeCell.outputData];
   const cellDeps = [
-    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true }, btcTestnetType)),
+    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true }, btcTestnetType, vendorCellDeps)),
     getSporeTypeDep(isMainnet),
   ];
   const sporeCoBuild = generateSporeTransferCoBuild([sporeCell], outputs);

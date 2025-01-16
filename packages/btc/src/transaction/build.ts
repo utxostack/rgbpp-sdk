@@ -159,7 +159,7 @@ export class TxBuilder {
     // Fill a default recommended fee rate if props.feeRate is not provided
     let defaultFeeRate: number | undefined;
     if (!feeRate && !this.feeRate) {
-      const feeRates = await this.source.service.getBtcRecommendedFeeRates();
+      const feeRates = await this.source.getBtcRecommendedFeeRates();
       defaultFeeRate = feeRates.fastestFee;
     }
 
