@@ -122,6 +122,12 @@ describe('dynamic fetch cell dep', () => {
       expect(scripts.length > 0).toBe(true);
       // RUSD Mainnet
       expect(scripts[0].codeHash).toBe('0x26a33e0815888a4a0614a0b7d09fa951e0993ff21e55905510104a0b1312032b');
+
+      await CompatibleXUDTRegistry.refreshCache();
+      const latestScripts = CompatibleXUDTRegistry.getCompatibleTokens();
+      expect(latestScripts.length > 0).toBe(true);
+      // RUSD Testnet
+      expect(latestScripts[0].codeHash).toBe('0x1142755a044bf2ee358cba9f2da187ce928c91cd4dc8692ded0337efa677d21a');
     },
     { timeout: 10000 },
   );
