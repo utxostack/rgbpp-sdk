@@ -10,6 +10,7 @@ export enum ErrorCodes {
   ASSETS_API_RESPONSE_DECODE_ERROR,
 
   OFFLINE_DATA_SOURCE_METHOD_NOT_AVAILABLE,
+  OFFLINE_DATA_SOURCE_SPV_PROOF_NOT_FOUND,
 }
 
 export const ErrorMessages = {
@@ -22,6 +23,7 @@ export const ErrorMessages = {
   [ErrorCodes.ASSETS_API_RESPONSE_DECODE_ERROR]: 'Failed to decode the response of BtcAssetsAPI',
 
   [ErrorCodes.OFFLINE_DATA_SOURCE_METHOD_NOT_AVAILABLE]: 'Method not available for offline data source',
+  [ErrorCodes.OFFLINE_DATA_SOURCE_SPV_PROOF_NOT_FOUND]: 'SPV proof not found for the given txid and confirmations',
 };
 
 export class BtcAssetsApiError extends Error {
