@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { fetchTypeIdCellDeps } from './cell-dep';
+import { CompatibleXUDTRegistry, fetchTypeIdCellDeps } from './cell-dep';
 import { getBtcTimeLockDep, getRgbppLockDep, getUniqueTypeDep, getXudtDep } from '../constants';
 
 describe('dynamic fetch cell dep', () => {
@@ -111,6 +111,17 @@ describe('dynamic fetch cell dep', () => {
       });
       expect(cellDeps[0].outPoint?.txHash).toBe('0xbbbb73972ac260a0f7204bea707288c3970688fe8714c3246a5e9a538168a42a');
       expect(cellDeps[0].outPoint?.index).toBe('0x0');
+    },
+    { timeout: 10000 },
+  );
+
+  it(
+    'CompatibleXUDTRegistry.getCompatibleTokens',
+    async () => {
+      const scripts = CompatibleXUDTRegistry.getCompatibleTokens();
+      expect(scripts.length > 0).toBe(true);
+      // RUSD Mainnet
+      expect(scripts[0].codeHash).toBe('0x26a33e0815888a4a0614a0b7d09fa951e0993ff21e55905510104a0b1312032b');
     },
     { timeout: 10000 },
   );

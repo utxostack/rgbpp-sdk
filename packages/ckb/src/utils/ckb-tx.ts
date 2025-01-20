@@ -5,7 +5,6 @@ import {
   CKB_UNIT,
   UNLOCKABLE_LOCK_SCRIPT,
   getClusterTypeScript,
-  COMPATIBLE_XUDT_TYPE_SCRIPTS,
   getSporeTypeScript,
   getTokenMetadataTypeScript,
   getUtxoAirdropBadgeTypeScript,
@@ -15,6 +14,7 @@ import { Hex, IndexerCell, RgbppTokenInfo } from '../types';
 import { encodeRgbppTokenInfo, genBtcTimeLockScript } from './rgbpp';
 import { Collector } from '../collector';
 import { NoLiveCellError } from '../error';
+import { CompatibleXUDTRegistry } from './cell-dep';
 
 export { serializeScript };
 
@@ -44,8 +44,17 @@ export const isTokenMetadataType = (type: CKBComponents.Script, isMainnet: boole
   return tokenMetadataType === typeAsset;
 };
 
+//
+/**
+ * Checks if the provided UDT (User Defined Token) type script is supported by comparing it against a list of compatible UDT types.
+ * If you want to get the latest compatible xUDT list, CompatibleXUDTRegistry.refreshCache should be called before the isCompatibleUDTTypesSupported
+ *
+ * @param type - The UDT type script to check for compatibility.
+ * @returns A boolean indicating whether the provided UDT type script is supported.
+ */
 export const isCompatibleUDTTypesSupported = (type: CKBComponents.Script): boolean => {
-  const compatibleXudtTypeBytes = COMPATIBLE_XUDT_TYPE_SCRIPTS.map((script) => serializeScript(script));
+  const compatibleList = CompatibleXUDTRegistry.getCompatibleTokens();
+  const compatibleXudtTypeBytes = compatibleList.map((script) => serializeScript(script));
   const typeAsset = serializeScript({
     ...type,
     args: '',
