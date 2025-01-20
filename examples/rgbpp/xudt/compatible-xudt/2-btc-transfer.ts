@@ -1,4 +1,4 @@
-import { buildRgbppLockArgs } from 'rgbpp/ckb';
+import { buildRgbppLockArgs, CompatibleXUDTRegistry } from 'rgbpp/ckb';
 import { buildRgbppTransferTx } from 'rgbpp';
 import { isMainnet, collector, btcService, btcAccount, btcDataSource, BTC_TESTNET_TYPE } from '../../env';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
@@ -18,6 +18,13 @@ const transferRusdOnBtc = async ({
   compatibleXudtTypeScript,
   transferAmount,
 }: RgbppTransferParams) => {
+  // Refresh the cache by fetching the latest compatible xUDT list from the specified URL.
+  // The default URL is:
+  // https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/compatible-udt.json
+  // You can set your own trusted URL to fetch the compatible xUDT list.
+  // await CompatibleXUDTRegistry.refreshCache("https://your-own-trusted-compatible-xudt-url");
+  await CompatibleXUDTRegistry.refreshCache();
+
   const { ckbVirtualTxResult, btcPsbtHex } = await buildRgbppTransferTx({
     ckb: {
       collector,

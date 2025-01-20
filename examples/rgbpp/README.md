@@ -2,6 +2,8 @@
 
 - xUDT directory: The examples for RGB++ UDT issuance, transfer, transferAll and leap
 - Spore directory: The examples for RGB++ Spore creation, transfer and leap
+- compatible-xudt directory: The examples for RGB++ compatible UDT issuance, transfer, transferAll and leap  
+  - If you want to get the latest compatible xUDT list, `CompatibleXUDTRegistry.refreshCache` should be called first
 
 > [!TIP]
 > All the parameters of the examples should be repalced with your own, including BTC private key, CKB private key, BTC Service origin, BTC Service token, BTC UTXO, xUDT type args, Spore type args, etc. 
