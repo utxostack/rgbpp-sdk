@@ -220,7 +220,7 @@ export class CompatibleXUDTRegistry {
   // If you want to get the latest compatible xUDT list, CompatibleXUDTRegistry.refreshCache should be called first
   static getCompatibleTokens(): CKBComponents.Script[] {
     const now = Date.now();
-    if (this.cache.length > 0 || now - this.lastFetchTime > this.CACHE_DURATION) {
+    if (this.cache.length === 0 || now - this.lastFetchTime > this.CACHE_DURATION) {
       this.refreshCache(this.xudtUrl);
     }
     return this.cache.length > 0 ? this.cache : COMPATIBLE_XUDT_TYPE_SCRIPTS;
@@ -239,9 +239,12 @@ export class CompatibleXUDTRegistry {
    * @returns A promise that resolves when the cache has been refreshed.
    */
   static async refreshCache(url?: string): Promise<void> {
-    this.xudtUrl = url ?? VERCEL_CELL_DEPS_JSON_STATIC_URL;
+    this.xudtUrl = url ?? VERCEL_STATIC_COMPATIBLE_XUDT_URL;
+    const isExternal = url !== VERCEL_STATIC_COMPATIBLE_XUDT_URL && url !== GITHUB_STATIC_COMPATIBLE_XUDT_URL;
     try {
-      const response = await Promise.any([request(this.xudtUrl), request(GITHUB_STATIC_COMPATIBLE_XUDT_URL)]);
+      const response = await (isExternal
+        ? request(this.xudtUrl)
+        : Promise.any([request(this.xudtUrl), request(GITHUB_STATIC_COMPATIBLE_XUDT_URL)]));
       if (response && response.data) {
         const xudtList = response.data as { codeHash: string }[];
         this.cache = xudtList.map((xudt) => {
