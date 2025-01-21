@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {
+  COMPATIBLE_XUDT_TYPE_SCRIPTS,
   getBtcTimeLockDep,
   getRgbppLockDep,
   getUniqueTypeDep,
@@ -36,11 +37,6 @@ export interface CellDepsObject {
 const GITHUB_CELL_DEPS_JSON_URL =
   'https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/deployment/cell-deps.json';
 
-// If the CDN has cache issue, please clear the cache by visiting
-// https://www.jsdelivr.com/tools/purge?path=/gh/utxostack/typeid-contract-cell-deps@main
-const CDN_GITHUB_CELL_DEPS_JSON_URL =
-  'https://cdn.jsdelivr.net/gh/utxostack/typeid-contract-cell-deps@main/deployment/cell-deps.json';
-
 const VERCEL_CELL_DEPS_JSON_STATIC_URL = 'https://typeid-contract-cell-deps.vercel.app/deployment/cell-deps.json';
 
 const VERCEL_SERVER_CELL_DEPS_JSON_URL = 'https://typeid-contract-cell-deps.vercel.app/api/cell-deps';
@@ -49,11 +45,7 @@ const request = (url: string) => axios.get(url, { timeout: 10000 });
 
 const fetchCellDepsJsonFromStaticSource = async () => {
   try {
-    const response = await Promise.any([
-      request(CDN_GITHUB_CELL_DEPS_JSON_URL),
-      request(GITHUB_CELL_DEPS_JSON_URL),
-      request(VERCEL_CELL_DEPS_JSON_STATIC_URL),
-    ]);
+    const response = await Promise.any([request(VERCEL_CELL_DEPS_JSON_STATIC_URL), request(GITHUB_CELL_DEPS_JSON_URL)]);
     return response.data as CellDepsObject;
   } catch (error) {
     // for (const e of error.errors) {
@@ -210,3 +202,61 @@ export const fetchTypeIdCellDeps = async (
 
   return cellDeps;
 };
+
+const VERCEL_STATIC_COMPATIBLE_XUDT_URL = 'https://typeid-contract-cell-deps.vercel.app/compatible-udt.json';
+const GITHUB_STATIC_COMPATIBLE_XUDT_URL =
+  'https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/compatible-udt.json';
+
+/**
+ * The `CompatibleXUDTRegistry` class is responsible for managing a cache of compatible XUDT (eXtensible User-Defined Token) scripts.
+ * It fetches and caches the compatible tokens from specified URLs and refreshes the cache periodically.
+ */
+export class CompatibleXUDTRegistry {
+  private static cache: CKBComponents.Script[] = [];
+  private static lastFetchTime: number = 0;
+  private static CACHE_DURATION = 3 * 60 * 1000; // 3 minutes ([about 24 CKB blocks](https://docs-old.nervos.org/docs/essays/tx-confirmation))
+  private static xudtUrl = VERCEL_STATIC_COMPATIBLE_XUDT_URL;
+
+  // If you want to get the latest compatible xUDT list, CompatibleXUDTRegistry.refreshCache should be called first
+  static getCompatibleTokens(): CKBComponents.Script[] {
+    const now = Date.now();
+    if (this.cache.length === 0 || now - this.lastFetchTime > this.CACHE_DURATION) {
+      this.refreshCache(this.xudtUrl);
+    }
+    return this.cache.length > 0 ? this.cache : COMPATIBLE_XUDT_TYPE_SCRIPTS;
+  }
+
+  /**
+   * Refreshes the cache by fetching data from the provided URL or a default URL.
+   *
+   * This method attempts to fetch data from the provided URL or a default URL
+   * using `Promise.any` to handle multiple potential sources. If the fetch is
+   * successful, it updates the cache with the fetched data and sets the last
+   * fetch time to the current timestamp.
+   *
+   * @param url - An optional URL to fetch data from. If not provided, a default
+   * URL (`VERCEL_CELL_DEPS_JSON_STATIC_URL`) will be used.
+   * @returns A promise that resolves when the cache has been refreshed.
+   */
+  static async refreshCache(url?: string): Promise<void> {
+    this.xudtUrl = url ?? VERCEL_STATIC_COMPATIBLE_XUDT_URL;
+    const isExternal = url !== VERCEL_STATIC_COMPATIBLE_XUDT_URL && url !== GITHUB_STATIC_COMPATIBLE_XUDT_URL;
+    try {
+      const response = await (isExternal
+        ? request(this.xudtUrl)
+        : Promise.any([request(this.xudtUrl), request(GITHUB_STATIC_COMPATIBLE_XUDT_URL)]));
+      if (response && response.data) {
+        const xudtList = response.data as { codeHash: string }[];
+        this.cache = xudtList.map((xudt) => {
+          return {
+            codeHash: xudt.codeHash,
+            hashType: 'type',
+          } as CKBComponents.Script;
+        });
+      }
+      this.lastFetchTime = Date.now();
+    } catch (error) {
+      // console.error(error)
+    }
+  }
+}

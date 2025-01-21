@@ -5,7 +5,6 @@ import {
   CKB_UNIT,
   UNLOCKABLE_LOCK_SCRIPT,
   getClusterTypeScript,
-  getCompatibleXudtTypeScripts,
   getSporeTypeScript,
   getTokenMetadataTypeScript,
   getUtxoAirdropBadgeTypeScript,
@@ -15,6 +14,7 @@ import { Hex, IndexerCell, RgbppTokenInfo } from '../types';
 import { encodeRgbppTokenInfo, genBtcTimeLockScript } from './rgbpp';
 import { Collector } from '../collector';
 import { NoLiveCellError } from '../error';
+import { CompatibleXUDTRegistry } from './cell-dep';
 
 export { serializeScript };
 
@@ -44,8 +44,17 @@ export const isTokenMetadataType = (type: CKBComponents.Script, isMainnet: boole
   return tokenMetadataType === typeAsset;
 };
 
-export const isCompatibleUDTTypesSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
-  const compatibleXudtTypeBytes = getCompatibleXudtTypeScripts(isMainnet).map((script) => serializeScript(script));
+//
+/**
+ * Checks if the provided UDT (User Defined Token) type script is supported by comparing it against a list of compatible UDT types.
+ * If you want to get the latest compatible xUDT list, CompatibleXUDTRegistry.refreshCache should be called before the isCompatibleUDTTypesSupported
+ *
+ * @param type - The UDT type script to check for compatibility.
+ * @returns A boolean indicating whether the provided UDT type script is supported.
+ */
+export const isCompatibleUDTTypesSupported = (type: CKBComponents.Script): boolean => {
+  const compatibleList = CompatibleXUDTRegistry.getCompatibleTokens();
+  const compatibleXudtTypeBytes = compatibleList.map((script) => serializeScript(script));
   const typeAsset = serializeScript({
     ...type,
     args: '',
@@ -63,7 +72,7 @@ export const isStandardUDTTypeSupported = (type: CKBComponents.Script, isMainnet
 };
 
 export const isUDTTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
-  return isStandardUDTTypeSupported(type, isMainnet) || isCompatibleUDTTypesSupported(type, isMainnet);
+  return isStandardUDTTypeSupported(type, isMainnet) || isCompatibleUDTTypesSupported(type);
 };
 
 export const isSporeTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {

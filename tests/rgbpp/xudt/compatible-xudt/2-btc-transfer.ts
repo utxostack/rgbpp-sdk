@@ -1,4 +1,4 @@
-import { buildRgbppLockArgs } from 'rgbpp/ckb';
+import { buildRgbppLockArgs, CompatibleXUDTRegistry } from 'rgbpp/ckb';
 import { buildRgbppTransferTx } from 'rgbpp';
 import { isMainnet, collector, btcService, btcDataSource, BTC_TESTNET_TYPE, btcAccount } from '../../env';
 import { getFastestFeeRate, readStepLog, writeStepLog } from '../../shared/utils';
@@ -20,6 +20,13 @@ const transfer = async ({
   transferAmount,
 }: RgbppTransferParams) => {
   const { retry } = await import('zx');
+
+  // Refresh the cache by fetching the latest compatible xUDT list from the specified URL.
+  // The default URL is:
+  // https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/compatible-udt.json
+  // You can set your own trusted URL to fetch the compatible xUDT list.
+  // await CompatibleXUDTRegistry.refreshCache("https://your-own-trusted-compatible-xudt-url");
+  await CompatibleXUDTRegistry.refreshCache();
 
   const feeRate = await getFastestFeeRate();
   console.log('feeRate = ', feeRate);

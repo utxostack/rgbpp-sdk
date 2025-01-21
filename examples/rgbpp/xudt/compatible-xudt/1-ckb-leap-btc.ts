@@ -1,6 +1,6 @@
 import { serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { genCkbJumpBtcVirtualTx } from 'rgbpp';
-import { getSecp256k1CellDep, buildRgbppLockArgs } from 'rgbpp/ckb';
+import { getSecp256k1CellDep, buildRgbppLockArgs, CompatibleXUDTRegistry } from 'rgbpp/ckb';
 import { CKB_PRIVATE_KEY, isMainnet, collector, ckbAddress, BTC_TESTNET_TYPE } from '../../env';
 
 interface LeapToBtcParams {
@@ -17,6 +17,13 @@ const leapRusdFromCkbToBtc = async ({
   compatibleXudtTypeScript,
 }: LeapToBtcParams) => {
   const toRgbppLockArgs = buildRgbppLockArgs(outIndex, btcTxId);
+
+  // Refresh the cache by fetching the latest compatible xUDT list from the specified URL.
+  // The default URL is:
+  // https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/compatible-udt.json
+  // You can set your own trusted URL to fetch the compatible xUDT list.
+  // await CompatibleXUDTRegistry.refreshCache("https://your-own-trusted-compatible-xudt-url");
+  await CompatibleXUDTRegistry.refreshCache();
 
   const ckbRawTx = await genCkbJumpBtcVirtualTx({
     collector,
