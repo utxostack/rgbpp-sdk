@@ -62,7 +62,7 @@ const fetchCellDepsJsonFromStaticSource = async () => {
   }
 };
 
-const fetchCellDepsJson = async () => {
+export const fetchCellDepsJson = async () => {
   try {
     const response = await request(VERCEL_SERVER_CELL_DEPS_JSON_URL);
     if (response && response.data) {
