@@ -321,3 +321,32 @@ export interface RgbppLaunchCkbVirtualTxParams {
    */
   vendorCellDeps?: CellDepsObject;
 }
+
+export interface BurnUTXOAirdropVirtualTxParams {
+  // The collector that collects CKB live cells and transactions
+  collector: Collector;
+  // The serialized hex string of the XUDT type script, and it must be UTXOAirdrop type script
+  xudtTypeBytes: Hex;
+  // The rgbpp assets cell lock script args array whose data structure is: out_index | bitcoin_tx_id
+  rgbppLockArgsList: Hex[];
+  // The serialized hex string of the issuer lock script
+  issuerLockBytes: Hex;
+  // True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet(see btcTestnetType for details about BTC Testnet)
+  isMainnet: boolean;
+  // The Bitcoin Testnet type including Testnet3 and Signet, default value is Testnet3
+  btcTestnetType?: BTCTestnetType;
+  // The WitnessArgs.lock placeholder bytes array size and the default value is 5000
+  witnessLockPlaceholderSize?: number;
+  // The CKB transaction fee rate, default value is 1100
+  ckbFeeRate?: bigint;
+
+  /*
+   * Vendor cell deps provided by the caller.
+   * These cell deps belong to scripts that may be upgraded in the future.
+   * Please ensure the cell dep information is up to date. The latest cell dep information is maintained at:
+   * https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/deployment/cell-deps.json.
+   */
+  vendorCellDeps?: CellDepsObject;
+}
+
+export interface BurnUTXOAirdropVirtualTxResult extends BaseCkbVirtualTxResult {}
