@@ -7,7 +7,7 @@ import {
   systemScripts,
 } from '@nervosnetwork/ckb-sdk-utils';
 import { NetworkType, AddressType, DataSource } from 'rgbpp/btc';
-import { BtcAssetsApi, OfflineBtcAssetsDataSource, OfflineBtcUtxo, BtcApiUtxo } from 'rgbpp/service';
+import { BtcAssetsApi, OfflineBtcAssetsDataSource, OfflineBtcUtxo, BtcApiUtxo, SpvProofEntry } from 'rgbpp/service';
 import {
   BTCTestnetType,
   Collector,
@@ -96,7 +96,11 @@ export const initOfflineCkbCollector = async (
   };
 };
 
-export const initOfflineBtcDataSource = async (rgbppLockArgsList: string[], address: string) => {
+export const initOfflineBtcDataSource = async (
+  rgbppLockArgsList: string[],
+  address: string,
+  spvProofs: SpvProofEntry[] = [],
+) => {
   const btcTxIds = rgbppLockArgsList.map((rgbppLockArgs) => remove0x(unpackRgbppLockArgs(rgbppLockArgs).btcTxId));
   const btcTxs = await Promise.all(
     btcTxIds.map(async (btcTxId) => {
@@ -130,7 +134,7 @@ export const initOfflineBtcDataSource = async (rgbppLockArgsList: string[], addr
   });
 
   return new DataSource(
-    new OfflineBtcAssetsDataSource({ txs: btcTxs, utxos: Array.from(utxoMap.values()) }),
+    new OfflineBtcAssetsDataSource({ txs: btcTxs, utxos: Array.from(utxoMap.values()), rgbppSpvProofs: spvProofs }),
     networkType,
   );
 };

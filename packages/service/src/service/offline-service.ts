@@ -16,11 +16,19 @@ import {
   RgbppApiRetryCkbTransactionPayload,
   OfflineBtcUtxo,
   BtcApiRecommendedFeeRates,
+  RgbppApiSpvProof,
 } from '../types';
 
 export interface OfflineBtcData {
   txs: BtcApiTransaction[];
   utxos: OfflineBtcUtxo[];
+  rgbppSpvProofs: SpvProofEntry[];
+}
+
+export interface SpvProofEntry {
+  txid: string;
+  confirmations: number;
+  proof: RgbppApiSpvProof;
 }
 
 /*
@@ -35,6 +43,8 @@ export class OfflineBtcAssetsDataSource extends BtcAssetsApi {
   private txs: Record<string, BtcApiTransaction>;
   // address -> utxos
   private utxos: Record<string, OfflineBtcUtxo[]>;
+  // txid:confirmations -> spv proof
+  private rgbppSpvProofs: Record<string, RgbppApiSpvProof>;
 
   private defaultFee = 1;
 
@@ -56,6 +66,18 @@ export class OfflineBtcAssetsDataSource extends BtcAssetsApi {
       },
       {} as Record<string, OfflineBtcUtxo[]>,
     );
+
+    this.rgbppSpvProofs = offlineData.rgbppSpvProofs.reduce(
+      (acc, proof) => {
+        acc[this.spvKey(proof.txid, proof.confirmations)] = proof.proof;
+        return acc;
+      },
+      {} as Record<string, RgbppApiSpvProof>,
+    );
+  }
+
+  private spvKey(txid: string, confirmations: number) {
+    return `${txid}:${confirmations}`;
   }
 
   getBtcTransaction(txId: string): Promise<BtcApiTransaction> {
@@ -84,6 +106,17 @@ export class OfflineBtcAssetsDataSource extends BtcAssetsApi {
       economyFee: this.defaultFee,
       minimumFee: this.defaultFee,
     });
+  }
+
+  getRgbppSpvProof(btcTxId: string, confirmations: number) {
+    const proof = this.rgbppSpvProofs[this.spvKey(btcTxId, confirmations)];
+    if (!proof) {
+      throw new OfflineBtcAssetsDataSourceError(
+        ErrorCodes.OFFLINE_DATA_SOURCE_SPV_PROOF_NOT_FOUND,
+        `SPV proof not found for txid ${btcTxId} with ${confirmations} confirmations`,
+      );
+    }
+    return Promise.resolve(proof);
   }
 
   /*
@@ -157,10 +190,6 @@ export class OfflineBtcAssetsDataSource extends BtcAssetsApi {
   }
 
   getRgbppActivityByBtcAddress(btcAddress: string, params?: RgbppApiActivityByAddressParams) {
-    return Promise.reject(new OfflineBtcAssetsDataSourceError(ErrorCodes.OFFLINE_DATA_SOURCE_METHOD_NOT_AVAILABLE));
-  }
-
-  getRgbppSpvProof(btcTxId: string, confirmations: number) {
     return Promise.reject(new OfflineBtcAssetsDataSourceError(ErrorCodes.OFFLINE_DATA_SOURCE_METHOD_NOT_AVAILABLE));
   }
 
