@@ -30,6 +30,10 @@ export interface CellDepsObject {
     testnet: CKBComponents.CellDep;
     mainnet: CKBComponents.CellDep;
   };
+  tokenMetadata: {
+    testnet: CKBComponents.CellDep;
+    mainnet: CKBComponents.CellDep;
+  };
   compatibleXudt: {
     [codeHash: string]: CKBComponents.CellDep;
   };
@@ -74,6 +78,7 @@ export interface CellDepsSelected {
   unique?: boolean;
   compatibleXudtCodeHashes?: string[];
   utxoAirdropBadge?: boolean;
+  metadata?: boolean;
 }
 
 export const fetchTypeIdCellDeps = async (
@@ -167,6 +172,11 @@ export const fetchTypeIdCellDeps = async (
       utxoAirdropBadgeDep = isMainnet ? cellDepsObj.utxoAirdropBadge.mainnet : cellDepsObj.utxoAirdropBadge.testnet;
     }
     cellDeps = [...cellDeps, utxoAirdropBadgeDep] as CKBComponents.CellDep[];
+  }
+
+  if (selected.metadata === true && cellDepsObj?.tokenMetadata) {
+    const metadataDep = isMainnet ? cellDepsObj.tokenMetadata.mainnet : cellDepsObj.tokenMetadata.testnet;
+    cellDeps = [...cellDeps, metadataDep] as CKBComponents.CellDep[];
   }
 
   /**
