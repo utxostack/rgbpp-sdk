@@ -2,7 +2,9 @@ import {
   buildRgbppLockArgs,
   getXudtTypeScript,
   genRgbppLockScript,
-  appendIssuerCellToBtcBatchTransfer,
+  appendOwnerCellToRgbppTx,
+  signCkbTransaction,
+  addressToScriptHash,
   appendCkbTxWitnesses,
   updateCkbTxWithRealBtcTxId,
   sendCkbTx,
@@ -71,7 +73,7 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
     fromPubkey: btcAccount.fromPubkey,
     source: btcOfflineDataSource,
     needPaymaster: false,
-    feeRate: 6000,
+    feeRate: 256,
   });
 
   const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
@@ -90,15 +92,17 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
         rgbppApiSpvProof,
       });
 
-      // pay tx fee
-      const signedTx = await appendIssuerCellToBtcBatchTransfer({
-        secp256k1PrivateKey: CKB_PRIVATE_KEY,
+      const { ckbRawTx: unsignedTx, inputCells } = await appendOwnerCellToRgbppTx({
         issuerAddress: ckbAddress,
         ckbRawTx: ckbTx,
         collector: offlineCollector,
         sumInputsCapacity,
         isMainnet,
       });
+
+      const keyMap = new Map<string, string>();
+      keyMap.set(addressToScriptHash(ckbAddress), CKB_PRIVATE_KEY);
+      const signedTx = signCkbTransaction(keyMap, unsignedTx, inputCells, true);
 
       const txHash = await sendCkbTx({ collector, signedTx });
       console.info(`Rgbpp asset has been jumped from BTC to CKB and the related CKB tx hash is ${txHash}`);
@@ -116,11 +120,11 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
 
 // rgbppLockArgs: outIndexU32 + btcTxId
 leapFromBtcToCKB({
-  rgbppLockArgsList: [buildRgbppLockArgs(5, '316267e33808ae437c9870c3538ec5d46361e6474ace0e150442b10c41a1cb21')],
+  rgbppLockArgsList: [buildRgbppLockArgs(1, 'dfb3be075b831ce7605ab3f56b7dda39ba7438e015ded3332db1f54cfac161de')],
   toCkbAddress: 'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqfpu7pwavwf3yang8khrsklumayj6nyxhqpmh7fq',
   // Please use your own RGB++ xudt asset's xudtTypeArgs
-  xudtTypeArgs: '0x13ce1d60ec65d693724006086568645aa24c019510ebc9af7cf6b993c2d7bffb',
-  transferAmount: BigInt(233_0000_0000),
+  xudtTypeArgs: '0xe402314a4b31223afe00a9c69c0b872863b990219525e1547ec05d9d88434b24',
+  transferAmount: BigInt(100_0000_0000),
 });
 
 /* 

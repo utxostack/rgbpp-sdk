@@ -2,8 +2,6 @@ import {
   addressToScript,
   bytesToHex,
   getTransactionSize,
-  rawTransactionToHash,
-  scriptToHash,
   serializeOutPoint,
   serializeWitnessArgs,
 } from '@nervosnetwork/ckb-sdk-utils';
@@ -27,8 +25,9 @@ import {
   buildSpvClientCellDep,
   isStandardUDTTypeSupported,
   isCompatibleUDTTypesSupported,
+  signCkbTransaction,
+  addressToScriptHash,
 } from '../utils';
-import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 
 export const buildBtcTimeUnlockWitness = (btcTxProof: Hex): Hex => {
   const btcTimeUnlock = BTCTimeUnlock.pack({ btcTxProof });
@@ -117,25 +116,17 @@ export const buildBtcTimeCellsSpentTx = async ({
   return ckbTx;
 };
 
-/**
- * Sign the BTC time cells spent transaction with Secp256k1 private key
- * @param secp256k1PrivateKey The Secp256k1 private key of the master address
- * @param ckbRawTx The CKB raw transaction to be signed
- * @param collector The collector that collects CKB live cells and transactions
- * @param masterCkbAddress The master CKB address
- * @param outputCapacityRange(Optional) [u64; 2], filter cells by output capacity range, [inclusive, exclusive]
- * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
- * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
- */
-export const signBtcTimeCellSpentTx = async ({
-  secp256k1PrivateKey,
+export const completeBtcTimeCellSpentTx = async ({
   ckbRawTx,
   collector,
   masterCkbAddress,
   isMainnet,
   outputCapacityRange,
   ckbFeeRate,
-}: SignBtcTimeCellsTxParams): Promise<CKBComponents.RawTransaction> => {
+}: Omit<SignBtcTimeCellsTxParams, 'secp256k1PrivateKey'>): Promise<{
+  ckbRawTx: CKBComponents.RawTransactionToSign;
+  inputCells: { outPoint: CKBComponents.OutPoint; lock: CKBComponents.Script }[];
+}> => {
   const masterLock = addressToScript(masterCkbAddress);
   let emptyCells = await collector.getCells({
     lock: masterLock,
@@ -166,30 +157,45 @@ export const signBtcTimeCellSpentTx = async ({
   const changeCapacity = BigInt(emptyCells[0].output.capacity) - estimatedTxFee;
   rawTx.outputs[0].capacity = append0x(changeCapacity.toString(16));
 
-  const keyMap = new Map<string, string>();
-  keyMap.set(scriptToHash(masterLock), secp256k1PrivateKey);
-
   const cells = rawTx.inputs.map((input, index) => ({
-    outPoint: input.previousOutput,
+    outPoint: input.previousOutput as CKBComponents.OutPoint,
     lock: index === 0 ? masterLock : getBtcTimeLockScript(isMainnet),
   }));
 
-  const transactionHash = rawTransactionToHash(rawTx);
-  const signedWitnesses = signWitnesses(keyMap)({
-    transactionHash,
-    witnesses: rawTx.witnesses,
-    inputCells: cells,
-    skipMissingKeys: true,
+  return { ckbRawTx: rawTx, inputCells: cells };
+};
+
+/**
+ * Sign the BTC time cells spent transaction with Secp256k1 private key
+ * @param secp256k1PrivateKey The Secp256k1 private key of the master address
+ * @param ckbRawTx The CKB raw transaction to be signed
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param masterCkbAddress The master CKB address
+ * @param outputCapacityRange(Optional) [u64; 2], filter cells by output capacity range, [inclusive, exclusive]
+ * @param ckbFeeRate(Optional) The CKB transaction fee rate, default value is 1100
+ * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
+ */
+export const signBtcTimeCellSpentTx = async ({
+  secp256k1PrivateKey,
+  ckbRawTx,
+  collector,
+  masterCkbAddress,
+  isMainnet,
+  outputCapacityRange,
+  ckbFeeRate,
+}: SignBtcTimeCellsTxParams): Promise<CKBComponents.RawTransaction> => {
+  const { ckbRawTx: rawTx, inputCells } = await completeBtcTimeCellSpentTx({
+    ckbRawTx,
+    collector,
+    masterCkbAddress,
+    isMainnet,
+    outputCapacityRange,
+    ckbFeeRate,
   });
 
-  const signedTx = {
-    ...rawTx,
-    witnesses: signedWitnesses.map((witness) =>
-      typeof witness !== 'string' ? serializeWitnessArgs(witness) : witness,
-    ),
-  } as CKBComponents.RawTransaction;
-
-  return signedTx;
+  const keyMap = new Map<string, string>();
+  keyMap.set(addressToScriptHash(masterCkbAddress), secp256k1PrivateKey);
+  return signCkbTransaction(keyMap, rawTx, inputCells, true);
 };
 
 /**
