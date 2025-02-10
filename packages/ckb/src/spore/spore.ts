@@ -205,7 +205,7 @@ export const buildAppendingIssuerCellToSporesCreateTx = async ({
   return rawTx;
 };
 
-export const completeAppendingIssuerCellToSporesCreateTx = async ({
+export const appendIssuerCellToSporesCreateUnsignedTx = async ({
   ckbRawTx,
   isMainnet,
   issuerAddress,
@@ -269,7 +269,7 @@ export const appendIssuerCellToSporesCreate = async ({
   isMainnet,
   ckbFeeRate,
 }: AppendIssuerCellToSporeCreate): Promise<CKBComponents.RawTransaction> => {
-  const { ckbRawTx: rawTx, inputCells } = await completeAppendingIssuerCellToSporesCreateTx({
+  const { ckbRawTx: rawTx, inputCells } = await appendIssuerCellToSporesCreateUnsignedTx({
     ckbRawTx,
     isMainnet,
     issuerAddress,

@@ -116,7 +116,7 @@ export const buildBtcTimeCellsSpentTx = async ({
   return ckbTx;
 };
 
-export const completeBtcTimeCellSpentTx = async ({
+export const prepareBtcTimeCellSpentUnsignedTx = async ({
   ckbRawTx,
   collector,
   masterCkbAddress,
@@ -184,7 +184,7 @@ export const signBtcTimeCellSpentTx = async ({
   outputCapacityRange,
   ckbFeeRate,
 }: SignBtcTimeCellsTxParams): Promise<CKBComponents.RawTransaction> => {
-  const { ckbRawTx: rawTx, inputCells } = await completeBtcTimeCellSpentTx({
+  const { ckbRawTx: rawTx, inputCells } = await prepareBtcTimeCellSpentUnsignedTx({
     ckbRawTx,
     collector,
     masterCkbAddress,

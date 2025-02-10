@@ -353,7 +353,7 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
  * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
  * @returns The updated transaction and input cells information
  */
-export const appendOwnerCellToRgbppTx = async ({
+export const appendIssuerCellToBtcBatchTransferToSign = async ({
   issuerAddress,
   collector,
   ckbRawTx,
@@ -432,7 +432,7 @@ export const appendIssuerCellToBtcBatchTransfer = async ({
   isMainnet,
   ckbFeeRate,
 }: AppendIssuerCellToBtcBatchTransfer): Promise<CKBComponents.RawTransaction> => {
-  const { ckbRawTx: rawTx, inputCells } = await appendOwnerCellToRgbppTx({
+  const { ckbRawTx: rawTx, inputCells } = await appendIssuerCellToBtcBatchTransferToSign({
     issuerAddress,
     collector,
     ckbRawTx,

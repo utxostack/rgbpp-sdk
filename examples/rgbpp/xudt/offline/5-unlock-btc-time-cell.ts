@@ -3,7 +3,7 @@ import {
   sendCkbTx,
   getBtcTimeLockScript,
   btcTxIdAndAfterFromBtcTimeLockArgs,
-  completeBtcTimeCellSpentTx,
+  prepareBtcTimeCellSpentUnsignedTx,
   addressToScriptHash,
   signCkbTransaction,
 } from 'rgbpp/ckb';
@@ -45,7 +45,7 @@ const unlockBtcTimeCell = async ({ btcTimeCellArgs }: { btcTimeCellArgs: string 
     btcTestnetType: BTC_TESTNET_TYPE,
   });
 
-  const { ckbRawTx: unsignedTx, inputCells } = await completeBtcTimeCellSpentTx({
+  const { ckbRawTx: unsignedTx, inputCells } = await prepareBtcTimeCellSpentUnsignedTx({
     collector,
     masterCkbAddress: ckbAddress,
     ckbRawTx,

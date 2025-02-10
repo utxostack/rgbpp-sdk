@@ -21,7 +21,7 @@ import {
   sendCkbTx,
   updateCkbTxWithRealBtcTxId,
   genRgbppLockScript,
-  appendOwnerCellToRgbppTx,
+  appendIssuerCellToBtcBatchTransferToSign,
   addressToScriptHash,
   signCkbTransaction,
 } from 'rgbpp/ckb';
@@ -99,7 +99,7 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers, xudtTyp
         rgbppApiSpvProof,
       });
 
-      const { ckbRawTx: unsignedTx, inputCells } = await appendOwnerCellToRgbppTx({
+      const { ckbRawTx: unsignedTx, inputCells } = await appendIssuerCellToBtcBatchTransferToSign({
         issuerAddress: ckbAddress,
         ckbRawTx: ckbTx,
         collector: offlineCollector,

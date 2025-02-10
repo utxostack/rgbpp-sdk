@@ -2,7 +2,7 @@ import {
   buildRgbppLockArgs,
   getXudtTypeScript,
   genRgbppLockScript,
-  appendOwnerCellToRgbppTx,
+  appendIssuerCellToBtcBatchTransferToSign,
   signCkbTransaction,
   addressToScriptHash,
   appendCkbTxWitnesses,
@@ -92,7 +92,7 @@ const leapFromBtcToCKB = async ({ rgbppLockArgsList, toCkbAddress, xudtTypeArgs,
         rgbppApiSpvProof,
       });
 
-      const { ckbRawTx: unsignedTx, inputCells } = await appendOwnerCellToRgbppTx({
+      const { ckbRawTx: unsignedTx, inputCells } = await appendIssuerCellToBtcBatchTransferToSign({
         issuerAddress: ckbAddress,
         ckbRawTx: ckbTx,
         collector: offlineCollector,
