@@ -247,20 +247,6 @@ export const checkCkbTxInputsCapacitySufficient = async (
 };
 
 export function signCkbTransaction(
-  key: string,
-  ckbTx: CKBComponents.RawTransactionToSign,
-  inputCells?: { outPoint: CKBComponents.OutPoint; lock: CKBComponents.Script }[],
-  skipMissingKeys?: boolean,
-): CKBComponents.RawTransaction;
-
-export function signCkbTransaction(
-  key: Map<string, string>,
-  ckbTx: CKBComponents.RawTransactionToSign,
-  inputCells: { outPoint: CKBComponents.OutPoint; lock: CKBComponents.Script }[],
-  skipMissingKeys?: boolean,
-): CKBComponents.RawTransaction;
-
-export function signCkbTransaction(
   key: string | Map<string, string>,
   ckbTx: CKBComponents.RawTransactionToSign,
   inputCells: { outPoint: CKBComponents.OutPoint; lock: CKBComponents.Script }[] = [],
@@ -278,6 +264,7 @@ export function signCkbTransaction(
     skipMissingKeys,
   });
 
+  // Serialize the witness args if needed to ensure all witnesses are consistently in string format
   return {
     ...ckbTx,
     witnesses: signedWitnesses.map((witness) =>
@@ -289,14 +276,4 @@ export function signCkbTransaction(
 export const addressToScriptHash = (address: string) => {
   const script = addressToScript(address);
   return scriptToHash(script);
-};
-
-// Normalizes a CKB transaction to be signed by ensuring all witnesses are in serialized string format.
-export const normalizeCkbTxToSign = (ckbTx: CKBComponents.RawTransactionToSign): CKBComponents.RawTransactionToSign => {
-  return {
-    ...ckbTx,
-    witnesses: ckbTx.witnesses.map((witness) =>
-      typeof witness !== 'string' ? serializeWitnessArgs(witness) : witness,
-    ),
-  };
 };
