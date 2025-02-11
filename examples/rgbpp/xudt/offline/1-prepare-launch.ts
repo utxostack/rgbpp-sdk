@@ -10,6 +10,7 @@ import {
   calculateTransactionFee,
   genRgbppLockScript,
   getSecp256k1CellDep,
+  signCkbTransaction,
 } from 'rgbpp/ckb';
 import { RGBPP_TOKEN_INFO } from './0-rgbpp-token-info';
 import {
@@ -75,15 +76,15 @@ const prepareLaunchCell = async ({
   changeCapacity -= estimatedTxFee;
   unsignedTx.outputs[unsignedTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
 
-  const signedTx = collector.getCkb().signTransaction(CKB_PRIVATE_KEY)(unsignedTx);
+  const signedTx = signCkbTransaction(CKB_PRIVATE_KEY, unsignedTx);
   const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
 
   console.info(`Launch cell has been created and the CKB tx hash ${txHash}`);
 };
 
 prepareLaunchCell({
-  outIndex: 6,
-  btcTxId: '692a88b83d7dee2a77b5ab3372115a311aa503b1632d3ecdd2e77ffbafd94bdf',
+  outIndex: 3,
+  btcTxId: 'd6cbc8c4418cb1c4cab200c60e653ee886fd67d1c839197b1ac73a88a6360473',
   rgbppTokenInfo: RGBPP_TOKEN_INFO,
 });
 

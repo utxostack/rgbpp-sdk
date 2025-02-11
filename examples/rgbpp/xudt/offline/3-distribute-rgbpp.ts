@@ -16,12 +16,14 @@ import {
 import {
   RgbppBtcAddressReceiver,
   appendCkbTxWitnesses,
-  appendIssuerCellToBtcBatchTransfer,
   buildRgbppLockArgs,
   getXudtTypeScript,
   sendCkbTx,
   updateCkbTxWithRealBtcTxId,
   genRgbppLockScript,
+  appendIssuerCellToBtcBatchTransferToSign,
+  addressToScriptHash,
+  signCkbTransaction,
 } from 'rgbpp/ckb';
 import { saveCkbVirtualTxResult } from '../../shared/utils';
 import { signAndSendPsbt } from '../../shared/btc-account';
@@ -78,7 +80,7 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers, xudtTyp
     from: btcAccount.from,
     fromPubkey: btcAccount.fromPubkey,
     source: btcOfflineDataSource,
-    feeRate: 4096,
+    feeRate: 256,
   });
 
   const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
@@ -97,14 +99,17 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers, xudtTyp
         rgbppApiSpvProof,
       });
 
-      const signedTx = await appendIssuerCellToBtcBatchTransfer({
-        secp256k1PrivateKey: CKB_PRIVATE_KEY,
+      const { ckbRawTx: unsignedTx, inputCells } = await appendIssuerCellToBtcBatchTransferToSign({
         issuerAddress: ckbAddress,
         ckbRawTx: ckbTx,
         collector: offlineCollector,
         sumInputsCapacity,
         isMainnet,
       });
+
+      const keyMap = new Map<string, string>();
+      keyMap.set(addressToScriptHash(ckbAddress), CKB_PRIVATE_KEY);
+      const signedTx = signCkbTransaction(keyMap, unsignedTx, inputCells, true);
 
       const txHash = await sendCkbTx({ collector, signedTx });
       console.info(`RGB++ Asset has been distributed and CKB tx hash is ${txHash}`);
@@ -123,9 +128,9 @@ const distributeRgbppAssetOnBtc = async ({ rgbppLockArgsList, receivers, xudtTyp
 // rgbppLockArgs: outIndexU32 + btcTxId
 distributeRgbppAssetOnBtc({
   // Warning: If rgbpp assets are distributed continuously, then the position of the current rgbpp asset utxo depends on the position of the previous change utxo distributed
-  rgbppLockArgsList: [buildRgbppLockArgs(1, 'a2bcca7807f8543d71e85e772335fa7eec2d812ca3250fed96a9d406aa1a9827')],
+  rgbppLockArgsList: [buildRgbppLockArgs(1, '65e0574dfdbed4809736f3ec5a73aa191f147873d083ddb9978aecb969dd1900')],
   // The xudtTypeArgs comes from the logs "RGB++ Asset type script args" of 2-launch-rgbpp.ts
-  xudtTypeArgs: '0x13ce1d60ec65d693724006086568645aa24c019510ebc9af7cf6b993c2d7bffb',
+  xudtTypeArgs: '0xe402314a4b31223afe00a9c69c0b872863b990219525e1547ec05d9d88434b24',
   receivers: [
     {
       toBtcAddress: 'tb1qeq27se73d0e6zkh53e3xrj90vqzv8g7ja3nm85',

@@ -13,6 +13,8 @@ import {
   generateSporeId,
   generateSporeTransferCoBuild,
   throwErrorWhenSporeCellsInvalid,
+  addressToScriptHash,
+  signCkbTransaction,
 } from '../utils';
 import {
   AppendIssuerCellToSporeCreate,
@@ -41,15 +43,7 @@ import {
   RgbppUtxoBindMultiTypeAssetsError,
   TypeAssetNotSupportedError,
 } from '../error';
-import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
-import {
-  addressToScript,
-  bytesToHex,
-  getTransactionSize,
-  rawTransactionToHash,
-  scriptToHash,
-  serializeWitnessArgs,
-} from '@nervosnetwork/ckb-sdk-utils';
+import { addressToScript, bytesToHex, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
 /**
  * Generate the virtual ckb transaction for creating spores
@@ -211,6 +205,51 @@ export const buildAppendingIssuerCellToSporesCreateTx = async ({
   return rawTx;
 };
 
+export const appendIssuerCellToSporesCreateUnsignedTx = async ({
+  ckbRawTx,
+  isMainnet,
+  issuerAddress,
+  collector,
+  sumInputsCapacity,
+  ckbFeeRate,
+}: Omit<AppendIssuerCellToSporeCreate, 'secp256k1PrivateKey'>): Promise<{
+  ckbRawTx: CKBComponents.RawTransactionToSign;
+  inputCells: { outPoint: CKBComponents.OutPoint; lock: CKBComponents.Script }[];
+}> => {
+  const rgbppInputsLength = ckbRawTx.inputs.length;
+
+  const rawTx = await buildAppendingIssuerCellToSporesCreateTx({
+    issuerAddress,
+    collector,
+    ckbRawTx,
+    sumInputsCapacity,
+    ckbFeeRate,
+  });
+
+  rawTx.cellDeps = [...rawTx.cellDeps, getSecp256k1CellDep(isMainnet)];
+
+  const issuerLock = addressToScript(issuerAddress);
+
+  const issuerCellIndex = rgbppInputsLength;
+  const cells = rawTx.inputs.map((input, index) => ({
+    outPoint: input.previousOutput as CKBComponents.OutPoint,
+    lock: index >= issuerCellIndex ? issuerLock : getRgbppLockScript(isMainnet),
+  }));
+
+  const emptyWitness = { lock: '', inputType: '', outputType: '' };
+  const issuerWitnesses = rawTx.inputs.slice(rgbppInputsLength).map((_, index) => (index === 0 ? emptyWitness : '0x'));
+
+  const lastRawTxWitnessIndex = rawTx.witnesses.length - 1;
+  rawTx.witnesses = [
+    ...rawTx.witnesses.slice(0, lastRawTxWitnessIndex),
+    ...issuerWitnesses,
+    // The cobuild witness will be placed to the tail of the witnesses
+    rawTx.witnesses[lastRawTxWitnessIndex],
+  ];
+
+  return { ckbRawTx: rawTx, inputCells: cells };
+};
+
 /**
  * Append paymaster cell to the ckb transaction inputs and sign the transaction with paymaster cell's secp256k1 private key
  * @param secp256k1PrivateKey The Secp256k1 private key of the paymaster cells maintainer
@@ -230,55 +269,18 @@ export const appendIssuerCellToSporesCreate = async ({
   isMainnet,
   ckbFeeRate,
 }: AppendIssuerCellToSporeCreate): Promise<CKBComponents.RawTransaction> => {
-  const rgbppInputsLength = ckbRawTx.inputs.length;
-
-  const rawTx = await buildAppendingIssuerCellToSporesCreateTx({
+  const { ckbRawTx: rawTx, inputCells } = await appendIssuerCellToSporesCreateUnsignedTx({
+    ckbRawTx,
+    isMainnet,
     issuerAddress,
     collector,
-    ckbRawTx,
     sumInputsCapacity,
     ckbFeeRate,
   });
 
-  rawTx.cellDeps = [...rawTx.cellDeps, getSecp256k1CellDep(isMainnet)];
-
-  const issuerLock = addressToScript(issuerAddress);
-
   const keyMap = new Map<string, string>();
-  keyMap.set(scriptToHash(issuerLock), secp256k1PrivateKey);
-
-  const issuerCellIndex = rgbppInputsLength;
-  const cells = rawTx.inputs.map((input, index) => ({
-    outPoint: input.previousOutput,
-    lock: index >= issuerCellIndex ? issuerLock : getRgbppLockScript(isMainnet),
-  }));
-
-  const emptyWitness = { lock: '', inputType: '', outputType: '' };
-  const issuerWitnesses = rawTx.inputs.slice(rgbppInputsLength).map((_, index) => (index === 0 ? emptyWitness : '0x'));
-
-  const lastRawTxWitnessIndex = rawTx.witnesses.length - 1;
-  rawTx.witnesses = [
-    ...rawTx.witnesses.slice(0, lastRawTxWitnessIndex),
-    ...issuerWitnesses,
-    // The cobuild witness will be placed to the tail of the witnesses
-    rawTx.witnesses[lastRawTxWitnessIndex],
-  ];
-
-  const transactionHash = rawTransactionToHash(rawTx);
-  const signedWitnesses = signWitnesses(keyMap)({
-    transactionHash,
-    witnesses: rawTx.witnesses,
-    inputCells: cells,
-    skipMissingKeys: true,
-  });
-
-  const signedTx = {
-    ...rawTx,
-    witnesses: signedWitnesses.map((witness) =>
-      typeof witness !== 'string' ? serializeWitnessArgs(witness) : witness,
-    ),
-  };
-  return signedTx;
+  keyMap.set(addressToScriptHash(issuerAddress), secp256k1PrivateKey);
+  return signCkbTransaction(keyMap, rawTx, inputCells, true);
 };
 
 /**

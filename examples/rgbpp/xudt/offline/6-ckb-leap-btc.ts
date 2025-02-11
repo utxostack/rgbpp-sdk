@@ -1,6 +1,6 @@
 import { addressToScript, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
 import { genCkbJumpBtcVirtualTx } from 'rgbpp';
-import { getSecp256k1CellDep, buildRgbppLockArgs, getXudtTypeScript } from 'rgbpp/ckb';
+import { getSecp256k1CellDep, buildRgbppLockArgs, getXudtTypeScript, signCkbTransaction } from 'rgbpp/ckb';
 import {
   CKB_PRIVATE_KEY,
   isMainnet,
@@ -49,8 +49,7 @@ const leapFromCkbToBtc = async ({ outIndex, btcTxId, xudtTypeArgs, transferAmoun
     witnesses: [emptyWitness, ...ckbRawTx.witnesses.slice(1)],
   };
 
-  const signedTx = collector.getCkb().signTransaction(CKB_PRIVATE_KEY)(unsignedTx);
-
+  const signedTx = signCkbTransaction(CKB_PRIVATE_KEY, unsignedTx);
   const txHash = await collector.getCkb().rpc.sendTransaction(signedTx, 'passthrough');
   console.info(`Rgbpp asset has been jumped from CKB to BTC and CKB tx hash is ${txHash}`);
 };
@@ -62,10 +61,10 @@ leapFromCkbToBtc({
   outIndex: 0,
   btcTxId: 'c1db31abe6bab345b5d5ab4a19c8f34c8cfe23efa4ec6bfa7b05c8e7b4f965b8',
   // Please use your own RGB++ xudt asset's xudtTypeArgs
-  xudtTypeArgs: '0x13ce1d60ec65d693724006086568645aa24c019510ebc9af7cf6b993c2d7bffb',
+  xudtTypeArgs: '0xe402314a4b31223afe00a9c69c0b872863b990219525e1547ec05d9d88434b24',
   transferAmount: BigInt(10_0000_0000),
 });
 
 /* 
-npx tsx examples/rgbpp/xudt/offline/5-ckb-leap-btc.ts
+npx tsx examples/rgbpp/xudt/offline/6-ckb-leap-btc.ts
 */

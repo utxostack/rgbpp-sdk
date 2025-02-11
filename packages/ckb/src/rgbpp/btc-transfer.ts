@@ -25,6 +25,8 @@ import {
   throwErrorWhenRgbppCellsInvalid,
   throwErrorWhenTxInputsExceeded,
   isStandardUDTTypeSupported,
+  signCkbTransaction,
+  addressToScriptHash,
 } from '../utils';
 import { Hex, IndexerCell } from '../types';
 import {
@@ -36,14 +38,7 @@ import {
   getSecp256k1CellDep,
 } from '../constants';
 import { blockchain } from '@ckb-lumos/base';
-import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
-import {
-  addressToScript,
-  getTransactionSize,
-  rawTransactionToHash,
-  scriptToHash,
-  serializeWitnessArgs,
-} from '@nervosnetwork/ckb-sdk-utils';
+import { addressToScript, getTransactionSize } from '@nervosnetwork/ckb-sdk-utils';
 
 /**
  * Generate the virtual ckb transaction for the btc transfer tx
@@ -348,27 +343,29 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
 };
 
 /**
- * Append paymaster cell to the ckb transaction inputs and sign the transaction with paymaster cell's secp256k1 private key
- * @param secp256k1PrivateKey The Secp256k1 private key of the paymaster cells maintainer
- * @param issuerAddress The issuer ckb address
+ * Appends cells from the issuer address to cover transaction fees and ensures sufficient capacity
+ * @param issuerAddress The address that provides cells for transaction fees
  * @param collector The collector that collects CKB live cells and transactions
- * @param ckbRawTx CKB raw transaction
+ * @param ckbRawTx The raw transaction to append cells to
  * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
- * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
+ * @param sumInputsCapacity The total capacity of existing inputs
  * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
+ * @returns The updated transaction and input cells information
  */
-export const appendIssuerCellToBtcBatchTransfer = async ({
-  secp256k1PrivateKey,
+export const appendIssuerCellToBtcBatchTransferToSign = async ({
   issuerAddress,
   collector,
   ckbRawTx,
   sumInputsCapacity,
-  isMainnet,
   ckbFeeRate,
-}: AppendIssuerCellToBtcBatchTransfer): Promise<CKBComponents.RawTransaction> => {
+  isMainnet,
+}: Omit<AppendIssuerCellToBtcBatchTransfer, 'secp256k1PrivateKey'>): Promise<{
+  ckbRawTx: CKBComponents.RawTransactionToSign;
+  inputCells: { outPoint: CKBComponents.OutPoint; lock: CKBComponents.Script }[];
+}> => {
+  const rgbppInputsLength = ckbRawTx.inputs.length;
   const rawTx = ckbRawTx as CKBComponents.RawTransactionToSign;
-
-  const rgbppInputsLength = rawTx.inputs.length;
 
   const sumOutputsCapacity: bigint = rawTx.outputs
     .map((output) => BigInt(output.capacity))
@@ -403,12 +400,9 @@ export const appendIssuerCellToBtcBatchTransfer = async ({
   changeCapacity -= estimatedTxFee;
   rawTx.outputs[rawTx.outputs.length - 1].capacity = append0x(changeCapacity.toString(16));
 
-  const keyMap = new Map<string, string>();
-  keyMap.set(scriptToHash(issuerLock), secp256k1PrivateKey);
-
   const issuerCellIndex = rgbppInputsLength;
   const cells = rawTx.inputs.map((input, index) => ({
-    outPoint: input.previousOutput,
+    outPoint: input.previousOutput as CKBComponents.OutPoint,
     lock: index >= issuerCellIndex ? issuerLock : getRgbppLockScript(isMainnet),
   }));
 
@@ -416,19 +410,39 @@ export const appendIssuerCellToBtcBatchTransfer = async ({
   const issuerWitnesses = rawTx.inputs.slice(rgbppInputsLength).map((_, index) => (index === 0 ? emptyWitness : '0x'));
   rawTx.witnesses = [...rawTx.witnesses, ...issuerWitnesses];
 
-  const transactionHash = rawTransactionToHash(rawTx);
-  const signedWitnesses = signWitnesses(keyMap)({
-    transactionHash,
-    witnesses: rawTx.witnesses,
-    inputCells: cells,
-    skipMissingKeys: true,
+  return { ckbRawTx: rawTx, inputCells: cells };
+};
+
+/**
+ * Append paymaster cell to the ckb transaction inputs and sign the transaction with paymaster cell's secp256k1 private key
+ * @param secp256k1PrivateKey The Secp256k1 private key of the paymaster cells maintainer
+ * @param issuerAddress The issuer ckb address
+ * @param collector The collector that collects CKB live cells and transactions
+ * @param ckbRawTx CKB raw transaction
+ * @param sumInputsCapacity The sum capacity of ckb inputs which is to be used to calculate ckb tx fee
+ * @param isMainnet True is for BTC and CKB Mainnet, false is for BTC and CKB Testnet
+ * @param ckbFeeRate The CKB transaction fee rate, default value is 1100
+ */
+export const appendIssuerCellToBtcBatchTransfer = async ({
+  secp256k1PrivateKey,
+  issuerAddress,
+  collector,
+  ckbRawTx,
+  sumInputsCapacity,
+  isMainnet,
+  ckbFeeRate,
+}: AppendIssuerCellToBtcBatchTransfer): Promise<CKBComponents.RawTransaction> => {
+  const { ckbRawTx: rawTx, inputCells } = await appendIssuerCellToBtcBatchTransferToSign({
+    issuerAddress,
+    collector,
+    ckbRawTx,
+    sumInputsCapacity,
+    ckbFeeRate,
+    isMainnet,
   });
 
-  const signedTx = {
-    ...rawTx,
-    witnesses: signedWitnesses.map((witness) =>
-      typeof witness !== 'string' ? serializeWitnessArgs(witness) : witness,
-    ),
-  };
-  return signedTx;
+  const keyMap = new Map<string, string>();
+  keyMap.set(addressToScriptHash(issuerAddress), secp256k1PrivateKey);
+
+  return signCkbTransaction(keyMap, rawTx, inputCells, true);
 };

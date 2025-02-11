@@ -1,4 +1,15 @@
-import { PERSONAL, blake2b, hexToBytes, serializeInput, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
+import {
+  PERSONAL,
+  addressToScript,
+  blake2b,
+  hexToBytes,
+  rawTransactionToHash,
+  scriptToHash,
+  serializeInput,
+  serializeScript,
+  serializeWitnessArgs,
+} from '@nervosnetwork/ckb-sdk-utils';
+import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 import { RawClusterData, packRawClusterData, SporeDataProps, packRawSporeData } from '@spore-sdk/core';
 import { remove0x, u64ToLe } from './hex';
 import {
@@ -233,4 +244,36 @@ export const checkCkbTxInputsCapacitySufficient = async (
     .map((output) => BigInt(output.capacity))
     .reduce((prev, current) => prev + current, BigInt(0));
   return sumInputsCapacity > sumOutputsCapacity;
+};
+
+export function signCkbTransaction(
+  key: string | Map<string, string>,
+  ckbTx: CKBComponents.RawTransactionToSign,
+  inputCells: { outPoint: CKBComponents.OutPoint; lock: CKBComponents.Script }[] = [],
+  skipMissingKeys = false,
+) {
+  if (key instanceof Map && inputCells.length === 0) {
+    throw new Error('inputCells must not be empty when using Map of keys');
+  }
+
+  const transactionHash = rawTransactionToHash(ckbTx);
+  const signedWitnesses = signWitnesses(key)({
+    transactionHash,
+    witnesses: ckbTx.witnesses,
+    inputCells,
+    skipMissingKeys,
+  });
+
+  // Serialize the witness args if needed to ensure all witnesses are consistently in string format
+  return {
+    ...ckbTx,
+    witnesses: signedWitnesses.map((witness) =>
+      typeof witness !== 'string' ? serializeWitnessArgs(witness) : witness,
+    ),
+  };
+}
+
+export const addressToScriptHash = (address: string) => {
+  const script = addressToScript(address);
+  return scriptToHash(script);
 };

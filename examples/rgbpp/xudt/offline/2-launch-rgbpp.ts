@@ -61,7 +61,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
     from: btcAccount.from,
     fromPubkey: btcAccount.fromPubkey,
     source: btcOfflineDataSource,
-    feeRate: 4096,
+    feeRate: 256,
   });
 
   const { txId: btcTxId, rawTxHex: btcTxBytes } = await signAndSendPsbt(psbt, btcAccount, btcService);
@@ -96,7 +96,7 @@ const launchRgppAsset = async ({ ownerRgbppLockArgs, launchAmount, rgbppTokenInf
 
 // rgbppLockArgs: outIndexU32 + btcTxId
 launchRgppAsset({
-  ownerRgbppLockArgs: buildRgbppLockArgs(6, '692a88b83d7dee2a77b5ab3372115a311aa503b1632d3ecdd2e77ffbafd94bdf'),
+  ownerRgbppLockArgs: buildRgbppLockArgs(3, 'd6cbc8c4418cb1c4cab200c60e653ee886fd67d1c839197b1ac73a88a6360473'),
   rgbppTokenInfo: RGBPP_TOKEN_INFO,
   // The total issuance amount of RGBPP Token, the decimal is determined by RGBPP Token info
   launchAmount: BigInt(2100_0000) * BigInt(10 ** RGBPP_TOKEN_INFO.decimal),
