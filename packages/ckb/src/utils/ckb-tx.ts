@@ -61,10 +61,11 @@ export const isTokenMetadataType = (type: CKBComponents.Script, isMainnet: boole
  * If you want to get the latest compatible xUDT list, CompatibleXUDTRegistry.refreshCache should be called before the isCompatibleUDTTypesSupported
  *
  * @param type - The UDT type script to check for compatibility.
+ * @param offline - Whether to use the offline mode.
  * @returns A boolean indicating whether the provided UDT type script is supported.
  */
-export const isCompatibleUDTTypesSupported = (type: CKBComponents.Script): boolean => {
-  const compatibleList = CompatibleXUDTRegistry.getCompatibleTokens();
+export const isCompatibleUDTTypesSupported = (type: CKBComponents.Script, offline: boolean = false): boolean => {
+  const compatibleList = CompatibleXUDTRegistry.getCompatibleTokens(offline);
   const compatibleXudtTypeBytes = compatibleList.map((script) => serializeScript(script));
   const typeAsset = serializeScript({
     ...type,
@@ -82,8 +83,12 @@ export const isStandardUDTTypeSupported = (type: CKBComponents.Script, isMainnet
   return xudtType === typeAsset;
 };
 
-export const isUDTTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
-  return isStandardUDTTypeSupported(type, isMainnet) || isCompatibleUDTTypesSupported(type);
+export const isUDTTypeSupported = (
+  type: CKBComponents.Script,
+  isMainnet: boolean,
+  offline: boolean = false,
+): boolean => {
+  return isStandardUDTTypeSupported(type, isMainnet) || isCompatibleUDTTypesSupported(type, offline);
 };
 
 export const isSporeTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
@@ -104,8 +109,12 @@ export const isClusterSporeTypeSupported = (type: CKBComponents.Script, isMainne
   return isSporeTypeSupported(type, isMainnet) || clusterType === typeAsset;
 };
 
-export const isTypeAssetSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
-  return isUDTTypeSupported(type, isMainnet) || isClusterSporeTypeSupported(type, isMainnet);
+export const isTypeAssetSupported = (
+  type: CKBComponents.Script,
+  isMainnet: boolean,
+  offline: boolean = false,
+): boolean => {
+  return isUDTTypeSupported(type, isMainnet, offline) || isClusterSporeTypeSupported(type, isMainnet);
 };
 
 const CELL_CAPACITY_SIZE = 8;

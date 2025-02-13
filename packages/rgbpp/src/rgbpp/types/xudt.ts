@@ -1,4 +1,11 @@
-import { BaseCkbVirtualTxResult, BTCTestnetType, BtcTransferVirtualTxResult, Collector, Hex } from '@rgbpp-sdk/ckb';
+import {
+  BaseCkbVirtualTxResult,
+  BTCTestnetType,
+  BtcTransferVirtualTxResult,
+  Collector,
+  Hex,
+  CellDepsObject,
+} from '@rgbpp-sdk/ckb';
 import { AddressToPubkeyMap, DataSource } from '@rgbpp-sdk/btc';
 import { TransactionGroupSummary } from '../summary/asset-summarizer';
 
@@ -55,6 +62,14 @@ export interface RgbppTransferAllTxsParams {
     feeRate?: bigint;
     // If the asset is compatible xUDT(not standard xUDT), the compatibleXudtTypeScript is required
     compatibleXudtTypeScript?: CKBComponents.Script;
+
+    /*
+     * Vendor cell deps provided by the caller.
+     * These cell deps belong to scripts that may be upgraded in the future.
+     * Please ensure the cell dep information is up to date. The latest cell dep information is maintained at:
+     * https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/deployment/cell-deps.json.
+     */
+    vendorCellDeps?: CellDepsObject;
   };
   btc: {
     // The list of BTC addresses to provide RGB++ xUDT assets

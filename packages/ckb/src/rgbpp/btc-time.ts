@@ -27,6 +27,7 @@ import {
   isCompatibleUDTTypesSupported,
   signCkbTransaction,
   addressToScriptHash,
+  isOfflineMode,
 } from '../utils';
 
 export const buildBtcTimeUnlockWitness = (btcTxProof: Hex): Hex => {
@@ -65,7 +66,7 @@ export const buildBtcTimeCellsSpentTx = async ({
 
   const hasStandardUDT = outputs.some((output) => isStandardUDTTypeSupported(output.type!, isMainnet));
   const compatibleXudtCodeHashes = outputs
-    .filter((output) => isCompatibleUDTTypesSupported(output.type!))
+    .filter((output) => isCompatibleUDTTypesSupported(output.type!, isOfflineMode(vendorCellDeps)))
     .map((output) => output.type!.codeHash);
   const cellDeps = await fetchTypeIdCellDeps(
     isMainnet,

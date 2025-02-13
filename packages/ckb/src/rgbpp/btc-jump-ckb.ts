@@ -20,6 +20,7 @@ import {
   throwErrorWhenRgbppCellsInvalid,
   isRgbppCapacitySufficientForChange,
   isStandardUDTTypeSupported,
+  isOfflineMode,
 } from '../utils';
 import { Hex, IndexerCell } from '../types';
 import { RGBPP_WITNESS_PLACEHOLDER, getSecp256k1CellDep } from '../constants';
@@ -52,8 +53,9 @@ export const genBtcJumpCkbVirtualTx = async ({
 }: BtcJumpCkbVirtualTxParams): Promise<BtcJumpCkbVirtualTxResult> => {
   const isMainnet = toCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
+  const isOffline = isOfflineMode(vendorCellDeps);
 
-  if (!isUDTTypeSupported(xudtType, isMainnet)) {
+  if (!isUDTTypeSupported(xudtType, isMainnet, isOffline)) {
     throw new TypeAssetNotSupportedError('The type script asset is not supported now');
   }
 
@@ -65,7 +67,7 @@ export const genBtcJumpCkbVirtualTx = async ({
   for await (const rgbppLock of rgbppLocks) {
     const cells = await collector.getCells({ lock: rgbppLock, isDataMustBeEmpty: false });
 
-    throwErrorWhenRgbppCellsInvalid(cells, xudtTypeBytes, isMainnet);
+    throwErrorWhenRgbppCellsInvalid(cells, xudtTypeBytes, isMainnet, isOffline);
 
     const targetCells = cells!.filter((cell) => isScriptEqual(cell.output.type!, xudtTypeBytes));
     const otherTypeCells = cells!.filter((cell) => !isScriptEqual(cell.output.type!, xudtTypeBytes));

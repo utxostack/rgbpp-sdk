@@ -31,6 +31,7 @@ import {
   serializeScript,
 } from '@nervosnetwork/ckb-sdk-utils';
 import { HashType } from '../schemas/customized';
+import { CellDepsObject } from './cell-dep';
 
 export const genRgbppLockScript = (rgbppLockArgs: Hex, isMainnet: boolean, btcTestnetType?: BTCTestnetType) => {
   return {
@@ -268,6 +269,7 @@ export const throwErrorWhenRgbppCellsInvalid = (
   cells: IndexerCell[] | undefined,
   xudtTypeBytes: Hex,
   isMainnet: boolean,
+  isOffline: boolean,
 ) => {
   if (!cells || cells.length === 0) {
     throw new NoRgbppLiveCellError('No rgbpp cells found with the rgbpp lock args');
@@ -278,7 +280,7 @@ export const throwErrorWhenRgbppCellsInvalid = (
   }
 
   const isUDTTypeNotSupported = typeCells.some(
-    (cell) => cell.output.type && !isUDTTypeSupported(cell.output.type, isMainnet),
+    (cell) => cell.output.type && !isUDTTypeSupported(cell.output.type, isMainnet, isOffline),
   );
   if (isUDTTypeNotSupported) {
     throw new RgbppUtxoBindMultiTypeAssetsError(
@@ -301,4 +303,11 @@ export const isRgbppCapacitySufficientForChange = (
 ): boolean => {
   const rgbppOccupiedCapacity = calculateRgbppCellCapacity();
   return sumUdtInputsCapacity > receiverOutputCapacity + rgbppOccupiedCapacity;
+};
+
+/**
+ * When vendorCellDeps is provided, this indicates offline mode, which means cellDeps and compatible xUDT Type Scripts will not be fetched through network requests
+ */
+export const isOfflineMode = (vendorCellDeps: CellDepsObject | undefined) => {
+  return vendorCellDeps === undefined;
 };
