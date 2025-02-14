@@ -219,7 +219,7 @@ export class CompatibleXUDTRegistry {
   private static xudtUrl = VERCEL_STATIC_COMPATIBLE_XUDT_URL;
 
   // If you want to get the latest compatible xUDT list, CompatibleXUDTRegistry.refreshCache should be called first
-  static getCompatibleTokens(offline: boolean = false): CKBComponents.Script[] {
+  static getCompatibleTokens(offline?: boolean): CKBComponents.Script[] {
     if (offline) {
       return COMPATIBLE_XUDT_TYPE_SCRIPTS;
     }

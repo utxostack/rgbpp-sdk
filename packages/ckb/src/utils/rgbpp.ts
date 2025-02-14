@@ -269,7 +269,7 @@ export const throwErrorWhenRgbppCellsInvalid = (
   cells: IndexerCell[] | undefined,
   xudtTypeBytes: Hex,
   isMainnet: boolean,
-  isOffline: boolean,
+  isOffline?: boolean,
 ) => {
   if (!cells || cells.length === 0) {
     throw new NoRgbppLiveCellError('No rgbpp cells found with the rgbpp lock args');

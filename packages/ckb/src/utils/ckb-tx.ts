@@ -64,7 +64,7 @@ export const isTokenMetadataType = (type: CKBComponents.Script, isMainnet: boole
  * @param offline - Whether to use the offline mode.
  * @returns A boolean indicating whether the provided UDT type script is supported.
  */
-export const isCompatibleUDTTypesSupported = (type: CKBComponents.Script, offline: boolean = false): boolean => {
+export const isCompatibleUDTTypesSupported = (type: CKBComponents.Script, offline?: boolean): boolean => {
   const compatibleList = CompatibleXUDTRegistry.getCompatibleTokens(offline);
   const compatibleXudtTypeBytes = compatibleList.map((script) => serializeScript(script));
   const typeAsset = serializeScript({
@@ -83,11 +83,7 @@ export const isStandardUDTTypeSupported = (type: CKBComponents.Script, isMainnet
   return xudtType === typeAsset;
 };
 
-export const isUDTTypeSupported = (
-  type: CKBComponents.Script,
-  isMainnet: boolean,
-  offline: boolean = false,
-): boolean => {
+export const isUDTTypeSupported = (type: CKBComponents.Script, isMainnet: boolean, offline?: boolean): boolean => {
   return isStandardUDTTypeSupported(type, isMainnet) || isCompatibleUDTTypesSupported(type, offline);
 };
 
@@ -109,11 +105,7 @@ export const isClusterSporeTypeSupported = (type: CKBComponents.Script, isMainne
   return isSporeTypeSupported(type, isMainnet) || clusterType === typeAsset;
 };
 
-export const isTypeAssetSupported = (
-  type: CKBComponents.Script,
-  isMainnet: boolean,
-  offline: boolean = false,
-): boolean => {
+export const isTypeAssetSupported = (type: CKBComponents.Script, isMainnet: boolean, offline?: boolean): boolean => {
   return isUDTTypeSupported(type, isMainnet, offline) || isClusterSporeTypeSupported(type, isMainnet);
 };
 
