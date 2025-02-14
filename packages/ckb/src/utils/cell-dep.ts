@@ -191,9 +191,8 @@ export const fetchTypeIdCellDeps = async (
     if (cellDepsObj?.compatibleXudt === undefined) {
       throw new Error('Compatible xUDT cell deps are null');
     }
-    const compatibleCellDeps = selected.compatibleXudtCodeHashes.map(
-      (codeHash) => cellDepsObj.compatibleXudt[codeHash],
-    );
+    let compatibleCellDeps = selected.compatibleXudtCodeHashes.map((codeHash) => cellDepsObj.compatibleXudt[codeHash]);
+    compatibleCellDeps = Array.from(new Set(compatibleCellDeps));
     if (compatibleCellDeps.length === 0) {
       throw new Error('The specific compatible xUDT cell deps are not found');
     }
