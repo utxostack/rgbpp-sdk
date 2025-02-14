@@ -139,8 +139,8 @@ importers:
   examples/rgbpp:
     dependencies:
       '@nervosnetwork/ckb-sdk-utils':
-        specifier: 0.109.3
-        version: 0.109.3
+        specifier: 0.109.5
+        version: 0.109.5
       rgbpp:
         specifier: workspace:*
         version: link:../../packages/rgbpp
@@ -155,8 +155,8 @@ importers:
   examples/xudt-on-ckb:
     dependencies:
       '@nervosnetwork/ckb-sdk-utils':
-        specifier: 0.109.3
-        version: 0.109.3
+        specifier: 0.109.5
+        version: 0.109.5
       rgbpp:
         specifier: workspace:*
         version: link:../../packages/rgbpp
@@ -177,8 +177,8 @@ importers:
         specifier: 0.22.2
         version: 0.22.2
       '@nervosnetwork/ckb-types':
-        specifier: 0.109.3
-        version: 0.109.3
+        specifier: 0.109.5
+        version: 0.109.5
       '@rgbpp-sdk/ckb':
         specifier: workspace:^
         version: link:../ckb
@@ -213,20 +213,20 @@ importers:
         specifier: ^1.0.13
         version: 1.0.14
       '@nervosnetwork/ckb-sdk-core':
-        specifier: 0.109.3
-        version: 0.109.3
+        specifier: 0.109.5
+        version: 0.109.5
       '@nervosnetwork/ckb-sdk-utils':
-        specifier: 0.109.3
-        version: 0.109.3
+        specifier: 0.109.5
+        version: 0.109.5
       '@nervosnetwork/ckb-types':
-        specifier: 0.109.3
-        version: 0.109.3
+        specifier: 0.109.5
+        version: 0.109.5
       '@rgbpp-sdk/service':
         specifier: workspace:^
         version: link:../service
       '@spore-sdk/core':
         specifier: ^0.2.0-beta.6
-        version: 0.2.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)
+        version: 0.2.0(@ckb-lumos/lumos@0.23.0)(lodash@4.17.21)
       axios:
         specifier: ^1.6.8
         version: 1.7.2
@@ -250,8 +250,8 @@ importers:
         specifier: ^0.22.2
         version: 0.22.2
       '@nervosnetwork/ckb-sdk-utils':
-        specifier: 0.109.3
-        version: 0.109.3
+        specifier: 0.109.5
+        version: 0.109.5
       '@rgbpp-sdk/btc':
         specifier: workspace:*
         version: link:../btc
@@ -281,8 +281,8 @@ importers:
         specifier: 0.22.2
         version: 0.22.2
       '@nervosnetwork/ckb-types':
-        specifier: 0.109.3
-        version: 0.109.3
+        specifier: 0.109.5
+        version: 0.109.5
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -290,8 +290,8 @@ importers:
   tests/rgbpp:
     dependencies:
       '@nervosnetwork/ckb-sdk-utils':
-        specifier: 0.109.3
-        version: 0.109.3
+        specifier: 0.109.5
+        version: 0.109.5
       rgbpp:
         specifier: workspace:*
         version: link:../../packages/rgbpp
@@ -423,64 +423,64 @@ packages:
   '@changesets/write@0.3.1':
     resolution: {integrity: sha512-SyGtMXzH3qFqlHKcvFY2eX+6b0NGiFcNav8AFsYwy5l8hejOeoeTDemu5Yjmke2V5jpzY+pBvM0vCCQ3gdZpfw==}
 
-  '@ckb-lumos/base@0.22.0-next.5':
-    resolution: {integrity: sha512-2I4f/zJm3Bdz/5soXo35vDh98Vffp2clO8n1ZeZRsUtBZUtvAGNbggC4J8/0a/yFw3cStaOJ1Tztla5E0hP+xA==}
-    engines: {node: '>=12.0.0'}
-
   '@ckb-lumos/base@0.22.2':
     resolution: {integrity: sha512-nosUCSa5rTV2IzxbEpqzrvUeQNXB66mgA0h40+QEdnE/gV/s4ke83AScrTAxWkErJy1G/sToIHCc2kWwO95DfQ==}
+    engines: {node: '>=12.0.0'}
+
+  '@ckb-lumos/base@0.23.0':
+    resolution: {integrity: sha512-8aLFsUyWIK0rT7GQlYFuXyiG5lQ2bLRK2GvUsxv5G7I3nJ1UyxjwvVOdtlsR/cwhzOam3ujwqASqBIayBL6GLA==}
     engines: {node: '>=12.0.0'}
 
   '@ckb-lumos/bi@0.0.0-canary-66bbbfd-20240805132534':
     resolution: {integrity: sha512-0eEPkaZ7WOXIkHbRx/vD2kynn4b5TRT8Xo3DGFPKDd/9ZQJX07fPvaCRdCV9/fyEZXC4aVv0XskWySKbrWDDLw==}
     engines: {node: '>=12.0.0'}
 
-  '@ckb-lumos/bi@0.22.0-next.5':
-    resolution: {integrity: sha512-hfh9PQDLJeZedlJ6qBVxx2MR9ndU0XyIl53vh1I+S4SGmvl/z2PGEY06vN34nkjmZ/1c87/KW+sL2Cpii0IxGg==}
-    engines: {node: '>=12.0.0'}
-
   '@ckb-lumos/bi@0.22.2':
     resolution: {integrity: sha512-F+dLC/tE+xdtNuGgJxlDqbgX/f8azg1tvIFTR5mu7Vhz08nkFgnA+Z+yC0t/I3fDwwH4p/SlGP/yducrsfVTqw==}
     engines: {node: '>=12.0.0'}
 
-  '@ckb-lumos/ckb-indexer@0.22.0-next.5':
-    resolution: {integrity: sha512-1UZ0whrn9k18wrvIIvsdAYRCGInNA4qcrMcxsqSV7ADQnPsw8c+ARkIyzQrqaM2bzvPa3O+aVXnZ7g2oTrhtFA==}
+  '@ckb-lumos/bi@0.23.0':
+    resolution: {integrity: sha512-KAy+lyVpL+Al4XD+c9tHrA9DSpHkMusyXtTS81aNZi5MyL6F9jrVmFcqLorhfyfl8Fsv2sEjMe5Neo2Y+w/RJQ==}
+    engines: {node: '>=12.0.0'}
+
+  '@ckb-lumos/ckb-indexer@0.23.0':
+    resolution: {integrity: sha512-yLODLJzvtz4M6W6OJR4iRbBTUGrKReV2dhVePPjbH/HRkRY6f6J6cEM9+qM2I3QABmaCXeAM3hWvnWU9hjalQQ==}
     engines: {node: '>=12.0.0'}
 
   '@ckb-lumos/codec@0.0.0-canary-66bbbfd-20240805132534':
     resolution: {integrity: sha512-/9RY2SfviZtWkSQbmgNxMHoora0vv6hCFB09n/RXF1jyfmmVNKuhtcbDKAiTl4WwWmxdJd1DhgPP0ARvM7VKfg==}
     engines: {node: '>=12.0.0'}
 
-  '@ckb-lumos/codec@0.22.0-next.5':
-    resolution: {integrity: sha512-AVvREoEc0zSbGSdFZOph1WL9QtUKUjQ2PABpApROMTqDCryG9/FpBrInjm2y50USZlwcEE3+ocEqFqJjfuTXKQ==}
-    engines: {node: '>=12.0.0'}
-
   '@ckb-lumos/codec@0.22.2':
     resolution: {integrity: sha512-P5SyhT2qkJwCwcHF3yMLInE0z3wWHDkqJNbSM2Q9oyu0+9kjMQfexNia3T+atBl2M7ELFzN5WvttojYr6DrCwQ==}
     engines: {node: '>=12.0.0'}
 
-  '@ckb-lumos/common-scripts@0.22.0-next.5':
-    resolution: {integrity: sha512-DXGwyc0pmrq0fj+NflDBeBgJSL2bNAVHpULpbUncDUPIBJf9IFyMDSZUgzX6hYjTX0WA07e5CEFo5wwHb24Dmw==}
+  '@ckb-lumos/codec@0.23.0':
+    resolution: {integrity: sha512-FwYooXnsFDjlHHnlFnCTB1UbBzV72I0VjkRpeauFk5nQ4+/75xl28ywK3J14M+0aHTnYU9msXUTRDAGqC0CaNQ==}
     engines: {node: '>=12.0.0'}
 
-  '@ckb-lumos/config-manager@0.22.0-next.5':
-    resolution: {integrity: sha512-kicoRgPP9DPxA90que/+9R0iQgiIJQNreZv1/EJ+4GDOj/pFb0iBbTEQxF3zXtLKjnZoMTqTQH7e4CAV0ZftSA==}
+  '@ckb-lumos/common-scripts@0.23.0':
+    resolution: {integrity: sha512-Dwic0Al94afdGNu+TGAMmZiU5OVF/zvXbzhCvNmkFS25t8BxPdFjGEc0MlWBI4ZSEoGRrC0O+BOxjzfl5VxSYg==}
     engines: {node: '>=12.0.0'}
 
-  '@ckb-lumos/hd@0.22.0-next.5':
-    resolution: {integrity: sha512-d+Ws/fknuh+P9+aEBhLWiCOxMVE6i78T+2bEj8aWDLoVfrLvuCqFEyVRCspOG22pgEj0h853nMsetrb4pI+fdw==}
+  '@ckb-lumos/config-manager@0.23.0':
+    resolution: {integrity: sha512-MvNyzGIJTmIpEf5WJB3TkE4icZyZ2HZhFIfJB2SXDRAC84E02jxENPelCnqRbM1rlFHnxjh/5a/oCi5LcXefag==}
     engines: {node: '>=12.0.0'}
 
-  '@ckb-lumos/helpers@0.22.0-next.5':
-    resolution: {integrity: sha512-fsPr7oTQuKdfEvqdakgfDv9daU4PLPc9g8l13klMhEayaTamBndG3GdhTTASFMBxQaz58E6thTObsig220yVIg==}
+  '@ckb-lumos/hd@0.23.0':
+    resolution: {integrity: sha512-z7EsR/GeX54hq4ukqwW3nrqLCsYrTWIFAjZLR1Ao8xycqQp0IBjCWZLLjRrZY6krbUQpVOoiKo3NBLpPW36LXg==}
     engines: {node: '>=12.0.0'}
 
-  '@ckb-lumos/light-client@0.22.0-next.5':
-    resolution: {integrity: sha512-PbrGQUQAILO7QI93qm8Cke7J8CduCppKNTJd9yP7Y6ldtFKfwev8uYVB+xhUaciQclLZ26kbe1peaxd9xP8pXQ==}
+  '@ckb-lumos/helpers@0.23.0':
+    resolution: {integrity: sha512-yfD28vSn1BBk8BA+/ivL7pF3rMsx4OPQ+UUJjsQiR1zGdkNR3zhJOecgICeddJGYDTBBDVgwHcuyoekLxQzmGg==}
     engines: {node: '>=12.0.0'}
 
-  '@ckb-lumos/lumos@0.22.0-next.5':
-    resolution: {integrity: sha512-Dv+MKa664zsD9Nxrnor04Hb52MNcwgtEutgzdlE+qtAB/skp6P0NVnU9uQF7RiYHNpdmUe8PROlkzB4jaKz9NA==}
+  '@ckb-lumos/light-client@0.23.0':
+    resolution: {integrity: sha512-O+dbfubDjl0iODiQ8Q+RVJLfuXYNCN6c0am8xEv4vvazLwfw1y/vn6fG/pFu9Mc1GahZ58y9o6fkUgs8ujH3Mg==}
+    engines: {node: '>=12.0.0'}
+
+  '@ckb-lumos/lumos@0.23.0':
+    resolution: {integrity: sha512-ocsmzgTgevVwyQeQkUZrg4PLJCfX48D5MEBNYTMoGh5b1g0f1iEBHcAgw4WBGOKgMJQmGRmWB5P6tPDZ3OZBwQ==}
     engines: {node: '>=12.0.0'}
 
   '@ckb-lumos/molecule@0.0.0-canary-66bbbfd-20240805132534':
@@ -488,20 +488,20 @@ packages:
     engines: {node: '>=12.0.0'}
     hasBin: true
 
-  '@ckb-lumos/rpc@0.22.0-next.5':
-    resolution: {integrity: sha512-ohH5kj/iiyKaTksgWCc4STwnEON9cCC2tPf3eP7XUaJ9ZO01ahOZ9C85NccBoK2lOqcLrZag3Y0LDQWw+eFbBg==}
-    engines: {node: '>=12.0.0'}
-
-  '@ckb-lumos/toolkit@0.22.0-next.5':
-    resolution: {integrity: sha512-D41GgB6D8WDh94gBNGXQJTxbI2NFFSH/71jE4kdRI6+qqbl/zYlI3nsLdQmY1RajIYyLgYLNAVHiDIWK/KGO/w==}
+  '@ckb-lumos/rpc@0.23.0':
+    resolution: {integrity: sha512-NEY1Wb2cNMYdHwcZYtd8XZ3CP6WGPd25hcsudoDAFlAt9vjHsPlNiwSS7tcZCZfg1XiJy3taViVgG8pFemgpbA==}
     engines: {node: '>=12.0.0'}
 
   '@ckb-lumos/toolkit@0.22.2':
     resolution: {integrity: sha512-HmKz2dGQeaW2XDqkvjJfLv50VQWGKbthg2RDfIxGsZyjveluRROTyuHP1akypy4pqF8TApGLsXci2MaHCRau+w==}
     engines: {node: '>=12.0.0'}
 
-  '@ckb-lumos/transaction-manager@0.22.0-next.5':
-    resolution: {integrity: sha512-Xs10tTPgxqrB1cUMUqTdAZDDpTs3ESxPLv9HmyR2jLFI6HVJjSbGJipXODYJaJ+iUNPG/qZaehHmuQoGgbBwiw==}
+  '@ckb-lumos/toolkit@0.23.0':
+    resolution: {integrity: sha512-7LTsUFfoNCBWJLgh+V/QFnemjGw+y4mmLeQvubwYuJqIPIhIpwKUuKRzkvVG8snA8xVQSfjSSQOs5m3mKp66Kg==}
+    engines: {node: '>=12.0.0'}
+
+  '@ckb-lumos/transaction-manager@0.23.0':
+    resolution: {integrity: sha512-sfwt2g8JlYxr5jRx5r/UZNffTpkwn3sh4dD2THzKmX0S1CsSgww2D1ZD7yruWwSu05ZLKlDPFVKyJ50tNc3LuQ==}
     engines: {node: '>=12.0.0'}
 
   '@colors/colors@1.5.0':
@@ -1040,17 +1040,17 @@ packages:
   '@manypkg/get-packages@1.1.3':
     resolution: {integrity: sha512-fo+QhuU3qE/2TQMQmbVMqaQ6EWbMhi4ABWP+O4AM1NqPBuy0OrApV5LO6BrrgnhtAHS2NH6RrVk9OL181tTi8A==}
 
-  '@nervosnetwork/ckb-sdk-core@0.109.3':
-    resolution: {integrity: sha512-YASdkmfvw6eu/q+7X2OTrnshhWb5bVtPPkzaryEfvGrRAhHzh45Q/umyvX3GOBxU5wncdTuptNsWI5A/T2ZjVw==}
+  '@nervosnetwork/ckb-sdk-core@0.109.5':
+    resolution: {integrity: sha512-eh3RjJlf8LqIAf03m81YLnuDaTOzs8C2cqXGJT9pdJIwEAaRcmgG6xZr5m9fdOMaeFMvaF4BQyjCeGjTQCFRGA==}
 
-  '@nervosnetwork/ckb-sdk-rpc@0.109.3':
-    resolution: {integrity: sha512-7CHY8S78IvwyawqVaBwTrqUjiNQ31GdovPRuUommtxv6JYetoZEWQuzdcIMipqEGXZT6jIfuAYeKS2mZJWQmCw==}
+  '@nervosnetwork/ckb-sdk-rpc@0.109.5':
+    resolution: {integrity: sha512-rT7iVRtagP3TxWel4zwXo6BAKfne4TBrGTnjmVTfqa/mrMNonVwOyJcFhWNSvq/r8HufL3QlYhngLHVDNomURQ==}
 
-  '@nervosnetwork/ckb-sdk-utils@0.109.3':
-    resolution: {integrity: sha512-sV3WXlZmd765qtFsXpwl0Bl3hOgGev15Og810acO6iC0cVHEVvv/Uiabd8a2xkqyfziRDI0tfWC0DewOJB28rg==}
+  '@nervosnetwork/ckb-sdk-utils@0.109.5':
+    resolution: {integrity: sha512-Tx642hcJWbN8W3KzCIhIo49yzJ8LMqWopQCSBDKuRmwHesO/bvJqYojCVwfrOyROtFOPhgjyiGm5RXBuxm0KpQ==}
 
-  '@nervosnetwork/ckb-types@0.109.3':
-    resolution: {integrity: sha512-i9EVTXCT0bTLpAQXAoF5zHGLWYCXNE5AP4Zl0Niwl3ZplaVAZHNU6ygsh2O3EGmCFv5qlkoY2DuLmsjysEaNLA==}
+  '@nervosnetwork/ckb-types@0.109.5':
+    resolution: {integrity: sha512-5jQNjFw76YCd+Ppl+0RvBWzxwvWaKfWC5wjVFFdNAieX7xksCHfZFIeow8je7AF8uVypwe56WlLBlblxw9NBBQ==}
 
   '@nestjs/cli@10.4.2':
     resolution: {integrity: sha512-fQexIfLHfp6GUgX+CO4fOg+AEwV5ox/LHotQhyZi9wXUQDyIqS0NTTbumr//62EcX35qV4nU0359nYnuEdzG+A==}
@@ -1698,11 +1698,11 @@ packages:
   avvio@8.3.2:
     resolution: {integrity: sha512-st8e519GWHa/azv8S87mcJvZs4WsgTBjOw/Ih1CP6u+8SZvcOeAYNG6JbsIrAUUJJ7JfmrnOkR8ipDS+u9SIRQ==}
 
-  axios@1.6.7:
-    resolution: {integrity: sha512-/hDJGff6/c7u0hDkvkGxR/oy6CbCs8ziCsC7SqmhjfozqiJGc8Z11wrv9z9lYfY4K8l+H9TpjcMDX0xOZmx+RA==}
-
   axios@1.7.2:
     resolution: {integrity: sha512-2A8QhOMrbomlDuiLeK9XibIBzuHeRcqqNOHp0Cyp5EoJ1IFDh+XZH3A6BkXtv0K4gFGCI0Y4BM7B1wOEi0Rmgw==}
+
+  axios@1.7.4:
+    resolution: {integrity: sha512-DukmaFRnY6AzAALSH4J2M3k6PkaC+MfaAGdEERRWcC9q3/TWQwLpHR8ZRLKTdQ3aBDL64EdluRDjJqKw+BPZEw==}
 
   b4a@1.6.6:
     resolution: {integrity: sha512-5Tk1HLk6b6ctmjIkAcU/Ujv/1WqiDl0F0JdRCR80VsOcUlHcu7pWeWRlOqQLHfDEsVx9YH/aif5AG4ehoCtTmg==}
@@ -2075,11 +2075,11 @@ packages:
   electron-to-chromium@1.4.832:
     resolution: {integrity: sha512-cTen3SB0H2SGU7x467NRe1eVcQgcuS6jckKfWJHia2eo0cHIGOqHoAxevIYZD4eRHcWjkvFzo93bi3vJ9W+1lA==}
 
-  elliptic@6.5.4:
-    resolution: {integrity: sha512-iLhC6ULemrljPZb+QutR5TQGB+pdW6KGD5RSegS+8sorOZT+rdQFbsQFJgvN3eRqNALqJer4oQ16YvJHlU8hzQ==}
-
   elliptic@6.5.6:
     resolution: {integrity: sha512-mpzdtpeCLuS3BmE3pO3Cpp5bbjlOPY2Q0PgoF+Od1XZrHLYI28Xe3ossCmYCQt11FQKEYd9+PF8jymTvtWJSHQ==}
+
+  elliptic@6.6.1:
+    resolution: {integrity: sha512-RaddvvMatK2LJHqFJ+YA4WysVN5Ita9E35botqIYspQ4TkRAlCicdzKOjlyv/1Za5RyTNn7di//eEV0uTAfe3g==}
 
   emoji-regex@10.3.0:
     resolution: {integrity: sha512-QpLs9D9v9kArv4lfDEgg1X/gN5XLnf/A6l9cs8SPZLRZR3ZkY9+kwIQTxm+fsSej5UMYGE8fdoaZVIBlqG0XTw==}
@@ -4157,17 +4157,6 @@ snapshots:
       human-id: 1.0.2
       prettier: 2.8.8
 
-  '@ckb-lumos/base@0.22.0-next.5':
-    dependencies:
-      '@ckb-lumos/bi': 0.22.0-next.5
-      '@ckb-lumos/codec': 0.22.0-next.5
-      '@ckb-lumos/toolkit': 0.22.0-next.5
-      '@types/blake2b': 2.1.3
-      '@types/lodash.isequal': 4.5.8
-      blake2b: 2.1.4
-      js-xxhash: 1.0.4
-      lodash.isequal: 4.5.0
-
   '@ckb-lumos/base@0.22.2':
     dependencies:
       '@ckb-lumos/bi': 0.22.2
@@ -4179,11 +4168,18 @@ snapshots:
       js-xxhash: 1.0.4
       lodash.isequal: 4.5.0
 
-  '@ckb-lumos/bi@0.0.0-canary-66bbbfd-20240805132534':
+  '@ckb-lumos/base@0.23.0':
     dependencies:
-      jsbi: 4.3.0
+      '@ckb-lumos/bi': 0.23.0
+      '@ckb-lumos/codec': 0.23.0
+      '@ckb-lumos/toolkit': 0.23.0
+      '@types/blake2b': 2.1.3
+      '@types/lodash.isequal': 4.5.8
+      blake2b: 2.1.4
+      js-xxhash: 1.0.4
+      lodash.isequal: 4.5.0
 
-  '@ckb-lumos/bi@0.22.0-next.5':
+  '@ckb-lumos/bi@0.0.0-canary-66bbbfd-20240805132534':
     dependencies:
       jsbi: 4.3.0
 
@@ -4191,13 +4187,17 @@ snapshots:
     dependencies:
       jsbi: 4.3.0
 
-  '@ckb-lumos/ckb-indexer@0.22.0-next.5':
+  '@ckb-lumos/bi@0.23.0':
     dependencies:
-      '@ckb-lumos/base': 0.22.0-next.5
-      '@ckb-lumos/bi': 0.22.0-next.5
-      '@ckb-lumos/codec': 0.22.0-next.5
-      '@ckb-lumos/rpc': 0.22.0-next.5
-      '@ckb-lumos/toolkit': 0.22.0-next.5
+      jsbi: 4.3.0
+
+  '@ckb-lumos/ckb-indexer@0.23.0':
+    dependencies:
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/bi': 0.23.0
+      '@ckb-lumos/codec': 0.23.0
+      '@ckb-lumos/rpc': 0.23.0
+      '@ckb-lumos/toolkit': 0.23.0
       cross-fetch: 3.1.8
       events: 3.3.0
     transitivePeerDependencies:
@@ -4207,86 +4207,86 @@ snapshots:
     dependencies:
       '@ckb-lumos/bi': 0.0.0-canary-66bbbfd-20240805132534
 
-  '@ckb-lumos/codec@0.22.0-next.5':
-    dependencies:
-      '@ckb-lumos/bi': 0.22.0-next.5
-
   '@ckb-lumos/codec@0.22.2':
     dependencies:
       '@ckb-lumos/bi': 0.22.2
 
-  '@ckb-lumos/common-scripts@0.22.0-next.5':
+  '@ckb-lumos/codec@0.23.0':
     dependencies:
-      '@ckb-lumos/base': 0.22.0-next.5
-      '@ckb-lumos/bi': 0.22.0-next.5
-      '@ckb-lumos/codec': 0.22.0-next.5
-      '@ckb-lumos/config-manager': 0.22.0-next.5
-      '@ckb-lumos/helpers': 0.22.0-next.5
-      '@ckb-lumos/rpc': 0.22.0-next.5
-      '@ckb-lumos/toolkit': 0.22.0-next.5
+      '@ckb-lumos/bi': 0.23.0
+
+  '@ckb-lumos/common-scripts@0.23.0':
+    dependencies:
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/bi': 0.23.0
+      '@ckb-lumos/codec': 0.23.0
+      '@ckb-lumos/config-manager': 0.23.0
+      '@ckb-lumos/helpers': 0.23.0
+      '@ckb-lumos/rpc': 0.23.0
+      '@ckb-lumos/toolkit': 0.23.0
       bech32: 2.0.0
       bs58: 5.0.0
       immutable: 4.3.6
     transitivePeerDependencies:
       - encoding
 
-  '@ckb-lumos/config-manager@0.22.0-next.5':
+  '@ckb-lumos/config-manager@0.23.0':
     dependencies:
-      '@ckb-lumos/base': 0.22.0-next.5
-      '@ckb-lumos/bi': 0.22.0-next.5
-      '@ckb-lumos/codec': 0.22.0-next.5
-      '@ckb-lumos/rpc': 0.22.0-next.5
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/bi': 0.23.0
+      '@ckb-lumos/codec': 0.23.0
+      '@ckb-lumos/rpc': 0.23.0
       '@types/deep-freeze-strict': 1.1.2
       deep-freeze-strict: 1.1.1
     transitivePeerDependencies:
       - encoding
 
-  '@ckb-lumos/hd@0.22.0-next.5':
+  '@ckb-lumos/hd@0.23.0':
     dependencies:
-      '@ckb-lumos/base': 0.22.0-next.5
-      '@ckb-lumos/bi': 0.22.0-next.5
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/bi': 0.23.0
       bn.js: 5.2.1
       elliptic: 6.5.6
       scrypt-js: 3.0.1
       sha3: 2.1.4
       uuid: 8.3.2
 
-  '@ckb-lumos/helpers@0.22.0-next.5':
+  '@ckb-lumos/helpers@0.23.0':
     dependencies:
-      '@ckb-lumos/base': 0.22.0-next.5
-      '@ckb-lumos/bi': 0.22.0-next.5
-      '@ckb-lumos/codec': 0.22.0-next.5
-      '@ckb-lumos/config-manager': 0.22.0-next.5
-      '@ckb-lumos/toolkit': 0.22.0-next.5
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/bi': 0.23.0
+      '@ckb-lumos/codec': 0.23.0
+      '@ckb-lumos/config-manager': 0.23.0
+      '@ckb-lumos/toolkit': 0.23.0
       bech32: 2.0.0
       immutable: 4.3.6
     transitivePeerDependencies:
       - encoding
 
-  '@ckb-lumos/light-client@0.22.0-next.5':
+  '@ckb-lumos/light-client@0.23.0':
     dependencies:
-      '@ckb-lumos/base': 0.22.0-next.5
-      '@ckb-lumos/ckb-indexer': 0.22.0-next.5
-      '@ckb-lumos/rpc': 0.22.0-next.5
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/ckb-indexer': 0.23.0
+      '@ckb-lumos/rpc': 0.23.0
       cross-fetch: 3.1.8
       events: 3.3.0
     transitivePeerDependencies:
       - encoding
 
-  '@ckb-lumos/lumos@0.22.0-next.5':
+  '@ckb-lumos/lumos@0.23.0':
     dependencies:
-      '@ckb-lumos/base': 0.22.0-next.5
-      '@ckb-lumos/bi': 0.22.0-next.5
-      '@ckb-lumos/ckb-indexer': 0.22.0-next.5
-      '@ckb-lumos/codec': 0.22.0-next.5
-      '@ckb-lumos/common-scripts': 0.22.0-next.5
-      '@ckb-lumos/config-manager': 0.22.0-next.5
-      '@ckb-lumos/hd': 0.22.0-next.5
-      '@ckb-lumos/helpers': 0.22.0-next.5
-      '@ckb-lumos/light-client': 0.22.0-next.5
-      '@ckb-lumos/rpc': 0.22.0-next.5
-      '@ckb-lumos/toolkit': 0.22.0-next.5
-      '@ckb-lumos/transaction-manager': 0.22.0-next.5
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/bi': 0.23.0
+      '@ckb-lumos/ckb-indexer': 0.23.0
+      '@ckb-lumos/codec': 0.23.0
+      '@ckb-lumos/common-scripts': 0.23.0
+      '@ckb-lumos/config-manager': 0.23.0
+      '@ckb-lumos/hd': 0.23.0
+      '@ckb-lumos/helpers': 0.23.0
+      '@ckb-lumos/light-client': 0.23.0
+      '@ckb-lumos/rpc': 0.23.0
+      '@ckb-lumos/toolkit': 0.23.0
+      '@ckb-lumos/transaction-manager': 0.23.0
     transitivePeerDependencies:
       - encoding
 
@@ -4302,30 +4302,30 @@ snapshots:
       nearley: 2.20.1
       relative: 3.0.2
 
-  '@ckb-lumos/rpc@0.22.0-next.5':
+  '@ckb-lumos/rpc@0.23.0':
     dependencies:
-      '@ckb-lumos/base': 0.22.0-next.5
-      '@ckb-lumos/bi': 0.22.0-next.5
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/bi': 0.23.0
       abort-controller: 3.0.0
       cross-fetch: 3.1.8
     transitivePeerDependencies:
       - encoding
 
-  '@ckb-lumos/toolkit@0.22.0-next.5':
-    dependencies:
-      '@ckb-lumos/bi': 0.22.0-next.5
-
   '@ckb-lumos/toolkit@0.22.2':
     dependencies:
       '@ckb-lumos/bi': 0.22.2
 
-  '@ckb-lumos/transaction-manager@0.22.0-next.5':
+  '@ckb-lumos/toolkit@0.23.0':
     dependencies:
-      '@ckb-lumos/base': 0.22.0-next.5
-      '@ckb-lumos/ckb-indexer': 0.22.0-next.5
-      '@ckb-lumos/codec': 0.22.0-next.5
-      '@ckb-lumos/rpc': 0.22.0-next.5
-      '@ckb-lumos/toolkit': 0.22.0-next.5
+      '@ckb-lumos/bi': 0.23.0
+
+  '@ckb-lumos/transaction-manager@0.23.0':
+    dependencies:
+      '@ckb-lumos/base': 0.23.0
+      '@ckb-lumos/ckb-indexer': 0.23.0
+      '@ckb-lumos/codec': 0.23.0
+      '@ckb-lumos/rpc': 0.23.0
+      '@ckb-lumos/toolkit': 0.23.0
       immutable: 4.3.6
     transitivePeerDependencies:
       - encoding
@@ -4680,32 +4680,32 @@ snapshots:
       globby: 11.1.0
       read-yaml-file: 1.1.0
 
-  '@nervosnetwork/ckb-sdk-core@0.109.3':
+  '@nervosnetwork/ckb-sdk-core@0.109.5':
     dependencies:
-      '@nervosnetwork/ckb-sdk-rpc': 0.109.3
-      '@nervosnetwork/ckb-sdk-utils': 0.109.3
-      '@nervosnetwork/ckb-types': 0.109.3
+      '@nervosnetwork/ckb-sdk-rpc': 0.109.5
+      '@nervosnetwork/ckb-sdk-utils': 0.109.5
+      '@nervosnetwork/ckb-types': 0.109.5
       tslib: 2.3.1
     transitivePeerDependencies:
       - debug
 
-  '@nervosnetwork/ckb-sdk-rpc@0.109.3':
+  '@nervosnetwork/ckb-sdk-rpc@0.109.5':
     dependencies:
-      '@nervosnetwork/ckb-sdk-utils': 0.109.3
-      axios: 1.6.7
+      '@nervosnetwork/ckb-sdk-utils': 0.109.5
+      axios: 1.7.4
       tslib: 2.3.1
     transitivePeerDependencies:
       - debug
 
-  '@nervosnetwork/ckb-sdk-utils@0.109.3':
+  '@nervosnetwork/ckb-sdk-utils@0.109.5':
     dependencies:
-      '@nervosnetwork/ckb-types': 0.109.3
+      '@nervosnetwork/ckb-types': 0.109.5
       bech32: 2.0.0
-      elliptic: 6.5.4
+      elliptic: 6.6.1
       jsbi: 3.1.3
       tslib: 2.3.1
 
-  '@nervosnetwork/ckb-types@0.109.3': {}
+  '@nervosnetwork/ckb-types@0.109.5': {}
 
   '@nestjs/cli@10.4.2(@swc/core@1.7.11)(esbuild@0.24.2)':
     dependencies:
@@ -4899,9 +4899,9 @@ snapshots:
 
   '@scure/base@1.1.7': {}
 
-  '@spore-sdk/core@0.2.0(@ckb-lumos/lumos@0.22.0-next.5)(lodash@4.17.21)':
+  '@spore-sdk/core@0.2.0(@ckb-lumos/lumos@0.23.0)(lodash@4.17.21)':
     dependencies:
-      '@ckb-lumos/lumos': 0.22.0-next.5
+      '@ckb-lumos/lumos': 0.23.0
       lodash: 4.17.21
 
   '@swc/core-darwin-arm64@1.7.11':
@@ -5366,7 +5366,7 @@ snapshots:
       '@fastify/error': 3.4.1
       fastq: 1.17.1
 
-  axios@1.6.7:
+  axios@1.7.2:
     dependencies:
       follow-redirects: 1.15.6
       form-data: 4.0.0
@@ -5374,7 +5374,7 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  axios@1.7.2:
+  axios@1.7.4:
     dependencies:
       follow-redirects: 1.15.6
       form-data: 4.0.0
@@ -5751,7 +5751,7 @@ snapshots:
 
   electron-to-chromium@1.4.832: {}
 
-  elliptic@6.5.4:
+  elliptic@6.5.6:
     dependencies:
       bn.js: 4.12.0
       brorand: 1.1.0
@@ -5761,7 +5761,7 @@ snapshots:
       minimalistic-assert: 1.0.1
       minimalistic-crypto-utils: 1.0.1
 
-  elliptic@6.5.6:
+  elliptic@6.6.1:
     dependencies:
       bn.js: 4.12.0
       brorand: 1.1.0
