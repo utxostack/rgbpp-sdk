@@ -13,7 +13,7 @@
     "integration:compatible-xudt": "npx tsx shared/prepare-utxo.ts && npx tsx xudt/compatible-xudt/1-ckb-leap-btc.ts && npx tsx xudt/compatible-xudt/2-btc-transfer.ts && npx tsx xudt/compatible-xudt/3-btc-leap-ckb.ts"
   },
   "dependencies": {
-    "@nervosnetwork/ckb-sdk-utils": "0.109.3",
+    "@nervosnetwork/ckb-sdk-utils": "0.109.5",
     "rgbpp": "workspace:*",
     "zx": "^8.0.2"
  },
