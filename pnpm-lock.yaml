@@ -959,6 +959,7 @@ packages:
   '@exact-realty/multipart-parser@1.0.14':
     resolution: {integrity: sha512-ln1+s1XOvRY9NRof3lpjWJZfSoV5XOWdVgK7sYeE3TAt0brtB+pIPJpSbxaol/490re2rcMEo24VZXeffKm8Aw==}
     engines: {node: '>=16.0.0', npm: '>=8.0.0'}
+    deprecated: Package has moved to @apeleghq/multipart-parser
 
   '@fastify/ajv-compiler@3.6.0':
     resolution: {integrity: sha512-LwdXQJjmMD+GwLOkP7TVC68qa+pSSogeWWmznRJ/coyTcfe9qA05AHFSe1eZFwK6q+xVRpChnvFUkf1iYaSZsQ==}
@@ -1976,8 +1977,8 @@ packages:
   create-require@1.1.1:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
 
-  cross-fetch@3.1.8:
-    resolution: {integrity: sha512-cvA+JwZoU0Xq+h6WkMvAUqPEYy92Obet6UdKLfW60qn99ftItKjB5T+BkyWOFWe2pUyfQ+IJHmpOTznqk1M6Kg==}
+  cross-fetch@3.2.0:
+    resolution: {integrity: sha512-Q+xVJLoGOeIMXZmbUK4HYk+69cQH6LudR0Vu/pRm2YlU/hDV9CiS0gKUMaWY5f2NeUH9C1nV3bsTlCo0FsTV1Q==}
 
   cross-spawn@5.1.0:
     resolution: {integrity: sha512-pTgQJ5KC0d2hcY8eyL1IzlBPYjTkyH72XRZPnLyKus2mBfNjQs3klqbJU2VILqZryAZUt9JOb3h/mWMy23/f5A==}
@@ -2075,9 +2076,6 @@ packages:
   electron-to-chromium@1.4.832:
     resolution: {integrity: sha512-cTen3SB0H2SGU7x467NRe1eVcQgcuS6jckKfWJHia2eo0cHIGOqHoAxevIYZD4eRHcWjkvFzo93bi3vJ9W+1lA==}
 
-  elliptic@6.5.6:
-    resolution: {integrity: sha512-mpzdtpeCLuS3BmE3pO3Cpp5bbjlOPY2Q0PgoF+Od1XZrHLYI28Xe3ossCmYCQt11FQKEYd9+PF8jymTvtWJSHQ==}
-
   elliptic@6.6.1:
     resolution: {integrity: sha512-RaddvvMatK2LJHqFJ+YA4WysVN5Ita9E35botqIYspQ4TkRAlCicdzKOjlyv/1Za5RyTNn7di//eEV0uTAfe3g==}
 
@@ -2158,6 +2156,7 @@ packages:
   eslint@8.57.0:
     resolution: {integrity: sha512-dZ6+mexnaTIbSBZWgou51U6OmzIhYM2VcNdtiTtI7qPNZm35Akpr0f6vtw3w1Kmn5PYo+tZVfh13WrhpS6oLqQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
 
   espree@9.6.1:
@@ -2493,8 +2492,8 @@ packages:
     resolution: {integrity: sha512-5Fytz/IraMjqpwfd34ke28PTVMjZjJG2MPn5t7OE4eUCUNf8BAa7b5WUS9/Qvr6mwOQS7Mk6vdsMno5he+T8Xw==}
     engines: {node: '>= 4'}
 
-  immutable@4.3.6:
-    resolution: {integrity: sha512-Ju0+lEMyzMVZarkTn/gqRpdqd5dOPaz1mCZ0SH3JV6iFw81PldE/PEB1hWVEA288HPt4WXW8O7AWxB10M+03QQ==}
+  immutable@4.3.7:
+    resolution: {integrity: sha512-1hqclzwYwjRDFLjcFxOM5AYkkG0rpFPpr1RLPMEuGczoS7YA8gLhy8SWXYRAA/XwfEHpfo3cw5JGioS32fnMRw==}
 
   import-fresh@3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
@@ -2733,6 +2732,7 @@ packages:
 
   lodash.isequal@4.5.0:
     resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
+    deprecated: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
 
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
@@ -4198,7 +4198,7 @@ snapshots:
       '@ckb-lumos/codec': 0.23.0
       '@ckb-lumos/rpc': 0.23.0
       '@ckb-lumos/toolkit': 0.23.0
-      cross-fetch: 3.1.8
+      cross-fetch: 3.2.0
       events: 3.3.0
     transitivePeerDependencies:
       - encoding
@@ -4226,7 +4226,7 @@ snapshots:
       '@ckb-lumos/toolkit': 0.23.0
       bech32: 2.0.0
       bs58: 5.0.0
-      immutable: 4.3.6
+      immutable: 4.3.7
     transitivePeerDependencies:
       - encoding
 
@@ -4246,7 +4246,7 @@ snapshots:
       '@ckb-lumos/base': 0.23.0
       '@ckb-lumos/bi': 0.23.0
       bn.js: 5.2.1
-      elliptic: 6.5.6
+      elliptic: 6.6.1
       scrypt-js: 3.0.1
       sha3: 2.1.4
       uuid: 8.3.2
@@ -4259,7 +4259,7 @@ snapshots:
       '@ckb-lumos/config-manager': 0.23.0
       '@ckb-lumos/toolkit': 0.23.0
       bech32: 2.0.0
-      immutable: 4.3.6
+      immutable: 4.3.7
     transitivePeerDependencies:
       - encoding
 
@@ -4268,7 +4268,7 @@ snapshots:
       '@ckb-lumos/base': 0.23.0
       '@ckb-lumos/ckb-indexer': 0.23.0
       '@ckb-lumos/rpc': 0.23.0
-      cross-fetch: 3.1.8
+      cross-fetch: 3.2.0
       events: 3.3.0
     transitivePeerDependencies:
       - encoding
@@ -4307,7 +4307,7 @@ snapshots:
       '@ckb-lumos/base': 0.23.0
       '@ckb-lumos/bi': 0.23.0
       abort-controller: 3.0.0
-      cross-fetch: 3.1.8
+      cross-fetch: 3.2.0
     transitivePeerDependencies:
       - encoding
 
@@ -4326,7 +4326,7 @@ snapshots:
       '@ckb-lumos/codec': 0.23.0
       '@ckb-lumos/rpc': 0.23.0
       '@ckb-lumos/toolkit': 0.23.0
-      immutable: 4.3.6
+      immutable: 4.3.7
     transitivePeerDependencies:
       - encoding
 
@@ -5665,7 +5665,7 @@ snapshots:
 
   create-require@1.1.1: {}
 
-  cross-fetch@3.1.8:
+  cross-fetch@3.2.0:
     dependencies:
       node-fetch: 2.7.0
     transitivePeerDependencies:
@@ -5750,16 +5750,6 @@ snapshots:
       wif: 2.0.6
 
   electron-to-chromium@1.4.832: {}
-
-  elliptic@6.5.6:
-    dependencies:
-      bn.js: 4.12.0
-      brorand: 1.1.0
-      hash.js: 1.1.7
-      hmac-drbg: 1.0.1
-      inherits: 2.0.4
-      minimalistic-assert: 1.0.1
-      minimalistic-crypto-utils: 1.0.1
 
   elliptic@6.6.1:
     dependencies:
@@ -6303,7 +6293,7 @@ snapshots:
 
   ignore@5.3.1: {}
 
-  immutable@4.3.6: {}
+  immutable@4.3.7: {}
 
   import-fresh@3.3.0:
     dependencies:
