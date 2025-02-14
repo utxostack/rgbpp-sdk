@@ -101,7 +101,7 @@ describe('dynamic fetch cell dep', () => {
       });
       expect(cellDeps[0].outPoint?.txHash).toBe('0xed7d65b9ad3d99657e37c4285d585fea8a5fcaf58165d54dacf90243f911548b');
       expect(cellDeps[0].outPoint?.index).toBe('0x0');
-      expect(cellDeps.length === 1);
+      expect(cellDeps.length).toBe(1);
     },
     { timeout: 10000 },
   );
