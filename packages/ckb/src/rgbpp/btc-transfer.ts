@@ -27,6 +27,7 @@ import {
   isStandardUDTTypeSupported,
   signCkbTransaction,
   addressToScriptHash,
+  isOfflineMode,
 } from '../utils';
 import { Hex, IndexerCell } from '../types';
 import {
@@ -65,8 +66,9 @@ export const genBtcTransferCkbVirtualTx = async ({
   vendorCellDeps,
 }: BtcTransferVirtualTxParams): Promise<BtcTransferVirtualTxResult> => {
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
+  const isOffline = isOfflineMode(vendorCellDeps);
 
-  if (!isUDTTypeSupported(xudtType, isMainnet)) {
+  if (!isUDTTypeSupported(xudtType, isMainnet, isOffline)) {
     throw new TypeAssetNotSupportedError('The type script asset is not supported now');
   }
 
@@ -78,7 +80,7 @@ export const genBtcTransferCkbVirtualTx = async ({
   for await (const rgbppLock of rgbppLocks) {
     const cells = await collector.getCells({ lock: rgbppLock, isDataMustBeEmpty: false });
 
-    throwErrorWhenRgbppCellsInvalid(cells, xudtTypeBytes, isMainnet);
+    throwErrorWhenRgbppCellsInvalid(cells, xudtTypeBytes, isMainnet, isOffline);
 
     const targetCells = cells!.filter((cell) => isScriptEqual(cell.output.type!, xudtTypeBytes));
     const otherTypeCells = cells!.filter((cell) => !isScriptEqual(cell.output.type!, xudtTypeBytes));
@@ -245,7 +247,7 @@ export const genBtcBatchTransferCkbVirtualTx = async ({
 }: BtcBatchTransferVirtualTxParams): Promise<BtcBatchTransferVirtualTxResult> => {
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
 
-  if (!isUDTTypeSupported(xudtType, isMainnet)) {
+  if (!isUDTTypeSupported(xudtType, isMainnet, isOfflineMode(vendorCellDeps))) {
     throw new TypeAssetNotSupportedError('The type script asset is not supported now');
   }
 

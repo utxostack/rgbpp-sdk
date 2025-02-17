@@ -209,6 +209,7 @@ const GITHUB_STATIC_COMPATIBLE_XUDT_URL =
 /**
  * The `CompatibleXUDTRegistry` class is responsible for managing a cache of compatible XUDT (eXtensible User-Defined Token) scripts.
  * It fetches and caches the compatible tokens from specified URLs and refreshes the cache periodically.
+ * Alternatively, the compatible tokens can also be fetched from the static list only when offline mode is enabled.
  */
 export class CompatibleXUDTRegistry {
   private static cache: CKBComponents.Script[] = [];
@@ -217,7 +218,11 @@ export class CompatibleXUDTRegistry {
   private static xudtUrl = VERCEL_STATIC_COMPATIBLE_XUDT_URL;
 
   // If you want to get the latest compatible xUDT list, CompatibleXUDTRegistry.refreshCache should be called first
-  static getCompatibleTokens(): CKBComponents.Script[] {
+  static getCompatibleTokens(offline?: boolean): CKBComponents.Script[] {
+    if (offline) {
+      return COMPATIBLE_XUDT_TYPE_SCRIPTS;
+    }
+
     const now = Date.now();
     if (this.cache.length === 0 || now - this.lastFetchTime > this.CACHE_DURATION) {
       this.refreshCache(this.xudtUrl);
