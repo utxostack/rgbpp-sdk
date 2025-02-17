@@ -32,7 +32,7 @@
     "tsx": "4.16.3",
     "tsup": "^8.3.5",
     "typescript": "5.4.3",
-    "vitest": "2.1.8"
+    "vitest": "2.1.9"
   },
   "lint-staged": {
     "{packages,apps,examples,tests}/**/*.{js,jsx,ts,tsx}": [
