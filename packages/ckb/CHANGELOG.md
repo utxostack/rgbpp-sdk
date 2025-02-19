@@ -19,7 +19,7 @@
 - [#304](https://github.com/utxostack/rgbpp-sdk/pull/304): Remove duplicate cell deps ([@duanyytop](https://github.com/duanyytop))
 
   - Fetch compatible xUDT `cellDeps` to build CKB transactions from the `typeid-contract-cell-deps` GitHub repository
-  -  Update the `ckb` package to support RGB++ compatible xUDT assets leaping and transferring
+  - Update the `ckb` package to support RGB++ compatible xUDT assets leaping and transferring
   - Add optional parameter `compatibleXudtTypeScript` to the functions of the `rgbpp` package to transfer RGB++ compatible xUDT assets
   - Add RGB++ compatible xUDT assets leaping and transferring examples
   - Add RGB++ compatible xUDT assets integration tests
