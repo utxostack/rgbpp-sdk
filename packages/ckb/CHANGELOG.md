@@ -5,38 +5,37 @@
 ### Minor Changes
 
 - [#291](https://github.com/utxostack/rgbpp-sdk/pull/291): Support RGB++ compatible xUDT assets([@duanyytop](https://github.com/duanyytop))
-
-- [#293](https://github.com/utxostack/rgbpp-sdk/pull/293): Add offline btc data source & ckb collector ([@fghdotio](https://github.com/fghdotio))
-
-- [#294](https://github.com/utxostack/rgbpp-sdk/pull/294): Add UTXOAirdropBadge Testnet deployment information ([@duanyytop](https://github.com/duanyytop))
-
-- [#297](https://github.com/utxostack/rgbpp-sdk/pull/297): Add USDI to compatible xUDT list ([@duanyytop](https://github.com/duanyytop))
-
-- [#302](https://github.com/utxostack/rgbpp-sdk/pull/302): Encapsulate transaction fee supplementation methods ([@fghdotio](https://github.com/fghdotio))
-
-- [#303](https://github.com/utxostack/rgbpp-sdk/pull/303): Add offline mode support for compatible xUDT type scripts ([@fghdotio](https://github.com/fghdotio))
-
-- [#304](https://github.com/utxostack/rgbpp-sdk/pull/304): Remove duplicate cell deps ([@duanyytop](https://github.com/duanyytop))
-
   - Fetch compatible xUDT `cellDeps` to build CKB transactions from the `typeid-contract-cell-deps` GitHub repository
   - Update the `ckb` package to support RGB++ compatible xUDT assets leaping and transferring
   - Add optional parameter `compatibleXudtTypeScript` to the functions of the `rgbpp` package to transfer RGB++ compatible xUDT assets
   - Add RGB++ compatible xUDT assets leaping and transferring examples
   - Add RGB++ compatible xUDT assets integration tests
+
+- [#293](https://github.com/utxostack/rgbpp-sdk/pull/293): Add offline btc data source & ckb collector ([@fghdotio](https://github.com/fghdotio))
+
+- [#294](https://github.com/utxostack/rgbpp-sdk/pull/294): Add UTXOAirdropBadge Testnet deployment information ([@duanyytop](https://github.com/duanyytop))
   - Add UTXOAirdropBadge and metadata Testnet deployment information
   - Fetch UTXOAirdropBadge and metadata Testnet deployment information from GitHub and Vercel server
   - Add `isUtxoAirdropBadgeType` and `isTokenMetadataType` for `btc-assets-api` to encode the token information and metadata of the UTXOAirdropBadge
+
+- [#297](https://github.com/utxostack/rgbpp-sdk/pull/297): Add USDI to compatible xUDT list ([@duanyytop](https://github.com/duanyytop))
   - Fetch and cache compatible xUDT list from Vercel or GitHub server
   - Use local static compatible xUDT list when the cache is empty
   - Remove jsdelivr CDN because CDN cache time is too long, causing UTXO Airdrop cellDeps to become outdated
+
+- [#302](https://github.com/utxostack/rgbpp-sdk/pull/302): Encapsulate transaction fee supplementation methods ([@fghdotio](https://github.com/fghdotio))
   - `appendIssuerCellToBtcBatchTransferToSign` for supplementing fees in RGB++ xUDT transactions
   - `prepareBtcTimeCellSpentUnsignedTx` for BTC timelock unlock transaction building and fee supplementation
   - `appendIssuerCellToSporesCreateUnsignedTx` for supplementing fees in Spores creation transactions
+
+- [#303](https://github.com/utxostack/rgbpp-sdk/pull/303): Add offline mode support for compatible xUDT type scripts ([@fghdotio](https://github.com/fghdotio))
   - Introduce an optional `offline` boolean parameter to the following methods:
     - `isUDTTypeSupported`
     - `isCompatibleUDTTypesSupported`
     - `CompatibleXUDTRegistry.getCompatibleTokens`
   - Add examples demonstrating compatible xUDT asset management in offline mode
+
+- [#304](https://github.com/utxostack/rgbpp-sdk/pull/304): Remove duplicate cell deps ([@duanyytop](https://github.com/duanyytop))
 
 ### Patch Changes
 
