@@ -1,5 +1,15 @@
 # @rgbpp-sdk/btc
 
+## 0.7.0
+
+### Minor Changes
+
+- [#293](https://github.com/utxostack/rgbpp-sdk/pull/293): Add offline btc data source & ckb collector ([@fghdotio](https://github.com/fghdotio))
+
+### Patch Changes
+
+- [#305](https://github.com/ckb-cell/rgbpp-sdk/pull/305): Upgrade ckb-sdk-js version ([@duanyytop](https://github.com/duanyytop))
+
 ## 0.6.0
 
 ### Minor Changes
