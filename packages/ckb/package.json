@@ -1,6 +1,6 @@
 {
   "name": "@rgbpp-sdk/ckb",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "scripts": {
     "test": "vitest",
     "build": "tsup",
@@ -32,12 +32,12 @@
     "@ckb-lumos/base": "^0.22.2",
     "@ckb-lumos/codec": "^0.22.2",
     "@spore-sdk/core": "^0.2.0-beta.6",
-    "@nervosnetwork/ckb-sdk-core": "0.109.3",
-    "@nervosnetwork/ckb-sdk-utils": "0.109.3",
-    "@nervosnetwork/ckb-types": "0.109.3",
+    "@nervosnetwork/ckb-sdk-core": "0.109.5",
+    "@nervosnetwork/ckb-sdk-utils": "0.109.5",
+    "@nervosnetwork/ckb-types": "0.109.5",
     "@rgbpp-sdk/service": "workspace:^",
     "@exact-realty/multipart-parser": "^1.0.13",
-    "axios": "^1.6.8",
+    "axios": "^1.7.4",
     "camelcase-keys": "^7.0.2",
     "js-sha256": "^0.11.0"
   },

@@ -1,5 +1,17 @@
 # rgbpp
 
+## 0.7.0
+
+### Minor Changes
+
+- [#291](https://github.com/utxostack/rgbpp-sdk/pull/291): Support RGB++ compatible xUDT assets([@duanyytop](https://github.com/duanyytop))
+
+- [#303](https://github.com/utxostack/rgbpp-sdk/pull/303): Add offline mode support for compatible xUDT type scripts ([@fghdotio](https://github.com/fghdotio))
+
+### Patch Changes
+
+- [#305](https://github.com/ckb-cell/rgbpp-sdk/pull/305): Upgrade ckb-sdk-js version ([@duanyytop](https://github.com/duanyytop))
+
 ## 0.6.0
 
 ### Minor Changes

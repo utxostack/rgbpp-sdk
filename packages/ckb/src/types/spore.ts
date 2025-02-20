@@ -2,6 +2,7 @@ import { RawClusterData, RawSporeData } from '@spore-sdk/core';
 import { Address, Hex, BTCTestnetType } from './common';
 import { Collector } from '../collector';
 import { IndexerCell } from './collector';
+import { CellDepsObject } from '../utils/cell-dep';
 
 export interface CreateClusterCkbVirtualTxParams {
   // The collector that collects CKB live cells and transactions
@@ -18,6 +19,14 @@ export interface CreateClusterCkbVirtualTxParams {
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
+
+  /*
+   * Vendor cell deps provided by the caller.
+   * These cell deps belong to scripts that may be upgraded in the future.
+   * Please ensure the cell dep information is up to date. The latest cell dep information is maintained at:
+   * https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/deployment/cell-deps.json.
+   */
+  vendorCellDeps?: CellDepsObject;
 }
 
 export interface SporeVirtualTxResult {
@@ -46,6 +55,14 @@ export interface CreateSporeCkbVirtualTxParams {
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
+
+  /*
+   * Vendor cell deps provided by the caller.
+   * These cell deps belong to scripts that may be upgraded in the future.
+   * Please ensure the cell dep information is up to date. The latest cell dep information is maintained at:
+   * https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/deployment/cell-deps.json.
+   */
+  vendorCellDeps?: CellDepsObject;
 }
 
 export interface SporeCreateVirtualTxResult {
@@ -115,6 +132,14 @@ export interface TransferSporeCkbVirtualTxParams {
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
+
+  /*
+   * Vendor cell deps provided by the caller.
+   * These cell deps belong to scripts that may be upgraded in the future.
+   * Please ensure the cell dep information is up to date. The latest cell dep information is maintained at:
+   * https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/deployment/cell-deps.json.
+   */
+  vendorCellDeps?: CellDepsObject;
 }
 
 export interface SporeTransferVirtualTxResult {
@@ -149,6 +174,14 @@ export interface LeapSporeFromBtcToCkbVirtualTxParams {
   witnessLockPlaceholderSize?: number;
   // The CKB transaction fee rate, default value is 1100
   ckbFeeRate?: bigint;
+
+  /*
+   * Vendor cell deps provided by the caller.
+   * These cell deps belong to scripts that may be upgraded in the future.
+   * Please ensure the cell dep information is up to date. The latest cell dep information is maintained at:
+   * https://raw.githubusercontent.com/utxostack/typeid-contract-cell-deps/main/deployment/cell-deps.json.
+   */
+  vendorCellDeps?: CellDepsObject;
 }
 
 export interface LeapSporeFromCkbToBtcVirtualTxParams {

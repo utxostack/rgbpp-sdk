@@ -9,6 +9,8 @@ import {
   isTypeAssetSupported,
   u128ToLe,
   genRgbppLockScript,
+  isStandardUDTTypeSupported,
+  isOfflineMode,
 } from '../utils';
 import { MAX_FEE, MIN_CAPACITY, RGBPP_TX_WITNESS_MAX_SIZE } from '../constants';
 import { blockchain } from '@ckb-lumos/base';
@@ -34,10 +36,11 @@ export const genCkbJumpBtcVirtualTx = async ({
   witnessLockPlaceholderSize,
   ckbFeeRate,
   btcTestnetType,
+  vendorCellDeps,
 }: CkbJumpBtcVirtualTxParams): Promise<CKBComponents.RawTransaction> => {
   const isMainnet = fromCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
-  if (!isTypeAssetSupported(xudtType, isMainnet)) {
+  if (!isTypeAssetSupported(xudtType, isMainnet, isOfflineMode(vendorCellDeps))) {
     throw new TypeAssetNotSupportedError('The type script asset is not supported now');
   }
 
@@ -100,7 +103,16 @@ export const genCkbJumpBtcVirtualTx = async ({
   });
   outputsData.push('0x');
 
-  const cellDeps = await fetchTypeIdCellDeps(isMainnet, { xudt: true });
+  const isStandardUDT = isStandardUDTTypeSupported(xudtType, isMainnet);
+  const cellDeps = await fetchTypeIdCellDeps(
+    isMainnet,
+    {
+      xudt: isStandardUDT,
+      compatibleXudtCodeHashes: isStandardUDT ? [] : [xudtType.codeHash],
+    },
+    btcTestnetType,
+    vendorCellDeps,
+  );
   const witnesses = inputs.map(() => '0x');
 
   const ckbRawTx: CKBComponents.RawTransaction = {
@@ -141,10 +153,11 @@ export const genCkbBatchJumpBtcVirtualTx = async ({
   witnessLockPlaceholderSize,
   ckbFeeRate,
   btcTestnetType,
+  vendorCellDeps,
 }: CkbBatchJumpBtcVirtualTxParams): Promise<CKBComponents.RawTransaction> => {
   const isMainnet = fromCkbAddress.startsWith('ckb');
   const xudtType = blockchain.Script.unpack(xudtTypeBytes) as CKBComponents.Script;
-  if (!isTypeAssetSupported(xudtType, isMainnet)) {
+  if (!isTypeAssetSupported(xudtType, isMainnet, isOfflineMode(vendorCellDeps))) {
     throw new TypeAssetNotSupportedError('The type script asset is not supported now');
   }
 
@@ -209,7 +222,16 @@ export const genCkbBatchJumpBtcVirtualTx = async ({
   });
   outputsData.push('0x');
 
-  const cellDeps = await fetchTypeIdCellDeps(isMainnet, { xudt: true });
+  const isStandardUDT = isStandardUDTTypeSupported(xudtType, isMainnet);
+  const cellDeps = await fetchTypeIdCellDeps(
+    isMainnet,
+    {
+      xudt: isStandardUDT,
+      compatibleXudtCodeHashes: isStandardUDT ? [] : [xudtType.codeHash],
+    },
+    btcTestnetType,
+    vendorCellDeps,
+  );
   const witnesses = inputs.map(() => '0x');
 
   const ckbRawTx: CKBComponents.RawTransaction = {

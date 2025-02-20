@@ -7,7 +7,8 @@ export const network = 'testnet';
 
 export async function getFastestFeeRate() {
   const fees = await btcService.getBtcRecommendedFeeRates();
-  return fees.fastestFee + 5;
+  // return fees.fastestFee + 1000;
+  return Math.ceil(fees.fastestFee * 1.1);
 }
 
 export async function writeStepLog(step: string, data: string | object) {

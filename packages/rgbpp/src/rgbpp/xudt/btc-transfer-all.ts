@@ -7,6 +7,7 @@ import {
   unpackRgbppLockArgs,
   genBtcTransferCkbVirtualTx,
   RGBPP_TX_INPUTS_MAX_LENGTH,
+  isOfflineMode,
 } from '@rgbpp-sdk/ckb';
 import {
   Utxo,
@@ -32,15 +33,15 @@ export async function buildRgbppTransferAllTxs(params: RgbppTransferAllTxsParams
   // Prepare base props
   const maxRgbppCellsPerCkbTx = RGBPP_TX_INPUTS_MAX_LENGTH;
   const isMainnet = params.isMainnet;
+  const isOffline = isOfflineMode(params.ckb.vendorCellDeps);
   const btcSource = params.btc.dataSource;
   const btcService = btcSource.service;
   const ckbCollector = params.ckb.collector;
-  const xudtTypeHex = bytes.hexify(
-    blockchain.Script.pack({
-      ...getXudtTypeScript(isMainnet),
-      args: params.ckb.xudtTypeArgs,
-    }),
-  );
+  const typeScript = params.ckb.compatibleXudtTypeScript ?? {
+    ...getXudtTypeScript(isMainnet),
+    args: params.ckb.xudtTypeArgs,
+  };
+  const xudtTypeHex = bytes.hexify(blockchain.Script.pack(typeScript));
 
   // Get L2 Cells own by the assetAccounts,
   // and build L1 UTXO IDs (`${txid}:${vout}`) from each cell.cellOutput.lock.args
@@ -98,7 +99,7 @@ export async function buildRgbppTransferAllTxs(params: RgbppTransferAllTxsParams
         }
         const utxo = utxoMap.get(utxoId);
         const hasUnsupportedTypeCell = cells.some((cell) => {
-          return cell.cellOutput.type && !isUDTTypeSupported(cell.cellOutput.type, isMainnet);
+          return cell.cellOutput.type && !isUDTTypeSupported(cell.cellOutput.type, isMainnet, isOffline);
         });
         if (!utxo || !cells || cells.length > maxRgbppCellsPerCkbTx || hasUnsupportedTypeCell) {
           invalidUtxoIds.add(utxoId);
@@ -135,6 +136,7 @@ export async function buildRgbppTransferAllTxs(params: RgbppTransferAllTxsParams
         utxo: utxoMap.get(group.id)!,
         cells: cellsMap.get(group.id)!,
       })),
+      isOffline,
     );
 
     // Props for constructing CKB_VTX

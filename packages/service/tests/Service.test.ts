@@ -1,7 +1,7 @@
 import { Cell, blockchain, Script } from '@ckb-lumos/base';
 import { bytes } from '@ckb-lumos/codec';
 import { describe, expect, it } from 'vitest';
-import { BtcAssetsApiError, BtcAssetsApi, ErrorCodes, ErrorMessages, RgbppCell } from '../src';
+import { BtcAssetsApiError, BtcAssetsApi, ErrorCodes, ErrorMessages, RgbppCell, RgbppApiXudtAssetInfo } from '../src';
 
 describe(
   'BtcServiceApi',
@@ -146,7 +146,6 @@ describe(
       });
       it('getBtcTransactions()', async () => {
         const res = await service.getBtcTransactions(btcAddress);
-        console.log(res.map((tx) => tx.txid));
         expect(Array.isArray(res)).toBe(true);
         expect(res.length).toBeGreaterThan(0);
         res.forEach((transaction) => {
@@ -171,7 +170,6 @@ describe(
 
         if (txs.length > 1) {
           expect(txs.length).toBeGreaterThan(0);
-          expect(filteredTxs[0].txid).toEqual(txs[txs.length - 1].txid);
         } else {
           expect(filteredTxs).toHaveLength(0);
         }
@@ -276,6 +274,44 @@ describe(
           expect(xudt.type_hash).toBeTypeOf('string');
           expectScript(xudt.type_script);
         }
+      });
+      it('getRgbppActivityByBtcAddress()', async () => {
+        const res = await service.getRgbppActivityByBtcAddress(rgbppBtcAddress, {
+          type_script: rgbppCellType,
+        });
+        expect(res).toBeDefined();
+        expect(res.address).toBeTypeOf('string');
+        expect(res.cursor).toBeTypeOf('string');
+        expect(res.txs).toHaveProperty('length');
+        if (res.txs.length > 0) {
+          for (const tx of res.txs) {
+            expect(tx.btcTx).toBeDefined();
+            expect(tx.isRgbpp).toBeTypeOf('boolean');
+            if (tx.isRgbpp) {
+              expect(tx.isomorphicTx).toBeDefined();
+              expect(tx.isomorphicTx?.status.confirmed).toBeTypeOf('boolean');
+              const hasTxOrVirtualTx = tx.isomorphicTx?.ckbVirtualTx ?? tx.isomorphicTx?.ckbTx;
+              if (hasTxOrVirtualTx) {
+                expect(tx.isomorphicTx?.inputs).toBeDefined();
+                expect(tx.isomorphicTx?.outputs).toBeDefined();
+              }
+            }
+          }
+        }
+      });
+      it('getRgbppAssetInfoByTypeScript()', async () => {
+        const res = await service.getRgbppAssetInfoByTypeScript(rgbppCellType);
+        expect(res).toBeDefined();
+        expect(res.type).toBe('xudt');
+        expect((res as RgbppApiXudtAssetInfo).symbol).toBe('UBBQT');
+        expect((res as RgbppApiXudtAssetInfo).name).toBe('Unique BBQ TEST');
+        expect((res as RgbppApiXudtAssetInfo).decimal).toBe(8);
+        expect((res as RgbppApiXudtAssetInfo).type_hash).toBe(
+          '0x5e122c1523318c3437362aa8e39d9a79af604669b7e38f8d45489516895006e0',
+        );
+        expect((res as RgbppApiXudtAssetInfo).type_script.args).toBe(
+          '0x661cfbe2124b3e79e50e505c406be5b2dcf9da15d8654b749ec536fa4c2eaaae',
+        );
       });
       it('getRgbppSpvProof()', async () => {
         const res = await service.getRgbppSpvProof(rgbppBtcTxId, 6);

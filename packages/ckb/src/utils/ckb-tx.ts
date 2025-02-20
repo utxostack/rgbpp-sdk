@@ -1,4 +1,15 @@
-import { PERSONAL, blake2b, hexToBytes, serializeInput, serializeScript } from '@nervosnetwork/ckb-sdk-utils';
+import {
+  PERSONAL,
+  addressToScript,
+  blake2b,
+  hexToBytes,
+  rawTransactionToHash,
+  scriptToHash,
+  serializeInput,
+  serializeScript,
+  serializeWitnessArgs,
+} from '@nervosnetwork/ckb-sdk-utils';
+import signWitnesses from '@nervosnetwork/ckb-sdk-core/lib/signWitnesses';
 import { RawClusterData, packRawClusterData, SporeDataProps, packRawSporeData } from '@spore-sdk/core';
 import { remove0x, u64ToLe } from './hex';
 import {
@@ -6,12 +17,15 @@ import {
   UNLOCKABLE_LOCK_SCRIPT,
   getClusterTypeScript,
   getSporeTypeScript,
+  getTokenMetadataTypeScript,
+  getUtxoAirdropBadgeTypeScript,
   getXudtTypeScript,
 } from '../constants';
 import { Hex, IndexerCell, RgbppTokenInfo } from '../types';
 import { encodeRgbppTokenInfo, genBtcTimeLockScript } from './rgbpp';
 import { Collector } from '../collector';
 import { NoLiveCellError } from '../error';
+import { CompatibleXUDTRegistry } from './cell-dep';
 
 export { serializeScript };
 
@@ -23,13 +37,54 @@ export const calculateTransactionFee = (txSize: number, feeRate?: bigint): bigin
   return fee * ratio < base ? fee + BigInt(1) : fee;
 };
 
-export const isUDTTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
+export const isUtxoAirdropBadgeType = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
+  const utxoAirdropBadgeType = serializeScript(getUtxoAirdropBadgeTypeScript(isMainnet));
+  const typeAsset = serializeScript({
+    ...type,
+    args: '',
+  });
+  return utxoAirdropBadgeType === typeAsset;
+};
+
+export const isTokenMetadataType = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
+  const tokenMetadataType = serializeScript(getTokenMetadataTypeScript(isMainnet));
+  const typeAsset = serializeScript({
+    ...type,
+    args: '',
+  });
+  return tokenMetadataType === typeAsset;
+};
+
+//
+/**
+ * Checks if the provided UDT (User Defined Token) type script is supported by comparing it against a list of compatible UDT types.
+ * If you want to get the latest compatible xUDT list, CompatibleXUDTRegistry.refreshCache should be called before the isCompatibleUDTTypesSupported
+ *
+ * @param type - The UDT type script to check for compatibility.
+ * @param offline - Whether to use the offline mode.
+ * @returns A boolean indicating whether the provided UDT type script is supported.
+ */
+export const isCompatibleUDTTypesSupported = (type: CKBComponents.Script, offline?: boolean): boolean => {
+  const compatibleList = CompatibleXUDTRegistry.getCompatibleTokens(offline);
+  const compatibleXudtTypeBytes = compatibleList.map((script) => serializeScript(script));
+  const typeAsset = serializeScript({
+    ...type,
+    args: '',
+  });
+  return compatibleXudtTypeBytes.includes(typeAsset);
+};
+
+export const isStandardUDTTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
   const xudtType = serializeScript(getXudtTypeScript(isMainnet));
   const typeAsset = serializeScript({
     ...type,
     args: '',
   });
   return xudtType === typeAsset;
+};
+
+export const isUDTTypeSupported = (type: CKBComponents.Script, isMainnet: boolean, offline?: boolean): boolean => {
+  return isStandardUDTTypeSupported(type, isMainnet) || isCompatibleUDTTypesSupported(type, offline);
 };
 
 export const isSporeTypeSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
@@ -50,8 +105,8 @@ export const isClusterSporeTypeSupported = (type: CKBComponents.Script, isMainne
   return isSporeTypeSupported(type, isMainnet) || clusterType === typeAsset;
 };
 
-export const isTypeAssetSupported = (type: CKBComponents.Script, isMainnet: boolean): boolean => {
-  return isUDTTypeSupported(type, isMainnet) || isClusterSporeTypeSupported(type, isMainnet);
+export const isTypeAssetSupported = (type: CKBComponents.Script, isMainnet: boolean, offline?: boolean): boolean => {
+  return isUDTTypeSupported(type, isMainnet, offline) || isClusterSporeTypeSupported(type, isMainnet);
 };
 
 const CELL_CAPACITY_SIZE = 8;
@@ -190,4 +245,36 @@ export const checkCkbTxInputsCapacitySufficient = async (
     .map((output) => BigInt(output.capacity))
     .reduce((prev, current) => prev + current, BigInt(0));
   return sumInputsCapacity > sumOutputsCapacity;
+};
+
+export function signCkbTransaction(
+  key: string | Map<string, string>,
+  ckbTx: CKBComponents.RawTransactionToSign,
+  inputCells: { outPoint: CKBComponents.OutPoint; lock: CKBComponents.Script }[] = [],
+  skipMissingKeys = false,
+) {
+  if (key instanceof Map && inputCells.length === 0) {
+    throw new Error('inputCells must not be empty when using Map of keys');
+  }
+
+  const transactionHash = rawTransactionToHash(ckbTx);
+  const signedWitnesses = signWitnesses(key)({
+    transactionHash,
+    witnesses: ckbTx.witnesses,
+    inputCells,
+    skipMissingKeys,
+  });
+
+  // Serialize the witness args if needed to ensure all witnesses are consistently in string format
+  return {
+    ...ckbTx,
+    witnesses: signedWitnesses.map((witness) =>
+      typeof witness !== 'string' ? serializeWitnessArgs(witness) : witness,
+    ),
+  };
+}
+
+export const addressToScriptHash = (address: string) => {
+  const script = addressToScript(address);
+  return scriptToHash(script);
 };

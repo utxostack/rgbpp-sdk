@@ -106,7 +106,7 @@ export async function createSendRbfBuilder(props: SendRbfProps): Promise<{
   const requireGreaterFeeAndRate = props.requireGreaterFeeAndRate ?? true;
   let feeRate: number | undefined = props.feeRate;
   if (requireGreaterFeeAndRate && !feeRate) {
-    const feeRates = await props.source.service.getBtcRecommendedFeeRates();
+    const feeRates = await props.source.getBtcRecommendedFeeRates();
     feeRate = feeRates.fastestFee;
   }
 

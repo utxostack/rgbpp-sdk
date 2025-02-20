@@ -1,5 +1,24 @@
 # @rgbpp-sdk/service
 
+## 0.7.0
+
+### Minor Changes
+
+- [#291](https://github.com/utxostack/rgbpp-sdk/pull/291): Support RGB++ compatible xUDT assets([@duanyytop](https://github.com/duanyytop))
+  - Add `assets/type` API to the service package
+
+- [#293](https://github.com/utxostack/rgbpp-sdk/pull/293): Add offline btc data source & ckb collector ([@fghdotio](https://github.com/fghdotio))
+
+- [#294](https://github.com/utxostack/rgbpp-sdk/pull/294): Add UTXOAirdropBadge Testnet deployment information ([@duanyytop](https://github.com/duanyytop))
+
+- [#298](https://github.com/utxostack/rgbpp-sdk/pull/298): Implement getRgbppSpvProof for OfflineBtcAssetsDataSource ([@fghdotio](https://github.com/fghdotio))
+
+- [#303](https://github.com/utxostack/rgbpp-sdk/pull/303): Add offline mode support for compatible xUDT type scripts ([@fghdotio](https://github.com/fghdotio))
+
+### Patch Changes
+
+- [#305](https://github.com/ckb-cell/rgbpp-sdk/pull/305): Upgrade ckb-sdk-js version ([@duanyytop](https://github.com/duanyytop))
+
 ## 0.6.0
 
 ### Minor Changes

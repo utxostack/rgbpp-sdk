@@ -44,6 +44,7 @@ export const genRgbppLaunchCkbVirtualTx = async ({
   ckbFeeRate,
   isMainnet,
   btcTestnetType,
+  vendorCellDeps,
 }: RgbppLaunchCkbVirtualTxParams): Promise<RgbppLaunchVirtualTxResult> => {
   const ownerLock = genRgbppLockScript(ownerRgbppLockArgs, isMainnet, btcTestnetType);
   let emptyCells = await collector.getCells({ lock: ownerLock });
@@ -77,7 +78,12 @@ export const genRgbppLaunchCkbVirtualTx = async ({
   ];
 
   const outputsData = [append0x(u128ToLe(launchAmount)), encodeRgbppTokenInfo(rgbppTokenInfo)];
-  const cellDeps = await fetchTypeIdCellDeps(isMainnet, { rgbpp: true, xudt: true, unique: true }, btcTestnetType);
+  const cellDeps = await fetchTypeIdCellDeps(
+    isMainnet,
+    { rgbpp: true, xudt: true, unique: true },
+    btcTestnetType,
+    vendorCellDeps,
+  );
 
   const witnesses: Hex[] = inputs.map((_, index) => (index === 0 ? RGBPP_WITNESS_PLACEHOLDER : '0x'));
 

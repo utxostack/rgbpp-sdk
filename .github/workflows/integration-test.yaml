@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        env_set: [ xudt, spore ]
+        env_set: [ xudt, spore, compatible-xudt ]
 
     steps:
       - name: Checkout rgbpp-sdk
@@ -65,3 +65,14 @@ jobs:
           VITE_SERVICE_ORIGIN: https://btc-assets-api.testnet.mibao.pro
           INTEGRATION_CKB_PRIVATE_KEY: ${{ secrets.INTEGRATION_CKB_SPORE_PRIVATE_KEY }}
           INTEGRATION_BTC_PRIVATE_KEY: ${{ secrets.INTEGRATION_BTC_SPORE_PRIVATE_KEY }}
+
+      - name: Run integration:compatible-xudt script
+        working-directory: ./tests/rgbpp
+        if: ${{ matrix.env_set == 'compatible-xudt' }}
+        run: pnpm run integration:compatible-xudt
+        env:
+          VITE_SERVICE_URL: https://btc-assets-api.testnet.mibao.pro
+          VITE_SERVICE_TOKEN: ${{ secrets.TESTNET_SERVICE_TOKEN }}
+          VITE_SERVICE_ORIGIN: https://btc-assets-api.testnet.mibao.pro
+          INTEGRATION_CKB_PRIVATE_KEY: ${{ secrets.INTEGRATION_CKB_compatible_xudt_PRIVATE_KEY }}
+          INTEGRATION_BTC_PRIVATE_KEY: ${{ secrets.INTEGRATION_BTC_compatible_xudt_PRIVATE_KEY }}

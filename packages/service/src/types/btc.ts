@@ -15,7 +15,7 @@ export interface BtcApis {
 export interface BtcApiBlockchainInfo {
   chain: string;
   blocks: number;
-  bestblockhash: number;
+  bestblockhash: string;
   difficulty: number;
   mediantime: number;
 }
@@ -88,6 +88,11 @@ export interface BtcApiUtxo {
     block_hash: string;
     block_time: number;
   };
+}
+
+export interface OfflineBtcUtxo extends BtcApiUtxo {
+  address: string;
+  nonRgbpp: boolean;
 }
 
 export interface BtcApiSentTransaction {

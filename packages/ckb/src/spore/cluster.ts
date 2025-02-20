@@ -38,6 +38,7 @@ export const genCreateClusterCkbVirtualTx = async ({
   witnessLockPlaceholderSize,
   ckbFeeRate,
   btcTestnetType,
+  vendorCellDeps,
 }: CreateClusterCkbVirtualTxParams): Promise<SporeVirtualTxResult> => {
   const rgbppLock = genRgbppLockScript(rgbppLockArgs, isMainnet, btcTestnetType);
   const rgbppCells = await collector.getCells({ lock: rgbppLock });
@@ -67,7 +68,7 @@ export const genCreateClusterCkbVirtualTx = async ({
   ];
   const outputsData: Hex[] = [bytesToHex(packRawClusterData(clusterData))];
   const cellDeps = [
-    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true }, btcTestnetType)),
+    ...(await fetchTypeIdCellDeps(isMainnet, { rgbpp: true }, btcTestnetType, vendorCellDeps)),
     getClusterTypeDep(isMainnet),
   ];
   const sporeCoBuild = generateClusterCreateCoBuild(outputs[0], outputsData[0]);
