@@ -1,7 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { accounts, config, network, service, source } from './shared/env';
+import { accounts, config, network, networkType, service, source } from './shared/env';
 import { expectPsbtFeeInRange, signAndBroadcastPsbt, waitFor } from './shared/utils';
-import { bitcoin, ErrorMessages, ErrorCodes, AddressType, TxBuilder, TxBuildError } from '../src';
+import {
+  bitcoin,
+  ErrorMessages,
+  ErrorCodes,
+  AddressType,
+  TxBuilder,
+  TxBuildError,
+  FeeEstimator,
+  utxoToInput,
+  isP2trScript,
+  isP2wpkhScript,
+} from '../src';
 import { createSendUtxosBuilder, createSendBtcBuilder, sendBtc, sendUtxos, sendRbf, tweakSigner } from '../src';
 
 const STATIC_FEE_RATE = 1;
@@ -9,6 +20,92 @@ const BTC_UTXO_DUST_LIMIT = config.btcUtxoDustLimit;
 const RGBPP_UTXO_DUST_LIMIT = config.rgbppUtxoDustLimit;
 
 describe('Transaction', () => {
+  describe('temp-test', () => {
+    it('Construct tx with inputs from different origin', async () => {
+      function calculateFee(psbt: bitcoin.Psbt) {
+        const tx = psbt.extractTransaction(true);
+
+        const inputs = tx.ins.length;
+        const weightWithWitness = tx.byteLength(true);
+        const weightWithoutWitness = tx.byteLength(false);
+
+        const weight = weightWithoutWitness * 3 + weightWithWitness + inputs;
+        const virtualSize = Math.ceil(weight / 4);
+        return Math.ceil(virtualSize * STATIC_FEE_RATE);
+      }
+
+      const [p2wpkhUtxos, p2trUtxos] = await Promise.all([
+        source.getUtxos(accounts.charlie.p2wpkh.address, {
+          min_satoshi: BTC_UTXO_DUST_LIMIT,
+          only_confirmed: true,
+        }),
+        source.getUtxos(accounts.charlie.p2tr.address, {
+          min_satoshi: BTC_UTXO_DUST_LIMIT,
+          only_confirmed: true,
+        }),
+      ]);
+
+      const p2wpkhInput = utxoToInput(p2wpkhUtxos[0]);
+      const p2trInput = utxoToInput({
+        pubkey: accounts.charlie.publicKey,
+        ...p2trUtxos[0],
+      });
+      console.log(p2wpkhInput);
+      console.log(p2trInput);
+
+      // construct psbt1 with inputs and an output
+      const psbt1 = new bitcoin.Psbt({ network });
+      psbt1.data.addInput(p2wpkhInput.data);
+      psbt1.data.addInput(p2trInput.data);
+      psbt1.addOutput({
+        address: accounts.charlie.p2wpkh.address,
+        // subtracting 1000 sat as network fee prepaid
+        value: p2wpkhInput.utxo.value + p2trInput.utxo.value - 1000,
+      });
+
+      // clone psbt1 and sign with estimator accounts
+      const psbt2 = psbt1.clone();
+      const estimator = FeeEstimator.fromRandom(networkType);
+      psbt2.data.inputs.forEach((inputData) => {
+        if (isP2wpkhScript(inputData.witnessUtxo.script)) {
+          inputData.witnessUtxo.script = Buffer.from(estimator.accounts.p2wpkh.scriptPubkey, 'hex');
+        }
+        if (isP2trScript(inputData.witnessUtxo.script)) {
+          inputData.witnessUtxo.script = Buffer.from(estimator.accounts.p2tr.scriptPubkey, 'hex');
+          inputData.tapInternalKey = Buffer.from(estimator.accounts.p2tr.tapInternalKey!);
+        }
+      });
+      await estimator.signPsbt(psbt2);
+      const psbt2Fee = calculateFee(psbt2);
+      const psbt2PaidFee = psbt2.getFee();
+      const tx2 = psbt2.extractTransaction();
+      const tx2Size = tx2.virtualSize();
+      console.log('psbt2-should-pay-fee', psbt2Fee);
+      console.log('psbt2-paid-fee', psbt2PaidFee);
+      console.log('psbt2-tx-size', tx2Size);
+
+      // sign psbt1 and calculate fee
+      psbt1.signInput(0, accounts.charlie.keyPair);
+      psbt1.signInput(
+        1,
+        tweakSigner(accounts.charlie.keyPair, {
+          network,
+        }),
+      );
+      psbt1.finalizeAllInputs();
+      const psbt1Fee = calculateFee(psbt1);
+      const psbt1PaidFee = psbt1.getFee();
+      const tx1 = psbt1.extractTransaction();
+      const tx1Size = tx1.virtualSize();
+      console.log('psbt1-should-pay-fee', psbt1Fee);
+      console.log('psbt1-paid-fee', psbt1PaidFee);
+      console.log('psbt1-tx-size', tx1Size);
+
+      // broadcast tx1 (actually signed with real keys)
+      const res = await source.service.sendBtcTransaction(tx1.toHex());
+      console.log('txid', res.txid);
+    }, 0);
+  });
   describe('sendBtc()', () => {
     it('Transfer from Native SegWit (P2WPKH) address', async () => {
       const { builder, feeRate } = await createSendBtcBuilder({
