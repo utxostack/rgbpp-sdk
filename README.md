@@ -1,3 +1,11 @@
+## Notice: Repository Archived
+
+Active development and maintenance have continued in a fork, which can be found here: [RGBPlusPlus/rgbpp-sdk](https://github.com/RGBPlusPlus/rgbpp-sdk).
+
+We encourage users and contributors to refer to the forked repository for the latest updates, issue tracking, and further contributions.
+
+Thank you for your understanding and continued support.
+
 # RGB++ SDK
 
 This repository offers utilities for Bitcoin and RGB++ asset integration.
