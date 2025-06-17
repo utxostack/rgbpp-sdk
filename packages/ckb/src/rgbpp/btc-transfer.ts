@@ -382,18 +382,30 @@ export const appendIssuerCellToBtcBatchTransferToSign = async ({
 
   let actualInputsCapacity = BigInt(sumInputsCapacity);
   const txFee = MAX_FEE;
-  if (actualInputsCapacity <= sumOutputsCapacity) {
+  let changeCapacity = actualInputsCapacity - sumOutputsCapacity;
+  while (changeCapacity < MIN_CAPACITY) {
     const needCapacity = sumOutputsCapacity - actualInputsCapacity + MIN_CAPACITY;
     const { inputs, sumInputsCapacity: sumEmptyCapacity } = collector.collectInputs(emptyCells, needCapacity, txFee);
     rawTx.inputs = [...rawTx.inputs, ...inputs];
     actualInputsCapacity += sumEmptyCapacity;
+    changeCapacity = actualInputsCapacity - sumOutputsCapacity;
   }
 
-  let changeCapacity = actualInputsCapacity - sumOutputsCapacity;
   const changeOutput = {
     lock: issuerLock,
     capacity: append0x(changeCapacity.toString(16)),
   };
+  const secp256k1CellDep = getSecp256k1CellDep(isMainnet);
+  if (
+    !rawTx.cellDeps.some(
+      ({ outPoint }) =>
+        outPoint &&
+        outPoint.txHash === secp256k1CellDep.outPoint!.txHash &&
+        outPoint.index === secp256k1CellDep.outPoint!.index,
+    )
+  ) {
+    rawTx.cellDeps = [...rawTx.cellDeps, secp256k1CellDep];
+  }
   rawTx.outputs = [...rawTx.outputs, changeOutput];
   rawTx.outputsData = [...rawTx.outputsData, '0x'];
 
